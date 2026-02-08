@@ -97,3 +97,51 @@ export const getScheduleByDay = query({
       .collect();
   },
 });
+
+export const bulkImportSchedule = mutation({
+  args: {
+    userId: v.id("users"),
+    clearExisting: v.optional(v.boolean()),
+    blocks: v.array(
+      v.object({
+        dayOfWeek: dayOfWeekValidator,
+        startTime: v.string(),
+        endTime: v.string(),
+        activity: v.string(),
+        notes: v.optional(v.string()),
+        color: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    // Optionally clear existing schedule
+    if (args.clearExisting) {
+      const existing = await ctx.db
+        .query("weeklySchedule")
+        .withIndex("by_user_and_day", (q) => q.eq("userId", args.userId))
+        .collect();
+      
+      for (const block of existing) {
+        await ctx.db.delete(block._id);
+      }
+    }
+
+    // Insert all new blocks
+    const insertedIds = [];
+    for (const block of args.blocks) {
+      const id = await ctx.db.insert("weeklySchedule", {
+        userId: args.userId,
+        dayOfWeek: block.dayOfWeek,
+        startTime: block.startTime,
+        endTime: block.endTime,
+        activity: block.activity,
+        notes: block.notes,
+        color: block.color,
+        createdAt: Date.now(),
+      });
+      insertedIds.push(id);
+    }
+
+    return { count: insertedIds.length, ids: insertedIds };
+  },
+});

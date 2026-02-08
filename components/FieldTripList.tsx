@@ -25,6 +25,7 @@ export function FieldTripList({ userId }: FieldTripListProps) {
     notes: "",
   });
   const [expandedId, setExpandedId] = useState<Id<"fieldTrips"> | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const handleAddTrip = async () => {
     if (newTrip.name.trim() && newTrip.location.trim()) {
@@ -38,6 +39,7 @@ export function FieldTripList({ userId }: FieldTripListProps) {
         order,
       });
       setNewTrip({ name: "", location: "", date: "", notes: "" });
+      setShowAddForm(false);
     }
   };
 
@@ -67,35 +69,59 @@ export function FieldTripList({ userId }: FieldTripListProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add Trip Form */}
-        <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
-          <Input
-            placeholder="Field trip name..."
-            value={newTrip.name}
-            onChange={(e) => setNewTrip({ ...newTrip, name: e.target.value })}
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <Input
-              placeholder="Location..."
-              value={newTrip.location}
-              onChange={(e) => setNewTrip({ ...newTrip, location: e.target.value })}
-            />
-            <Input
-              type="date"
-              value={newTrip.date}
-              onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
-            />
-          </div>
-          <Textarea
-            placeholder="Notes (optional)..."
-            value={newTrip.notes}
-            onChange={(e) => setNewTrip({ ...newTrip, notes: e.target.value })}
-            rows={2}
-          />
-          <Button onClick={handleAddTrip} size="sm" className="w-full">
+        {!showAddForm ? (
+          <Button 
+            onClick={() => setShowAddForm(true)} 
+            variant="outline" 
+            size="sm" 
+            className="w-full"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Field Trip
           </Button>
-        </div>
+        ) : (
+          <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+            <Input
+              placeholder="Field trip name..."
+              value={newTrip.name}
+              onChange={(e) => setNewTrip({ ...newTrip, name: e.target.value })}
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Location..."
+                value={newTrip.location}
+                onChange={(e) => setNewTrip({ ...newTrip, location: e.target.value })}
+              />
+              <Input
+                type="date"
+                value={newTrip.date}
+                onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
+              />
+            </div>
+            <Textarea
+              placeholder="Notes (optional)..."
+              value={newTrip.notes}
+              onChange={(e) => setNewTrip({ ...newTrip, notes: e.target.value })}
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <Button onClick={handleAddTrip} size="sm" className="flex-1">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Field Trip
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowAddForm(false);
+                  setNewTrip({ name: "", location: "", date: "", notes: "" });
+                }} 
+                variant="outline" 
+                size="sm"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Trip List */}
         <div className="space-y-2">
