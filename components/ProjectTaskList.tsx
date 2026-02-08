@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, User } from "lucide-react";
+import { Plus, Trash2, User, Calendar, ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ProjectTaskListProps {
   userId: Id<"users">;
@@ -97,9 +98,61 @@ export function ProjectTaskList({
     });
   };
 
+  const handleChangeStatus = async (
+    taskId: Id<"projectTasks">,
+    status: "todo" | "in_progress" | "done"
+  ) => {
+    await updateTask({
+      id: taskId,
+      status,
+    });
+  };
+
+  const handleChangeDueDate = async (
+    taskId: Id<"projectTasks">,
+    dueDate: string
+  ) => {
+    await updateTask({
+      id: taskId,
+      dueDate: dueDate || undefined,
+    });
+  };
+
+  const handleUpdateDescription = async (
+    taskId: Id<"projectTasks">,
+    description: string
+  ) => {
+    await updateTask({
+      id: taskId,
+      description: description || undefined,
+    });
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleAddTask();
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "done":
+        return "bg-green-100 text-green-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "done":
+        return "Completed";
+      case "in_progress":
+        return "In Progress";
+      default:
+        return "Not Started";
     }
   };
 
