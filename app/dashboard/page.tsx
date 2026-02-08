@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -204,49 +205,38 @@ export default function DashboardPage() {
 
         {/* Daily Tab */}
         <TabsContent value="daily" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             {/* Habit Tracker */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Habit Tracker</CardTitle>
-                <CardDescription>Your daily habits</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Habit
-                </Button>
-              </CardContent>
-            </Card>
+            <TaskList
+              title="Habit Tracker"
+              description="Your daily habits"
+            />
 
             {/* 5 to Thrive */}
-            <Card>
-              <CardHeader>
-                <CardTitle>5 to Thrive</CardTitle>
-                <CardDescription>Today's must-dos</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Task
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Reflection/Journal */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Daily Reflection</CardTitle>
-                <CardDescription>Journal & gratitude</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" variant="outline">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Write Entry
-                </Button>
-              </CardContent>
-            </Card>
+            <TaskList
+              title="5 to Thrive"
+              description="Today's must-dos"
+            />
           </div>
+
+          {/* Daily Reflection */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Daily Reflection</CardTitle>
+              <CardDescription>Journal & gratitude</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                placeholder="What are you grateful for today? What did you learn? How did you grow?"
+                rows={6}
+                className="w-full"
+              />
+              <Button className="mt-4">
+                <Edit className="mr-2 h-4 w-4" />
+                Save Entry
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* HTA Tab */}
@@ -268,51 +258,31 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="product" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Product Development</CardTitle>
-                  <CardDescription>Subscription box development & testing</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Task management for product development</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Product Development"
+                description="Subscription box development & testing"
+              />
             </TabsContent>
 
             <TabsContent value="curriculum" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Curriculum Development</CardTitle>
-                  <CardDescription>Activity creation & content</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Curriculum task tracking</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Curriculum Development"
+                description="Activity creation & content"
+              />
             </TabsContent>
 
             <TabsContent value="marketing" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Marketing</CardTitle>
-                  <CardDescription>Brand, content & customer acquisition</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Marketing campaigns & tracking</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Marketing"
+                description="Brand, content & customer acquisition"
+              />
             </TabsContent>
 
             <TabsContent value="operations" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Operations</CardTitle>
-                  <CardDescription>Fulfillment, shipping & systems</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Operations task management</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Operations"
+                description="Fulfillment, shipping & systems"
+              />
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -338,75 +308,45 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="pali" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pali (Region 69)</CardTitle>
-                  <CardDescription>Pacific Palisades programs & coordination</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Pali program management</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Pali (Region 69)"
+                description="Pacific Palisades programs & coordination"
+              />
             </TabsContent>
 
             <TabsContent value="agoura" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Agoura (Region 4)</CardTitle>
-                  <CardDescription>Agoura programs & coordination</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Agoura program management</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Agoura (Region 4)"
+                description="Agoura programs & coordination"
+              />
             </TabsContent>
 
             <TabsContent value="spring" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Spring League</CardTitle>
-                  <CardDescription>Season planning & registration</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Spring League management</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Spring League"
+                description="Season planning & registration"
+              />
             </TabsContent>
 
             <TabsContent value="camps" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Camps</CardTitle>
-                  <CardDescription>Camp planning, scheduling & execution</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Camp management</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="Camps"
+                description="Camp planning, scheduling & execution"
+              />
             </TabsContent>
 
             <TabsContent value="pdp" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>PDP (Player Development Program)</CardTitle>
-                  <CardDescription>Winter training program</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: PDP coordination</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="PDP (Player Development Program)"
+                description="Winter training program"
+              />
             </TabsContent>
 
             <TabsContent value="7v7" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>7v7 Tournaments</CardTitle>
-                  <CardDescription>Tournament organization & logistics</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: 7v7 tournament management</p>
-                </CardContent>
-              </Card>
+              <TaskList
+                title="7v7 Tournaments"
+                description="Tournament organization & logistics"
+              />
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -423,48 +363,28 @@ export default function DashboardPage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Monthly Itinerary */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Itinerary</CardTitle>
-                <CardDescription>This month's schedule</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">Coming soon: Monthly planning calendar</p>
-              </CardContent>
-            </Card>
+            <TaskList
+              title="Monthly Itinerary"
+              description="This month's schedule"
+            />
 
             {/* Field Trips */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Field Trips</CardTitle>
-                <CardDescription>Educational outings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon: Field trip planning</p>
-              </CardContent>
-            </Card>
+            <TaskList
+              title="Upcoming Field Trips"
+              description="Educational outings"
+            />
 
             {/* Learning Outcomes */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Learning Outcomes</CardTitle>
-                <CardDescription>Goals & progress tracking</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon: Learning objectives tracker</p>
-              </CardContent>
-            </Card>
+            <TaskList
+              title="Learning Outcomes"
+              description="Goals & progress tracking"
+            />
 
             {/* Curriculum */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Curriculum</CardTitle>
-                <CardDescription>Current studies & resources</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon: Curriculum management</p>
-              </CardContent>
-            </Card>
+            <TaskList
+              title="Curriculum"
+              description="Current studies & resources"
+            />
           </div>
         </TabsContent>
       </Tabs>
