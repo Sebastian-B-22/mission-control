@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
@@ -7,9 +8,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function DashboardPage() {
   const { user } = useUser();
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [purpose, setPurpose] = useState("");
+  const [yearlyGoals, setYearlyGoals] = useState("");
+  const [needleMovers, setNeedleMovers] = useState("");
   
   // TODO: Get user from Convex by Clerk ID
   // const convexUser = useQuery(api.users.getUserByClerkId, { clerkId: user?.id || "" });
@@ -32,6 +48,24 @@ export default function DashboardPage() {
     "Operational Systems Guru",
     "Program Innovation & Excellence",
   ];
+
+  const handleEditCategory = (category: string) => {
+    setEditingCategory(category);
+    // TODO: Load existing data from Convex
+    setPurpose("");
+    setYearlyGoals("");
+    setNeedleMovers("");
+  };
+
+  const handleSaveCategory = () => {
+    // TODO: Save to Convex
+    console.log("Saving category:", editingCategory, {
+      purpose,
+      yearlyGoals,
+      needleMovers,
+    });
+    setEditingCategory(null);
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -58,7 +92,11 @@ export default function DashboardPage() {
         <TabsContent value="personal" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {personalCategories.map((category) => (
-              <Card key={category} className="hover:shadow-lg transition-shadow cursor-pointer group">
+              <Card 
+                key={category} 
+                className="hover:shadow-lg transition-shadow cursor-pointer group"
+                onClick={() => handleEditCategory(category)}
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -69,6 +107,10 @@ export default function DashboardPage() {
                       variant="ghost" 
                       size="sm" 
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditCategory(category);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -76,6 +118,12 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">Purpose</p>
+                      <p className="text-sm italic text-muted-foreground">
+                        Click to add purpose...
+                      </p>
+                    </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
                       <p className="text-sm italic text-muted-foreground">
@@ -101,7 +149,11 @@ export default function DashboardPage() {
         <TabsContent value="professional" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {professionalCategories.map((category) => (
-              <Card key={category} className="hover:shadow-lg transition-shadow cursor-pointer group">
+              <Card 
+                key={category} 
+                className="hover:shadow-lg transition-shadow cursor-pointer group"
+                onClick={() => handleEditCategory(category)}
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -112,6 +164,10 @@ export default function DashboardPage() {
                       variant="ghost" 
                       size="sm" 
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditCategory(category);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -119,6 +175,12 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">Purpose</p>
+                      <p className="text-sm italic text-muted-foreground">
+                        Click to add purpose...
+                      </p>
+                    </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
                       <p className="text-sm italic text-muted-foreground">
@@ -265,58 +327,84 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <Tabs defaultValue="camps" className="w-full">
+          <Tabs defaultValue="pali" className="w-full">
             <TabsList>
+              <TabsTrigger value="pali">Pali</TabsTrigger>
+              <TabsTrigger value="agoura">Agoura</TabsTrigger>
+              <TabsTrigger value="spring">Spring League</TabsTrigger>
               <TabsTrigger value="camps">Camps</TabsTrigger>
-              <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
-              <TabsTrigger value="leagues">Leagues</TabsTrigger>
-              <TabsTrigger value="coaching">Coach Training</TabsTrigger>
+              <TabsTrigger value="pdp">PDP</TabsTrigger>
+              <TabsTrigger value="7v7">7v7</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="pali" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pali (Region 69)</CardTitle>
+                  <CardDescription>Pacific Palisades programs & coordination</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Coming soon: Pali program management</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="agoura" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Agoura (Region 4)</CardTitle>
+                  <CardDescription>Agoura programs & coordination</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Coming soon: Agoura program management</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="spring" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Spring League</CardTitle>
+                  <CardDescription>Season planning & registration</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Coming soon: Spring League management</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             <TabsContent value="camps" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Soccer Camps</CardTitle>
-                  <CardDescription>Planning, scheduling & execution</CardDescription>
+                  <CardTitle>Camps</CardTitle>
+                  <CardDescription>Camp planning, scheduling & execution</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Camp management & scheduling</p>
+                  <p className="text-sm text-muted-foreground">Coming soon: Camp management</p>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="tournaments" className="space-y-4">
+            <TabsContent value="pdp" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Tournaments</CardTitle>
-                  <CardDescription>Organization & logistics</CardDescription>
+                  <CardTitle>PDP (Player Development Program)</CardTitle>
+                  <CardDescription>Winter training program</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Tournament planning tools</p>
+                  <p className="text-sm text-muted-foreground">Coming soon: PDP coordination</p>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="leagues" className="space-y-4">
+            <TabsContent value="7v7" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Leagues</CardTitle>
-                  <CardDescription>Season planning & coordination</CardDescription>
+                  <CardTitle>7v7 Tournaments</CardTitle>
+                  <CardDescription>Tournament organization & logistics</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: League management</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="coaching" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Coach Training</CardTitle>
-                  <CardDescription>Development & education programs</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Coming soon: Coach training coordination</p>
+                  <p className="text-sm text-muted-foreground">Coming soon: 7v7 tournament management</p>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -380,6 +468,64 @@ export default function DashboardPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={!!editingCategory} onOpenChange={() => setEditingCategory(null)}>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Edit {editingCategory}</DialogTitle>
+            <DialogDescription>
+              Update your RPM (Results, Purpose, Massive Action Plan) for this category
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="purpose">
+                Purpose (Why is this important?)
+              </Label>
+              <Textarea
+                id="purpose"
+                placeholder="What's your deeper purpose for this area of your life?"
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="goals">
+                Yearly Goals (What results do you want?)
+              </Label>
+              <Textarea
+                id="goals"
+                placeholder="List your specific, measurable goals for this year..."
+                value={yearlyGoals}
+                onChange={(e) => setYearlyGoals(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="needle-movers">
+                Monthly Needle Movers (What actions will create the biggest impact?)
+              </Label>
+              <Textarea
+                id="needle-movers"
+                placeholder="What are the 3-5 most important actions this month?"
+                value={needleMovers}
+                onChange={(e) => setNeedleMovers(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingCategory(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveCategory}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
