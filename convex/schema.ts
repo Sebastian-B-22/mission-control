@@ -13,10 +13,81 @@ export default defineSchema({
     userId: v.id("users"),
     name: v.string(),
     type: v.union(v.literal("personal"), v.literal("professional")),
+    purpose: v.optional(v.string()),
     yearlyGoals: v.array(v.string()),
     monthlyFocus: v.array(v.string()),
     order: v.number(),
   }).index("by_user", ["userId"]),
+
+  teamMembers: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    role: v.optional(v.string()),
+    active: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  habitTemplates: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    active: v.boolean(),
+    order: v.number(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  dailyHabits: defineTable({
+    userId: v.id("users"),
+    habitTemplateId: v.id("habitTemplates"),
+    date: v.string(), // YYYY-MM-DD format
+    completed: v.boolean(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user_and_date", ["userId", "date"])
+    .index("by_template", ["habitTemplateId"]),
+
+  projectTasks: defineTable({
+    userId: v.id("users"),
+    project: v.union(v.literal("hta"), v.literal("aspire"), v.literal("homeschool")),
+    subProject: v.string(),
+    title: v.string(),
+    description: v.optional(v.string()),
+    assignedToId: v.optional(v.id("teamMembers")),
+    status: v.union(
+      v.literal("todo"),
+      v.literal("in_progress"),
+      v.literal("done")
+    ),
+    dueDate: v.optional(v.string()), // YYYY-MM-DD format
+    priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    order: v.number(),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_project", ["project", "subProject"])
+    .index("by_assignedTo", ["assignedToId"]),
+
+  fiveToThrive: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    tasks: v.array(
+      v.object({
+        text: v.string(),
+        completed: v.boolean(),
+        completedAt: v.optional(v.number()),
+      })
+    ),
+    createdAt: v.number(),
+  }).index("by_user_and_date", ["userId", "date"]),
+
+  dailyReflections: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    content: v.string(),
+    createdAt: v.number(),
+  }).index("by_user_and_date", ["userId", "date"]),
 
   dailyCheckIns: defineTable({
     userId: v.id("users"),

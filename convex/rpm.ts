@@ -6,6 +6,7 @@ export const createCategory = mutation({
     userId: v.id("users"),
     name: v.string(),
     type: v.union(v.literal("personal"), v.literal("professional")),
+    purpose: v.optional(v.string()),
     yearlyGoals: v.array(v.string()),
     monthlyFocus: v.array(v.string()),
     order: v.number(),
@@ -18,6 +19,7 @@ export const createCategory = mutation({
 export const updateCategory = mutation({
   args: {
     id: v.id("rpmCategories"),
+    purpose: v.optional(v.string()),
     yearlyGoals: v.optional(v.array(v.string())),
     monthlyFocus: v.optional(v.array(v.string())),
   },
