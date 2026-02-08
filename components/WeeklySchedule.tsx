@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface WeeklyScheduleProps {
   userId: Id<"users">;
@@ -49,6 +50,7 @@ export function WeeklySchedule({ userId }: WeeklyScheduleProps) {
 
   const [isAddingBlock, setIsAddingBlock] = useState(false);
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>("monday");
+  const [activeDay, setActiveDay] = useState<DayOfWeek>("monday");
   const [newBlock, setNewBlock] = useState({
     startTime: "09:00",
     endTime: "10:00",
@@ -118,53 +120,58 @@ export function WeeklySchedule({ userId }: WeeklyScheduleProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <Tabs defaultValue="monday" className="w-full">
+            <TabsList className="grid w-full grid-cols-7 mb-4">
+              {DAYS.map((day) => (
+                <TabsTrigger key={day.key} value={day.key}>
+                  {day.label.slice(0, 3)}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
             {DAYS.map((day) => (
-              <div key={day.key} className="border-b pb-4 last:border-b-0">
-                <h3 className="font-semibold text-lg mb-3">{day.label}</h3>
+              <TabsContent key={day.key} value={day.key} className="space-y-2">
                 {schedule[day.key].length === 0 ? (
-                  <p className="text-sm text-muted-foreground italic">
-                    No activities scheduled
+                  <p className="text-sm text-muted-foreground italic text-center py-8">
+                    No activities scheduled for {day.label}
                   </p>
                 ) : (
-                  <div className="space-y-2">
-                    {schedule[day.key].map((block: any) => (
-                      <div
-                        key={block._id}
-                        className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
-                      >
-                        <Clock className="h-4 w-4 mt-1 text-muted-foreground" />
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">
-                              {formatTime(block.startTime)} - {formatTime(block.endTime)}
-                            </span>
-                            <span className="text-sm">•</span>
-                            <span className="text-sm font-semibold">
-                              {block.activity}
-                            </span>
-                          </div>
-                          {block.notes && (
-                            <p className="text-xs text-muted-foreground">
-                              {block.notes}
-                            </p>
-                          )}
+                  schedule[day.key].map((block: any) => (
+                    <div
+                      key={block._id}
+                      className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
+                    >
+                      <Clock className="h-4 w-4 mt-1 text-muted-foreground" />
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">
+                            {formatTime(block.startTime)} - {formatTime(block.endTime)}
+                          </span>
+                          <span className="text-sm">•</span>
+                          <span className="text-sm font-semibold">
+                            {block.activity}
+                          </span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteBlock(block._id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        {block.notes && (
+                          <p className="text-xs text-muted-foreground">
+                            {block.notes}
+                          </p>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteBlock(block._id)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))
                 )}
-              </div>
+              </TabsContent>
             ))}
-          </div>
+          </Tabs>
         </CardContent>
       </Card>
 
