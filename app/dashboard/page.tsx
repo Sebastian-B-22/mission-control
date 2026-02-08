@@ -46,7 +46,8 @@ export default function DashboardPage() {
         name: user.fullName || user.firstName || "User",
       });
     }
-  }, [user, convexUser, createUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, convexUser]);
 
   // Get RPM categories
   const categories = useQuery(
