@@ -89,6 +89,23 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user_and_date", ["userId", "date"]),
 
+  fieldTrips: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    location: v.string(),
+    date: v.optional(v.string()), // YYYY-MM-DD format
+    notes: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  monthlyItinerary: defineTable({
+    userId: v.id("users"),
+    month: v.string(), // YYYY-MM format
+    content: v.string(),
+    updatedAt: v.number(),
+  }).index("by_user_and_month", ["userId", "month"]),
+
   dailyCheckIns: defineTable({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format

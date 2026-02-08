@@ -450,43 +450,79 @@ export default function DashboardPage() {
             </TabsContent>
 
             <TabsContent value="spring" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="aspire"
-                subProject="spring"
-                title="Spring League"
-                description="Season planning & registration"
-              />
+              <div className="grid gap-6 md:grid-cols-2">
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="spring-agoura"
+                  title="Agoura Spring League"
+                  description="Region 4 season planning & registration"
+                />
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="spring-pali"
+                  title="Pali Spring League"
+                  description="Region 69 season planning & registration"
+                />
+              </div>
             </TabsContent>
 
             <TabsContent value="camps" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="aspire"
-                subProject="camps"
-                title="Camps"
-                description="Camp planning, scheduling & execution"
-              />
+              <div className="grid gap-6 md:grid-cols-2">
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="camps-agoura"
+                  title="Agoura Camps"
+                  description="Region 4 camp planning & execution"
+                />
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="camps-pali"
+                  title="Pali Camps"
+                  description="Region 69 camp planning & execution"
+                />
+              </div>
             </TabsContent>
 
             <TabsContent value="pdp" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="aspire"
-                subProject="pdp"
-                title="PDP (Player Development Program)"
-                description="Winter training program"
-              />
+              <div className="grid gap-6 md:grid-cols-2">
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="pdp-agoura"
+                  title="Agoura PDP"
+                  description="Region 4 winter training program"
+                />
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="pdp-pali"
+                  title="Pali PDP"
+                  description="Region 69 winter training program"
+                />
+              </div>
             </TabsContent>
 
             <TabsContent value="7v7" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="aspire"
-                subProject="7v7"
-                title="7v7 Tournaments"
-                description="Tournament organization & logistics"
-              />
+              <div className="grid gap-6 md:grid-cols-2">
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="7v7-agoura"
+                  title="Agoura 7v7 Tournaments"
+                  description="Region 4 tournament organization"
+                />
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="aspire"
+                  subProject="7v7-pali"
+                  title="Pali 7v7 Tournaments"
+                  description="Region 69 tournament organization"
+                />
+              </div>
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -499,10 +535,10 @@ export default function DashboardPage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Monthly Itinerary */}
-            <MonthlyItinerary />
+            <MonthlyItinerary userId={convexUser._id} />
 
             {/* Field Trips */}
-            <FieldTripList />
+            <FieldTripList userId={convexUser._id} />
 
             {/* Learning Outcomes */}
             <ProjectTaskList

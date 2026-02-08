@@ -1,46 +1,63 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, MapPin, Calendar } from "lucide-react";
 
-interface FieldTrip {
-  id: string;
-  name: string;
-  location: string;
-  date: string;
-  notes: string;
+interface FieldTripListProps {
+  userId: Id<"users">;
 }
 
-export function FieldTripList() {
-  const [trips, setTrips] = useState<FieldTrip[]>([]);
+export function FieldTripList({ userId }: FieldTripListProps) {
+  const trips = useQuery(api.fieldTrips.getFieldTrips, { userId });
+  const createTrip = useMutation(api.fieldTrips.createFieldTrip);
+  const deleteTrip = useMutation(api.fieldTrips.deleteFieldTrip);
   const [newTrip, setNewTrip] = useState({
     name: "",
     location: "",
     date: "",
     notes: "",
   });
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<Id<"fieldTrips"> | null>(null);
 
-  const handleAddTrip = () => {
+  const handleAddTrip = async () => {
     if (newTrip.name.trim() && newTrip.location.trim()) {
-      setTrips([
-        ...trips,
-        {
-          id: Date.now().toString(),
-          ...newTrip,
-        },
-      ]);
+      const order = trips ? trips.length : 0;
+      await createTrip({
+        userId,
+        name: newTrip.name,
+        location: newTrip.location,
+        date: newTrip.date || undefined,
+        notes: newTrip.notes || undefined,
+        order,
+      });
       setNewTrip({ name: "", location: "", date: "", notes: "" });
     }
   };
 
-  const handleDeleteTrip = (id: string) => {
-    setTrips(trips.filter((trip) => trip.id !== id));
+  const handleDeleteTrip = async (id: Id<"fieldTrips">) => {
+    await deleteTrip({ id });
   };
+
+  if (!trips) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Upcoming Field Trips</CardTitle>
+          <CardDescription>Educational outings & adventures</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -89,7 +106,7 @@ export function FieldTripList() {
           ) : (
             trips.map((trip) => (
               <div
-                key={trip.id}
+                key={trip._id}
                 className="border rounded-lg p-3 hover:bg-accent/50 transition-colors group"
               >
                 <div className="flex items-start justify-between">
@@ -109,7 +126,7 @@ export function FieldTripList() {
                     </div>
                     {trip.notes && (
                       <div className="mt-2">
-                        {expandedId === trip.id ? (
+                        {expandedId === trip._id ? (
                           <div className="space-y-2">
                             <p className="text-sm text-muted-foreground">{trip.notes}</p>
                             <Button
@@ -125,7 +142,7 @@ export function FieldTripList() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setExpandedId(trip.id)}
+                            onClick={() => setExpandedId(trip._id)}
                             className="text-xs"
                           >
                             View notes
@@ -137,7 +154,7 @@ export function FieldTripList() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDeleteTrip(trip.id)}
+                    onClick={() => handleDeleteTrip(trip._id)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />

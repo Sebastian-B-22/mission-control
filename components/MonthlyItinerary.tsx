@@ -1,17 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Save } from "lucide-react";
 
-export function MonthlyItinerary() {
+interface MonthlyItineraryProps {
+  userId: Id<"users">;
+}
+
+export function MonthlyItinerary({ userId }: MonthlyItineraryProps) {
+  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const currentMonthDisplay = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  
+  const itinerary = useQuery(api.fieldTrips.getMonthlyItinerary, { userId, month: currentMonth });
+  const saveItinerary = useMutation(api.fieldTrips.saveMonthlyItinerary);
+  
   const [content, setContent] = useState("");
   const [isSaved, setIsSaved] = useState(true);
 
-  const handleSave = () => {
-    // TODO: Save to Convex
+  useEffect(() => {
+    if (itinerary) {
+      setContent(itinerary.content);
+      setIsSaved(true);
+    }
+  }, [itinerary]);
+
+  const handleSave = async () => {
+    await saveItinerary({
+      userId,
+      month: currentMonth,
+      content,
+    });
     setIsSaved(true);
   };
 
@@ -19,8 +43,6 @@ export function MonthlyItinerary() {
     setContent(value);
     setIsSaved(false);
   };
-
-  const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
     <Card>
@@ -30,7 +52,7 @@ export function MonthlyItinerary() {
             <Calendar className="h-5 w-5 text-primary" />
             <div>
               <CardTitle>Monthly Itinerary</CardTitle>
-              <CardDescription>{currentMonth}</CardDescription>
+              <CardDescription>{currentMonthDisplay}</CardDescription>
             </div>
           </div>
           <Button onClick={handleSave} disabled={isSaved} size="sm">

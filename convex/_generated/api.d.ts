@@ -11,6 +11,7 @@
 import type * as admin from "../admin.js";
 import type * as checkIns from "../checkIns.js";
 import type * as daily from "../daily.js";
+import type * as fieldTrips from "../fieldTrips.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
 import type * as projectTasks from "../projectTasks.js";
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   checkIns: typeof checkIns;
   daily: typeof daily;
+  fieldTrips: typeof fieldTrips;
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
   projectTasks: typeof projectTasks;
