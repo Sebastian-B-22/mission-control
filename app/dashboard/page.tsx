@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { HabitTracker } from "@/components/HabitTracker";
+import { FiveToThrive } from "@/components/FiveToThrive";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -312,10 +313,7 @@ export default function DashboardPage() {
             <HabitTracker userId={convexUser._id} date={today} />
 
             {/* 5 to Thrive */}
-            <TaskList
-              title="5 to Thrive"
-              description="Today's must-dos"
-            />
+            <FiveToThrive userId={convexUser._id} date={today} />
           </div>
 
           {/* Daily Reflection */}

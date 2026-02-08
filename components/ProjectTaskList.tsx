@@ -96,7 +96,7 @@ export function ProjectTaskList({
     }
   };
 
-  if (!tasks || !teamMembers) {
+  if (tasks === undefined || teamMembers === undefined) {
     return (
       <Card>
         <CardHeader>
