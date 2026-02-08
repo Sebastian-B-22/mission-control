@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
 import type * as checkIns from "../checkIns.js";
 import type * as daily from "../daily.js";
 import type * as habitTemplates from "../habitTemplates.js";
@@ -24,6 +25,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   checkIns: typeof checkIns;
   daily: typeof daily;
   habitTemplates: typeof habitTemplates;

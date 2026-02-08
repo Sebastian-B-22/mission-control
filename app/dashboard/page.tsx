@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { HabitTracker } from "@/components/HabitTracker";
 import { FiveToThrive } from "@/components/FiveToThrive";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -38,6 +39,13 @@ export default function DashboardPage() {
   );
   const createUser = useMutation(api.users.createUser);
 
+  // Check user setup
+  const userSetup = useQuery(
+    api.admin.checkUserSetup,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+  const manuallyInitialize = useMutation(api.admin.manuallyInitializeUser);
+
   // Auto-create user if doesn't exist
   useEffect(() => {
     if (user && convexUser === null) {
@@ -49,6 +57,15 @@ export default function DashboardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, convexUser]);
+
+  // Auto-initialize if missing team members
+  useEffect(() => {
+    if (user && userSetup && userSetup.exists && userSetup.teamMembersCount === 0) {
+      console.log("Initializing user data...");
+      manuallyInitialize({ clerkId: user.id });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, userSetup]);
 
   // Get RPM categories
   const categories = useQuery(
@@ -351,13 +368,15 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="product" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="hta"
-                subProject="product"
-                title="Product Development"
-                description="Subscription box development & testing"
-              />
+              <ErrorBoundary>
+                <ProjectTaskList
+                  userId={convexUser._id}
+                  project="hta"
+                  subProject="product"
+                  title="Product Development"
+                  description="Subscription box development & testing"
+                />
+              </ErrorBoundary>
             </TabsContent>
 
             <TabsContent value="curriculum" className="space-y-4">
