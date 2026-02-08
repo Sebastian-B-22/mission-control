@@ -18,6 +18,7 @@ import type * as projectTasks from "../projectTasks.js";
 import type * as rpm from "../rpm.js";
 import type * as teamMembers from "../teamMembers.js";
 import type * as users from "../users.js";
+import type * as weeklySchedule from "../weeklySchedule.js";
 
 import type {
   ApiFromModules,
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   rpm: typeof rpm;
   teamMembers: typeof teamMembers;
   users: typeof users;
+  weeklySchedule: typeof weeklySchedule;
 }>;
 
 /**

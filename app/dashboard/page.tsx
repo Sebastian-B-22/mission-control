@@ -25,6 +25,7 @@ import { FiveToThrive } from "@/components/FiveToThrive";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FieldTripList } from "@/components/FieldTripList";
 import { MonthlyItinerary } from "@/components/MonthlyItinerary";
+import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -533,6 +534,10 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold">A & R Academy</h2>
           </div>
 
+          {/* Weekly Schedule - Full Width */}
+          <WeeklySchedule userId={convexUser._id} />
+
+          {/* Monthly Overview & Other Sections */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Monthly Itinerary */}
             <MonthlyItinerary userId={convexUser._id} />

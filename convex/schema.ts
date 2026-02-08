@@ -106,6 +106,25 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_user_and_month", ["userId", "month"]),
 
+  weeklySchedule: defineTable({
+    userId: v.id("users"),
+    dayOfWeek: v.union(
+      v.literal("monday"),
+      v.literal("tuesday"),
+      v.literal("wednesday"),
+      v.literal("thursday"),
+      v.literal("friday"),
+      v.literal("saturday"),
+      v.literal("sunday")
+    ),
+    startTime: v.string(), // HH:MM format (24-hour)
+    endTime: v.string(), // HH:MM format (24-hour)
+    activity: v.string(),
+    notes: v.optional(v.string()),
+    color: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_user_and_day", ["userId", "dayOfWeek"]),
+
   dailyCheckIns: defineTable({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format
