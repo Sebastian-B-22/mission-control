@@ -35,6 +35,8 @@ export default function DashboardPage() {
   const [purpose, setPurpose] = useState("");
   const [yearlyGoals, setYearlyGoals] = useState("");
   const [needleMovers, setNeedleMovers] = useState("");
+  const [importingSchedule, setImportingSchedule] = useState(false);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
   
   // Get or create user in Convex
   const convexUser = useQuery(
@@ -78,6 +80,7 @@ export default function DashboardPage() {
   );
 
   const updateCategory = useMutation(api.rpm.updateCategory);
+  const importSchedule = useMutation(api.admin.importWeeklySchedule);
 
   // Get today's date
   const today = new Date().toISOString().split("T")[0];
@@ -115,6 +118,25 @@ export default function DashboardPage() {
     setPurpose("");
     setYearlyGoals("");
     setNeedleMovers("");
+  };
+
+  const handleImportSchedule = async () => {
+    if (!user) return;
+    
+    setImportingSchedule(true);
+    setImportMessage(null);
+
+    try {
+      const result = await importSchedule({
+        clerkId: user.id,
+        clearExisting: true,
+      });
+      setImportMessage(result.message || "Schedule imported successfully!");
+    } catch (error: any) {
+      setImportMessage("Error: " + (error.message || "Failed to import schedule"));
+    } finally {
+      setImportingSchedule(false);
+    }
   };
 
   const editingCategory = categories?.find((c) => c._id === editingCategoryId);
@@ -516,8 +538,28 @@ export default function DashboardPage() {
         {/* Homeschool Tab */}
         <TabsContent value="homeschool" className="space-y-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">A & R Academy</h2>
+            <div>
+              <h2 className="text-2xl font-bold">A & R Academy</h2>
+            </div>
+            <Button 
+              onClick={handleImportSchedule}
+              disabled={importingSchedule}
+              variant="outline"
+              size="sm"
+            >
+              {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
+            </Button>
           </div>
+
+          {importMessage && (
+            <div className={`p-3 rounded-lg text-sm ${
+              importMessage.startsWith("Error") 
+                ? "bg-red-50 text-red-800 border border-red-200" 
+                : "bg-green-50 text-green-800 border border-green-200"
+            }`}>
+              {importMessage}
+            </div>
+          )}
 
           {/* Weekly Schedule - Full Width */}
           <WeeklySchedule userId={convexUser._id} />
