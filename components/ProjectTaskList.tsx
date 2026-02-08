@@ -33,7 +33,7 @@ export function ProjectTaskList({
   description,
 }: ProjectTaskListProps) {
   const [newTask, setNewTask] = useState("");
-  const [newTaskAssignee, setNewTaskAssignee] = useState<string>("");
+  const [newTaskAssignee, setNewTaskAssignee] = useState<string>("unassigned");
 
   // Queries
   const tasks = useQuery(api.projectTasks.getTasksByProject, {
@@ -56,7 +56,7 @@ export function ProjectTaskList({
         project,
         subProject,
         title: newTask,
-        assignedToId: newTaskAssignee
+        assignedToId: newTaskAssignee !== "unassigned"
           ? (newTaskAssignee as Id<"teamMembers">)
           : undefined,
         status: "todo",
@@ -64,7 +64,7 @@ export function ProjectTaskList({
         order,
       });
       setNewTask("");
-      setNewTaskAssignee("");
+      setNewTaskAssignee("unassigned");
     }
   };
 
@@ -86,7 +86,7 @@ export function ProjectTaskList({
   ) => {
     await updateTask({
       id: taskId,
-      assignedToId: assignedToId ? (assignedToId as Id<"teamMembers">) : undefined,
+      assignedToId: assignedToId !== "unassigned" ? (assignedToId as Id<"teamMembers">) : undefined,
     });
   };
 
@@ -135,7 +135,7 @@ export function ProjectTaskList({
                 <SelectValue placeholder="Assign to..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Unassigned</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
                 {teamMembers.map((member) => (
                   <SelectItem key={member._id} value={member._id}>
                     {member.name}
@@ -177,14 +177,14 @@ export function ProjectTaskList({
                 )}
               </div>
               <Select
-                value={task.assignedToId || ""}
+                value={task.assignedToId || "unassigned"}
                 onValueChange={(value) => handleChangeAssignee(task._id, value)}
               >
                 <SelectTrigger className="w-[100px] h-8 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                   <SelectValue placeholder="Assign" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Unassigned</SelectItem>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
                   {teamMembers.map((member) => (
                     <SelectItem key={member._id} value={member._id}>
                       {member.name}
