@@ -34,6 +34,9 @@ yarn-error.log*
 .env
 .env.production
 
+# credentials
+.credentials
+
 # vercel
 .vercel
 
