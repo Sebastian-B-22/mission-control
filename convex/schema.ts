@@ -85,7 +85,10 @@ export default defineSchema({
   dailyReflections: defineTable({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format
-    content: v.string(),
+    morningExcited: v.optional(v.string()),
+    morningSurprise: v.optional(v.string()),
+    eveningAppreciated: v.optional(v.string()),
+    eveningLearned: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_user_and_date", ["userId", "date"]),
 

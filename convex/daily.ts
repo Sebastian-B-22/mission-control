@@ -82,7 +82,10 @@ export const saveDailyReflection = mutation({
   args: {
     userId: v.id("users"),
     date: v.string(),
-    content: v.string(),
+    morningExcited: v.optional(v.string()),
+    morningSurprise: v.optional(v.string()),
+    eveningAppreciated: v.optional(v.string()),
+    eveningLearned: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // Check if reflection already exists for this date
@@ -93,17 +96,22 @@ export const saveDailyReflection = mutation({
       )
       .first();
 
+    const updates = {
+      morningExcited: args.morningExcited,
+      morningSurprise: args.morningSurprise,
+      eveningAppreciated: args.eveningAppreciated,
+      eveningLearned: args.eveningLearned,
+    };
+
     if (existing) {
-      await ctx.db.patch(existing._id, {
-        content: args.content,
-      });
+      await ctx.db.patch(existing._id, updates);
       return existing._id;
     }
 
     return await ctx.db.insert("dailyReflections", {
       userId: args.userId,
       date: args.date,
-      content: args.content,
+      ...updates,
       createdAt: Date.now(),
     });
   },

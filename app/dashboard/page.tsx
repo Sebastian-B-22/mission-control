@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { HabitTracker } from "@/components/HabitTracker";
 import { FiveToThrive } from "@/components/FiveToThrive";
+import { JournalPrompts } from "@/components/JournalPrompts";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FieldTripList } from "@/components/FieldTripList";
 import { MonthlyItinerary } from "@/components/MonthlyItinerary";
@@ -336,24 +337,8 @@ export default function DashboardPage() {
             <FiveToThrive userId={convexUser._id} date={today} />
           </div>
 
-          {/* Daily Reflection */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Daily Reflection</CardTitle>
-              <CardDescription>Journal & gratitude</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="What are you grateful for today? What did you learn? How did you grow?"
-                rows={6}
-                className="w-full"
-              />
-              <Button className="mt-4">
-                <Edit className="mr-2 h-4 w-4" />
-                Save Entry
-              </Button>
-            </CardContent>
-          </Card>
+          {/* Morning Mindset & Evening Reflection */}
+          <JournalPrompts userId={convexUser._id} date={today} />
         </TabsContent>
 
         {/* HTA Tab */}
