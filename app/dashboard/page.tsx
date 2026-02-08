@@ -23,6 +23,8 @@ import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { HabitTracker } from "@/components/HabitTracker";
 import { FiveToThrive } from "@/components/FiveToThrive";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { FieldTripList } from "@/components/FieldTripList";
+import { MonthlyItinerary } from "@/components/MonthlyItinerary";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -497,22 +499,10 @@ export default function DashboardPage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Monthly Itinerary */}
-            <ProjectTaskList
-              userId={convexUser._id}
-              project="homeschool"
-              subProject="itinerary"
-              title="Monthly Itinerary"
-              description="This month's schedule"
-            />
+            <MonthlyItinerary />
 
             {/* Field Trips */}
-            <ProjectTaskList
-              userId={convexUser._id}
-              project="homeschool"
-              subProject="fieldtrips"
-              title="Upcoming Field Trips"
-              description="Educational outings"
-            />
+            <FieldTripList />
 
             {/* Learning Outcomes */}
             <ProjectTaskList
@@ -521,6 +511,7 @@ export default function DashboardPage() {
               subProject="outcomes"
               title="Learning Outcomes"
               description="Goals & progress tracking"
+              showAssignments={false}
             />
 
             {/* Curriculum */}
@@ -530,6 +521,7 @@ export default function DashboardPage() {
               subProject="curriculum"
               title="Curriculum"
               description="Current studies & resources"
+              showAssignments={false}
             />
           </div>
         </TabsContent>

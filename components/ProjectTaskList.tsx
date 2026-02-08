@@ -23,6 +23,9 @@ interface ProjectTaskListProps {
   subProject: string;
   title: string;
   description: string;
+  showAssignments?: boolean;
+  showStatus?: boolean;
+  showDueDate?: boolean;
 }
 
 export function ProjectTaskList({
@@ -31,9 +34,13 @@ export function ProjectTaskList({
   subProject,
   title,
   description,
+  showAssignments = true,
+  showStatus = true,
+  showDueDate = true,
 }: ProjectTaskListProps) {
   const [newTask, setNewTask] = useState("");
   const [newTaskAssignee, setNewTaskAssignee] = useState<string>("unassigned");
+  const [expandedTaskId, setExpandedTaskId] = useState<Id<"projectTasks"> | null>(null);
 
   // Queries
   const tasks = useQuery(api.projectTasks.getTasksByProject, {
@@ -130,19 +137,21 @@ export function ProjectTaskList({
               onKeyPress={handleKeyPress}
               className="flex-1"
             />
-            <Select value={newTaskAssignee} onValueChange={setNewTaskAssignee}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Assign to..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="unassigned">Unassigned</SelectItem>
-                {teamMembers.map((member) => (
-                  <SelectItem key={member._id} value={member._id}>
-                    {member.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {showAssignments && (
+              <Select value={newTaskAssignee} onValueChange={setNewTaskAssignee}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Assign to..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  {teamMembers.map((member) => (
+                    <SelectItem key={member._id} value={member._id}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Button onClick={handleAddTask} size="sm">
               <Plus className="h-4 w-4 mr-1" />
               Add
@@ -169,29 +178,31 @@ export function ProjectTaskList({
               />
               <div className="flex-1 space-y-1">
                 <span className="block">{task.title}</span>
-                {task.assignedTo && (
+                {showAssignments && task.assignedTo && (
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <User className="h-3 w-3" />
                     <span>{task.assignedTo.name}</span>
                   </div>
                 )}
               </div>
-              <Select
-                value={task.assignedToId || "unassigned"}
-                onValueChange={(value) => handleChangeAssignee(task._id, value)}
-              >
-                <SelectTrigger className="w-[100px] h-8 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                  <SelectValue placeholder="Assign" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
-                  {teamMembers.map((member) => (
-                    <SelectItem key={member._id} value={member._id}>
-                      {member.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {showAssignments && (
+                <Select
+                  value={task.assignedToId || "unassigned"}
+                  onValueChange={(value) => handleChangeAssignee(task._id, value)}
+                >
+                  <SelectTrigger className="w-[100px] h-8 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                    <SelectValue placeholder="Assign" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    {teamMembers.map((member) => (
+                      <SelectItem key={member._id} value={member._id}>
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
