@@ -133,12 +133,14 @@ export const initializeDefaultHabitTemplates = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const defaultHabits = [
-      { name: "Morning meditation/prayer", icon: "🧘", order: 0 },
-      { name: "Exercise (30+ min)", icon: "💪", order: 1 },
-      { name: "Healthy meals", icon: "🥗", order: 2 },
-      { name: "Family quality time", icon: "👨‍👩‍👧‍👦", order: 3 },
-      { name: "Learning/reading", icon: "📚", order: 4 },
-      { name: "Gratitude practice", icon: "🙏", order: 5 },
+      { name: "Morning light", icon: "☀️", order: 0 },
+      { name: "Redlight/meditation", icon: "🧘", order: 1 },
+      { name: "Workout before 8am", icon: "💪", order: 2 },
+      { name: "Take all supplements", icon: "💊", order: 3 },
+      { name: "Ice bath", icon: "🧊", order: 4 },
+      { name: "Sauna", icon: "🔥", order: 5 },
+      { name: "Screens off by 9:30 pm", icon: "📱", order: 6 },
+      { name: "Sleep 7.5 hours", icon: "😴", order: 7 },
     ];
 
     for (const habit of defaultHabits) {
