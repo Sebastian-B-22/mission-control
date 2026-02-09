@@ -8,7 +8,8 @@ const objectives = [
   "Growth mindset",
   "Emotional mastery",
   "Healthy habits & routines",
-  "Engaged experiential learning",
+  "Learn by doing",
+  "Cultivate creativity & wonder",
 ];
 
 export function HomeschoolObjectives() {
