@@ -596,13 +596,13 @@ export default function DashboardPage() {
             {/* Right Column */}
             <div className="space-y-6">
               <ReadAloudList />
-              <FieldTripList userId={convexUser._id} />
+              <TripsOnHorizon />
             </div>
           </div>
 
-          {/* Additional Resources - Bottom Section */}
+          {/* Long Lists - Bottom Section */}
           <div className="grid gap-6 md:grid-cols-2">
-            <TripsOnHorizon />
+            <FieldTripList userId={convexUser._id} />
             <BookLibrary />
           </div>
         </TabsContent>
