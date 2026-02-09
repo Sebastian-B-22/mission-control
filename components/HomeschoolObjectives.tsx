@@ -15,17 +15,17 @@ const objectives = [
 export function HomeschoolObjectives() {
   return (
     <Card className="border-amber-200 bg-amber-50/50">
-      <CardContent className="py-3">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-amber-700 font-semibold whitespace-nowrap">
+      <CardContent className="py-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-amber-700 font-semibold">
             <Target className="h-4 w-4" />
             <span>Objectives:</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 justify-center">
             {objectives.map((obj, i) => (
               <span
                 key={i}
-                className="px-3 py-1 bg-white border border-amber-200 rounded-full text-sm text-amber-900"
+                className="px-4 py-1.5 bg-white border border-amber-200 rounded-full text-sm text-amber-900 font-medium"
               >
                 {obj}
               </span>
