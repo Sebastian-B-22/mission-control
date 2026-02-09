@@ -256,7 +256,7 @@ export default function DashboardPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Purpose</p>
+                      <p className="text-sm font-bold text-muted-foreground mb-1">Purpose</p>
                       {category.purpose ? (
                         <p className="text-sm">{category.purpose}</p>
                       ) : (
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                      <p className="text-sm font-bold text-muted-foreground mb-1">
                         Monthly Needle Movers
                       </p>
                       {category.monthlyFocus.length > 0 ? (
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
+                      <p className="text-sm font-bold text-muted-foreground mb-1">Yearly Goals</p>
                       {category.yearlyGoals.length > 0 ? (
                         <ul className="text-sm list-disc list-inside space-y-1">
                           {category.yearlyGoals.slice(0, 2).map((goal, i) => (
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Purpose</p>
+                      <p className="text-sm font-bold text-muted-foreground mb-1">Purpose</p>
                       {category.purpose ? (
                         <p className="text-sm">{category.purpose}</p>
                       ) : (
@@ -374,7 +374,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                      <p className="text-sm font-bold text-muted-foreground mb-1">
                         Monthly Needle Movers
                       </p>
                       {category.monthlyFocus.length > 0 ? (
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
+                      <p className="text-sm font-bold text-muted-foreground mb-1">Yearly Goals</p>
                       {category.yearlyGoals.length > 0 ? (
                         <ul className="text-sm list-disc list-inside space-y-1">
                           {category.yearlyGoals.slice(0, 2).map((goal, i) => (
