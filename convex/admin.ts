@@ -291,6 +291,99 @@ export const updateRPMPurposes = mutation({
   },
 });
 
+// Import book library
+export const importBookLibrary = mutation({
+  args: { clerkId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if books already exist
+    const existing = await ctx.db
+      .query("bookLibrary")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+
+    if (existing) {
+      return { success: true, message: "Books already imported", count: 0 };
+    }
+
+    // Your complete book collection
+    const books = [
+      { title: "Abraham Lincoln (DK Biography)", author: "DK", category: "Biography", read: false },
+      { title: "Albert Einstein (DK Biography)", author: "DK", category: "Biography", read: false },
+      { title: "Alexander Hamilton: The Outsider", author: "", category: "Biography", read: false },
+      { title: "All Creatures Great and Small", author: "James Herriot", category: "Health/Science", read: false },
+      { title: "Amelia Earhart (DK Biography)", author: "DK", category: "Biography", read: false },
+      { title: "Ancient Art of Origami", author: "", category: "Other", read: false },
+      { title: "Anne Frank's Diary", author: "Anne Frank", category: "Classic Lit", read: false },
+      { title: "Blood and Guts", author: "Linda Allison", category: "Health/Science", read: false },
+      { title: "Carry On, Mr. Bowditch", author: "Jean Lee Latham", category: "Adventure", read: false },
+      { title: "Ender's Game", author: "Orson Scott Card", category: "Adventure", read: false },
+      { title: "George Washington's Secret Six", author: "", category: "Biography", read: true },
+      { title: "Great Battles for Boys - American Revolution", author: "", category: "History", read: false },
+      { title: "Hana's Suitcase", author: "", category: "History", read: true },
+      { title: "Heidi", author: "Johanna Spyri", category: "Classic Lit", read: false },
+      { title: "How to Teach Children Shakespeare", author: "", category: "Other", read: false },
+      { title: "King Arthur (Classic Starts)", author: "", category: "Classic Lit", read: false },
+      { title: "Leon Garfield's Shakespeare Stories", author: "Leon Garfield", category: "Classic Lit", read: false },
+      { title: "Little Britches: Father and I Were Ranchers", author: "Ralph Moody", category: "Adventure", read: false },
+      { title: "Little Women", author: "Louisa May Alcott", category: "Classic Lit", read: false },
+      { title: "Lord of the Flies", author: "William Golding", category: "Classic Lit", read: false },
+      { title: "Lord of the Rings trilogy", author: "J.R.R. Tolkien", category: "Adventure", read: false },
+      { title: "Marie Antoinette (Who/What Was)", author: "", category: "Biography", read: false },
+      { title: "Miller Moguls series", author: "", category: "Other", read: false },
+      { title: "Nelson Mandela (Who/What Was)", author: "", category: "Biography", read: false },
+      { title: "Once and Future King", author: "T.H. White", category: "Classic Lit", read: false },
+      { title: "Pearl Harbor (Who/What Was)", author: "", category: "History", read: false },
+      { title: "Queen Elizabeth 2 (Who/What Was)", author: "", category: "Biography", read: false },
+      { title: "Robinson Crusoe", author: "Daniel Defoe", category: "Classic Lit", read: false },
+      { title: "See Inside Your Body (Usborne)", author: "Usborne", category: "Health/Science", read: false },
+      { title: "Shane", author: "Jack Schaefer", category: "Classic Lit", read: false },
+      { title: "Story of Doctor Doolittle", author: "Hugh Lofting", category: "Adventure", read: false },
+      { title: "Story of the World Book 1 (Ancient times)", author: "", category: "History", read: false },
+      { title: "The Bronze Bow", author: "Elizabeth George Speare", category: "Classic Lit", read: false },
+      { title: "The Disappearing Spoon", author: "Sam Kean", category: "Health/Science", read: false },
+      { title: "The Door in the Wall", author: "Marguerite de Angeli", category: "Classic Lit", read: false },
+      { title: "The Way We Work", author: "David Macaulay", category: "Health/Science", read: false },
+      { title: "Treasure Island (Classic Starts)", author: "", category: "Adventure", read: false },
+      { title: "Treasury of Egyptian Mythology", author: "", category: "Mythology", read: false },
+      { title: "Treasury of Norse Mythology", author: "", category: "Mythology", read: false },
+      { title: "Tuttle Twins Free Market Rules", author: "", category: "History", read: false },
+      { title: "Tuttle Twins Guide to series", author: "", category: "History", read: false },
+      { title: "Tuttle Twins History Volume 2 (American Revolution)", author: "", category: "History", read: false },
+      { title: "Tuttle Twins History Volume 3 (War of 1812, Civil War)", author: "", category: "History", read: false },
+      { title: "Tuttle Twins Teen Series (Choose Your Consequence)", author: "", category: "History", read: false },
+      { title: "Understood Betsy", author: "Dorothy Canfield Fisher", category: "Classic Lit", read: false },
+      { title: "Who Was Benjamin Franklin?", author: "", category: "Biography", read: false },
+      { title: "Will You Sign Here, John Hancock?", author: "", category: "Biography", read: false },
+      { title: "A Wind in the Door", author: "Madeleine L'Engle", category: "Adventure", read: false },
+      { title: "A Wrinkle in Time", author: "Madeleine L'Engle", category: "Adventure", read: true },
+    ];
+
+    let count = 0;
+    for (const book of books) {
+      await ctx.db.insert("bookLibrary", {
+        userId: user._id,
+        title: book.title,
+        author: book.author || undefined,
+        category: book.category || undefined,
+        read: book.read,
+        createdAt: Date.now(),
+      });
+      count++;
+    }
+
+    return { success: true, message: `Imported ${count} books successfully!`, count };
+  },
+});
+
 // Query to check user setup
 export const checkUserSetup = query({
   args: { clerkId: v.string() },

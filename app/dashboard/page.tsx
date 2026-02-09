@@ -45,6 +45,8 @@ export default function DashboardPage() {
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [updatingPurposes, setUpdatingPurposes] = useState(false);
   const [purposeMessage, setPurposeMessage] = useState<string | null>(null);
+  const [importingBooks, setImportingBooks] = useState(false);
+  const [bookMessage, setBookMessage] = useState<string | null>(null);
   
   // Get or create user in Convex
   const convexUser = useQuery(
@@ -90,6 +92,7 @@ export default function DashboardPage() {
   const updateCategory = useMutation(api.rpm.updateCategory);
   const importSchedule = useMutation(api.admin.importWeeklySchedule);
   const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
+  const importBooks = useMutation(api.admin.importBookLibrary);
 
   // Get today's date
   const today = new Date().toISOString().split("T")[0];
@@ -165,6 +168,25 @@ export default function DashboardPage() {
       setPurposeMessage("Error: " + (error.message || "Failed to update purposes"));
     } finally {
       setUpdatingPurposes(false);
+    }
+  };
+
+  const handleImportBooks = async () => {
+    if (!user) return;
+    
+    setImportingBooks(true);
+    setBookMessage(null);
+
+    try {
+      const result = await importBooks({
+        clerkId: user.id,
+      });
+      setBookMessage(result.message || "Books imported successfully!");
+      setTimeout(() => setBookMessage(null), 3000);
+    } catch (error: any) {
+      setBookMessage("Error: " + (error.message || "Failed to import books"));
+    } finally {
+      setImportingBooks(false);
     }
   };
 
@@ -624,23 +646,46 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-2xl font-bold">A & R Academy</h2>
             </div>
-            <Button 
-              onClick={handleImportSchedule}
-              disabled={importingSchedule}
-              variant="outline"
-              size="sm"
-            >
-              {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleImportBooks}
+                disabled={importingBooks}
+                variant="outline"
+                size="sm"
+              >
+                {importingBooks ? "Importing..." : "Import Book Library"}
+              </Button>
+              <Button 
+                onClick={handleImportSchedule}
+                disabled={importingSchedule}
+                variant="outline"
+                size="sm"
+              >
+                {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
+              </Button>
+            </div>
           </div>
 
-          {importMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
-              importMessage.startsWith("Error") 
-                ? "bg-red-50 text-red-800 border border-red-200" 
-                : "bg-green-50 text-green-800 border border-green-200"
-            }`}>
-              {importMessage}
+          {(importMessage || bookMessage) && (
+            <div className="space-y-2">
+              {importMessage && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  importMessage.startsWith("Error") 
+                    ? "bg-red-50 text-red-800 border border-red-200" 
+                    : "bg-green-50 text-green-800 border border-green-200"
+                }`}>
+                  {importMessage}
+                </div>
+              )}
+              {bookMessage && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  bookMessage.startsWith("Error") 
+                    ? "bg-red-50 text-red-800 border border-red-200" 
+                    : "bg-green-50 text-green-800 border border-green-200"
+                }`}>
+                  {bookMessage}
+                </div>
+              )}
             </div>
           )}
 
