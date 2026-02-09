@@ -43,11 +43,13 @@ export const deleteFieldTrip = mutation({
 export const getFieldTrips = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const trips = await ctx.db
       .query("fieldTrips")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .order("asc")
       .collect();
+    
+    // Sort alphabetically by name
+    return trips.sort((a, b) => a.name.localeCompare(b.name));
   },
 });
 

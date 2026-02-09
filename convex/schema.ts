@@ -171,4 +171,21 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_and_week", ["userId", "weekStartDate"]),
+
+  bookLibrary: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    author: v.optional(v.string()),
+    category: v.optional(v.string()),
+    read: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  readAloudBooks: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    author: v.optional(v.string()),
+    completed: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

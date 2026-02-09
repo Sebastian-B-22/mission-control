@@ -30,9 +30,9 @@ import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { HomeschoolObjectives } from "@/components/HomeschoolObjectives";
 import { MonthlyFocus } from "@/components/MonthlyFocus";
 import { ProjectsThisMonth } from "@/components/ProjectsThisMonth";
-import { ReadAloudList } from "@/components/ReadAloudList";
+import { ReadAloudList } from "@/components/ReadAloudListDB";
 import { TripsOnHorizon } from "@/components/TripsOnHorizon";
-import { BookLibrary } from "@/components/BookLibrary";
+import { BookLibrary } from "@/components/BookLibraryDB";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -660,7 +660,7 @@ export default function DashboardPage() {
 
             {/* Right Column */}
             <div className="space-y-6">
-              <ReadAloudList />
+              <ReadAloudList userId={convexUser._id} />
               <TripsOnHorizon />
             </div>
           </div>
@@ -668,7 +668,7 @@ export default function DashboardPage() {
           {/* Long Lists - Bottom Section */}
           <div className="grid gap-6 md:grid-cols-2">
             <FieldTripList userId={convexUser._id} />
-            <BookLibrary />
+            <BookLibrary userId={convexUser._id} />
           </div>
         </TabsContent>
       </Tabs>
