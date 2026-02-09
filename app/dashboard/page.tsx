@@ -22,7 +22,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { HabitTracker } from "@/components/HabitTracker";
 import { FiveToThrive } from "@/components/FiveToThrive";
-import { JournalPrompts } from "@/components/JournalPrompts";
+import { MorningMindset } from "@/components/MorningMindset";
+import { EveningReflection } from "@/components/EveningReflection";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FieldTripList } from "@/components/FieldTripList";
 import { MonthlyItinerary } from "@/components/MonthlyItinerary";
@@ -351,16 +352,17 @@ export default function DashboardPage() {
 
         {/* Daily Tab */}
         <TabsContent value="daily" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Habit Tracker */}
-            <HabitTracker userId={convexUser._id} date={today} />
+          {/* Morning Mindset - Top */}
+          <MorningMindset userId={convexUser._id} date={today} />
 
-            {/* 5 to Thrive */}
+          {/* Habits & 5 to Thrive - Middle */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <HabitTracker userId={convexUser._id} date={today} />
             <FiveToThrive userId={convexUser._id} date={today} />
           </div>
 
-          {/* Morning Mindset & Evening Reflection */}
-          <JournalPrompts userId={convexUser._id} date={today} />
+          {/* Evening Reflection - Bottom */}
+          <EveningReflection userId={convexUser._id} date={today} />
         </TabsContent>
 
         {/* HTA Tab */}
@@ -369,13 +371,24 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold">HTA Project Management</h2>
           </div>
 
-          <Tabs defaultValue="product" className="w-full">
+          <Tabs defaultValue="gtm" className="w-full">
             <TabsList>
+              <TabsTrigger value="gtm">GTM Timeline</TabsTrigger>
               <TabsTrigger value="product">Product Dev</TabsTrigger>
               <TabsTrigger value="curriculum">Curriculum Dev</TabsTrigger>
               <TabsTrigger value="marketing">Marketing</TabsTrigger>
               <TabsTrigger value="operations">Operations</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="gtm" className="space-y-4">
+              <ProjectTaskList
+                userId={convexUser._id}
+                project="hta"
+                subProject="gtm"
+                title="Go-To-Market Timeline"
+                description="Launch milestones, key dates & GTM strategy"
+              />
+            </TabsContent>
 
             <TabsContent value="product" className="space-y-4">
               <ErrorBoundary>
@@ -427,14 +440,14 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold">Aspire Project Management</h2>
           </div>
 
-          <Tabs defaultValue="pali" className="w-full">
+          <Tabs defaultValue="spring" className="w-full">
             <TabsList>
-              <TabsTrigger value="pali">Pali</TabsTrigger>
-              <TabsTrigger value="agoura">Agoura</TabsTrigger>
               <TabsTrigger value="spring">Spring League</TabsTrigger>
               <TabsTrigger value="camps">Camps</TabsTrigger>
               <TabsTrigger value="pdp">PDP</TabsTrigger>
               <TabsTrigger value="7v7">7v7</TabsTrigger>
+              <TabsTrigger value="pali">Pali</TabsTrigger>
+              <TabsTrigger value="agoura">Agoura</TabsTrigger>
             </TabsList>
 
             <TabsContent value="pali" className="space-y-4">
