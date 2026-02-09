@@ -70,6 +70,14 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
     });
   };
 
+  const handleClearAll = async () => {
+    await saveFiveToThrive({
+      userId,
+      date,
+      tasks: [],
+    });
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleAddTask();
@@ -81,11 +89,20 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>5 to Thrive</CardTitle>
-        <CardDescription>
-          {completedCount} of {tasks.length} completed
-          {tasks.length < 5 && ` • ${5 - tasks.length} slots remaining`}
-        </CardDescription>
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle>5 to Thrive</CardTitle>
+            <CardDescription>
+              {completedCount} of {tasks.length} completed
+              {tasks.length < 5 && ` • ${5 - tasks.length} slots remaining`}
+            </CardDescription>
+          </div>
+          {tasks.length > 0 && (
+            <Button variant="outline" size="sm" onClick={handleClearAll}>
+              Clear All
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add Task Input */}
