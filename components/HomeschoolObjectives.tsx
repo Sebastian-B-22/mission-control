@@ -16,7 +16,7 @@ export function HomeschoolObjectives() {
   return (
     <Card className="border-amber-200 bg-amber-50/50">
       <CardContent className="py-2">
-        <div className="flex items-start gap-3 max-w-3xl mx-auto">
+        <div className="flex items-start gap-3 max-w-2xl mx-auto">
           <div className="flex items-center gap-2 text-amber-700 font-semibold whitespace-nowrap pt-1">
             <Target className="h-4 w-4" />
             <span>Objectives:</span>

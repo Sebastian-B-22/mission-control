@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, MapPin, Calendar } from "lucide-react";
+import { Plus, Trash2, MapPin } from "lucide-react";
 
 interface FieldTripListProps {
   userId: Id<"users">;
@@ -21,7 +21,6 @@ export function FieldTripList({ userId }: FieldTripListProps) {
   const [newTrip, setNewTrip] = useState({
     name: "",
     location: "",
-    date: "",
     notes: "",
   });
   const [expandedId, setExpandedId] = useState<Id<"fieldTrips"> | null>(null);
@@ -34,11 +33,10 @@ export function FieldTripList({ userId }: FieldTripListProps) {
         userId,
         name: newTrip.name,
         location: newTrip.location,
-        date: newTrip.date || undefined,
         notes: newTrip.notes || undefined,
         order,
       });
-      setNewTrip({ name: "", location: "", date: "", notes: "" });
+      setNewTrip({ name: "", location: "", notes: "" });
       setShowAddForm(false);
     }
   };
@@ -51,8 +49,8 @@ export function FieldTripList({ userId }: FieldTripListProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Upcoming Field Trips</CardTitle>
-          <CardDescription>Educational outings & adventures</CardDescription>
+          <CardTitle>Field Trip Ideas</CardTitle>
+          <CardDescription>Possibilities for future outings</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Loading...</p>
@@ -64,8 +62,8 @@ export function FieldTripList({ userId }: FieldTripListProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Upcoming Field Trips</CardTitle>
-        <CardDescription>Educational outings & adventures</CardDescription>
+        <CardTitle>Field Trip Ideas</CardTitle>
+        <CardDescription>Possibilities for future outings</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add Trip Form */}
@@ -86,18 +84,11 @@ export function FieldTripList({ userId }: FieldTripListProps) {
               value={newTrip.name}
               onChange={(e) => setNewTrip({ ...newTrip, name: e.target.value })}
             />
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                placeholder="Location..."
-                value={newTrip.location}
-                onChange={(e) => setNewTrip({ ...newTrip, location: e.target.value })}
-              />
-              <Input
-                type="date"
-                value={newTrip.date}
-                onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
-              />
-            </div>
+            <Input
+              placeholder="Location..."
+              value={newTrip.location}
+              onChange={(e) => setNewTrip({ ...newTrip, location: e.target.value })}
+            />
             <Textarea
               placeholder="Notes (optional)..."
               value={newTrip.notes}
@@ -107,12 +98,12 @@ export function FieldTripList({ userId }: FieldTripListProps) {
             <div className="flex gap-2">
               <Button onClick={handleAddTrip} size="sm" className="flex-1">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Field Trip
+                Add Idea
               </Button>
               <Button 
                 onClick={() => {
                   setShowAddForm(false);
-                  setNewTrip({ name: "", location: "", date: "", notes: "" });
+                  setNewTrip({ name: "", location: "", notes: "" });
                 }} 
                 variant="outline" 
                 size="sm"
@@ -127,7 +118,7 @@ export function FieldTripList({ userId }: FieldTripListProps) {
         <div className="space-y-2">
           {trips.length === 0 ? (
             <p className="text-sm text-muted-foreground italic text-center py-4">
-              No field trips planned yet!
+              No field trip ideas yet!
             </p>
           ) : (
             trips.map((trip) => (
@@ -138,17 +129,9 @@ export function FieldTripList({ userId }: FieldTripListProps) {
                 <div className="flex items-start justify-between">
                   <div className="flex-1 space-y-2">
                     <h4 className="font-medium">{trip.name}</h4>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        <span>{trip.location}</span>
-                      </div>
-                      {trip.date && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{new Date(trip.date).toLocaleDateString()}</span>
-                        </div>
-                      )}
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      <span>{trip.location}</span>
                     </div>
                     {trip.notes && (
                       <div className="mt-2">

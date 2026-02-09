@@ -31,6 +31,8 @@ import { HomeschoolObjectives } from "@/components/HomeschoolObjectives";
 import { MonthlyFocus } from "@/components/MonthlyFocus";
 import { ProjectsThisMonth } from "@/components/ProjectsThisMonth";
 import { ReadAloudList } from "@/components/ReadAloudList";
+import { TripsOnHorizon } from "@/components/TripsOnHorizon";
+import { BookLibrary } from "@/components/BookLibrary";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -596,6 +598,12 @@ export default function DashboardPage() {
               <ReadAloudList />
               <FieldTripList userId={convexUser._id} />
             </div>
+          </div>
+
+          {/* Additional Resources - Bottom Section */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <TripsOnHorizon />
+            <BookLibrary />
           </div>
         </TabsContent>
       </Tabs>
