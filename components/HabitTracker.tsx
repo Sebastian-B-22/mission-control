@@ -6,7 +6,6 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
 
 interface HabitTrackerProps {
   userId: Id<"users">;
@@ -73,17 +72,10 @@ export function HabitTracker({ userId, date }: HabitTrackerProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Habit Tracker</CardTitle>
-            <CardDescription>
-              {completed} of {total} completed
-            </CardDescription>
-          </div>
-          <Button variant="ghost" size="sm">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
+        <CardTitle>Habit Tracker</CardTitle>
+        <CardDescription>
+          {completed} of {total} completed
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
