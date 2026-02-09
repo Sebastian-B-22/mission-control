@@ -94,8 +94,22 @@ export default function DashboardPage() {
   const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
   const importBooks = useMutation(api.admin.importBookLibrary);
 
-  // Get today's date
-  const today = new Date().toISOString().split("T")[0];
+  // Get today's date (with auto-update at midnight)
+  const [today, setToday] = useState(() => new Date().toISOString().split("T")[0]);
+
+  // Update date at midnight
+  useEffect(() => {
+    const checkDate = () => {
+      const currentDate = new Date().toISOString().split("T")[0];
+      if (currentDate !== today) {
+        setToday(currentDate);
+      }
+    };
+
+    // Check every minute for date change
+    const interval = setInterval(checkDate, 60000);
+    return () => clearInterval(interval);
+  }, [today]);
 
   const personalCategories = categories?.filter((c) => c.type === "personal") || [];
   const professionalCategories = categories?.filter((c) => c.type === "professional") || [];
