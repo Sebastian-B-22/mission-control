@@ -314,6 +314,27 @@ export default function DashboardPage() {
 
         {/* Professional RPM Tab */}
         <TabsContent value="professional" className="space-y-4">
+          <div className="flex items-center justify-end mb-4">
+            <Button 
+              onClick={handleUpdatePurposes}
+              disabled={updatingPurposes}
+              variant="outline"
+              size="sm"
+            >
+              {updatingPurposes ? "Updating..." : "Update Category Purposes"}
+            </Button>
+          </div>
+
+          {purposeMessage && (
+            <div className={`p-3 rounded-lg text-sm ${
+              purposeMessage.startsWith("Error") 
+                ? "bg-red-50 text-red-800 border border-red-200" 
+                : "bg-green-50 text-green-800 border border-green-200"
+            }`}>
+              {purposeMessage}
+            </div>
+          )}
+
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {professionalCategories.map((category) => (
               <Card 

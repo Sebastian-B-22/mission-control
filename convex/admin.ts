@@ -251,6 +251,7 @@ export const updateRPMPurposes = mutation({
 
     // Map of category names to purposes
     const purposes: Record<string, string> = {
+      // Personal
       "Financial Independence & Freedom": "To take massive action towards creating a compelling future, eradicate financial stress, and live life on MY terms with abundance and ease.",
       "Bangin' Ass Body": "To show up every damn day with sexy confidence, limitless energy, and a body that feels as good as it looks.",
       "Home Haven & Sanctuary": "To create a space where my family feels loved, safe, and at peace - our refuge from the chaos of the world.",
@@ -258,6 +259,14 @@ export const updateRPMPurposes = mutation({
       "Phenomenal Relationship": "To nurture a passionate partnership with Joey that models what an extraordinary relationship truly looks like for our kids.",
       "Raising Resilient Humans": "To guide Anthony & Roma to become confident, curious, capable humans who know they're deeply loved and can create their own extraordinary lives.",
       "Magnificent Mommy/Homeschooling Hero": "To guide Anthony & Roma to become confident, curious, capable humans who know they're deeply loved and can create their own extraordinary lives.",
+      
+      // Professional
+      "Bad Ass Business Owner": "To build a thriving business that creates the freedom, impact, and lifestyle I deserve - on my own terms.",
+      "HTA Empire Builder": "To create a game-changing brand that transforms how families connect through sports - and scales like crazy.",
+      "Staff Empowerment & Kickass Workplace": "To build a team of empowered, passionate coaches who love what they do and help each other win every day.",
+      "Marketing & Networking Genius": "To create powerful messaging that attracts our ideal families and build relationships that open doors and amplify impact.",
+      "Operational Systems Guru": "To design systems that run like clockwork - freeing me to focus on growth, innovation, and what I do best.",
+      "Program Innovation & Excellence": "To continuously raise the bar and deliver phenomenal experiences that blow families away and keep them coming back for more.",
     };
 
     let updatedCount = 0;
