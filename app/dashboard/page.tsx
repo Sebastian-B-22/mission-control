@@ -266,25 +266,6 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
-                      {category.yearlyGoals.length > 0 ? (
-                        <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.yearlyGoals.slice(0, 2).map((goal, i) => (
-                            <li key={i} className="truncate">{goal}</li>
-                          ))}
-                          {category.yearlyGoals.length > 2 && (
-                            <li className="text-muted-foreground">
-                              +{category.yearlyGoals.length - 2} more
-                            </li>
-                          )}
-                        </ul>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add goals...
-                        </p>
-                      )}
-                    </div>
-                    <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Monthly Needle Movers
                       </p>
@@ -302,6 +283,25 @@ export default function DashboardPage() {
                       ) : (
                         <p className="text-sm italic text-muted-foreground">
                           Click to add focus areas...
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
+                      {category.yearlyGoals.length > 0 ? (
+                        <ul className="text-sm list-disc list-inside space-y-1">
+                          {category.yearlyGoals.slice(0, 2).map((goal, i) => (
+                            <li key={i} className="truncate">{goal}</li>
+                          ))}
+                          {category.yearlyGoals.length > 2 && (
+                            <li className="text-muted-foreground">
+                              +{category.yearlyGoals.length - 2} more
+                            </li>
+                          )}
+                        </ul>
+                      ) : (
+                        <p className="text-sm italic text-muted-foreground">
+                          Click to add goals...
                         </p>
                       )}
                     </div>
@@ -374,25 +374,6 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
-                      {category.yearlyGoals.length > 0 ? (
-                        <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.yearlyGoals.slice(0, 2).map((goal, i) => (
-                            <li key={i} className="truncate">{goal}</li>
-                          ))}
-                          {category.yearlyGoals.length > 2 && (
-                            <li className="text-muted-foreground">
-                              +{category.yearlyGoals.length - 2} more
-                            </li>
-                          )}
-                        </ul>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add goals...
-                        </p>
-                      )}
-                    </div>
-                    <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
                         Monthly Needle Movers
                       </p>
@@ -410,6 +391,25 @@ export default function DashboardPage() {
                       ) : (
                         <p className="text-sm italic text-muted-foreground">
                           Click to add focus areas...
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">Yearly Goals</p>
+                      {category.yearlyGoals.length > 0 ? (
+                        <ul className="text-sm list-disc list-inside space-y-1">
+                          {category.yearlyGoals.slice(0, 2).map((goal, i) => (
+                            <li key={i} className="truncate">{goal}</li>
+                          ))}
+                          {category.yearlyGoals.length > 2 && (
+                            <li className="text-muted-foreground">
+                              +{category.yearlyGoals.length - 2} more
+                            </li>
+                          )}
+                        </ul>
+                      ) : (
+                        <p className="text-sm italic text-muted-foreground">
+                          Click to add goals...
                         </p>
                       )}
                     </div>
