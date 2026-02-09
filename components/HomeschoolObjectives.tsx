@@ -16,12 +16,12 @@ export function HomeschoolObjectives() {
   return (
     <Card className="border-amber-200 bg-amber-50/50">
       <CardContent className="py-4">
-        <div className="flex items-center gap-3 max-w-5xl mx-auto">
-          <div className="flex items-center gap-2 text-amber-700 font-semibold whitespace-nowrap">
+        <div className="flex items-start gap-3 max-w-3xl mx-auto">
+          <div className="flex items-center gap-2 text-amber-700 font-semibold whitespace-nowrap pt-1">
             <Target className="h-4 w-4" />
             <span>Objectives:</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 flex-1">
             {objectives.map((obj, i) => (
               <span
                 key={i}
