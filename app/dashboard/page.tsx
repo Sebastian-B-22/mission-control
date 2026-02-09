@@ -26,8 +26,11 @@ import { MorningMindset } from "@/components/MorningMindset";
 import { EveningReflection } from "@/components/EveningReflection";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FieldTripList } from "@/components/FieldTripList";
-import { MonthlyItinerary } from "@/components/MonthlyItinerary";
 import { WeeklySchedule } from "@/components/WeeklySchedule";
+import { HomeschoolObjectives } from "@/components/HomeschoolObjectives";
+import { MonthlyFocus } from "@/components/MonthlyFocus";
+import { ProjectsThisMonth } from "@/components/ProjectsThisMonth";
+import { ReadAloudList } from "@/components/ReadAloudList";
 import { TaskList } from "@/components/TaskList";
 
 export default function DashboardPage() {
@@ -574,36 +577,25 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* Homeschool Objectives - Slim Banner */}
+          <HomeschoolObjectives />
+
           {/* Weekly Schedule - Full Width */}
           <WeeklySchedule userId={convexUser._id} />
 
-          {/* Monthly Overview & Other Sections */}
+          {/* Two Column Section */}
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Monthly Itinerary */}
-            <MonthlyItinerary userId={convexUser._id} />
+            {/* Left Column */}
+            <div className="space-y-6">
+              <MonthlyFocus />
+              <ProjectsThisMonth />
+            </div>
 
-            {/* Field Trips */}
-            <FieldTripList userId={convexUser._id} />
-
-            {/* Learning Outcomes */}
-            <ProjectTaskList
-              userId={convexUser._id}
-              project="homeschool"
-              subProject="outcomes"
-              title="Learning Outcomes"
-              description="Goals & progress tracking"
-              showAssignments={false}
-            />
-
-            {/* Curriculum */}
-            <ProjectTaskList
-              userId={convexUser._id}
-              project="homeschool"
-              subProject="curriculum"
-              title="Curriculum"
-              description="Current studies & resources"
-              showAssignments={false}
-            />
+            {/* Right Column */}
+            <div className="space-y-6">
+              <ReadAloudList />
+              <FieldTripList userId={convexUser._id} />
+            </div>
           </div>
         </TabsContent>
       </Tabs>
