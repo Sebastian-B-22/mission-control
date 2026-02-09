@@ -231,6 +231,57 @@ export const importWeeklySchedule = mutation({
   },
 });
 
+// Update RPM category purposes
+export const updateRPMPurposes = mutation({
+  args: { clerkId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const categories = await ctx.db
+      .query("rpmCategories")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    // Map of category names to purposes
+    const purposes: Record<string, string> = {
+      "Financial Independence & Freedom": "To take massive action towards creating a compelling future, eradicate financial stress, and live life on MY terms with abundance and ease.",
+      "Bangin' Ass Body": "To show up every damn day with sexy confidence, limitless energy, and a body that feels as good as it looks.",
+      "Home Haven & Sanctuary": "To create a space where my family feels loved, safe, and at peace - our refuge from the chaos of the world.",
+      "Extraordinary Friendships": "To consistently invest in and deepen relationships with my friends and family who make life richer, more joyful, and full of meaning.",
+      "Phenomenal Relationship": "To nurture a passionate partnership with Joey that models what an extraordinary relationship truly looks like for our kids.",
+      "Raising Resilient Humans": "To guide Anthony & Roma to become confident, curious, capable humans who know they're deeply loved and can create their own extraordinary lives.",
+      "Magnificent Mommy/Homeschooling Hero": "To guide Anthony & Roma to become confident, curious, capable humans who know they're deeply loved and can create their own extraordinary lives.",
+    };
+
+    let updatedCount = 0;
+    for (const category of categories) {
+      const purpose = purposes[category.name];
+      if (purpose) {
+        await ctx.db.patch(category._id, { purpose });
+        updatedCount++;
+      }
+      
+      // Also rename if needed
+      if (category.name === "Magnificent Mommy/Homeschooling Hero") {
+        await ctx.db.patch(category._id, { name: "Raising Resilient Humans", purpose: purposes["Raising Resilient Humans"] });
+      }
+    }
+
+    return {
+      success: true,
+      updatedCount,
+      message: `Updated ${updatedCount} category purposes`,
+    };
+  },
+});
+
 // Query to check user setup
 export const checkUserSetup = query({
   args: { clerkId: v.string() },

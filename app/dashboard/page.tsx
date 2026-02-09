@@ -43,6 +43,8 @@ export default function DashboardPage() {
   const [needleMovers, setNeedleMovers] = useState("");
   const [importingSchedule, setImportingSchedule] = useState(false);
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const [updatingPurposes, setUpdatingPurposes] = useState(false);
+  const [purposeMessage, setPurposeMessage] = useState<string | null>(null);
   
   // Get or create user in Convex
   const convexUser = useQuery(
@@ -87,6 +89,7 @@ export default function DashboardPage() {
 
   const updateCategory = useMutation(api.rpm.updateCategory);
   const importSchedule = useMutation(api.admin.importWeeklySchedule);
+  const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
 
   // Get today's date
   const today = new Date().toISOString().split("T")[0];
@@ -145,6 +148,26 @@ export default function DashboardPage() {
     }
   };
 
+  const handleUpdatePurposes = async () => {
+    if (!user) return;
+    
+    setUpdatingPurposes(true);
+    setPurposeMessage(null);
+
+    try {
+      const result = await updateRPMPurposes({
+        clerkId: user.id,
+      });
+      setPurposeMessage(result.message || "Purposes updated successfully!");
+      // Reload to show updated purposes
+      setTimeout(() => setPurposeMessage(null), 3000);
+    } catch (error: any) {
+      setPurposeMessage("Error: " + (error.message || "Failed to update purposes"));
+    } finally {
+      setUpdatingPurposes(false);
+    }
+  };
+
   const editingCategory = categories?.find((c) => c._id === editingCategoryId);
 
   if (!convexUser) {
@@ -183,6 +206,27 @@ export default function DashboardPage() {
 
         {/* Personal RPM Tab */}
         <TabsContent value="personal" className="space-y-4">
+          <div className="flex items-center justify-end mb-4">
+            <Button 
+              onClick={handleUpdatePurposes}
+              disabled={updatingPurposes}
+              variant="outline"
+              size="sm"
+            >
+              {updatingPurposes ? "Updating..." : "Update Category Purposes"}
+            </Button>
+          </div>
+
+          {purposeMessage && (
+            <div className={`p-3 rounded-lg text-sm ${
+              purposeMessage.startsWith("Error") 
+                ? "bg-red-50 text-red-800 border border-red-200" 
+                : "bg-green-50 text-green-800 border border-green-200"
+            }`}>
+              {purposeMessage}
+            </div>
+          )}
+
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {personalCategories.map((category) => (
               <Card 
