@@ -94,13 +94,23 @@ export default function DashboardPage() {
   const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
   const importBooks = useMutation(api.admin.importBookLibrary);
 
-  // Get today's date (with auto-update at midnight)
-  const [today, setToday] = useState(() => new Date().toISOString().split("T")[0]);
+  // Get today's date in PST (with auto-update at midnight PST)
+  const getPSTDate = () => {
+    const now = new Date();
+    // Convert to PST (America/Los_Angeles)
+    const pstDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+    const year = pstDate.getFullYear();
+    const month = String(pstDate.getMonth() + 1).padStart(2, '0');
+    const day = String(pstDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
-  // Update date at midnight
+  const [today, setToday] = useState(() => getPSTDate());
+
+  // Update date at midnight PST
   useEffect(() => {
     const checkDate = () => {
-      const currentDate = new Date().toISOString().split("T")[0];
+      const currentDate = getPSTDate();
       if (currentDate !== today) {
         setToday(currentDate);
       }
@@ -458,6 +468,19 @@ export default function DashboardPage() {
 
         {/* Daily Tab */}
         <TabsContent value="daily" className="space-y-6">
+          {/* Date Display */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">
+              Daily - {new Date(today + 'T00:00:00').toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                timeZone: 'America/Los_Angeles'
+              })}
+            </h2>
+          </div>
+
           {/* Morning Mindset - Top */}
           <MorningMindset userId={convexUser._id} date={today} />
 
