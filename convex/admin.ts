@@ -431,8 +431,8 @@ export const importBookLibrary = mutation({
   },
 });
 
-// Import HTA tasks for first 4 weeks
-export const importHTATasks = mutation({
+// Clear all HTA tasks
+export const clearHTATasks = mutation({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db
@@ -442,6 +442,55 @@ export const importHTATasks = mutation({
 
     if (!user) {
       throw new Error("User not found");
+    }
+
+    // Find all HTA tasks
+    const htaTasks = await ctx.db
+      .query("projectTasks")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("project"), "hta"))
+      .collect();
+
+    // Delete them all
+    for (const task of htaTasks) {
+      await ctx.db.delete(task._id);
+    }
+
+    return { 
+      success: true, 
+      message: `Cleared ${htaTasks.length} HTA tasks`,
+      count: htaTasks.length 
+    };
+  },
+});
+
+// Import HTA tasks for first 4 weeks
+export const importHTATasks = mutation({
+  args: { 
+    clerkId: v.string(),
+    clearFirst: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Clear existing tasks if requested
+    if (args.clearFirst) {
+      const htaTasks = await ctx.db
+        .query("projectTasks")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .filter((q) => q.eq(q.field("project"), "hta"))
+        .collect();
+
+      for (const task of htaTasks) {
+        await ctx.db.delete(task._id);
+      }
     }
 
     // Get team members for assignment

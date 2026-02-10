@@ -226,6 +226,7 @@ export default function DashboardPage() {
     try {
       const result = await importHTATasks({
         clerkId: user.id,
+        clearFirst: true, // Always clear old tasks before importing
       });
       setHTAMessage(result.message || "HTA tasks imported successfully!");
       setTimeout(() => setHTAMessage(null), 3000);
