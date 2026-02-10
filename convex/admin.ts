@@ -258,11 +258,11 @@ export const updateRPMPurposes = mutation({
       },
       "Bangin' Ass Body": {
         purpose: "To show up every damn day with sexy confidence, limitless energy, and a body that feels as good as it looks.",
-        role: "Elite Performer"
+        role: "Pro Athlete & Longevity Queen"
       },
       "Home Haven & Sanctuary": {
         purpose: "To create a space where my family feels loved, safe, and at peace - our refuge from the chaos of the world.",
-        role: "Intentional Nest Creator"
+        role: "Intentional Nest Curator"
       },
       "Extraordinary Friendships": {
         purpose: "To consistently invest in and deepen relationships with my friends and family who make life richer, more joyful, and full of meaning.",
@@ -270,7 +270,7 @@ export const updateRPMPurposes = mutation({
       },
       "Phenomenal Relationship": {
         purpose: "To nurture a passionate partnership with Joey that models what an extraordinary relationship truly looks like for our kids.",
-        role: "Devoted Partner"
+        role: "Woman of His Dreams"
       },
       "Raising Resilient Humans": {
         purpose: "To guide Anthony & Roma to become confident, curious, capable humans who know they're deeply loved and can create their own extraordinary lives.",
@@ -284,11 +284,11 @@ export const updateRPMPurposes = mutation({
       // Professional
       "Bad Ass Business Owner": {
         purpose: "To build a thriving business that creates the freedom, impact, and lifestyle I deserve - on my own terms.",
-        role: "Strategic Visionary"
+        role: "God Damn Warrior"
       },
       "HTA Empire Builder": {
         purpose: "To create a game-changing brand that transforms how families connect through sports - and scales like crazy.",
-        role: "Product Innovator"
+        role: "Life-Changing Wealth Creator"
       },
       "Staff Empowerment & Kickass Workplace": {
         purpose: "To build a team of empowered, passionate coaches who love what they do and help each other win every day.",
@@ -428,6 +428,195 @@ export const importBookLibrary = mutation({
     }
 
     return { success: true, message: `Imported ${count} books successfully!`, count };
+  },
+});
+
+// Import HTA tasks for first 4 weeks
+export const importHTATasks = mutation({
+  args: { clerkId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Get team members for assignment
+    const teamMembers = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    
+    const corinne = teamMembers.find(m => m.name === "Corinne");
+    const allie = teamMembers.find(m => m.name === "Allie");
+
+    // GTM Timeline - High-level milestones
+    const gtmTasks = [
+      { title: "Finalize Welcome Box design & contents", dueDate: "2026-02-15", priority: "high" as const },
+      { title: "Complete logo design", dueDate: "2026-02-22", priority: "high" as const },
+      { title: "Film all Month 1 training videos", dueDate: "2026-02-28", priority: "high" as const },
+      { title: "Assemble 10 beta Welcome Boxes", dueDate: "2026-03-08", priority: "high" as const },
+      { title: "Launch beta testing (10 families)", dueDate: "2026-03-15", priority: "high" as const },
+      { title: "Build Founding Families landing page", dueDate: "2026-04-01", priority: "high" as const },
+      { title: "Launch Founding Families waitlist", dueDate: "2026-04-15", priority: "high" as const },
+      { title: "Fulfill first 50 Welcome Boxes", dueDate: "2026-05-15", priority: "high" as const },
+      { title: "🚀 LAUNCH - World Cup Opening Weekend", dueDate: "2026-06-15", priority: "high" as const },
+    ];
+
+    // Product Dev - Inventory & Welcome Box
+    const productTasks = [
+      { title: "Order wristbands (500-1000 units)", dueDate: "2026-02-15", assignedTo: allie, priority: "high" as const },
+      { title: "Order mini soccer balls (500 units)", dueDate: "2026-02-15", assignedTo: allie, priority: "high" as const },
+      { title: "Order blank t-shirts from S&S Activewear (400 total)", dueDate: "2026-02-15", assignedTo: allie, priority: "high" as const },
+      { title: "Get screen printing quote from local printer", dueDate: "2026-02-15", assignedTo: allie, priority: "medium" as const },
+      { title: "Order achievement posters (100 units)", dueDate: "2026-02-22", assignedTo: allie, priority: "medium" as const },
+      { title: "Order storybooks (200 units - 100 per age)", dueDate: "2026-02-22", assignedTo: allie, priority: "medium" as const },
+      { title: "Order shipping boxes (100 units)", dueDate: "2026-02-22", assignedTo: allie, priority: "medium" as const },
+      { title: "Submit t-shirt design to screen printer", dueDate: "2026-02-22", priority: "medium" as const },
+      { title: "Create inventory tracking spreadsheet", dueDate: "2026-02-22", assignedTo: allie, priority: "low" as const },
+    ];
+
+    // Curriculum Dev - Content Creation
+    const curriculumTasks = [
+      { title: "Design achievement poster template in Canva", dueDate: "2026-02-15", assignedTo: corinne, priority: "high" as const },
+      { title: "Write Month 1 storybook (Ages 3-5)", dueDate: "2026-02-22", assignedTo: corinne, priority: "high" as const },
+      { title: "Write Month 1 storybook (Ages 6-8)", dueDate: "2026-02-22", assignedTo: corinne, priority: "high" as const },
+      { title: "Generate storybook illustrations (AI)", dueDate: "2026-02-22", priority: "medium" as const },
+      { title: "Write 4 mission scripts (Ages 3-5)", dueDate: "2026-02-22", assignedTo: corinne, priority: "high" as const },
+      { title: "Write 4 mission scripts (Ages 6-8)", dueDate: "2026-02-22", assignedTo: corinne, priority: "high" as const },
+      { title: "Create Month 1 quiz questions (both tiers)", dueDate: "2026-02-22", priority: "medium" as const },
+      { title: "Design mission cards template (Canva)", dueDate: "2026-02-22", priority: "medium" as const },
+      { title: "Film 4 training videos (Ages 3-5)", dueDate: "2026-03-01", assignedTo: corinne, priority: "high" as const },
+      { title: "Film 4 training videos (Ages 6-8)", dueDate: "2026-03-01", assignedTo: corinne, priority: "high" as const },
+      { title: "Edit videos in Descript", dueDate: "2026-03-01", priority: "high" as const },
+      { title: "Upload videos to Vimeo", dueDate: "2026-03-01", assignedTo: allie, priority: "medium" as const },
+      { title: "Create QR codes for mission cards", dueDate: "2026-03-08", assignedTo: allie, priority: "medium" as const },
+      { title: "Film lead magnet video (3 Home Drills)", dueDate: "2026-03-08", assignedTo: corinne, priority: "medium" as const },
+      { title: "Create 5-10 Instagram Reels (CapCut)", dueDate: "2026-03-08", priority: "low" as const },
+    ];
+
+    // Marketing - Landing Pages & Campaigns
+    const marketingTasks = [
+      { title: "Draft Founding Families landing page copy (StoryBrand)", dueDate: "2026-02-22", assignedTo: corinne, priority: "high" as const },
+      { title: "Write welcome email sequence (Days 1, 3, 7)", dueDate: "2026-02-22", priority: "medium" as const },
+      { title: "Write mission unlock emails (Weeks 1-4)", dueDate: "2026-02-22", priority: "medium" as const },
+      { title: "Create lead magnet concept", dueDate: "2026-02-22", priority: "low" as const },
+      { title: "Build Founding Families landing page", dueDate: "2026-03-01", priority: "high" as const },
+      { title: "Set up ConvertKit email collection", dueDate: "2026-03-01", priority: "medium" as const },
+      { title: "Create social media content calendar (Mar-May)", dueDate: "2026-03-08", priority: "low" as const },
+      { title: "Finalize Founding Families offer details", dueDate: "2026-03-08", priority: "high" as const },
+      { title: "Design AYSO info night presentation", dueDate: "2026-03-08", priority: "medium" as const },
+    ];
+
+    // Operations - Tech & Testing
+    const operationsTasks = [
+      { title: "Review Bubble wireframes", dueDate: "2026-02-15", priority: "medium" as const },
+      { title: "Document Convex schema needs", dueDate: "2026-02-15", priority: "medium" as const },
+      { title: "Set up Convex production project", dueDate: "2026-02-22", priority: "high" as const },
+      { title: "Build Convex schema & functions", dueDate: "2026-02-22", priority: "high" as const },
+      { title: "Build Bubble UI - Parent dashboard", dueDate: "2026-03-01", priority: "high" as const },
+      { title: "Build Bubble UI - Kids dashboards (2 versions)", dueDate: "2026-03-01", priority: "high" as const },
+      { title: "Build Bubble UI - Reward shop", dueDate: "2026-03-01", priority: "medium" as const },
+      { title: "Connect Bubble to Convex (API)", dueDate: "2026-03-01", priority: "high" as const },
+      { title: "Integrate Stripe subscriptions", dueDate: "2026-03-01", priority: "high" as const },
+      { title: "Test full user signup flow", dueDate: "2026-03-08", priority: "high" as const },
+      { title: "Test mission completion & coins flow", dueDate: "2026-03-08", priority: "high" as const },
+      { title: "Recruit 10 beta families", dueDate: "2026-03-08", assignedTo: corinne, priority: "high" as const },
+      { title: "Create beta feedback form", dueDate: "2026-03-08", priority: "medium" as const },
+      { title: "Write beta family onboarding email", dueDate: "2026-03-08", priority: "medium" as const },
+    ];
+
+    let count = 0;
+    
+    // Insert GTM tasks
+    for (let i = 0; i < gtmTasks.length; i++) {
+      await ctx.db.insert("projectTasks", {
+        userId: user._id,
+        project: "hta",
+        subProject: "gtm",
+        title: gtmTasks[i].title,
+        assignedToId: corinne?._id,
+        status: "todo",
+        dueDate: gtmTasks[i].dueDate,
+        priority: gtmTasks[i].priority,
+        order: i,
+        createdAt: Date.now(),
+      });
+      count++;
+    }
+
+    // Insert Product tasks
+    for (let i = 0; i < productTasks.length; i++) {
+      await ctx.db.insert("projectTasks", {
+        userId: user._id,
+        project: "hta",
+        subProject: "product",
+        title: productTasks[i].title,
+        assignedToId: productTasks[i].assignedTo?._id,
+        status: "todo",
+        dueDate: productTasks[i].dueDate,
+        priority: productTasks[i].priority,
+        order: i,
+        createdAt: Date.now(),
+      });
+      count++;
+    }
+
+    // Insert Curriculum tasks
+    for (let i = 0; i < curriculumTasks.length; i++) {
+      await ctx.db.insert("projectTasks", {
+        userId: user._id,
+        project: "hta",
+        subProject: "curriculum",
+        title: curriculumTasks[i].title,
+        assignedToId: curriculumTasks[i].assignedTo?._id,
+        status: "todo",
+        dueDate: curriculumTasks[i].dueDate,
+        priority: curriculumTasks[i].priority,
+        order: i,
+        createdAt: Date.now(),
+      });
+      count++;
+    }
+
+    // Insert Marketing tasks
+    for (let i = 0; i < marketingTasks.length; i++) {
+      await ctx.db.insert("projectTasks", {
+        userId: user._id,
+        project: "hta",
+        subProject: "marketing",
+        title: marketingTasks[i].title,
+        assignedToId: marketingTasks[i].assignedTo?._id,
+        status: "todo",
+        dueDate: marketingTasks[i].dueDate,
+        priority: marketingTasks[i].priority,
+        order: i,
+        createdAt: Date.now(),
+      });
+      count++;
+    }
+
+    // Insert Operations tasks
+    for (let i = 0; i < operationsTasks.length; i++) {
+      await ctx.db.insert("projectTasks", {
+        userId: user._id,
+        project: "hta",
+        subProject: "operations",
+        title: operationsTasks[i].title,
+        assignedToId: operationsTasks[i].assignedTo?._id,
+        status: "todo",
+        dueDate: operationsTasks[i].dueDate,
+        priority: operationsTasks[i].priority,
+        order: i,
+        createdAt: Date.now(),
+      });
+      count++;
+    }
+
+    return { success: true, message: `Imported ${count} HTA tasks successfully!`, count };
   },
 });
 

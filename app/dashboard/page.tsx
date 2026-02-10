@@ -47,6 +47,8 @@ export default function DashboardPage() {
   const [purposeMessage, setPurposeMessage] = useState<string | null>(null);
   const [importingBooks, setImportingBooks] = useState(false);
   const [bookMessage, setBookMessage] = useState<string | null>(null);
+  const [importingHTATasks, setImportingHTATasks] = useState(false);
+  const [htaMessage, setHTAMessage] = useState<string | null>(null);
   
   // Get or create user in Convex
   const convexUser = useQuery(
@@ -93,6 +95,7 @@ export default function DashboardPage() {
   const importSchedule = useMutation(api.admin.importWeeklySchedule);
   const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
   const importBooks = useMutation(api.admin.importBookLibrary);
+  const importHTATasks = useMutation(api.admin.importHTATasks);
 
   // Get today's date in PST (with auto-update at midnight PST)
   const getPSTDate = () => {
@@ -214,6 +217,25 @@ export default function DashboardPage() {
     }
   };
 
+  const handleImportHTATasks = async () => {
+    if (!user) return;
+    
+    setImportingHTATasks(true);
+    setHTAMessage(null);
+
+    try {
+      const result = await importHTATasks({
+        clerkId: user.id,
+      });
+      setHTAMessage(result.message || "HTA tasks imported successfully!");
+      setTimeout(() => setHTAMessage(null), 3000);
+    } catch (error: any) {
+      setHTAMessage("Error: " + (error.message || "Failed to import HTA tasks"));
+    } finally {
+      setImportingHTATasks(false);
+    }
+  };
+
   const editingCategory = categories?.find((c) => c._id === editingCategoryId);
 
   if (!convexUser) {
@@ -259,7 +281,7 @@ export default function DashboardPage() {
               variant="outline"
               size="sm"
             >
-              {updatingPurposes ? "Updating..." : "Update Category Purposes"}
+              {updatingPurposes ? "Updating..." : "Update Categories"}
             </Button>
           </div>
 
@@ -367,7 +389,7 @@ export default function DashboardPage() {
               variant="outline"
               size="sm"
             >
-              {updatingPurposes ? "Updating..." : "Update Category Purposes"}
+              {updatingPurposes ? "Updating..." : "Update Categories"}
             </Button>
           </div>
 
@@ -498,7 +520,25 @@ export default function DashboardPage() {
         <TabsContent value="hta" className="space-y-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">HTA Project Management</h2>
+            <Button 
+              onClick={handleImportHTATasks}
+              disabled={importingHTATasks}
+              variant="outline"
+              size="sm"
+            >
+              {importingHTATasks ? "Importing..." : "Import 4-Week Plan"}
+            </Button>
           </div>
+
+          {htaMessage && (
+            <div className={`p-3 rounded-lg text-sm ${
+              htaMessage.startsWith("Error") 
+                ? "bg-red-50 text-red-800 border border-red-200" 
+                : "bg-green-50 text-green-800 border border-green-200"
+            }`}>
+              {htaMessage}
+            </div>
+          )}
 
           <Tabs defaultValue="gtm" className="w-full">
             <TabsList>
