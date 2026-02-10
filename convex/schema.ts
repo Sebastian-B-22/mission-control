@@ -14,6 +14,7 @@ export default defineSchema({
     name: v.string(),
     type: v.union(v.literal("personal"), v.literal("professional")),
     purpose: v.optional(v.string()),
+    role: v.optional(v.string()),
     yearlyGoals: v.array(v.string()),
     monthlyFocus: v.array(v.string()),
     order: v.number(),

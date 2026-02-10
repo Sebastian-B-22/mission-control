@@ -284,7 +284,7 @@ export default function DashboardPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg">{category.name}</CardTitle>
-                      <CardDescription>RPM Category</CardDescription>
+                      <CardDescription>{category.role || "RPM Category"}</CardDescription>
                     </div>
                     <Button 
                       variant="ghost" 
@@ -392,7 +392,7 @@ export default function DashboardPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg">{category.name}</CardTitle>
-                      <CardDescription>RPM Category</CardDescription>
+                      <CardDescription>{category.role || "RPM Category"}</CardDescription>
                     </div>
                     <Button 
                       variant="ghost" 
