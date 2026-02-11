@@ -264,14 +264,16 @@ export default function DashboardPage() {
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 mb-8 h-auto gap-1">
-          <TabsTrigger value="personal" className="text-xs sm:text-sm">Personal RPM</TabsTrigger>
-          <TabsTrigger value="professional" className="text-xs sm:text-sm">Professional RPM</TabsTrigger>
-          <TabsTrigger value="daily" className="text-xs sm:text-sm">Daily</TabsTrigger>
-          <TabsTrigger value="hta" className="text-xs sm:text-sm">HTA</TabsTrigger>
-          <TabsTrigger value="aspire" className="text-xs sm:text-sm">Aspire</TabsTrigger>
-          <TabsTrigger value="homeschool" className="text-xs sm:text-sm">Homeschool</TabsTrigger>
-        </TabsList>
+        <div className="mb-8 overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full md:grid md:grid-cols-6 h-auto">
+            <TabsTrigger value="personal" className="whitespace-nowrap">Personal RPM</TabsTrigger>
+            <TabsTrigger value="professional" className="whitespace-nowrap">Professional RPM</TabsTrigger>
+            <TabsTrigger value="daily" className="whitespace-nowrap">Daily</TabsTrigger>
+            <TabsTrigger value="hta" className="whitespace-nowrap">HTA</TabsTrigger>
+            <TabsTrigger value="aspire" className="whitespace-nowrap">Aspire</TabsTrigger>
+            <TabsTrigger value="homeschool" className="whitespace-nowrap">Homeschool</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Personal RPM Tab */}
         <TabsContent value="personal" className="space-y-4">
