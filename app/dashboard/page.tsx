@@ -259,18 +259,18 @@ export default function DashboardPage() {
           Mission Control
         </h1>
         <p className="text-muted-foreground">
-          Welcome back, {user?.firstName || "Corinne"}! Ready to make today count?
+          Hi {user?.firstName || "Corinne"}. Let's make today epic!
         </p>
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-8 h-auto">
-          <TabsTrigger value="personal">Personal RPM</TabsTrigger>
-          <TabsTrigger value="professional">Professional RPM</TabsTrigger>
-          <TabsTrigger value="daily">Daily</TabsTrigger>
-          <TabsTrigger value="hta">HTA</TabsTrigger>
-          <TabsTrigger value="aspire">Aspire</TabsTrigger>
-          <TabsTrigger value="homeschool">Homeschool</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 mb-8 h-auto gap-1">
+          <TabsTrigger value="personal" className="text-xs sm:text-sm">Personal RPM</TabsTrigger>
+          <TabsTrigger value="professional" className="text-xs sm:text-sm">Professional RPM</TabsTrigger>
+          <TabsTrigger value="daily" className="text-xs sm:text-sm">Daily</TabsTrigger>
+          <TabsTrigger value="hta" className="text-xs sm:text-sm">HTA</TabsTrigger>
+          <TabsTrigger value="aspire" className="text-xs sm:text-sm">Aspire</TabsTrigger>
+          <TabsTrigger value="homeschool" className="text-xs sm:text-sm">Homeschool</TabsTrigger>
         </TabsList>
 
         {/* Personal RPM Tab */}
