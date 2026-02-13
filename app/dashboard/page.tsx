@@ -285,30 +285,6 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* One-time RPM Goals Update Button */}
-      <div className="mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>🎯 Update RPM Goals (One-Time Setup)</CardTitle>
-            <CardDescription>Load your February/March monthly needle movers + 2026 yearly goals into all 12 categories</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button onClick={handleUpdateAllRPMGoals} disabled={updatingAllGoals} className="w-full">
-              {updatingAllGoals ? "Updating..." : "Update All RPM Goals Now"}
-            </Button>
-            {allGoalsMessage && (
-              <div className={`p-3 rounded-lg text-sm ${
-                allGoalsMessage.startsWith("Error") 
-                  ? "bg-red-50 text-red-800 border border-red-200" 
-                  : "bg-green-50 text-green-800 border border-green-200"
-              }`}>
-                {allGoalsMessage}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
       <Tabs defaultValue="personal" className="w-full">
         <div className="mb-8 overflow-x-auto">
           <TabsList className="inline-flex w-auto min-w-full md:grid md:grid-cols-6 h-auto">
@@ -388,14 +364,9 @@ export default function DashboardPage() {
                       </p>
                       {category.monthlyFocus.length > 0 ? (
                         <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.monthlyFocus.slice(0, 2).map((focus, i) => (
-                            <li key={i} className="truncate">{focus}</li>
+                          {category.monthlyFocus.map((focus, i) => (
+                            <li key={i}>{focus}</li>
                           ))}
-                          {category.monthlyFocus.length > 2 && (
-                            <li className="text-muted-foreground">
-                              +{category.monthlyFocus.length - 2} more
-                            </li>
-                          )}
                         </ul>
                       ) : (
                         <p className="text-sm italic text-muted-foreground">
@@ -407,14 +378,9 @@ export default function DashboardPage() {
                       <p className="text-sm font-bold text-muted-foreground mb-1">Yearly Goals</p>
                       {category.yearlyGoals.length > 0 ? (
                         <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.yearlyGoals.slice(0, 2).map((goal, i) => (
-                            <li key={i} className="truncate">{goal}</li>
+                          {category.yearlyGoals.map((goal, i) => (
+                            <li key={i}>{goal}</li>
                           ))}
-                          {category.yearlyGoals.length > 2 && (
-                            <li className="text-muted-foreground">
-                              +{category.yearlyGoals.length - 2} more
-                            </li>
-                          )}
                         </ul>
                       ) : (
                         <p className="text-sm italic text-muted-foreground">
@@ -496,14 +462,9 @@ export default function DashboardPage() {
                       </p>
                       {category.monthlyFocus.length > 0 ? (
                         <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.monthlyFocus.slice(0, 2).map((focus, i) => (
-                            <li key={i} className="truncate">{focus}</li>
+                          {category.monthlyFocus.map((focus, i) => (
+                            <li key={i}>{focus}</li>
                           ))}
-                          {category.monthlyFocus.length > 2 && (
-                            <li className="text-muted-foreground">
-                              +{category.monthlyFocus.length - 2} more
-                            </li>
-                          )}
                         </ul>
                       ) : (
                         <p className="text-sm italic text-muted-foreground">
@@ -515,14 +476,9 @@ export default function DashboardPage() {
                       <p className="text-sm font-bold text-muted-foreground mb-1">Yearly Goals</p>
                       {category.yearlyGoals.length > 0 ? (
                         <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.yearlyGoals.slice(0, 2).map((goal, i) => (
-                            <li key={i} className="truncate">{goal}</li>
+                          {category.yearlyGoals.map((goal, i) => (
+                            <li key={i}>{goal}</li>
                           ))}
-                          {category.yearlyGoals.length > 2 && (
-                            <li className="text-muted-foreground">
-                              +{category.yearlyGoals.length - 2} more
-                            </li>
-                          )}
                         </ul>
                       ) : (
                         <p className="text-sm italic text-muted-foreground">
