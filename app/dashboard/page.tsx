@@ -398,17 +398,6 @@ export default function DashboardPage() {
 
         {/* Professional RPM Tab */}
         <TabsContent value="professional" className="space-y-4">
-          <div className="flex items-center justify-end mb-4">
-            <Button 
-              onClick={handleUpdatePurposes}
-              disabled={updatingPurposes}
-              variant="outline"
-              size="sm"
-            >
-              {updatingPurposes ? "Updating..." : "Update Categories"}
-            </Button>
-          </div>
-
           {purposeMessage && (
             <div className={`p-3 rounded-lg text-sm ${
               purposeMessage.startsWith("Error") 
@@ -492,6 +481,17 @@ export default function DashboardPage() {
               </Card>
             ))}
           </div>
+
+          <div className="flex items-center justify-end mt-4">
+            <Button 
+              onClick={handleUpdatePurposes}
+              disabled={updatingPurposes}
+              variant="outline"
+              size="sm"
+            >
+              {updatingPurposes ? "Updating..." : "Update Categories"}
+            </Button>
+          </div>
         </TabsContent>
 
         {/* Daily Tab */}
@@ -526,14 +526,6 @@ export default function DashboardPage() {
         <TabsContent value="hta" className="space-y-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">HTA Project Management</h2>
-            <Button 
-              onClick={handleImportHTATasks}
-              disabled={importingHTATasks}
-              variant="outline"
-              size="sm"
-            >
-              {importingHTATasks ? "Importing..." : "Import 4-Week Plan"}
-            </Button>
           </div>
 
           {htaMessage && (
@@ -607,6 +599,17 @@ export default function DashboardPage() {
               />
             </TabsContent>
           </Tabs>
+
+          <div className="flex items-center justify-end mt-4">
+            <Button 
+              onClick={handleImportHTATasks}
+              disabled={importingHTATasks}
+              variant="outline"
+              size="sm"
+            >
+              {importingHTATasks ? "Importing..." : "Import 4-Week Plan"}
+            </Button>
+          </div>
         </TabsContent>
 
         {/* Aspire Tab */}
@@ -729,24 +732,6 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-2xl font-bold">A & R Academy</h2>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleImportBooks}
-                disabled={importingBooks}
-                variant="outline"
-                size="sm"
-              >
-                {importingBooks ? "Importing..." : "Import Book Library"}
-              </Button>
-              <Button 
-                onClick={handleImportSchedule}
-                disabled={importingSchedule}
-                variant="outline"
-                size="sm"
-              >
-                {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
-              </Button>
-            </div>
           </div>
 
           {(importMessage || bookMessage) && (
@@ -797,6 +782,25 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <FieldTripList userId={convexUser._id} />
             <BookLibrary userId={convexUser._id} />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 mt-4">
+            <Button 
+              onClick={handleImportBooks}
+              disabled={importingBooks}
+              variant="outline"
+              size="sm"
+            >
+              {importingBooks ? "Importing..." : "Import Book Library"}
+            </Button>
+            <Button 
+              onClick={handleImportSchedule}
+              disabled={importingSchedule}
+              variant="outline"
+              size="sm"
+            >
+              {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
+            </Button>
           </div>
         </TabsContent>
       </Tabs>
