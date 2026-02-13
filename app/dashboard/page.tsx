@@ -49,6 +49,8 @@ export default function DashboardPage() {
   const [bookMessage, setBookMessage] = useState<string | null>(null);
   const [importingHTATasks, setImportingHTATasks] = useState(false);
   const [htaMessage, setHTAMessage] = useState<string | null>(null);
+  const [updatingAllGoals, setUpdatingAllGoals] = useState(false);
+  const [allGoalsMessage, setAllGoalsMessage] = useState<string | null>(null);
   
   // Get or create user in Convex
   const convexUser = useQuery(
@@ -96,6 +98,7 @@ export default function DashboardPage() {
   const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
   const importBooks = useMutation(api.admin.importBookLibrary);
   const importHTATasks = useMutation(api.admin.importHTATasks);
+  const updateAllRPMGoals = useMutation(api.admin.updateAllRPMGoals);
 
   // Get today's date in PST (with auto-update at midnight PST)
   const getPSTDate = () => {
@@ -237,6 +240,25 @@ export default function DashboardPage() {
     }
   };
 
+  const handleUpdateAllRPMGoals = async () => {
+    if (!user) return;
+    
+    setUpdatingAllGoals(true);
+    setAllGoalsMessage(null);
+
+    try {
+      const result = await updateAllRPMGoals({
+        clerkId: user.id,
+      });
+      setAllGoalsMessage(result.message || "All RPM goals updated successfully!");
+      setTimeout(() => setAllGoalsMessage(null), 5000);
+    } catch (error: any) {
+      setAllGoalsMessage("Error: " + (error.message || "Failed to update goals"));
+    } finally {
+      setUpdatingAllGoals(false);
+    }
+  };
+
   const editingCategory = categories?.find((c) => c._id === editingCategoryId);
 
   if (!convexUser) {
@@ -261,6 +283,30 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">
           Hi {user?.firstName || "Corinne"}. Let's make today epic!
         </p>
+      </div>
+
+      {/* One-time RPM Goals Update Button */}
+      <div className="mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>🎯 Update RPM Goals (One-Time Setup)</CardTitle>
+            <CardDescription>Load your February/March monthly needle movers + 2026 yearly goals into all 12 categories</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button onClick={handleUpdateAllRPMGoals} disabled={updatingAllGoals} className="w-full">
+              {updatingAllGoals ? "Updating..." : "Update All RPM Goals Now"}
+            </Button>
+            {allGoalsMessage && (
+              <div className={`p-3 rounded-lg text-sm ${
+                allGoalsMessage.startsWith("Error") 
+                  ? "bg-red-50 text-red-800 border border-red-200" 
+                  : "bg-green-50 text-green-800 border border-green-200"
+              }`}>
+                {allGoalsMessage}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
