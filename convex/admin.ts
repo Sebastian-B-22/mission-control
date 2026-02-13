@@ -817,7 +817,7 @@ export const updateAllRPMGoals = mutation({
           "FOCUS: Hit 1,000 HTA subscribers (this is the needle-mover)"
         ]
       },
-      "Magnificent Mommy/Homeschooling Hero": {
+      "Raising Resilient Humans": {
         monthlyFocus: [
           "iFLY and Nixon Museum field trips",
           "Anthony & Roma days (alternate - one this month, one next month)",
