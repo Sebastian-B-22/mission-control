@@ -16,7 +16,7 @@ import {
   Home,
   Briefcase,
   BookOpen,
-  Bot,
+  Zap,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
@@ -128,7 +128,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     },
     {
       name: "Sebastian",
-      icon: Bot,
+      icon: Zap,
       view: "sebastian",
       badge: inProgressCount > 0 ? `${inProgressCount} in progress` : null,
     },

@@ -35,6 +35,7 @@ import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { BookLibrary } from "@/components/BookLibraryDB";
 import { TaskList } from "@/components/TaskList";
 import { SebastianKanban } from "@/components/SebastianKanban";
+import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import { SidebarNew } from "@/components/SidebarNew";
 import { RPMCategoryPage } from "@/components/RPMCategoryPage";
 import { PersonalOverview } from "@/components/views/PersonalOverview";
@@ -378,15 +379,7 @@ export default function DashboardPage() {
         );
 
       case "sebastian":
-        return (
-          <div className="space-y-6">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold">Sebastian's Task Board</h2>
-              <p className="text-muted-foreground">AI sidekick workspace</p>
-            </div>
-            <SebastianKanban userId={convexUser._id} />
-          </div>
-        );
+        return <SebastianWorkspace userId={convexUser._id} />;
 
       // HTA views
       case "hta-overview":
