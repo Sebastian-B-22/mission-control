@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
+import { AspireMonthSwimlanes } from "@/components/AspireMonthSwimlanes";
+import { Calendar, List } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface AspireOverviewProps {
@@ -9,14 +13,43 @@ interface AspireOverviewProps {
 }
 
 export function AspireOverview({ userId }: AspireOverviewProps) {
+  const [viewMode, setViewMode] = useState<"timeline" | "sections">("timeline");
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Aspire Project Management</h1>
-        <p className="text-muted-foreground mt-1">Soccer coaching operations & programs</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Aspire Project Management</h1>
+          <p className="text-muted-foreground mt-1">Soccer coaching operations & programs</p>
+        </div>
+        
+        {/* View Toggle */}
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === "timeline" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("timeline")}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Timeline View
+          </Button>
+          <Button
+            variant={viewMode === "sections" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("sections")}
+          >
+            <List className="h-4 w-4 mr-2" />
+            By Section
+          </Button>
+        </div>
       </div>
 
-      <Tabs defaultValue="spring" className="w-full">
+      {/* Timeline View (Month Swimlanes) */}
+      {viewMode === "timeline" && <AspireMonthSwimlanes userId={userId} />}
+
+      {/* Sections View (Original Tabs) */}
+      {viewMode === "sections" && (
+        <Tabs defaultValue="spring" className="w-full">
         <TabsList>
           <TabsTrigger value="spring">Spring League</TabsTrigger>
           <TabsTrigger value="camps">Camps</TabsTrigger>
@@ -122,6 +155,7 @@ export function AspireOverview({ userId }: AspireOverviewProps) {
           </div>
         </TabsContent>
       </Tabs>
+      )}
     </div>
   );
 }
