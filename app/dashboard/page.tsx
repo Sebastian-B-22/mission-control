@@ -34,6 +34,7 @@ import { ReadAloudList } from "@/components/ReadAloudListDB";
 import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { BookLibrary } from "@/components/BookLibraryDB";
 import { TaskList } from "@/components/TaskList";
+import { SebastianKanban } from "@/components/SebastianKanban";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -287,13 +288,14 @@ export default function DashboardPage() {
 
       <Tabs defaultValue="personal" className="w-full">
         <div className="mb-8 overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full md:grid md:grid-cols-6 h-auto">
+          <TabsList className="inline-flex w-auto min-w-full md:grid md:grid-cols-7 h-auto">
             <TabsTrigger value="personal" className="whitespace-nowrap">Personal RPM</TabsTrigger>
             <TabsTrigger value="professional" className="whitespace-nowrap">Professional RPM</TabsTrigger>
             <TabsTrigger value="daily" className="whitespace-nowrap">Daily</TabsTrigger>
             <TabsTrigger value="hta" className="whitespace-nowrap">HTA</TabsTrigger>
             <TabsTrigger value="aspire" className="whitespace-nowrap">Aspire</TabsTrigger>
             <TabsTrigger value="homeschool" className="whitespace-nowrap">Homeschool</TabsTrigger>
+            <TabsTrigger value="sebastian" className="whitespace-nowrap">Sebastian ⚡</TabsTrigger>
           </TabsList>
         </div>
 
@@ -802,6 +804,16 @@ export default function DashboardPage() {
               {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
             </Button>
           </div>
+        </TabsContent>
+
+        {/* Sebastian Tab */}
+        <TabsContent value="sebastian" className="space-y-6">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Sebastian's Task Board ⚡</h2>
+            <p className="text-muted-foreground">AI sidekick workspace - tracking progress toward our goals</p>
+          </div>
+
+          <SebastianKanban userId={convexUser._id} />
         </TabsContent>
       </Tabs>
 

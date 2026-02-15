@@ -189,4 +189,20 @@ export default defineSchema({
     completed: v.boolean(),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  sebastianTasks: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    status: v.union(
+      v.literal("backlog"),
+      v.literal("todo"),
+      v.literal("in-progress"),
+      v.literal("done")
+    ),
+    priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    category: v.string(), // infrastructure, hta, aspire, agent-squad, skills, other
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
 });
