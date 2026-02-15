@@ -27,7 +27,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   // Get today's date for quick stats
   const today = new Date().toISOString().split("T")[0];
@@ -103,21 +103,20 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile/Desktop Toggle Button */}
+      {/* Mobile Toggle Button (only show on small screens) */}
       <Button
         variant="ghost"
         size="sm"
-        className="fixed top-4 left-4 z-50"
+        className="fixed top-4 left-4 z-50 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>
 
-      {/* Sidebar */}
+      {/* Sidebar - always visible on desktop, collapsible on mobile */}
       <div
-        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-40 transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } w-64 overflow-y-auto`}
+        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-40 transition-transform duration-300 w-64 overflow-y-auto
+        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="p-6 pt-16">
           {/* Header */}

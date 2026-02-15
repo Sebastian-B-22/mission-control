@@ -39,7 +39,7 @@ import { Sidebar } from "@/components/Sidebar";
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const [activeTab, setActiveTab] = useState("personal");
+  const [activeTab, setActiveTab] = useState("daily");
   const [editingCategoryId, setEditingCategoryId] = useState<Id<"rpmCategories"> | null>(null);
   const [purpose, setPurpose] = useState("");
   const [yearlyGoals, setYearlyGoals] = useState("");
@@ -308,7 +308,8 @@ export default function DashboardPage() {
         onTabChange={setActiveTab} 
       />
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="lg:pl-64">
+        <div className="container mx-auto py-8 px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
             Mission Control
@@ -319,18 +320,6 @@ export default function DashboardPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="mb-8 overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full md:grid md:grid-cols-7 h-auto">
-            <TabsTrigger value="personal" className="whitespace-nowrap">Personal RPM</TabsTrigger>
-            <TabsTrigger value="professional" className="whitespace-nowrap">Professional RPM</TabsTrigger>
-            <TabsTrigger value="daily" className="whitespace-nowrap">Daily</TabsTrigger>
-            <TabsTrigger value="hta" className="whitespace-nowrap">HTA</TabsTrigger>
-            <TabsTrigger value="aspire" className="whitespace-nowrap">Aspire</TabsTrigger>
-            <TabsTrigger value="homeschool" className="whitespace-nowrap">Homeschool</TabsTrigger>
-            <TabsTrigger value="sebastian" className="whitespace-nowrap">Sebastian</TabsTrigger>
-          </TabsList>
-        </div>
-
         {/* Personal RPM Tab */}
         <TabsContent value="personal" className="space-y-4">
 
@@ -906,6 +895,7 @@ export default function DashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </div>
       </div>
     </>
   );
