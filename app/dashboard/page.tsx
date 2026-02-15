@@ -35,9 +35,11 @@ import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { BookLibrary } from "@/components/BookLibraryDB";
 import { TaskList } from "@/components/TaskList";
 import { SebastianKanban } from "@/components/SebastianKanban";
+import { Sidebar } from "@/components/Sidebar";
 
 export default function DashboardPage() {
   const { user } = useUser();
+  const [activeTab, setActiveTab] = useState("personal");
   const [editingCategoryId, setEditingCategoryId] = useState<Id<"rpmCategories"> | null>(null);
   const [purpose, setPurpose] = useState("");
   const [yearlyGoals, setYearlyGoals] = useState("");
@@ -298,17 +300,25 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
-          Mission Control
-        </h1>
-        <p className="text-muted-foreground">
-          Hi {user?.firstName || "Corinne"}. Let's make today epic!
-        </p>
-      </div>
+    <>
+      {/* Sidebar */}
+      <Sidebar 
+        userId={convexUser._id} 
+        currentTab={activeTab} 
+        onTabChange={setActiveTab} 
+      />
 
-      <Tabs defaultValue="personal" className="w-full">
+      <div className="container mx-auto py-8 px-4">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
+            Mission Control
+          </h1>
+          <p className="text-muted-foreground">
+            Hi {user?.firstName || "Corinne"}. Let's make today epic!
+          </p>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="mb-8 overflow-x-auto">
           <TabsList className="inline-flex w-auto min-w-full md:grid md:grid-cols-7 h-auto">
             <TabsTrigger value="personal" className="whitespace-nowrap">Personal RPM</TabsTrigger>
@@ -896,6 +906,7 @@ export default function DashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </>
   );
 }
