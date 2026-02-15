@@ -317,7 +317,7 @@ export default function DashboardPage() {
             <TabsTrigger value="hta" className="whitespace-nowrap">HTA</TabsTrigger>
             <TabsTrigger value="aspire" className="whitespace-nowrap">Aspire</TabsTrigger>
             <TabsTrigger value="homeschool" className="whitespace-nowrap">Homeschool</TabsTrigger>
-            <TabsTrigger value="sebastian" className="whitespace-nowrap">Sebastian ⚡</TabsTrigger>
+            <TabsTrigger value="sebastian" className="whitespace-nowrap">Sebastian</TabsTrigger>
           </TabsList>
         </div>
 
@@ -830,30 +830,10 @@ export default function DashboardPage() {
 
         {/* Sebastian Tab */}
         <TabsContent value="sebastian" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold">Sebastian's Task Board ⚡</h2>
-              <p className="text-muted-foreground">AI sidekick workspace - tracking progress toward our goals</p>
-            </div>
-            <Button 
-              onClick={handleImportSebastianTasks}
-              disabled={importingSebastianTasks}
-              variant="outline"
-              size="sm"
-            >
-              {importingSebastianTasks ? "Importing..." : "Import Initial Tasks"}
-            </Button>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Sebastian's Task Board</h2>
+            <p className="text-muted-foreground">AI sidekick workspace</p>
           </div>
-
-          {sebastianMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
-              sebastianMessage.startsWith("Error") 
-                ? "bg-red-50 text-red-800 border border-red-200" 
-                : "bg-green-50 text-green-800 border border-green-200"
-            }`}>
-              {sebastianMessage}
-            </div>
-          )}
 
           <SebastianKanban userId={convexUser._id} />
         </TabsContent>
