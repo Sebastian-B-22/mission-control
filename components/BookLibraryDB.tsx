@@ -24,6 +24,21 @@ export function BookLibrary({ userId }: BookLibraryProps) {
   const [newAuthor, setNewAuthor] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [sortBy, setSortBy] = useState<"title" | "author" | "category">("title");
+
+  // Sort books based on selected option
+  const sortedBooks = books ? [...books].sort((a, b) => {
+    switch (sortBy) {
+      case "title":
+        return a.title.localeCompare(b.title);
+      case "author":
+        return (a.author || "").localeCompare(b.author || "");
+      case "category":
+        return (a.category || "").localeCompare(b.category || "");
+      default:
+        return 0;
+    }
+  }) : [];
 
   const handleToggle = async (id: Id<"bookLibrary">, currentRead: boolean) => {
     await toggleRead({ id, read: !currentRead });
@@ -75,8 +90,22 @@ export function BookLibrary({ userId }: BookLibraryProps) {
         <CardDescription>Books available to read & explore</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Sort Dropdown */}
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium">Sort by:</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as "title" | "author" | "category")}
+            className="text-sm border rounded px-2 py-1"
+          >
+            <option value="title">Title (A-Z)</option>
+            <option value="author">Author</option>
+            <option value="category">Category</option>
+          </select>
+        </div>
+
         <div className="space-y-2">
-          {books.map((book) => (
+          {sortedBooks.map((book) => (
             <div
               key={book._id}
               className="flex items-start gap-2 group hover:bg-accent/50 p-2 rounded transition-colors"

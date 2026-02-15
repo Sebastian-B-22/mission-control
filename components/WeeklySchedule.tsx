@@ -48,9 +48,16 @@ export function WeeklySchedule({ userId }: WeeklyScheduleProps) {
   const createBlock = useMutation(api.weeklySchedule.createScheduleBlock);
   const deleteBlock = useMutation(api.weeklySchedule.deleteScheduleBlock);
 
+  // Get current day of week
+  const getCurrentDay = (): DayOfWeek => {
+    const days: DayOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const today = new Date().getDay();
+    return days[today];
+  };
+
   const [isAddingBlock, setIsAddingBlock] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek>("monday");
-  const [activeDay, setActiveDay] = useState<DayOfWeek>("monday");
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(getCurrentDay());
+  const [activeDay, setActiveDay] = useState<DayOfWeek>(getCurrentDay());
   const [newBlock, setNewBlock] = useState({
     startTime: "09:00",
     endTime: "10:00",
@@ -120,7 +127,7 @@ export function WeeklySchedule({ userId }: WeeklyScheduleProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="monday" className="w-full">
+          <Tabs value={activeDay} onValueChange={(val) => setActiveDay(val as DayOfWeek)} className="w-full">
             <TabsList className="grid w-full grid-cols-7 mb-4">
               {DAYS.map((day) => (
                 <TabsTrigger key={day.key} value={day.key}>

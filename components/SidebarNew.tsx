@@ -29,7 +29,7 @@ interface SidebarProps {
 
 export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [expandedSections, setExpandedSections] = useState<string[]>(["personal", "professional"]);
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
   // Get Sebastian's tasks for quick status
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
