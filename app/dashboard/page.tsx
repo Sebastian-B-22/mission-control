@@ -43,6 +43,10 @@ import { HTAOverview } from "@/components/views/HTAOverview";
 import { HTASubView } from "@/components/views/HTASubView";
 import { AspireOverview } from "@/components/views/AspireOverview";
 import { AspireSubView } from "@/components/views/AspireSubView";
+import { AspireSpringView } from "@/components/views/AspireSpringView";
+import { AspireCampsView } from "@/components/views/AspireCampsView";
+import { AspirePDPView } from "@/components/views/AspirePDPView";
+import { Aspire7v7View } from "@/components/views/Aspire7v7View";
 import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
 import {
   HomeschoolScheduleView,
@@ -406,13 +410,13 @@ export default function DashboardPage() {
       case "aspire-agoura":
         return <AspireSubView userId={convexUser._id} subProject="agoura" title="Agoura (Region 4)" description="Agoura programs & coordination" />;
       case "aspire-spring":
-        return <AspireSubView userId={convexUser._id} subProject="spring" title="Spring League" description="Season planning & registration" />;
+        return <AspireSpringView userId={convexUser._id} />;
       case "aspire-camps":
-        return <AspireSubView userId={convexUser._id} subProject="camps" title="Camps" description="Camp planning & execution" />;
+        return <AspireCampsView userId={convexUser._id} />;
       case "aspire-pdp":
-        return <AspireSubView userId={convexUser._id} subProject="pdp" title="PDP" description="Winter training program" />;
+        return <AspirePDPView userId={convexUser._id} />;
       case "aspire-7v7":
-        return <AspireSubView userId={convexUser._id} subProject="7v7" title="7v7 Tournaments" description="Tournament organization" />;
+        return <Aspire7v7View userId={convexUser._id} />;
 
       // Homeschool views
       case "homeschool-overview":
