@@ -39,6 +39,20 @@ import { SidebarNew } from "@/components/SidebarNew";
 import { RPMCategoryPage } from "@/components/RPMCategoryPage";
 import { PersonalOverview } from "@/components/views/PersonalOverview";
 import { ProfessionalOverview } from "@/components/views/ProfessionalOverview";
+import { HTAOverview } from "@/components/views/HTAOverview";
+import { HTASubView } from "@/components/views/HTASubView";
+import { AspireOverview } from "@/components/views/AspireOverview";
+import { AspireSubView } from "@/components/views/AspireSubView";
+import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
+import {
+  HomeschoolScheduleView,
+  HomeschoolFocusView,
+  HomeschoolProjectsView,
+  HomeschoolReadAloudView,
+  HomeschoolLibraryView,
+  HomeschoolFieldTripsView,
+  HomeschoolTripsView,
+} from "@/components/views/HomeschoolSubViews";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -370,530 +384,60 @@ export default function DashboardPage() {
           </div>
         );
 
-      // HTA, Aspire, Homeschool - still using tabs for now
+      // HTA views
       case "hta-overview":
+        return <HTAOverview userId={convexUser._id} />;
+      case "hta-gtm":
+        return <HTASubView userId={convexUser._id} subProject="gtm" title="GTM Timeline" description="Launch milestones, key dates & GTM strategy" />;
+      case "hta-product":
+        return <HTASubView userId={convexUser._id} subProject="product" title="Product Development" description="Subscription box development & testing" />;
+      case "hta-curriculum":
+        return <HTASubView userId={convexUser._id} subProject="curriculum" title="Curriculum Development" description="Activity creation & content" />;
+      case "hta-marketing":
+        return <HTASubView userId={convexUser._id} subProject="marketing" title="Marketing" description="Brand, content & customer acquisition" />;
+      case "hta-operations":
+        return <HTASubView userId={convexUser._id} subProject="operations" title="Operations" description="Fulfillment, shipping & systems" />;
+
+      // Aspire views
       case "aspire-overview":
+        return <AspireOverview userId={convexUser._id} />;
+      case "aspire-pali":
+        return <AspireSubView userId={convexUser._id} subProject="pali" title="Pali (Region 69)" description="Pacific Palisades programs & coordination" />;
+      case "aspire-agoura":
+        return <AspireSubView userId={convexUser._id} subProject="agoura" title="Agoura (Region 4)" description="Agoura programs & coordination" />;
+      case "aspire-spring":
+        return <AspireSubView userId={convexUser._id} subProject="spring" title="Spring League" description="Season planning & registration" />;
+      case "aspire-camps":
+        return <AspireSubView userId={convexUser._id} subProject="camps" title="Camps" description="Camp planning & execution" />;
+      case "aspire-pdp":
+        return <AspireSubView userId={convexUser._id} subProject="pdp" title="PDP" description="Winter training program" />;
+      case "aspire-7v7":
+        return <AspireSubView userId={convexUser._id} subProject="7v7" title="7v7 Tournaments" description="Tournament organization" />;
+
+      // Homeschool views
       case "homeschool-overview":
+        return <HomeschoolOverview userId={convexUser._id} />;
+      case "homeschool-schedule":
+        return <HomeschoolScheduleView userId={convexUser._id} />;
+      case "homeschool-focus":
+        return <HomeschoolFocusView userId={convexUser._id} />;
+      case "homeschool-projects":
+        return <HomeschoolProjectsView userId={convexUser._id} />;
+      case "homeschool-readaloud":
+        return <HomeschoolReadAloudView userId={convexUser._id} />;
+      case "homeschool-library":
+        return <HomeschoolLibraryView userId={convexUser._id} />;
+      case "homeschool-fieldtrips":
+        return <HomeschoolFieldTripsView userId={convexUser._id} />;
+      case "homeschool-trips":
+        return <HomeschoolTripsView userId={convexUser._id} />;
+
       default:
         return (
-          <Tabs value={currentView} onValueChange={setCurrentView} className="w-full">
-        {/* Personal RPM Tab (legacy - now handled by overview) */}
-        <TabsContent value="personal-overview" className="space-y-4">
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {personalCategories.map((category) => (
-              <Card 
-                key={category._id} 
-                className="hover:shadow-lg transition-shadow cursor-pointer group"
-                onClick={() => handleEditCategory(category._id)}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{category.name}</CardTitle>
-                      <CardDescription>{category.role || "RPM Category"}</CardDescription>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditCategory(category._id);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm font-bold text-muted-foreground mb-1">Purpose</p>
-                      {category.purpose ? (
-                        <p className="text-sm">{category.purpose}</p>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add purpose...
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-muted-foreground mb-1">
-                        Monthly Needle Movers
-                      </p>
-                      {category.monthlyFocus.length > 0 ? (
-                        <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.monthlyFocus.map((focus, i) => (
-                            <li key={i}>{focus}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add focus areas...
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-muted-foreground mb-1">Yearly Goals</p>
-                      {category.yearlyGoals.length > 0 ? (
-                        <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.yearlyGoals.map((goal, i) => (
-                            <li key={i}>{goal}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add goals...
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-gray-400">View not found</h2>
+            <p className="text-muted-foreground mt-2">Current view: {currentView}</p>
           </div>
-          <div className="flex items-center justify-end mb-4">
-            <Button 
-              onClick={handleUpdatePurposes}
-              disabled={updatingPurposes}
-              variant="outline"
-              size="sm"
-            >
-              {updatingPurposes ? "Updating..." : "Update Categories"}
-            </Button>
-          </div>
-
-          {purposeMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
-              purposeMessage.startsWith("Error") 
-                ? "bg-red-50 text-red-800 border border-red-200" 
-                : "bg-green-50 text-green-800 border border-green-200"
-            }`}>
-              {purposeMessage}
-            </div>
-          )}
-
-        </TabsContent>
-
-        {/* Professional RPM Tab */}
-        <TabsContent value="professional" className="space-y-4">
-          {purposeMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
-              purposeMessage.startsWith("Error") 
-                ? "bg-red-50 text-red-800 border border-red-200" 
-                : "bg-green-50 text-green-800 border border-green-200"
-            }`}>
-              {purposeMessage}
-            </div>
-          )}
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {professionalCategories.map((category) => (
-              <Card 
-                key={category._id} 
-                className="hover:shadow-lg transition-shadow cursor-pointer group"
-                onClick={() => handleEditCategory(category._id)}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{category.name}</CardTitle>
-                      <CardDescription>{category.role || "RPM Category"}</CardDescription>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditCategory(category._id);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm font-bold text-muted-foreground mb-1">Purpose</p>
-                      {category.purpose ? (
-                        <p className="text-sm">{category.purpose}</p>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add purpose...
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-muted-foreground mb-1">
-                        Monthly Needle Movers
-                      </p>
-                      {category.monthlyFocus.length > 0 ? (
-                        <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.monthlyFocus.map((focus, i) => (
-                            <li key={i}>{focus}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add focus areas...
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-muted-foreground mb-1">Yearly Goals</p>
-                      {category.yearlyGoals.length > 0 ? (
-                        <ul className="text-sm list-disc list-inside space-y-1">
-                          {category.yearlyGoals.map((goal, i) => (
-                            <li key={i}>{goal}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          Click to add goals...
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-end mt-4">
-            <Button 
-              onClick={handleUpdatePurposes}
-              disabled={updatingPurposes}
-              variant="outline"
-              size="sm"
-            >
-              {updatingPurposes ? "Updating..." : "Update Categories"}
-            </Button>
-          </div>
-        </TabsContent>
-
-        {/* Daily Tab */}
-        <TabsContent value="daily" className="space-y-6">
-          {/* Date Display */}
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">
-              Daily - {new Date(today + 'T00:00:00').toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                timeZone: 'America/Los_Angeles'
-              })}
-            </h2>
-          </div>
-
-          {/* Morning Mindset - Top */}
-          <MorningMindset userId={convexUser._id} date={today} />
-
-          {/* Habits & 5 to Thrive - Middle */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <HabitTracker userId={convexUser._id} date={today} />
-            <FiveToThrive userId={convexUser._id} date={today} />
-          </div>
-
-          {/* Evening Reflection - Bottom */}
-          <EveningReflection userId={convexUser._id} date={today} />
-        </TabsContent>
-
-        {/* HTA Tab */}
-        <TabsContent value="hta" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">HTA Project Management</h2>
-          </div>
-
-          {htaMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
-              htaMessage.startsWith("Error") 
-                ? "bg-red-50 text-red-800 border border-red-200" 
-                : "bg-green-50 text-green-800 border border-green-200"
-            }`}>
-              {htaMessage}
-            </div>
-          )}
-
-          <Tabs defaultValue="gtm" className="w-full">
-            <TabsList>
-              <TabsTrigger value="gtm">GTM Timeline</TabsTrigger>
-              <TabsTrigger value="product">Product Dev</TabsTrigger>
-              <TabsTrigger value="curriculum">Curriculum Dev</TabsTrigger>
-              <TabsTrigger value="marketing">Marketing</TabsTrigger>
-              <TabsTrigger value="operations">Operations</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="gtm" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="hta"
-                subProject="gtm"
-                title="Go-To-Market Timeline"
-                description="Launch milestones, key dates & GTM strategy"
-              />
-            </TabsContent>
-
-            <TabsContent value="product" className="space-y-4">
-              <ErrorBoundary>
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="hta"
-                  subProject="product"
-                  title="Product Development"
-                  description="Subscription box development & testing"
-                />
-              </ErrorBoundary>
-            </TabsContent>
-
-            <TabsContent value="curriculum" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="hta"
-                subProject="curriculum"
-                title="Curriculum Development"
-                description="Activity creation & content"
-              />
-            </TabsContent>
-
-            <TabsContent value="marketing" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="hta"
-                subProject="marketing"
-                title="Marketing"
-                description="Brand, content & customer acquisition"
-              />
-            </TabsContent>
-
-            <TabsContent value="operations" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="hta"
-                subProject="operations"
-                title="Operations"
-                description="Fulfillment, shipping & systems"
-              />
-            </TabsContent>
-          </Tabs>
-
-          <div className="flex items-center justify-end mt-4">
-            <Button 
-              onClick={handleImportHTATasks}
-              disabled={importingHTATasks}
-              variant="outline"
-              size="sm"
-            >
-              {importingHTATasks ? "Importing..." : "Import 4-Week Plan"}
-            </Button>
-          </div>
-        </TabsContent>
-
-        {/* Aspire Tab */}
-        <TabsContent value="aspire" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Aspire Project Management</h2>
-          </div>
-
-          <Tabs defaultValue="spring" className="w-full">
-            <TabsList>
-              <TabsTrigger value="spring">Spring League</TabsTrigger>
-              <TabsTrigger value="camps">Camps</TabsTrigger>
-              <TabsTrigger value="pdp">PDP</TabsTrigger>
-              <TabsTrigger value="7v7">7v7</TabsTrigger>
-              <TabsTrigger value="pali">Pali</TabsTrigger>
-              <TabsTrigger value="agoura">Agoura</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="pali" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="aspire"
-                subProject="pali"
-                title="Pali (Region 69)"
-                description="Pacific Palisades programs & coordination"
-              />
-            </TabsContent>
-
-            <TabsContent value="agoura" className="space-y-4">
-              <ProjectTaskList
-                userId={convexUser._id}
-                project="aspire"
-                subProject="agoura"
-                title="Agoura (Region 4)"
-                description="Agoura programs & coordination"
-              />
-            </TabsContent>
-
-            <TabsContent value="spring" className="space-y-4">
-              <div className="grid gap-6 md:grid-cols-2">
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="spring-agoura"
-                  title="Agoura Spring League"
-                  description="Region 4 season planning & registration"
-                />
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="spring-pali"
-                  title="Pali Spring League"
-                  description="Region 69 season planning & registration"
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="camps" className="space-y-4">
-              <div className="grid gap-6 md:grid-cols-2">
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="camps-agoura"
-                  title="Agoura Camps"
-                  description="Region 4 camp planning & execution"
-                />
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="camps-pali"
-                  title="Pali Camps"
-                  description="Region 69 camp planning & execution"
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="pdp" className="space-y-4">
-              <div className="grid gap-6 md:grid-cols-2">
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="pdp-agoura"
-                  title="Agoura PDP"
-                  description="Region 4 winter training program"
-                />
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="pdp-pali"
-                  title="Pali PDP"
-                  description="Region 69 winter training program"
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="7v7" className="space-y-4">
-              <div className="grid gap-6 md:grid-cols-2">
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="7v7-agoura"
-                  title="Agoura 7v7 Tournaments"
-                  description="Region 4 tournament organization"
-                />
-                <ProjectTaskList
-                  userId={convexUser._id}
-                  project="aspire"
-                  subProject="7v7-pali"
-                  title="Pali 7v7 Tournaments"
-                  description="Region 69 tournament organization"
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-
-        {/* Homeschool Tab */}
-        <TabsContent value="homeschool" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold">A & R Academy</h2>
-            </div>
-          </div>
-
-          {(importMessage || bookMessage) && (
-            <div className="space-y-2">
-              {importMessage && (
-                <div className={`p-3 rounded-lg text-sm ${
-                  importMessage.startsWith("Error") 
-                    ? "bg-red-50 text-red-800 border border-red-200" 
-                    : "bg-green-50 text-green-800 border border-green-200"
-                }`}>
-                  {importMessage}
-                </div>
-              )}
-              {bookMessage && (
-                <div className={`p-3 rounded-lg text-sm ${
-                  bookMessage.startsWith("Error") 
-                    ? "bg-red-50 text-red-800 border border-red-200" 
-                    : "bg-green-50 text-green-800 border border-green-200"
-                }`}>
-                  {bookMessage}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Homeschool Objectives - Slim Banner */}
-          <HomeschoolObjectives />
-
-          {/* Weekly Schedule - Full Width */}
-          <WeeklySchedule userId={convexUser._id} />
-
-          {/* Two Column Section */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Left Column */}
-            <div className="space-y-6">
-              <MonthlyFocus />
-              <ProjectsThisMonth />
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-              <ReadAloudList userId={convexUser._id} />
-              <TripsOnHorizon />
-            </div>
-          </div>
-
-          {/* Long Lists - Bottom Section */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <FieldTripList userId={convexUser._id} />
-            <BookLibrary userId={convexUser._id} />
-          </div>
-
-          <div className="flex items-center justify-end gap-2 mt-4">
-            <Button 
-              onClick={handleImportBooks}
-              disabled={importingBooks}
-              variant="outline"
-              size="sm"
-            >
-              {importingBooks ? "Importing..." : "Import Book Library"}
-            </Button>
-            <Button 
-              onClick={handleImportSchedule}
-              disabled={importingSchedule}
-              variant="outline"
-              size="sm"
-            >
-              {importingSchedule ? "Importing..." : "Import Weekly Schedule"}
-            </Button>
-          </div>
-        </TabsContent>
-
-        {/* Sebastian Tab */}
-        <TabsContent value="sebastian" className="space-y-6">
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold">Sebastian's Task Board</h2>
-            <p className="text-muted-foreground">AI sidekick workspace</p>
-          </div>
-
-          <SebastianKanban userId={convexUser._id} />
-        </TabsContent>
-      </Tabs>
         );
     }
   };
