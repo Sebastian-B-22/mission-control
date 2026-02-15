@@ -39,6 +39,13 @@ export const getCategoriesByUser = query({
   },
 });
 
+export const getCategoryById = query({
+  args: { id: v.id("rpmCategories") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const initializeDefaultCategories = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {

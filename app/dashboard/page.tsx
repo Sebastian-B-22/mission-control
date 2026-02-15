@@ -35,11 +35,14 @@ import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { BookLibrary } from "@/components/BookLibraryDB";
 import { TaskList } from "@/components/TaskList";
 import { SebastianKanban } from "@/components/SebastianKanban";
-import { Sidebar } from "@/components/Sidebar";
+import { SidebarNew } from "@/components/SidebarNew";
+import { RPMCategoryPage } from "@/components/RPMCategoryPage";
+import { PersonalOverview } from "@/components/views/PersonalOverview";
+import { ProfessionalOverview } from "@/components/views/ProfessionalOverview";
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const [activeTab, setActiveTab] = useState("daily");
+  const [currentView, setCurrentView] = useState("daily");
   const [editingCategoryId, setEditingCategoryId] = useState<Id<"rpmCategories"> | null>(null);
   const [purpose, setPurpose] = useState("");
   const [yearlyGoals, setYearlyGoals] = useState("");
@@ -299,29 +302,83 @@ export default function DashboardPage() {
     );
   }
 
-  return (
-    <>
-      {/* Sidebar */}
-      <Sidebar 
-        userId={convexUser._id} 
-        currentTab={activeTab} 
-        onTabChange={setActiveTab} 
-      />
+  // Helper function to render content based on current view
+  const renderContent = () => {
+    // Personal category pages
+    if (currentView.startsWith("personal-category-")) {
+      const categoryId = currentView.replace("personal-category-", "") as Id<"rpmCategories">;
+      return <RPMCategoryPage categoryId={categoryId} />;
+    }
 
-      <div className="lg:pl-64">
-        <div className="container mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
-            Mission Control
-          </h1>
-          <p className="text-muted-foreground">
-            Hi {user?.firstName || "Corinne"}. Let's make today epic!
-          </p>
-        </div>
+    // Professional category pages
+    if (currentView.startsWith("professional-category-")) {
+      const categoryId = currentView.replace("professional-category-", "") as Id<"rpmCategories">;
+      return <RPMCategoryPage categoryId={categoryId} />;
+    }
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        {/* Personal RPM Tab */}
-        <TabsContent value="personal" className="space-y-4">
+    // Main views
+    switch (currentView) {
+      case "daily":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">
+                Daily - {new Date(today + 'T00:00:00').toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric',
+                  timeZone: 'America/Los_Angeles'
+                })}
+              </h2>
+            </div>
+            <MorningMindset userId={convexUser._id} date={today} />
+            <div className="grid gap-6 md:grid-cols-2">
+              <HabitTracker userId={convexUser._id} date={today} />
+              <FiveToThrive userId={convexUser._id} date={today} />
+            </div>
+            <EveningReflection userId={convexUser._id} date={today} />
+          </div>
+        );
+
+      case "personal-overview":
+        return (
+          <PersonalOverview
+            categories={personalCategories}
+            onEditCategory={handleEditCategory}
+            onViewCategory={(id) => setCurrentView(`personal-category-${id}`)}
+          />
+        );
+
+      case "professional-overview":
+        return (
+          <ProfessionalOverview
+            categories={professionalCategories}
+            onEditCategory={handleEditCategory}
+            onViewCategory={(id) => setCurrentView(`professional-category-${id}`)}
+          />
+        );
+
+      case "sebastian":
+        return (
+          <div className="space-y-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold">Sebastian's Task Board</h2>
+              <p className="text-muted-foreground">AI sidekick workspace</p>
+            </div>
+            <SebastianKanban userId={convexUser._id} />
+          </div>
+        );
+
+      // HTA, Aspire, Homeschool - still using tabs for now
+      case "hta-overview":
+      case "aspire-overview":
+      case "homeschool-overview":
+      default:
+        return (
+          <Tabs value={currentView} onValueChange={setCurrentView} className="w-full">
+        {/* Personal RPM Tab (legacy - now handled by overview) */}
+        <TabsContent value="personal-overview" className="space-y-4">
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {personalCategories.map((category) => (
@@ -837,6 +894,32 @@ export default function DashboardPage() {
           <SebastianKanban userId={convexUser._id} />
         </TabsContent>
       </Tabs>
+        );
+    }
+  };
+
+  return (
+    <>
+      {/* Sidebar */}
+      <SidebarNew
+        userId={convexUser._id} 
+        currentView={currentView} 
+        onViewChange={setCurrentView} 
+      />
+
+      <div className="lg:pl-64">
+        <div className="container mx-auto py-8 px-4">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
+              Mission Control
+            </h1>
+            <p className="text-muted-foreground">
+              Hi {user?.firstName || "Corinne"}. Let's make today epic!
+            </p>
+          </div>
+
+          {/* Render current view content */}
+          {renderContent()}
 
       {/* Edit Category Dialog */}
       <Dialog open={!!editingCategoryId} onOpenChange={() => setEditingCategoryId(null)}>
