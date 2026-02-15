@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#f59e0b"/>
+  <!-- Checklist icon -->
+  <g transform="translate(130, 120)">
+    <!-- First checkbox - checked -->
+    <rect x="0" y="0" width="60" height="60" rx="8" fill="white"/>
+    <polyline points="15,30 25,40 45,20" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="80" y="10" width="170" height="40" rx="8" fill="white" opacity="0.9"/>
+    
+    <!-- Second checkbox - checked -->
+    <rect x="0" y="90" width="60" height="60" rx="8" fill="white"/>
+    <polyline points="15,120 25,130 45,110" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="80" y="100" width="140" height="40" rx="8" fill="white" opacity="0.9"/>
+    
+    <!-- Third checkbox - empty -->
+    <rect x="0" y="180" width="60" height="60" rx="8" fill="white"/>
+    <rect x="80" y="190" width="200" height="40" rx="8" fill="white" opacity="0.7"/>
+  </g>
+</svg>

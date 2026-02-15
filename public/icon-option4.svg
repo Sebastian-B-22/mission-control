@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#f59e0b"/>
+  <!-- Dashboard/Grid icon -->
+  <g transform="translate(110, 110)">
+    <!-- Top left square -->
+    <rect x="0" y="0" width="130" height="130" rx="20" fill="white"/>
+    <!-- Top right square -->
+    <rect x="162" y="0" width="130" height="130" rx="20" fill="white" opacity="0.8"/>
+    <!-- Bottom left square -->
+    <rect x="0" y="162" width="130" height="130" rx="20" fill="white" opacity="0.8"/>
+    <!-- Bottom right square -->
+    <rect x="162" y="162" width="130" height="130" rx="20" fill="white" opacity="0.6"/>
+  </g>
+</svg>

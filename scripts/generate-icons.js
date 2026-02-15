@@ -6,14 +6,26 @@ const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="100" fill="#f59e0b"/>
   <text
     x="50%"
-    y="50%"
+    y="38%"
     font-family="system-ui, -apple-system, sans-serif"
-    font-size="320"
-    font-weight="bold"
+    font-size="170"
+    font-weight="900"
     fill="white"
     text-anchor="middle"
     dominant-baseline="central"
-  >M</text>
+    letter-spacing="6"
+  >Life</text>
+  <text
+    x="50%"
+    y="68%"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="170"
+    font-weight="900"
+    fill="white"
+    text-anchor="middle"
+    dominant-baseline="central"
+    letter-spacing="6"
+  >OS</text>
 </svg>`;
 
 const publicDir = path.join(__dirname, '..', 'public');
