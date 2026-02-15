@@ -50,6 +50,8 @@ export default function DashboardPage() {
   const [bookMessage, setBookMessage] = useState<string | null>(null);
   const [importingHTATasks, setImportingHTATasks] = useState(false);
   const [htaMessage, setHTAMessage] = useState<string | null>(null);
+  const [importingSebastianTasks, setImportingSebastianTasks] = useState(false);
+  const [sebastianMessage, setSebastianMessage] = useState<string | null>(null);
   const [updatingAllGoals, setUpdatingAllGoals] = useState(false);
   const [allGoalsMessage, setAllGoalsMessage] = useState<string | null>(null);
   
@@ -100,6 +102,7 @@ export default function DashboardPage() {
   const importBooks = useMutation(api.admin.importBookLibrary);
   const importHTATasks = useMutation(api.admin.importHTATasks);
   const updateAllRPMGoals = useMutation(api.admin.updateAllRPMGoals);
+  const seedSebastianTasks = useMutation(api.seedSebastianTasks.seedInitialTasks);
 
   // Get today's date in PST (with auto-update at midnight PST)
   const getPSTDate = () => {
@@ -257,6 +260,25 @@ export default function DashboardPage() {
       setAllGoalsMessage("Error: " + (error.message || "Failed to update goals"));
     } finally {
       setUpdatingAllGoals(false);
+    }
+  };
+
+  const handleImportSebastianTasks = async () => {
+    if (!user) return;
+    
+    setImportingSebastianTasks(true);
+    setSebastianMessage(null);
+
+    try {
+      const result = await seedSebastianTasks({
+        clerkId: user.id,
+      });
+      setSebastianMessage(result.message || "Imported Sebastian's tasks successfully!");
+      setTimeout(() => setSebastianMessage(null), 5000);
+    } catch (error: any) {
+      setSebastianMessage("Error: " + (error.message || "Failed to import tasks"));
+    } finally {
+      setImportingSebastianTasks(false);
     }
   };
 
@@ -808,10 +830,30 @@ export default function DashboardPage() {
 
         {/* Sebastian Tab */}
         <TabsContent value="sebastian" className="space-y-6">
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold">Sebastian's Task Board ⚡</h2>
-            <p className="text-muted-foreground">AI sidekick workspace - tracking progress toward our goals</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Sebastian's Task Board ⚡</h2>
+              <p className="text-muted-foreground">AI sidekick workspace - tracking progress toward our goals</p>
+            </div>
+            <Button 
+              onClick={handleImportSebastianTasks}
+              disabled={importingSebastianTasks}
+              variant="outline"
+              size="sm"
+            >
+              {importingSebastianTasks ? "Importing..." : "Import Initial Tasks"}
+            </Button>
           </div>
+
+          {sebastianMessage && (
+            <div className={`p-3 rounded-lg text-sm ${
+              sebastianMessage.startsWith("Error") 
+                ? "bg-red-50 text-red-800 border border-red-200" 
+                : "bg-green-50 text-green-800 border border-green-200"
+            }`}>
+              {sebastianMessage}
+            </div>
+          )}
 
           <SebastianKanban userId={convexUser._id} />
         </TabsContent>
