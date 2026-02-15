@@ -205,7 +205,7 @@ export function SebastianKanban({ userId }: { userId: Id<"users"> }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="flex gap-4 overflow-x-auto pb-4">
         <KanbanColumn
           title="Backlog"
           status="backlog"

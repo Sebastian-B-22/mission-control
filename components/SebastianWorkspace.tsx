@@ -40,7 +40,7 @@ export function SebastianWorkspace({ userId }: SebastianWorkspaceProps) {
           </TabsTrigger>
           <TabsTrigger value="kanban" className="flex items-center gap-2">
             <KanbanSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">Kanban</span>
+            <span className="hidden sm:inline">Projects</span>
           </TabsTrigger>
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
