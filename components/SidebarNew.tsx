@@ -239,15 +239,24 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
             <h3 className="text-sm font-semibold mb-3">Agent Squad</h3>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600">Sebastian</span>
+                <div className="flex flex-col">
+                  <span className="text-gray-700 font-medium">Sebastian</span>
+                  <span className="text-gray-500 text-[10px]">Chief of Staff</span>
+                </div>
                 <span className="text-green-600 font-medium">● Active</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600">Scout</span>
+                <div className="flex flex-col">
+                  <span className="text-gray-700 font-medium">Scout</span>
+                  <span className="text-gray-500 text-[10px]">Operations</span>
+                </div>
                 <span className="text-green-600 font-medium">● Live</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600">Maven</span>
+                <div className="flex flex-col">
+                  <span className="text-gray-700 font-medium">Maven</span>
+                  <span className="text-gray-500 text-[10px]">Marketing</span>
+                </div>
                 <span className="text-green-600 font-medium">● Live</span>
               </div>
             </div>

@@ -6,6 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Circle, Clock, Zap, TrendingUp } from "lucide-react";
+import { SelfImprovementFeedback } from "./SelfImprovementFeedback";
 
 interface SebastianDailyViewProps {
   userId: Id<"users">;
@@ -242,6 +243,9 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Self-Improvement Feedback */}
+      <SelfImprovementFeedback />
     </div>
   );
 }
