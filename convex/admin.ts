@@ -927,3 +927,19 @@ export const updateAllRPMGoals = mutation({
     };
   },
 });
+
+// Admin: get all Sebastian tasks (no userId required)
+export const getAllSebastianTasks = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("sebastianTasks").collect();
+  },
+});
+
+// Admin: get all users
+export const getAllUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("users").collect();
+  },
+});

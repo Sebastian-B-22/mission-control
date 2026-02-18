@@ -17,6 +17,8 @@ import {
   Briefcase,
   BookOpen,
   Bot,
+  Brain,
+  Layers,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
@@ -35,6 +37,10 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
   const inProgressCount = sebastianTasks.filter(t => t.status === "in-progress").length;
   const todoCount = sebastianTasks.filter(t => t.status === "todo").length;
+
+  // Get content pipeline review count for badge
+  const pipelineReview = useQuery(api.contentPipeline.listByStage, { stage: "review" }) || [];
+  const reviewCount = pipelineReview.length;
 
   // Get RPM categories
   const categories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
@@ -131,6 +137,18 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       icon: Bot,
       view: "sebastian",
       badge: inProgressCount > 0 ? `${inProgressCount} in progress` : null,
+    },
+    {
+      name: "Content Pipeline",
+      icon: Layers,
+      view: "content-pipeline",
+      badge: reviewCount > 0 ? `${reviewCount} to review` : null,
+    },
+    {
+      name: "Memory Search",
+      icon: Brain,
+      view: "memory",
+      badge: null,
     },
   ];
 

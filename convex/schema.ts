@@ -202,7 +202,42 @@ export default defineSchema({
     ),
     priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     category: v.string(), // infrastructure, hta, aspire, agent-squad, skills, other
+    // Agent-aware fields (Sprint 1 upgrade)
+    assignedTo: v.optional(v.string()),    // "corinne" | "sebastian" | "scout" | "maven" | "compass" | "james"
+    agentNotes: v.optional(v.string()),    // Progress notes written by agents
+    lastUpdatedBy: v.optional(v.string()), // Who last touched this task
     createdAt: v.number(),
     completedAt: v.optional(v.number()),
   }).index("by_user", ["userId"]),
+
+  // ─── Content Pipeline ──────────────────────────────────────────────────
+  // Where agents drop drafts and Corinne reviews/approves them.
+  contentPipeline: defineTable({
+    title: v.string(),
+    content: v.string(),
+    type: v.union(
+      v.literal("x-post"),
+      v.literal("email"),
+      v.literal("blog"),
+      v.literal("landing-page"),
+      v.literal("other")
+    ),
+    stage: v.union(
+      v.literal("idea"),
+      v.literal("draft"),
+      v.literal("review"),
+      v.literal("approved"),
+      v.literal("published")
+    ),
+    createdBy: v.string(),           // "sebastian" | "maven" | "scout"
+    assignedTo: v.string(),          // "corinne" (who reviews)
+    notes: v.optional(v.string()),   // Agent notes / Corinne feedback
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    publishedUrl: v.optional(v.string()),
+  })
+    .index("by_stage", ["stage"])
+    .index("by_type", ["type"])
+    .index("by_created_by", ["createdBy"])
+    .index("by_stage_type", ["stage", "type"]),
 });

@@ -36,6 +36,8 @@ import { BookLibrary } from "@/components/BookLibraryDB";
 import { TaskList } from "@/components/TaskList";
 import { SebastianKanban } from "@/components/SebastianKanban";
 import { SebastianWorkspace } from "@/components/SebastianWorkspace";
+import { ContentPipeline } from "@/components/ContentPipeline";
+import { MemoryView } from "@/components/MemoryView";
 import { SidebarNew } from "@/components/SidebarNew";
 import { RPMCategoryPage } from "@/components/RPMCategoryPage";
 import { PersonalOverview } from "@/components/views/PersonalOverview";
@@ -380,6 +382,26 @@ export default function DashboardPage() {
 
       case "sebastian":
         return <SebastianWorkspace userId={convexUser._id} />;
+
+      case "content-pipeline":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <span>🎯</span> Content Pipeline
+                </h2>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Maven&apos;s drafts waiting for your review &amp; approval
+                </p>
+              </div>
+            </div>
+            <ContentPipeline />
+          </div>
+        );
+
+      case "memory":
+        return <MemoryView />;
 
       // HTA views
       case "hta-overview":
