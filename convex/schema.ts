@@ -338,4 +338,32 @@ export default defineSchema({
     .index("by_family", ["familyId"])
     .index("by_child", ["childId"])
     .index("by_program", ["program"]),
+
+  // ─── Personal CRM ─────────────────────────────────────────────────────
+  // People Corinne wants to maintain relationships with: friends, family, mentors
+  contacts: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    relationship: v.string(), // "friend" | "family" | "mentor" | "community" | "colleague" | "other"
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    birthday: v.optional(v.string()),          // MM-DD
+    keyFacts: v.optional(v.string()),          // kids names, what they care about, job, etc
+    memories: v.optional(v.string()),          // meaningful shared moments/context
+    lastContactDate: v.optional(v.number()),   // timestamp ms
+    lastContactMethod: v.optional(v.string()), // "voice-text" | "call" | "text" | "in-person" | "card" | "gift"
+    lastContactNote: v.optional(v.string()),   // brief note on what was said/sent
+    nextAction: v.optional(v.string()),        // "send-note" | "call" | "gift" | "card" | "nothing"
+    nextActionNote: v.optional(v.string()),
+    occasions: v.optional(v.array(v.object({
+      name: v.string(),   // "birthday" | "anniversary" | "graduation" | custom
+      date: v.string(),   // MM-DD
+    }))),
+    priority: v.optional(v.string()),         // "high" | "medium" | "low"
+    tags: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_last_contact", ["userId", "lastContactDate"]),
 });

@@ -46,6 +46,7 @@ import { HTAOverview } from "@/components/views/HTAOverview";
 import { HTASubView } from "@/components/views/HTASubView";
 import { AspireOverview } from "@/components/views/AspireOverview";
 import { FamilyCRM } from "@/components/FamilyCRM";
+import { PersonalCRM, SurpriseCard } from "@/components/PersonalCRM";
 import { AspireSubView } from "@/components/views/AspireSubView";
 import { AspireSpringView } from "@/components/views/AspireSpringView";
 import { AspireCampsView } from "@/components/views/AspireCampsView";
@@ -355,6 +356,7 @@ export default function DashboardPage() {
               </h2>
             </div>
             <MorningMindset userId={convexUser._id} date={today} />
+            {user?.id && <SurpriseCard clerkId={user.id} />}
             <div className="grid gap-6 md:grid-cols-2">
               <HabitTracker userId={convexUser._id} date={today} />
               <FiveToThrive userId={convexUser._id} date={today} />
@@ -435,6 +437,15 @@ export default function DashboardPage() {
         return <Aspire7v7View userId={convexUser._id} />;
       case "aspire-families":
         return <FamilyCRM />;
+
+      case "personal-crm":
+        return (
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">Personal CRM</h2>
+            <p className="text-sm text-gray-500 mb-4">Your people - friends, family, mentors. Remember what matters to them.</p>
+            <PersonalCRM />
+          </div>
+        );
 
       // Homeschool views
       case "homeschool-overview":

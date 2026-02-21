@@ -19,6 +19,7 @@ import {
   Bot,
   Brain,
   Layers,
+  Heart,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
@@ -62,6 +63,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Daily",
       icon: Calendar,
       view: "daily",
+    },
+    {
+      name: "Personal CRM",
+      icon: Heart,
+      view: "personal-crm",
     },
     {
       name: "Personal RPM",
