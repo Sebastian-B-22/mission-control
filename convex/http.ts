@@ -500,6 +500,88 @@ http.route({
   }),
 });
 
+// ─── POST /content/delete ─────────────────────────────────────────────────
+//
+// Delete a single content item.
+//
+// Body (JSON):
+//   contentId    (required) - Convex content ID
+
+["/content/delete", "/content/bulk-clear"].forEach((path) => {
+  http.route({
+    path,
+    method: "OPTIONS",
+    handler: httpAction(async () => {
+      return new Response(null, { status: 204, headers: corsHeaders() });
+    }),
+  });
+});
+
+http.route({
+  path: "/content/delete",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const contentId = body.contentId as string;
+    if (!contentId) return errorResponse("Missing required field: contentId");
+
+    try {
+      await ctx.runMutation(api.contentPipeline.deleteContent, {
+        id: contentId as Id<"contentPipeline">,
+      });
+      return jsonResponse({ success: true });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      return errorResponse("Delete failed: " + message, 500);
+    }
+  }),
+});
+
+// ─── POST /content/bulk-clear ─────────────────────────────────────────────
+//
+// Delete all content items, optionally filtered by stage.
+//
+// Body (JSON):
+//   stage        (optional) - Only delete items in this stage
+//   createdBy    (optional) - Only delete items from this agent
+
+http.route({
+  path: "/content/bulk-clear",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown> = {};
+    try {
+      body = await request.json();
+    } catch { /* empty body is fine */ }
+
+    const stage = body.stage as string | undefined;
+    const createdBy = body.createdBy as string | undefined;
+
+    const items = await ctx.runQuery(internal.contentPipeline.listAllInternal, {
+      stage: stage as ContentStage | undefined,
+      createdBy,
+    });
+
+    let deleted = 0;
+    for (const item of items) {
+      await ctx.runMutation(api.contentPipeline.deleteContent, { id: item._id });
+      deleted++;
+    }
+
+    return jsonResponse({ success: true, deleted });
+  }),
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // CAMP REGISTRATION API
 // Base: https://harmless-salamander-44.convex.site/camp/...

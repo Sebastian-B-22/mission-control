@@ -208,7 +208,7 @@ function ContentCard({
           <Button
             variant="ghost"
             size="sm"
-            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-gray-500 hover:text-red-400 shrink-0"
+            className="h-6 w-6 p-0 text-gray-600 hover:text-red-400 shrink-0"
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
           >
             <Trash2 className="h-3 w-3" />
@@ -888,6 +888,8 @@ export function ContentPipeline() {
   const [isAdding, setIsAdding] = useState(false);
   const [requestChangesItem, setRequestChangesItem] = useState<ContentItem | null>(null);
 
+  const [isClearing, setIsClearing] = useState(false);
+
   // Queries & mutations
   const allItems = (useQuery(api.contentPipeline.listAll, {
     type: typeFilter !== "all" ? typeFilter : undefined,
@@ -973,13 +975,40 @@ export function ContentPipeline() {
     if (selectedItem?._id === id) setSelectedItem(null);
   };
 
+  const handleClearAll = async () => {
+    const count = allItems.length;
+    if (!confirm(`Delete all ${count} items from the pipeline? This cannot be undone.`)) return;
+    setIsClearing(true);
+    try {
+      for (const item of allItems) {
+        await deleteContent({ id: item._id });
+      }
+    } finally {
+      setIsClearing(false);
+      setSelectedItem(null);
+    }
+  };
+
+  const handleClearReview = async () => {
+    const reviewItems = byStage("review");
+    if (!confirm(`Delete all ${reviewItems.length} items in Review? This cannot be undone.`)) return;
+    setIsClearing(true);
+    try {
+      for (const item of reviewItems) {
+        await deleteContent({ id: item._id });
+      }
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <p className="text-sm text-muted-foreground">
-            Content drafts from agents - review and approve before publishing
+            Maven drops drafts here daily. <strong className="text-amber-400">Approve</strong> = ready for you to post. Copy the text, paste to X manually. Maven does not post automatically.
           </p>
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             <span className="text-xs text-gray-500">{totalCount} total</span>
@@ -990,14 +1019,40 @@ export function ContentPipeline() {
             )}
           </div>
         </div>
-        <Button
-          onClick={() => setIsAdding(true)}
-          size="sm"
-          className="bg-amber-500 hover:bg-amber-600 text-black"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add Content
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {totalCount > 0 && (
+            <Button
+              onClick={handleClearReview}
+              size="sm"
+              variant="outline"
+              disabled={isClearing || byStage("review").length === 0}
+              className="border-red-800 text-red-400 hover:bg-red-900/20 text-xs"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              Clear Review ({byStage("review").length})
+            </Button>
+          )}
+          {totalCount > 0 && (
+            <Button
+              onClick={handleClearAll}
+              size="sm"
+              variant="outline"
+              disabled={isClearing}
+              className="border-red-800 text-red-400 hover:bg-red-900/20 text-xs"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              {isClearing ? "Clearing..." : "Clear All"}
+            </Button>
+          )}
+          <Button
+            onClick={() => setIsAdding(true)}
+            size="sm"
+            className="bg-amber-500 hover:bg-amber-600 text-black"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add Content
+          </Button>
+        </div>
       </div>
 
       {/* Type filter */}
