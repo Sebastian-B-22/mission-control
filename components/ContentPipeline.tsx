@@ -58,10 +58,10 @@ type ContentItem = {
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
-const STAGES: { value: ContentStage; label: string; emoji: string; color: string; headerColor: string }[] = [
+const STAGES: { value: ContentStage; label: string; sublabel?: string; emoji: string; color: string; headerColor: string }[] = [
   { value: "idea",      label: "Idea",      emoji: "💡", color: "border-gray-600",   headerColor: "text-gray-400" },
   { value: "review",    label: "Review",    emoji: "👀", color: "border-amber-600",  headerColor: "text-amber-400" },
-  { value: "approved",  label: "Approved",  emoji: "✅", color: "border-green-700",  headerColor: "text-green-400" },
+  { value: "approved",  label: "Approved",  sublabel: "auto-posts to X ≤15min", emoji: "✅", color: "border-green-700",  headerColor: "text-green-400" },
   { value: "published", label: "Published", emoji: "🚀", color: "border-purple-700", headerColor: "text-purple-400" },
 ];
 
@@ -260,7 +260,7 @@ function ContentCard({
               onClick={onApprove}
             >
               <Check className="h-3 w-3 mr-1" />
-              Approve
+              {item.type === "x-reply" || item.title?.startsWith("Reply:") ? "Approve (manual)" : "Approve → Post"}
             </Button>
           )}
 
@@ -647,6 +647,9 @@ function KanbanColumn({
           <CardTitle className={`text-base font-semibold flex items-center gap-2 ${stage.headerColor}`}>
             <span>{stage.emoji}</span>
             <span>{stage.label}</span>
+            {"sublabel" in stage && stage.sublabel && (
+              <span className="text-xs text-green-500 font-normal">— {stage.sublabel}</span>
+            )}
             <span className="text-xs text-muted-foreground font-normal ml-auto">
               ({items.length})
             </span>
@@ -1008,7 +1011,7 @@ export function ContentPipeline() {
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <p className="text-sm text-muted-foreground">
-            Maven drops drafts here daily. <strong className="text-amber-400">Approve</strong> = ready for you to post. Copy the text, paste to X manually. Maven does not post automatically.
+            Maven drops drafts here daily. <strong className="text-green-400">Approve</strong> = auto-posts to @corinnebriers within 15 min. Reply targets need manual posting (copy + paste). Failed posts stay here for you to handle.
           </p>
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             <span className="text-xs text-gray-500">{totalCount} total</span>
