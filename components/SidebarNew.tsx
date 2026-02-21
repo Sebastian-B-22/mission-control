@@ -108,12 +108,13 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "aspire",
       children: [
-        { name: "Pali", view: "aspire-pali" },
-        { name: "Agoura", view: "aspire-agoura" },
+        { name: "👨‍👩‍👧‍👦 Family CRM", view: "aspire-families" },
         { name: "Spring League", view: "aspire-spring" },
         { name: "Camps", view: "aspire-camps" },
         { name: "PDP", view: "aspire-pdp" },
         { name: "7v7", view: "aspire-7v7" },
+        { name: "Pali", view: "aspire-pali" },
+        { name: "Agoura", view: "aspire-agoura" },
       ]
     },
     {

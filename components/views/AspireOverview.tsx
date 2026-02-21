@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { AspireMonthSwimlanes } from "@/components/AspireMonthSwimlanes";
+import { FamilyCRM } from "@/components/FamilyCRM";
 import { Calendar, List } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -51,6 +52,7 @@ export function AspireOverview({ userId }: AspireOverviewProps) {
       {viewMode === "sections" && (
         <Tabs defaultValue="spring" className="w-full">
         <TabsList>
+          <TabsTrigger value="families">👨‍👩‍👧‍👦 Families</TabsTrigger>
           <TabsTrigger value="spring">Spring League</TabsTrigger>
           <TabsTrigger value="camps">Camps</TabsTrigger>
           <TabsTrigger value="pdp">PDP</TabsTrigger>
@@ -58,6 +60,10 @@ export function AspireOverview({ userId }: AspireOverviewProps) {
           <TabsTrigger value="pali">Pali</TabsTrigger>
           <TabsTrigger value="agoura">Agoura</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="families" className="space-y-4">
+          <FamilyCRM />
+        </TabsContent>
 
         <TabsContent value="pali" className="space-y-4">
           <ProjectTaskList

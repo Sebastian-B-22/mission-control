@@ -34,7 +34,7 @@ export function SebastianAgentView() {
         "Parent action item detection",
         "Early warning system",
       ],
-      lastActivity: "Yesterday 9:30 PM",
+      lastActivity: "Today 5:15 PM",
     },
     {
       name: "Maven",
@@ -49,7 +49,7 @@ export function SebastianAgentView() {
         "Landing page copy",
         "Corinne's voice & tone",
       ],
-      lastActivity: "Feb 13 (setup)",
+      lastActivity: "Today 7:30 AM",
     },
   ];
 

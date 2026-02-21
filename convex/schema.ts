@@ -224,7 +224,6 @@ export default defineSchema({
     ),
     stage: v.union(
       v.literal("idea"),
-      v.literal("draft"),
       v.literal("review"),
       v.literal("approved"),
       v.literal("published")
@@ -240,4 +239,103 @@ export default defineSchema({
     .index("by_type", ["type"])
     .index("by_created_by", ["createdBy"])
     .index("by_stage_type", ["stage", "type"]),
+
+  // ─── Camp Registration ────────────────────────────────────────────────
+  campRegistrations: defineTable({
+    season: v.string(),
+    parent: v.object({
+      firstName: v.string(),
+      lastName: v.string(),
+      email: v.string(),
+      phone: v.string(),
+    }),
+    children: v.array(v.object({
+      firstName: v.string(),
+      lastName: v.string(),
+      age: v.optional(v.number()),
+      gender: v.optional(v.string()),
+      allergies: v.optional(v.string()),
+      sessions: v.any(),
+    })),
+    emergencyContact: v.object({
+      name: v.string(),
+      phone: v.string(),
+    }),
+    waiverAccepted: v.boolean(),
+    promoCode: v.optional(v.string()),
+    pricing: v.object({
+      subtotal: v.number(),
+      discount: v.number(),
+      total: v.number(),
+    }),
+    stripePaymentIntentId: v.string(),
+    status: v.string(),
+    createdAt: v.number(),
+    paidAt: v.optional(v.number()),
+  })
+    .index("by_status", ["status"])
+    .index("by_email", ["parent.email"])
+    .index("by_stripe_pi", ["stripePaymentIntentId"]),
+
+  campAvailability: defineTable({
+    weekId: v.string(),
+    label: v.string(),
+    shortLabel: v.string(),
+    startDate: v.string(),
+    endDate: v.string(),
+    weeklySlots: v.number(),
+    weeklyUsed: v.number(),
+    dailySlots: v.number(),
+    dailyUsed: v.number(),
+  }).index("by_week_id", ["weekId"]),
+
+  campPromoCodes: defineTable({
+    code: v.string(),
+    type: v.string(),
+    value: v.number(),
+    description: v.string(),
+    active: v.boolean(),
+    usedCount: v.number(),
+    maxUses: v.optional(v.number()),
+    createdAt: v.number(),
+  }).index("by_code", ["code"]),
+
+  // ─── Family CRM ───────────────────────────────────────────────────────
+  families: defineTable({
+    parentFirstName: v.string(),
+    parentLastName: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    lastQuoMessage: v.optional(v.string()),
+    lastQuoDate: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_phone", ["phone"]),
+
+  children: defineTable({
+    familyId: v.id("families"),
+    firstName: v.string(),
+    lastName: v.string(),
+    birthYear: v.optional(v.number()),
+    gender: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_family", ["familyId"]),
+
+  enrollments: defineTable({
+    childId: v.id("children"),
+    familyId: v.id("families"),
+    program: v.string(),
+    region: v.optional(v.string()),
+    season: v.optional(v.string()),
+    division: v.optional(v.string()),
+    practiceDay: v.optional(v.string()),
+    status: v.string(),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_family", ["familyId"])
+    .index("by_child", ["childId"])
+    .index("by_program", ["program"]),
 });

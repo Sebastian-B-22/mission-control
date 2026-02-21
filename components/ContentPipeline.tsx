@@ -40,7 +40,7 @@ import {
 // ─── Types ────────────────────────────────────────────────────────────────
 
 type ContentType = "x-post" | "email" | "blog" | "landing-page" | "other";
-type ContentStage = "idea" | "draft" | "review" | "approved" | "published";
+type ContentStage = "idea" | "review" | "approved" | "published";
 
 type ContentItem = {
   _id: Id<"contentPipeline">;
@@ -60,7 +60,6 @@ type ContentItem = {
 
 const STAGES: { value: ContentStage; label: string; emoji: string; color: string; headerColor: string }[] = [
   { value: "idea",      label: "Idea",      emoji: "💡", color: "border-gray-600",   headerColor: "text-gray-400" },
-  { value: "draft",     label: "Draft",     emoji: "✏️", color: "border-blue-700",   headerColor: "text-blue-400" },
   { value: "review",    label: "Review",    emoji: "👀", color: "border-amber-600",  headerColor: "text-amber-400" },
   { value: "approved",  label: "Approved",  emoji: "✅", color: "border-green-700",  headerColor: "text-green-400" },
   { value: "published", label: "Published", emoji: "🚀", color: "border-purple-700", headerColor: "text-purple-400" },
@@ -81,7 +80,7 @@ const CREATOR_CONFIG: Record<string, { emoji: string; color: string }> = {
   corinne:   { emoji: "👑", color: "text-purple-400" },
 };
 
-const STAGE_ORDER: ContentStage[] = ["idea", "draft", "review", "approved", "published"];
+const STAGE_ORDER: ContentStage[] = ["idea", "review", "approved", "published"];
 
 function getNextStage(current: ContentStage): ContentStage | null {
   const idx = STAGE_ORDER.indexOf(current);
@@ -232,6 +231,24 @@ function ContentCard({
           </div>
         )}
 
+        {/* Open Post link - extracted from notes for reply targets */}
+        {(() => {
+          const urlMatch = item.notes?.match(/https?:\/\/[^\s,|)]+/);
+          if (!urlMatch) return null;
+          return (
+            <a
+              href={urlMatch[0]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="h-3 w-3" />
+              Open Post →
+            </a>
+          );
+        })()}
+
         {/* Action row */}
         <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
           <CopyButton text={item.content} />
@@ -334,7 +351,7 @@ function ContentModal({
   };
 
   const handleRequestChanges = () => {
-    onUpdateStage(item._id, "draft", requestChangesNote || "Changes requested by Corinne");
+    onUpdateStage(item._id, "idea", requestChangesNote || "Needs revision - moved to Ideas");
     setShowRequestChanges(false);
     setRequestChangesNote("");
     onClose();
@@ -686,13 +703,13 @@ function AddContentDialog({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState<ContentType>("x-post");
-  const [stage, setStage] = useState<ContentStage>("draft");
+  const [stage, setStage] = useState<ContentStage>("review");
   const [createdBy, setCreatedBy] = useState("sebastian");
   const [notes, setNotes] = useState("");
 
   const reset = () => {
     setTitle(""); setContent(""); setType("x-post");
-    setStage("draft"); setCreatedBy("sebastian"); setNotes("");
+    setStage("review"); setCreatedBy("sebastian"); setNotes("");
   };
 
   const handleSave = () => {
@@ -940,8 +957,8 @@ export function ContentPipeline() {
     if (!requestChangesItem) return;
     await updateStage({
       id: requestChangesItem._id,
-      stage: "draft",
-      notes: note || "Changes requested by Corinne",
+      stage: "idea",
+      notes: note || "Needs revision - moved to Ideas",
     });
     setRequestChangesItem(null);
   };

@@ -10,13 +10,16 @@
 
 import type * as admin from "../admin.js";
 import type * as books from "../books.js";
+import type * as camp from "../camp.js";
 import type * as checkIns from "../checkIns.js";
 import type * as contentPipeline from "../contentPipeline.js";
 import type * as daily from "../daily.js";
+import type * as families from "../families.js";
 import type * as fieldTrips from "../fieldTrips.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
 import type * as http from "../http.js";
+import type * as jotformSync from "../jotformSync.js";
 import type * as projectTasks from "../projectTasks.js";
 import type * as rpm from "../rpm.js";
 import type * as sebastianTasks from "../sebastianTasks.js";
@@ -35,13 +38,16 @@ import type {
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   books: typeof books;
+  camp: typeof camp;
   checkIns: typeof checkIns;
   contentPipeline: typeof contentPipeline;
   daily: typeof daily;
+  families: typeof families;
   fieldTrips: typeof fieldTrips;
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
   http: typeof http;
+  jotformSync: typeof jotformSync;
   projectTasks: typeof projectTasks;
   rpm: typeof rpm;
   sebastianTasks: typeof sebastianTasks;

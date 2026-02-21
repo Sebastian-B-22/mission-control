@@ -3,7 +3,7 @@
  *
  * Agents drop content drafts here. Corinne reviews and approves.
  *
- * Stages: idea → draft → review → approved → published
+ * Stages: idea → review → approved → published
  * Types:  x-post | email | blog | landing-page | other
  */
 
@@ -23,7 +23,6 @@ const CONTENT_TYPE = v.union(
 
 const CONTENT_STAGE = v.union(
   v.literal("idea"),
-  v.literal("draft"),
   v.literal("review"),
   v.literal("approved"),
   v.literal("published")
@@ -98,7 +97,7 @@ export const createContent = mutation({
       title: args.title,
       content: args.content,
       type: args.type,
-      stage: args.stage ?? "draft",
+      stage: args.stage ?? "review",
       createdBy: args.createdBy ?? "sebastian",
       assignedTo: args.assignedTo ?? "corinne",
       notes: args.notes,
@@ -185,7 +184,7 @@ export const createContentInternal = internalMutation({
       title: args.title,
       content: args.content,
       type: args.type,
-      stage: args.stage ?? "draft",
+      stage: args.stage ?? "review",
       createdBy: args.createdBy ?? "sebastian",
       assignedTo: args.assignedTo ?? "corinne",
       notes: args.notes,

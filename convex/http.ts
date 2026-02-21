@@ -13,12 +13,12 @@
 
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { internal, api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
 // Re-export type so TypeScript can use it
 type ContentType = "x-post" | "email" | "blog" | "landing-page" | "other";
-type ContentStage = "idea" | "draft" | "review" | "approved" | "published";
+type ContentStage = "idea" | "review" | "approved" | "published";
 
 const http = httpRouter();
 
@@ -340,7 +340,7 @@ http.route({
 //   title       (required) - Content title
 //   content     (required) - The actual text/copy
 //   type        (required) - "x-post" | "email" | "blog" | "landing-page" | "other"
-//   stage       (optional) - "idea" | "draft" | "review" | "approved" | "published" (default: "draft")
+//   stage       (optional) - "idea" | "review" | "approved" | "published" (default: "review")
 //   createdBy   (optional) - Agent name: "sebastian" | "maven" | "scout" (default: "sebastian")
 //   assignedTo  (optional) - Who reviews (default: "corinne")
 //   notes       (optional) - Agent notes about the content
@@ -378,8 +378,8 @@ http.route({
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
 
-    const stage = (body.stage as string) ?? "draft";
-    const validStages: ContentStage[] = ["idea", "draft", "review", "approved", "published"];
+    const stage = (body.stage as string) ?? "review";
+    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
     if (!validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -436,7 +436,7 @@ http.route({
     if (!contentId) return errorResponse("Missing required field: contentId");
 
     const stage = body.stage as string;
-    const validStages: ContentStage[] = ["idea", "draft", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
     if (!stage || !validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -480,7 +480,7 @@ http.route({
     const type = url.searchParams.get("type") || undefined;
     const createdBy = url.searchParams.get("createdBy") || undefined;
 
-    const validStages: ContentStage[] = ["idea", "draft", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
     if (stage && !validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -497,6 +497,306 @@ http.route({
     });
 
     return jsonResponse({ items, count: items.length });
+  }),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CAMP REGISTRATION API
+// Base: https://harmless-salamander-44.convex.site/camp/...
+// No auth required for public routes; admin routes require X-Admin-Password header
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ADMIN_PASSWORD = process.env.CAMP_ADMIN_PASSWORD ?? "Aspire2026!";
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? "";
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
+const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY ?? "";
+const CONVERTKIT_API_KEY = process.env.CONVERTKIT_API_KEY ?? "";
+
+function campCors() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password",
+    "Content-Type": "application/json",
+  };
+}
+function campJson(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: campCors() });
+}
+function campError(msg: string, status = 400) {
+  return new Response(JSON.stringify({ error: msg }), { status, headers: campCors() });
+}
+function isAdmin(req: Request) {
+  return req.headers.get("x-admin-password") === ADMIN_PASSWORD;
+}
+
+// Stripe: create payment intent via REST
+async function createStripePaymentIntent(amount: number, metadata: Record<string, string>) {
+  const params = new URLSearchParams({
+    amount: String(amount * 100),
+    currency: "usd",
+    "automatic_payment_methods[enabled]": "true",
+    ...Object.fromEntries(Object.entries(metadata).map(([k, v]) => [`metadata[${k}]`, v])),
+  });
+  const res = await fetch("https://api.stripe.com/v1/payment_intents", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
+  return res.json() as Promise<{ id: string; client_secret: string }>;
+}
+
+// Stripe: verify webhook signature
+async function verifyStripeWebhook(payload: string, sigHeader: string, secret: string): Promise<boolean> {
+  try {
+    const parts = sigHeader.split(",");
+    const tPart = parts.find((p) => p.startsWith("t="));
+    const v1Part = parts.find((p) => p.startsWith("v1="));
+    if (!tPart || !v1Part) return false;
+    const timestamp = tPart.substring(2);
+    const expected = v1Part.substring(3);
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw", encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false, ["sign"]
+    );
+    const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(`${timestamp}.${payload}`));
+    const hex = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    return hex === expected;
+  } catch { return false; }
+}
+
+// ConvertKit tagging
+async function tagConvertKit(email: string, firstName: string, weekNumbers: string[]) {
+  const tags = ["Summer Camp 2026", ...weekNumbers.map((n) => `Camp-Week-${n}`)];
+  try {
+    await fetch("https://api.kit.com/v4/subscribers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
+      body: JSON.stringify({ email_address: email, first_name: firstName, tags }),
+    });
+  } catch { /* non-fatal */ }
+}
+
+// CORS preflight for all camp routes
+["/camp/availability", "/camp/validate-promo", "/camp/register", "/camp/stripe-webhook",
+ "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/promo-codes"].forEach((path) => {
+  http.route({
+    path, method: "OPTIONS",
+    handler: httpAction(async () => new Response(null, { status: 204, headers: campCors() })),
+  });
+});
+
+// GET /camp/availability
+http.route({
+  path: "/camp/availability", method: "GET",
+  handler: httpAction(async (ctx) => {
+    const data = await ctx.runQuery(api.camp.getAvailability, {});
+    return campJson(data);
+  }),
+});
+
+// POST /camp/validate-promo
+http.route({
+  path: "/camp/validate-promo", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    const { code } = await req.json() as { code: string };
+    if (!code) return campError("Code required");
+    const result = await ctx.runQuery(api.camp.validatePromo, { code });
+    return campJson(result, result.valid ? 200 : 404);
+  }),
+});
+
+// POST /camp/register
+http.route({
+  path: "/camp/register", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    let body: Record<string, unknown>;
+    try { body = await req.json(); } catch { return campError("Invalid JSON"); }
+
+    const { parent, children, emergencyContact, waiverAccepted, promoCode, season } = body as {
+      parent: { firstName: string; lastName: string; email: string; phone: string };
+      children: Array<{ firstName: string; lastName: string; age?: number; gender?: string; allergies?: string; sessions: Record<string, { type: string; selectedDays?: string[] }> }>;
+      emergencyContact: { name: string; phone: string };
+      waiverAccepted: boolean;
+      promoCode?: string;
+      season?: string;
+    };
+
+    if (!parent?.email || !parent?.firstName) return campError("Missing parent info");
+    if (!children?.length) return campError("At least one child required");
+    if (!waiverAccepted) return campError("Waiver must be accepted");
+
+    // Server-side pricing
+    let subtotal = 0;
+    for (const child of children) {
+      for (const session of Object.values(child.sessions || {})) {
+        if (session.type === "full") subtotal += 299;
+        else if (session.type === "days") subtotal += (session.selectedDays?.length || 0) * 65;
+      }
+    }
+
+    // Validate promo
+    let discount = 0;
+    let validPromoCode: string | undefined;
+    if (promoCode) {
+      const promo = await ctx.runQuery(api.camp.validatePromo, { code: promoCode });
+      if (promo.valid && "type" in promo) {
+        validPromoCode = promo.code as string;
+        if (promo.type === "free_days") discount = (promo.value as number) * 65;
+        else if (promo.type === "percent_off") discount = Math.round(subtotal * (promo.value as number) / 100);
+        else if (promo.type === "dollar_off") discount = promo.value as number;
+        discount = Math.min(discount, subtotal);
+      }
+    }
+
+    const total = Math.max(0, subtotal - discount);
+
+    // Create Stripe PaymentIntent
+    const pi = await createStripePaymentIntent(total, {
+      parentEmail: parent.email,
+      parentName: `${parent.firstName} ${parent.lastName}`,
+      childCount: String(children.length),
+      season: (season as string) || "summer-2026",
+    });
+
+    // Save to Convex
+    await ctx.runMutation(api.camp.createRegistration, {
+      season: (season as string) || "summer-2026",
+      parent,
+      children,
+      emergencyContact,
+      waiverAccepted,
+      promoCode: validPromoCode,
+      pricing: { subtotal, discount, total },
+      stripePaymentIntentId: pi.id,
+    });
+
+    return campJson({
+      clientSecret: pi.client_secret,
+      publishableKey: STRIPE_PUBLISHABLE_KEY,
+      amount: total,
+      pricing: { subtotal, discount, total },
+    });
+  }),
+});
+
+// POST /camp/stripe-webhook
+http.route({
+  path: "/camp/stripe-webhook", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    const rawBody = await req.text();
+    const sig = req.headers.get("stripe-signature") || "";
+
+    if (STRIPE_WEBHOOK_SECRET) {
+      const valid = await verifyStripeWebhook(rawBody, sig, STRIPE_WEBHOOK_SECRET);
+      if (!valid) return new Response("Webhook signature failed", { status: 400 });
+    }
+
+    let event: { type: string; data: { object: { id: string; metadata?: Record<string, string> } } };
+    try { event = JSON.parse(rawBody); } catch { return new Response("Invalid JSON", { status: 400 }); }
+
+    if (event.type === "payment_intent.succeeded") {
+      const pi = event.data.object;
+      const reg = await ctx.runMutation(internal.camp.markPaid, { stripePaymentIntentId: pi.id });
+
+      if (reg) {
+        // Tag in ConvertKit
+        const weekNumbers: string[] = [];
+        for (const child of reg.children) {
+          const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }>;
+          for (const [wk, sess] of Object.entries(sessions)) {
+            if (sess.type === "full" || (sess.selectedDays?.length ?? 0) > 0) {
+              weekNumbers.push(wk.replace("week", ""));
+            }
+          }
+        }
+        await tagConvertKit(reg.parent.email, reg.parent.firstName, [...new Set(weekNumbers)]);
+      }
+    }
+
+    return campJson({ received: true });
+  }),
+});
+
+// GET /camp/admin/stats
+http.route({
+  path: "/camp/admin/stats", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const stats = await ctx.runQuery(api.camp.getStats, {});
+    return campJson(stats);
+  }),
+});
+
+// GET /camp/admin/registrations
+http.route({
+  path: "/camp/admin/registrations", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const url = new URL(req.url);
+    const regs = await ctx.runQuery(api.camp.getRegistrations, {
+      week: url.searchParams.get("week") ?? undefined,
+      status: url.searchParams.get("status") ?? undefined,
+      q: url.searchParams.get("q") ?? undefined,
+    });
+    return campJson(regs);
+  }),
+});
+
+// GET /camp/admin/promo-codes
+http.route({
+  path: "/camp/admin/promo-codes", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const codes = await ctx.runQuery(api.camp.getPromoCodes, {});
+    return campJson(codes);
+  }),
+});
+
+// POST /camp/admin/promo-codes
+http.route({
+  path: "/camp/admin/promo-codes", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const body = await req.json() as { code: string; type: string; value: number; description?: string; maxUses?: number };
+    if (!body.code || !body.type || body.value === undefined) return campError("code, type, value required");
+    if (!["free_days", "percent_off", "dollar_off"].includes(body.type)) return campError("Invalid type");
+    try {
+      const id = await ctx.runMutation(api.camp.createPromoCode, {
+        code: body.code,
+        type: body.type,
+        value: body.value,
+        description: body.description || "",
+        maxUses: body.maxUses,
+      });
+      return campJson({ success: true, id }, 201);
+    } catch (e) {
+      return campError(e instanceof Error ? e.message : "Failed", 409);
+    }
+  }),
+});
+
+// PATCH /camp/admin/promo-codes/:code  →  use query param since Convex HTTP doesn't support path params natively
+// Call as: PATCH /camp/admin/promo-code?code=REFERRAL  body: { active: true/false }
+http.route({
+  path: "/camp/admin/promo-code", method: "PATCH",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const url = new URL(req.url);
+    const code = url.searchParams.get("code");
+    if (!code) return campError("code query param required");
+    const body = await req.json() as { active?: boolean };
+    try {
+      const result = await ctx.runMutation(api.camp.togglePromoCode, { code, active: body.active });
+      return campJson(result);
+    } catch (e) {
+      return campError(e instanceof Error ? e.message : "Failed", 404);
+    }
   }),
 });
 

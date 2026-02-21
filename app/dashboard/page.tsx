@@ -45,6 +45,7 @@ import { ProfessionalOverview } from "@/components/views/ProfessionalOverview";
 import { HTAOverview } from "@/components/views/HTAOverview";
 import { HTASubView } from "@/components/views/HTASubView";
 import { AspireOverview } from "@/components/views/AspireOverview";
+import { FamilyCRM } from "@/components/FamilyCRM";
 import { AspireSubView } from "@/components/views/AspireSubView";
 import { AspireSpringView } from "@/components/views/AspireSpringView";
 import { AspireCampsView } from "@/components/views/AspireCampsView";
@@ -432,6 +433,8 @@ export default function DashboardPage() {
         return <AspirePDPView userId={convexUser._id} />;
       case "aspire-7v7":
         return <Aspire7v7View userId={convexUser._id} />;
+      case "aspire-families":
+        return <FamilyCRM />;
 
       // Homeschool views
       case "homeschool-overview":
