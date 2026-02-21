@@ -346,7 +346,13 @@ function ContentModal({
   };
 
   const handleApprove = () => {
-    onUpdateStage(item._id, "approved", "Approved by Corinne ✅");
+    // Preserve existing notes - append approval stamp
+    const existingNotes = item.notes ?? "";
+    const approvalStamp = "✅ Approved by Corinne";
+    const newNotes = existingNotes
+      ? `${existingNotes}\n\n${approvalStamp}`
+      : approvalStamp;
+    onUpdateStage(item._id, "approved", newNotes);
     onClose();
   };
 
@@ -951,7 +957,14 @@ export function ContentPipeline() {
   };
 
   const handleApprove = async (id: Id<"contentPipeline">) => {
-    await updateStage({ id, stage: "approved", notes: "Approved by Corinne ✅" });
+    // Preserve existing notes - append approval stamp rather than replacing
+    const item = allItems.find(i => i._id === id);
+    const existingNotes = item?.notes ?? "";
+    const approvalStamp = "✅ Approved by Corinne";
+    const newNotes = existingNotes
+      ? `${existingNotes}\n\n${approvalStamp}`
+      : approvalStamp;
+    await updateStage({ id, stage: "approved", notes: newNotes });
   };
 
   const handleRequestChanges = (item: ContentItem) => {
