@@ -14,7 +14,7 @@ interface Props {
   userId: Id<"users">;
 }
 
-const defaultMembers = ["Corinne", "Sebastian", "Kid 1", "Kid 2"];
+const defaultMembers = ["Corinne", "Joey", "Anthony", "Roma"];
 
 function startOfWeekSunday(date = new Date()) {
   const d = new Date(date);
