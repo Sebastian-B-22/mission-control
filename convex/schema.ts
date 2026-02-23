@@ -366,4 +366,54 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_and_last_contact", ["userId", "lastContactDate"]),
+
+  // ─── Maven Voice Feedback ────────────────────────────────────────────────
+  // Tracks feedback when Corinne rejects or edits Maven's content
+  mavenFeedback: defineTable({
+    contentId: v.optional(v.id("contentPipeline")),
+    feedbackType: v.union(
+      v.literal("reject"),
+      v.literal("edit")
+    ),
+    reason: v.optional(v.string()),  // "too-salesy" | "off-brand" | "wrong-tone" | "factually-wrong" | "custom"
+    customReason: v.optional(v.string()),  // When reason is "custom"
+    originalContent: v.optional(v.string()),  // Original content before edit
+    finalContent: v.optional(v.string()),  // Final content after edit
+    contentTitle: v.string(),
+    contentType: v.string(),
+    createdBy: v.string(),  // Who created the original content (maven, scout, etc.)
+    reviewedBy: v.string(),  // Who provided feedback (corinne)
+    createdAt: v.number(),
+  })
+    .index("by_content", ["contentId"])
+    .index("by_type", ["feedbackType"])
+    .index("by_created_at", ["createdAt"]),
+
+  // ─── Engagement Habits ───────────────────────────────────────────────────
+  // Tracks daily engagement activities (comments, posts, interactions)
+  engagementActivities: defineTable({
+    userId: v.id("users"),
+    date: v.string(),  // YYYY-MM-DD format
+    type: v.union(
+      v.literal("comment"),
+      v.literal("post"),
+      v.literal("reply"),
+      v.literal("like"),
+      v.literal("share")
+    ),
+    platform: v.string(),  // "x" | "linkedin" | "instagram" | "other"
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_user_and_date", ["userId", "date"])
+    .index("by_user", ["userId"]),
+
+  // ─── Engagement Settings ─────────────────────────────────────────────────
+  engagementSettings: defineTable({
+    userId: v.id("users"),
+    dailyGoalMin: v.number(),  // Minimum engagements per day (default: 3)
+    dailyGoalMax: v.number(),  // Maximum engagements per day (default: 5)
+    trackingEnabled: v.boolean(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

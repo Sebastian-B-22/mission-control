@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -41,6 +41,15 @@ import {
 
 type ContentType = "x-post" | "email" | "blog" | "landing-page" | "other";
 type ContentStage = "idea" | "review" | "approved" | "published";
+type RejectReason = "too-salesy" | "off-brand" | "wrong-tone" | "factually-wrong" | "custom";
+
+const REJECT_REASONS: { value: RejectReason; label: string; emoji: string }[] = [
+  { value: "too-salesy", label: "Too Salesy", emoji: "💰" },
+  { value: "off-brand", label: "Off-Brand", emoji: "🎨" },
+  { value: "wrong-tone", label: "Wrong Tone", emoji: "🗣️" },
+  { value: "factually-wrong", label: "Factually Wrong", emoji: "❌" },
+  { value: "custom", label: "Other...", emoji: "✏️" },
+];
 
 type ContentItem = {
   _id: Id<"contentPipeline">;
@@ -315,12 +324,16 @@ function ContentModal({
   onClose,
   onUpdateStage,
   onUpdateContent,
+  onRecordEdit,
+  onRecordReject,
 }: {
   item: ContentItem | null;
   open: boolean;
   onClose: () => void;
   onUpdateStage: (id: Id<"contentPipeline">, stage: ContentStage, notes?: string, publishedUrl?: string) => void;
   onUpdateContent: (id: Id<"contentPipeline">, title?: string, content?: string, notes?: string) => void;
+  onRecordEdit: (item: ContentItem, originalContent: string, finalContent: string) => void;
+  onRecordReject: (item: ContentItem, reason: RejectReason, customReason?: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -330,6 +343,12 @@ function ContentModal({
   const [showRequestChanges, setShowRequestChanges] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState("");
   const [showPublishUrl, setShowPublishUrl] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectReason, setRejectReason] = useState<RejectReason | null>(null);
+  const [customRejectReason, setCustomRejectReason] = useState("");
+  
+  // Track original content for edit comparison
+  const originalContentRef = useRef<string>("");
 
   if (!item) return null;
 
@@ -337,10 +356,15 @@ function ContentModal({
     setEditTitle(item.title);
     setEditContent(item.content);
     setEditNotes(item.notes ?? "");
+    originalContentRef.current = item.content; // Capture original for comparison
     setIsEditing(true);
   };
 
   const saveEdit = () => {
+    // Record edit if content changed
+    if (originalContentRef.current && originalContentRef.current !== editContent) {
+      onRecordEdit(item, originalContentRef.current, editContent);
+    }
     onUpdateContent(item._id, editTitle, editContent, editNotes || undefined);
     setIsEditing(false);
   };
@@ -360,6 +384,16 @@ function ContentModal({
     onUpdateStage(item._id, "idea", requestChangesNote || "Needs revision - moved to Ideas");
     setShowRequestChanges(false);
     setRequestChangesNote("");
+    onClose();
+  };
+
+  const handleReject = () => {
+    if (!rejectReason) return;
+    onRecordReject(item, rejectReason, rejectReason === "custom" ? customRejectReason : undefined);
+    onUpdateStage(item._id, "idea", `Rejected: ${REJECT_REASONS.find(r => r.value === rejectReason)?.label}${rejectReason === "custom" && customRejectReason ? ` - ${customRejectReason}` : ""}`);
+    setShowRejectDialog(false);
+    setRejectReason(null);
+    setCustomRejectReason("");
     onClose();
   };
 
@@ -539,6 +573,62 @@ function ContentModal({
               </div>
             </div>
           )}
+
+          {/* Reject Dialog */}
+          {showRejectDialog && (
+            <div className="space-y-3 border border-red-600/30 rounded p-4 bg-red-900/10">
+              <Label className="text-red-300 text-sm font-medium">Why are you rejecting this?</Label>
+              <p className="text-xs text-gray-400">This feedback helps Maven learn your voice</p>
+              <div className="grid grid-cols-2 gap-2">
+                {REJECT_REASONS.map((reason) => (
+                  <button
+                    key={reason.value}
+                    onClick={() => setRejectReason(reason.value)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      rejectReason === reason.value
+                        ? "border-red-500 bg-red-900/30 text-red-200"
+                        : "border-gray-700 hover:border-gray-600 text-gray-300"
+                    }`}
+                  >
+                    <span className="text-lg mr-2">{reason.emoji}</span>
+                    <span className="text-sm font-medium">{reason.label}</span>
+                  </button>
+                ))}
+              </div>
+              {rejectReason === "custom" && (
+                <Textarea
+                  value={customRejectReason}
+                  onChange={(e) => setCustomRejectReason(e.target.value)}
+                  placeholder="Describe what's wrong with this content..."
+                  rows={2}
+                  className="bg-gray-800 border-gray-600 text-gray-100 text-sm mt-2"
+                  autoFocus
+                />
+              )}
+              <div className="flex gap-2 pt-2">
+                <Button
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={handleReject}
+                  disabled={!rejectReason || (rejectReason === "custom" && !customRejectReason.trim())}
+                >
+                  Reject Content
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-gray-400"
+                  onClick={() => {
+                    setShowRejectDialog(false);
+                    setRejectReason(null);
+                    setCustomRejectReason("");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
@@ -582,10 +672,19 @@ function ContentModal({
                   <Button
                     size="sm"
                     variant="outline"
+                    className="border-red-600 text-red-400 hover:bg-red-600/10 gap-1"
+                    onClick={() => setShowRejectDialog(true)}
+                  >
+                    <X className="h-3 w-3" />
+                    Reject
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     className="border-amber-600 text-amber-400 hover:bg-amber-600/10 gap-1"
                     onClick={() => setShowRequestChanges(true)}
                   >
-                    <X className="h-3 w-3" />
+                    <Pencil className="h-3 w-3" />
                     Request Changes
                   </Button>
                 </>
@@ -909,6 +1008,11 @@ export function ContentPipeline() {
   const updateContent = useMutation(api.contentPipeline.updateContent);
   const deleteContent = useMutation(api.contentPipeline.deleteContent);
 
+  // Maven feedback mutations
+  const recordReject = useMutation(api.mavenFeedback.recordReject);
+  const recordEdit = useMutation(api.mavenFeedback.recordEdit);
+  const feedbackStats = useQuery(api.mavenFeedback.getFeedbackStats);
+
   // Group by stage
   const byStage = (stage: ContentStage) => allItems.filter((i) => i.stage === stage);
 
@@ -1018,6 +1122,30 @@ export function ContentPipeline() {
     }
   };
 
+  // Maven feedback handlers
+  const handleRecordEdit = async (item: ContentItem, originalContent: string, finalContent: string) => {
+    await recordEdit({
+      contentId: item._id,
+      contentTitle: item.title,
+      contentType: item.type,
+      createdBy: item.createdBy,
+      originalContent,
+      finalContent,
+    });
+  };
+
+  const handleRecordReject = async (item: ContentItem, reason: RejectReason, customReason?: string) => {
+    await recordReject({
+      contentId: item._id,
+      contentTitle: item.title,
+      contentType: item.type,
+      createdBy: item.createdBy,
+      reason,
+      customReason,
+      originalContent: item.content,
+    });
+  };
+
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -1031,6 +1159,11 @@ export function ContentPipeline() {
             {reviewCount > 0 && (
               <span className="text-xs text-amber-400 font-medium animate-pulse">
                 👀 {reviewCount} waiting for review
+              </span>
+            )}
+            {feedbackStats && feedbackStats.total > 0 && (
+              <span className="text-xs text-purple-400" title="Voice feedback collected for Maven">
+                🎯 {feedbackStats.total} voice feedback items
               </span>
             )}
           </div>
@@ -1118,6 +1251,8 @@ export function ContentPipeline() {
         onClose={() => setSelectedItem(null)}
         onUpdateStage={handleUpdateStage}
         onUpdateContent={handleUpdateContent}
+        onRecordEdit={handleRecordEdit}
+        onRecordReject={handleRecordReject}
       />
 
       {/* Add content dialog */}

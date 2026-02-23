@@ -882,4 +882,178 @@ http.route({
   }),
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Maven Feedback API
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /maven/feedback - Get all feedback with optional filters
+http.route({
+  path: "/maven/feedback", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    const url = new URL(req.url);
+    const feedbackType = url.searchParams.get("type") as "reject" | "edit" | null;
+    const limit = url.searchParams.get("limit");
+    
+    const feedback = await ctx.runQuery(api.mavenFeedback.listAll, {
+      feedbackType: feedbackType || undefined,
+      limit: limit ? parseInt(limit) : undefined,
+    });
+    
+    return jsonResponse({ success: true, feedback });
+  }),
+});
+
+// GET /maven/feedback/stats - Get feedback statistics
+http.route({
+  path: "/maven/feedback/stats", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    const stats = await ctx.runQuery(api.mavenFeedback.getFeedbackStats, {});
+    return jsonResponse({ success: true, stats });
+  }),
+});
+
+// GET /maven/feedback/export - Export feedback as JSON (for syncing to voice-feedback.json)
+http.route({
+  path: "/maven/feedback/export", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const feedback = await ctx.runQuery(api.mavenFeedback.listAll, { limit: 100 });
+    const stats = await ctx.runQuery(api.mavenFeedback.getFeedbackStats, {});
+    
+    // Generate pattern-based recommendations
+    const recommendations: string[] = [];
+    if (stats.byReason["too-salesy"] >= 3) {
+      recommendations.push("Reduce promotional language - focus on value and education");
+    }
+    if (stats.byReason["off-brand"] >= 3) {
+      recommendations.push("Review SOUL.md voice guidelines - content doesn't match brand");
+    }
+    if (stats.byReason["wrong-tone"] >= 3) {
+      recommendations.push("Adjust tone to be more conversational and authentic");
+    }
+    if (stats.byReason["factually-wrong"] >= 2) {
+      recommendations.push("Double-check facts and data before drafting content");
+    }
+    
+    const exportData = {
+      description: "Maven voice feedback - tracking patterns from Corinne's rejections and edits",
+      lastExport: new Date().toISOString(),
+      feedbackSummary: {
+        totalFeedback: stats.total,
+        rejects: stats.rejects,
+        edits: stats.edits,
+        patterns: stats.recentPatterns,
+        byReason: stats.byReason,
+        recommendations,
+      },
+      recentFeedback: feedback.slice(0, 20).map(f => ({
+        id: f._id,
+        type: f.feedbackType,
+        reason: f.reason,
+        customReason: f.customReason,
+        contentTitle: f.contentTitle,
+        contentType: f.contentType,
+        createdBy: f.createdBy,
+        createdAt: new Date(f.createdAt).toISOString(),
+        originalContent: f.originalContent?.substring(0, 500),
+        finalContent: f.finalContent?.substring(0, 500),
+      })),
+      notes: "This file is auto-generated from Mission Control feedback. Data is stored in Convex DB.",
+    };
+    
+    return jsonResponse(exportData);
+  }),
+});
+
+// POST /maven/feedback/reject - Record a rejection
+http.route({
+  path: "/maven/feedback/reject", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const body = await req.json() as {
+      contentId?: string;
+      contentTitle: string;
+      contentType: string;
+      createdBy: string;
+      reason: "too-salesy" | "off-brand" | "wrong-tone" | "factually-wrong" | "custom";
+      customReason?: string;
+      originalContent?: string;
+    };
+    
+    if (!body.contentTitle || !body.contentType || !body.createdBy || !body.reason) {
+      return jsonResponse({ error: "Missing required fields: contentTitle, contentType, createdBy, reason" }, 400);
+    }
+    
+    const id = await ctx.runMutation(api.mavenFeedback.recordReject, {
+      contentId: body.contentId as Id<"contentPipeline"> | undefined,
+      contentTitle: body.contentTitle,
+      contentType: body.contentType,
+      createdBy: body.createdBy,
+      reason: body.reason,
+      customReason: body.customReason,
+      originalContent: body.originalContent,
+    });
+    
+    return jsonResponse({ success: true, id });
+  }),
+});
+
+// POST /maven/feedback/edit - Record an edit comparison
+http.route({
+  path: "/maven/feedback/edit", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const body = await req.json() as {
+      contentId?: string;
+      contentTitle: string;
+      contentType: string;
+      createdBy: string;
+      originalContent: string;
+      finalContent: string;
+    };
+    
+    if (!body.contentTitle || !body.contentType || !body.createdBy || !body.originalContent || !body.finalContent) {
+      return jsonResponse({ error: "Missing required fields" }, 400);
+    }
+    
+    const id = await ctx.runMutation(api.mavenFeedback.recordEdit, {
+      contentId: body.contentId as Id<"contentPipeline"> | undefined,
+      contentTitle: body.contentTitle,
+      contentType: body.contentType,
+      createdBy: body.createdBy,
+      originalContent: body.originalContent,
+      finalContent: body.finalContent,
+    });
+    
+    return jsonResponse({ success: true, id });
+  }),
+});
+
+// OPTIONS for CORS preflight
+http.route({
+  path: "/maven/feedback", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+http.route({
+  path: "/maven/feedback/stats", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+http.route({
+  path: "/maven/feedback/export", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+http.route({
+  path: "/maven/feedback/reject", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+http.route({
+  path: "/maven/feedback/edit", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
 export default http;

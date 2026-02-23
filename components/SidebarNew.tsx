@@ -22,6 +22,7 @@ import {
   Heart,
   ChevronRight,
   ChevronDown,
+  TrendingUp,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -150,6 +151,12 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       icon: Layers,
       view: "content-pipeline",
       badge: reviewCount > 0 ? `${reviewCount} to review` : null,
+    },
+    {
+      name: "Engagement",
+      icon: TrendingUp,
+      view: "engagement-habits",
+      badge: null,
     },
     {
       name: "Memory Search",

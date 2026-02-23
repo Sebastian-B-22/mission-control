@@ -38,6 +38,7 @@ import { SebastianKanban } from "@/components/SebastianKanban";
 import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import { ContentPipeline } from "@/components/ContentPipeline";
 import { MemoryView } from "@/components/MemoryView";
+import { EngagementHabits } from "@/components/EngagementHabits";
 import { SidebarNew } from "@/components/SidebarNew";
 import { RPMCategoryPage } from "@/components/RPMCategoryPage";
 import { PersonalOverview } from "@/components/views/PersonalOverview";
@@ -405,6 +406,23 @@ export default function DashboardPage() {
 
       case "memory":
         return <MemoryView />;
+
+      case "engagement-habits":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <span>📈</span> Engagement Habits
+                </h2>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Track your daily social media engagement to build consistency
+                </p>
+              </div>
+            </div>
+            <EngagementHabits userId={convexUser._id} />
+          </div>
+        );
 
       // HTA views
       case "hta-overview":
