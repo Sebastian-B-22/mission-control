@@ -40,6 +40,8 @@ import { ContentPipeline } from "@/components/ContentPipeline";
 import { MemoryView } from "@/components/MemoryView";
 import { EngagementHabits } from "@/components/EngagementHabits";
 import { SidebarNew } from "@/components/SidebarNew";
+import { QuickWinsCard } from "@/components/QuickWinsCard";
+import { FamilyMeetingDashboard } from "@/components/FamilyMeetingDashboard";
 import { RPMCategoryPage } from "@/components/RPMCategoryPage";
 import { PersonalOverview } from "@/components/views/PersonalOverview";
 import { ProfessionalOverview } from "@/components/views/ProfessionalOverview";
@@ -358,9 +360,10 @@ export default function DashboardPage() {
             </div>
             <MorningMindset userId={convexUser._id} date={today} />
             {user?.id && <SurpriseCard clerkId={user.id} />}
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               <HabitTracker userId={convexUser._id} date={today} />
               <FiveToThrive userId={convexUser._id} date={today} />
+              <QuickWinsCard userId={convexUser._id} date={today} />
             </div>
             <EveningReflection userId={convexUser._id} date={today} />
           </div>
@@ -423,6 +426,9 @@ export default function DashboardPage() {
             <EngagementHabits userId={convexUser._id} />
           </div>
         );
+
+      case "family-meeting":
+        return <FamilyMeetingDashboard userId={convexUser._id} />;
 
       // HTA views
       case "hta-overview":

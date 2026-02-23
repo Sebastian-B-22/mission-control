@@ -416,4 +416,96 @@ export default defineSchema({
     trackingEnabled: v.boolean(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  // ─── Family Meeting + Quick Wins ───────────────────────────────────────
+  quickWins: defineTable({
+    userId: v.id("users"),
+    task: v.string(),
+    completed: v.boolean(),
+    date: v.string(),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_date", ["userId", "date"]),
+
+  familyMeetings: defineTable({
+    userId: v.id("users"),
+    weekOf: v.string(),
+    familyMembers: v.array(v.string()),
+    acknowledgements: v.array(
+      v.object({
+        from: v.string(),
+        to: v.string(),
+        message: v.string(),
+        createdAt: v.number(),
+      })
+    ),
+    supportRequests: v.array(
+      v.object({
+        person: v.string(),
+        request: v.string(),
+        conflict: v.optional(v.boolean()),
+      })
+    ),
+    goals: v.array(
+      v.object({
+        person: v.string(),
+        goal: v.string(),
+        habitFocus: v.optional(v.string()),
+        completed: v.optional(v.boolean()),
+      })
+    ),
+    mealPlan: v.optional(
+      v.array(
+        v.object({
+          day: v.string(),
+          meal: v.string(),
+        })
+      )
+    ),
+    gameNights: v.array(
+      v.object({
+        game: v.string(),
+        winner: v.optional(v.string()),
+        moment: v.optional(v.string()),
+        date: v.string(),
+      })
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_week", ["userId", "weekOf"]),
+
+  discussionQueue: defineTable({
+    userId: v.id("users"),
+    item: v.string(),
+    addedBy: v.string(),
+    status: v.union(
+      v.literal("queued"),
+      v.literal("resolved"),
+      v.literal("tabled"),
+      v.literal("action-needed"),
+      v.literal("archived")
+    ),
+    notes: v.optional(v.string()),
+    dateAdded: v.string(),
+    createdAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"]),
+
+  movieLibrary: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    type: v.union(v.literal("suggestion"), v.literal("watched")),
+    suggestedBy: v.optional(v.string()),
+    watchedOn: v.optional(v.string()),
+    rating: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    votes: v.array(v.string()),
+    favorite: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

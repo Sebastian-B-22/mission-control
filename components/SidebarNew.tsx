@@ -23,6 +23,7 @@ import {
   ChevronRight,
   ChevronDown,
   TrendingUp,
+  Handshake,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -69,6 +70,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Personal CRM",
       icon: Heart,
       view: "personal-crm",
+    },
+    {
+      name: "Family Meeting",
+      icon: Handshake,
+      view: "family-meeting",
     },
     {
       name: "Personal RPM",

@@ -17,6 +17,7 @@ import type * as contentPipeline from "../contentPipeline.js";
 import type * as daily from "../daily.js";
 import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
+import type * as familyMeeting from "../familyMeeting.js";
 import type * as fieldTrips from "../fieldTrips.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   daily: typeof daily;
   engagementHabits: typeof engagementHabits;
   families: typeof families;
+  familyMeeting: typeof familyMeeting;
   fieldTrips: typeof fieldTrips;
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
