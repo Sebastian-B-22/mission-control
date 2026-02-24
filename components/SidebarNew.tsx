@@ -150,24 +150,13 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       icon: Bot,
       view: "sebastian",
       badge: inProgressCount > 0 ? `${inProgressCount} in progress` : null,
-    },
-    {
-      name: "Content Pipeline",
-      icon: Layers,
-      view: "content-pipeline",
-      badge: reviewCount > 0 ? `${reviewCount} to review` : null,
-    },
-    {
-      name: "Engagement",
-      icon: TrendingUp,
-      view: "engagement-habits",
-      badge: null,
-    },
-    {
-      name: "Memory Search",
-      icon: Brain,
-      view: "memory",
-      badge: null,
+      expandable: true,
+      section: "sebastian",
+      children: [
+        { name: "Content Pipeline", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
+        { name: "Engagement", view: "engagement-habits" },
+        { name: "Memory Search", view: "memory" },
+      ]
     },
   ];
 
