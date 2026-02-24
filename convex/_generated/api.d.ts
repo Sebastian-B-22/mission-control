@@ -14,6 +14,7 @@ import type * as camp from "../camp.js";
 import type * as checkIns from "../checkIns.js";
 import type * as contacts from "../contacts.js";
 import type * as contentPipeline from "../contentPipeline.js";
+import type * as contentVerification from "../contentVerification.js";
 import type * as daily from "../daily.js";
 import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   checkIns: typeof checkIns;
   contacts: typeof contacts;
   contentPipeline: typeof contentPipeline;
+  contentVerification: typeof contentVerification;
   daily: typeof daily;
   engagementHabits: typeof engagementHabits;
   families: typeof families;

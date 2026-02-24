@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bot, Activity, MessageSquare, CheckCircle } from "lucide-react";
+import { Bot, Activity, MessageSquare } from "lucide-react";
 
 export function SebastianAgentView() {
   const agents = [

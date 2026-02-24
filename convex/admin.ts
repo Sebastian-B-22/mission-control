@@ -213,7 +213,7 @@ export const importWeeklySchedule = mutation({
     for (const block of scheduleData) {
       await ctx.db.insert("weeklySchedule", {
         userId: user._id,
-        dayOfWeek: block.dayOfWeek as any,
+        dayOfWeek: block.dayOfWeek as "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday",
         startTime: block.startTime,
         endTime: block.endTime,
         activity: block.activity,

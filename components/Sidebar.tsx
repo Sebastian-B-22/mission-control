@@ -10,8 +10,7 @@ import {
   Menu,
   X,
   Calendar,
-  CheckSquare,
-  Target,
+    Target,
   Users,
   Home,
   Briefcase,
@@ -30,7 +29,6 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
 
   // Get today's date for quick stats
-  const today = new Date().toISOString().split("T")[0];
   
   // Get Sebastian's tasks for quick status
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
@@ -191,7 +189,7 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
             </div>
             {(todoCount > 0 || inProgressCount > 0) && (
               <div className="mt-3 pt-3 border-t">
-                <p className="text-xs text-gray-500">Sebastian's Work:</p>
+                <p className="text-xs text-gray-500">Sebastian&apos;s Work:</p>
                 <div className="mt-1 space-y-1">
                   {inProgressCount > 0 && (
                     <p className="text-xs">

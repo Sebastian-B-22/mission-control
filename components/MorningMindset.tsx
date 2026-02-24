@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -12,6 +12,15 @@ interface MorningMindsetProps {
   date: string;
 }
 
+interface ReflectionUpdates {
+  userId: Id<"users">;
+  date: string;
+  morningExcited?: string;
+  morningSurprise?: string;
+  eveningAppreciated?: string;
+  eveningLearned?: string;
+}
+
 export function MorningMindset({ userId, date }: MorningMindsetProps) {
   const reflection = useQuery(api.daily.getDailyReflection, { userId, date });
   const saveReflection = useMutation(api.daily.saveDailyReflection);
@@ -19,27 +28,18 @@ export function MorningMindset({ userId, date }: MorningMindsetProps) {
   const [morningExcited, setMorningExcited] = useState("");
   const [morningSurprise, setMorningSurprise] = useState("");
 
-  useEffect(() => {
-    if (reflection) {
-      setMorningExcited(reflection.morningExcited || "");
-      setMorningSurprise(reflection.morningSurprise || "");
-    }
-  }, [reflection]);
+  const displayedMorningExcited = morningExcited || reflection?.morningExcited || "";
+  const displayedMorningSurprise = morningSurprise || reflection?.morningSurprise || "";
 
-  const handleSave = (field: string, value: string) => {
-    const updates: any = { userId, date };
-    
-    if (field === "morningExcited") {
-      updates.morningExcited = value;
-      updates.morningSurprise = morningSurprise;
-      updates.eveningAppreciated = reflection?.eveningAppreciated;
-      updates.eveningLearned = reflection?.eveningLearned;
-    } else if (field === "morningSurprise") {
-      updates.morningExcited = morningExcited;
-      updates.morningSurprise = value;
-      updates.eveningAppreciated = reflection?.eveningAppreciated;
-      updates.eveningLearned = reflection?.eveningLearned;
-    }
+  const handleSave = (field: "morningExcited" | "morningSurprise", value: string) => {
+    const updates: ReflectionUpdates = {
+      userId,
+      date,
+      morningExcited: field === "morningExcited" ? value : displayedMorningExcited,
+      morningSurprise: field === "morningSurprise" ? value : displayedMorningSurprise,
+      eveningAppreciated: reflection?.eveningAppreciated,
+      eveningLearned: reflection?.eveningLearned,
+    };
 
     saveReflection(updates);
   };
@@ -55,13 +55,11 @@ export function MorningMindset({ userId, date }: MorningMindsetProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
-            One thing I can get excited about today is...
-          </label>
+          <label className="text-sm font-medium text-muted-foreground">One thing I can get excited about today is...</label>
           <Textarea
-            value={morningExcited}
+            value={displayedMorningExcited}
             onChange={(e) => setMorningExcited(e.target.value)}
-            onBlur={() => handleSave("morningExcited", morningExcited)}
+            onBlur={() => handleSave("morningExcited", displayedMorningExcited)}
             placeholder="What lights you up today?"
             rows={2}
             className="resize-none"
@@ -69,13 +67,11 @@ export function MorningMindset({ userId, date }: MorningMindsetProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
-            Someone I could surprise with a note, gift, or sign of appreciation is...
-          </label>
+          <label className="text-sm font-medium text-muted-foreground">Someone I could surprise with a note, gift, or sign of appreciation is...</label>
           <Textarea
-            value={morningSurprise}
+            value={displayedMorningSurprise}
             onChange={(e) => setMorningSurprise(e.target.value)}
-            onBlur={() => handleSave("morningSurprise", morningSurprise)}
+            onBlur={() => handleSave("morningSurprise", displayedMorningSurprise)}
             placeholder="Who could you brighten today?"
             rows={2}
             className="resize-none"

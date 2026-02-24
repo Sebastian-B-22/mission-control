@@ -63,6 +63,8 @@ type ContentItem = {
   createdAt: number;
   updatedAt: number;
   publishedUrl?: string;
+  verificationStatus?: "pending" | "passed" | "failed" | "overridden";
+  verificationScore?: number;
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────
@@ -185,6 +187,22 @@ function CreatorBadge({ createdBy }: { createdBy: string }) {
   );
 }
 
+function VerificationBadge({ item }: { item: ContentItem }) {
+  if (item.verificationStatus === "passed") {
+    return <Badge className="bg-green-600/20 text-green-300 border-green-600/30">✅ Verified {item.verificationScore ?? ""}</Badge>;
+  }
+  if (item.verificationStatus === "failed") {
+    return <Badge className="bg-amber-600/20 text-amber-300 border-amber-600/30">⚠️ Needs Review {item.verificationScore ?? ""}</Badge>;
+  }
+  if (item.verificationStatus === "pending") {
+    return <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30">⏳ Verifying...</Badge>;
+  }
+  if (item.verificationStatus === "overridden") {
+    return <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">🛡️ Override</Badge>;
+  }
+  return null;
+}
+
 // ─── Content Card ─────────────────────────────────────────────────────────
 
 function ContentCard({
@@ -228,6 +246,7 @@ function ContentCard({
         <div className="flex items-center gap-2 flex-wrap">
           <TypeBadge type={item.type} />
           <CreatorBadge createdBy={item.createdBy} />
+          <VerificationBadge item={item} />
         </div>
 
         {/* Content preview */}
@@ -349,6 +368,11 @@ function ContentModal({
   
   // Track original content for edit comparison
   const originalContentRef = useRef<string>("");
+  const verification = useQuery(
+    api.contentVerification.getVerificationForContent,
+    item ? { contentId: item._id } : "skip"
+  );
+  const overrideVerification = useMutation(api.contentVerification.overrideVerification);
 
   if (!item) return null;
 
@@ -479,6 +503,52 @@ function ContentModal({
               </div>
             )}
           </div>
+
+          {/* Auto-preview + verification */}
+          {!isEditing && (
+            <div className="space-y-3">
+              <div className="rounded-lg border border-gray-700 bg-gray-800/40 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-gray-400">Preview ({item.type === "x-post" ? "X" : "LinkedIn"})</p>
+                  <Badge className="bg-gray-700 text-gray-200">{item.content.length} chars</Badge>
+                </div>
+                <div className="rounded-md bg-black/20 border border-gray-700 p-3 text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
+                  {item.content}
+                </div>
+              </div>
+
+              {verification && (
+                <div className="rounded-lg border border-gray-700 bg-gray-800/40 p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-400">Verification Results</p>
+                    <Badge className={verification.overallPassed ? "bg-green-600/20 text-green-300" : "bg-amber-600/20 text-amber-300"}>
+                      Tone {verification.checks.tone.score}
+                    </Badge>
+                  </div>
+                  <ul className="text-xs text-gray-300 space-y-1">
+                    <li>{verification.checks.characterCount.passed ? "✅" : "⚠️"} Character count ({verification.checks.characterCount.count}/{verification.checks.characterCount.limit})</li>
+                    <li>{verification.checks.links.passed ? "✅" : "⚠️"} Links ({verification.checks.links.broken.length} broken)</li>
+                    <li>{verification.checks.tone.passed ? "✅" : "⚠️"} Tone similarity ({verification.checks.tone.score}/100)</li>
+                    <li>{verification.checks.formatting.passed ? "✅" : "⚠️"} Formatting ({verification.checks.formatting.issues.length} issues)</li>
+                  </ul>
+                  {!verification.overallPassed && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-purple-600 text-purple-300 hover:bg-purple-900/20"
+                      onClick={async () => {
+                        await overrideVerification({ contentId: item._id, overriddenBy: "corinne" });
+                        onUpdateStage(item._id, "approved", "Override approved by Corinne");
+                        onClose();
+                      }}
+                    >
+                      Override & Approve Anyway
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Notes */}
           {isEditing ? (

@@ -32,7 +32,7 @@ export function AspireMonthSwimlanes({ userId }: AspireMonthSwimlanesProps) {
     noDate: tasks.filter(t => !t.dueDate),
   };
 
-  const getMonthProgress = (monthTasks: any[]) => {
+  const getMonthProgress = (monthTasks: typeof tasks) => {
     if (monthTasks.length === 0) return 0;
     const completed = monthTasks.filter(t => t.status === "done").length;
     return Math.round((completed / monthTasks.length) * 100);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -14,33 +14,24 @@ interface MonthlyItineraryProps {
 }
 
 export function MonthlyItinerary({ userId }: MonthlyItineraryProps) {
-  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const currentMonthDisplay = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const currentMonthDisplay = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
   const itinerary = useQuery(api.fieldTrips.getMonthlyItinerary, { userId, month: currentMonth });
   const saveItinerary = useMutation(api.fieldTrips.saveMonthlyItinerary);
-  
-  const [content, setContent] = useState("");
+
+  const [draftContent, setDraftContent] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(true);
 
-  useEffect(() => {
-    if (itinerary) {
-      setContent(itinerary.content);
-      setIsSaved(true);
-    }
-  }, [itinerary]);
+  const content = draftContent ?? itinerary?.content ?? "";
 
   const handleSave = async () => {
-    await saveItinerary({
-      userId,
-      month: currentMonth,
-      content,
-    });
+    await saveItinerary({ userId, month: currentMonth, content });
     setIsSaved(true);
   };
 
   const handleChange = (value: string) => {
-    setContent(value);
+    setDraftContent(value);
     setIsSaved(false);
   };
 

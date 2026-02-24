@@ -37,14 +37,14 @@ export default function MorningCheckInPage() {
             Good Morning! ☀️
           </CardTitle>
           <CardDescription>
-            Let's set your intention for today. Complete before 9am for best results.
+            Let&apos;s set your intention for today. Complete before 9am for best results.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="oneThing" className="text-lg font-semibold">
-                What's your ONE THING today? *
+                What&apos;s your ONE THING today? *
               </Label>
               <p className="text-sm text-muted-foreground">
                 The one thing that, if completed, will make today a success.
@@ -86,7 +86,7 @@ export default function MorningCheckInPage() {
             </div>
 
             <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-              <h3 className="font-semibold mb-2">Today's Top 3 Priorities</h3>
+              <h3 className="font-semibold mb-2">Today&apos;s Top 3 Priorities</h3>
               <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                 <li>Priority 1 from your RPM categories</li>
                 <li>Priority 2 from your RPM categories</li>

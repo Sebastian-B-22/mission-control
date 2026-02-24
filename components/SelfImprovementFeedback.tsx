@@ -53,7 +53,7 @@ export function SelfImprovementFeedback() {
               Self-Improvement Ideas
             </CardTitle>
             <CardDescription className="mt-1">
-              Spot something repetitive or tedious? Log it here and I'll build a skill/tool to automate it.
+              Spot something repetitive or tedious? Log it here and I&apos;ll build a skill/tool to automate it.
             </CardDescription>
           </div>
           {!showForm && (
@@ -89,7 +89,7 @@ export function SelfImprovementFeedback() {
         {/* Feedback Items */}
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">
-            No improvement ideas yet. Click "+ Add Idea" to get started!
+            No improvement ideas yet. Click &quot;+ Add Idea&quot; to get started!
           </p>
         ) : (
           <div className="space-y-3">

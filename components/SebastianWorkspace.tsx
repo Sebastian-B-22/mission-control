@@ -22,7 +22,7 @@ export function SebastianWorkspace({ userId }: SebastianWorkspaceProps) {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <span className="text-amber-500">⚡</span>
-          Sebastian's Workspace
+          Sebastian&apos;s Workspace
         </h1>
         <p className="text-muted-foreground mt-1">AI sidekick coordination center</p>
       </div>

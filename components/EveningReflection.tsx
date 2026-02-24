@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -12,34 +12,33 @@ interface EveningReflectionProps {
   date: string;
 }
 
+interface ReflectionUpdates {
+  userId: Id<"users">;
+  date: string;
+  morningExcited?: string;
+  morningSurprise?: string;
+  eveningAppreciated?: string;
+  eveningLearned?: string;
+}
+
 export function EveningReflection({ userId, date }: EveningReflectionProps) {
   const reflection = useQuery(api.daily.getDailyReflection, { userId, date });
   const saveReflection = useMutation(api.daily.saveDailyReflection);
-
   const [eveningAppreciated, setEveningAppreciated] = useState("");
   const [eveningLearned, setEveningLearned] = useState("");
 
-  useEffect(() => {
-    if (reflection) {
-      setEveningAppreciated(reflection.eveningAppreciated || "");
-      setEveningLearned(reflection.eveningLearned || "");
-    }
-  }, [reflection]);
+  const displayedEveningAppreciated = eveningAppreciated || reflection?.eveningAppreciated || "";
+  const displayedEveningLearned = eveningLearned || reflection?.eveningLearned || "";
 
-  const handleSave = (field: string, value: string) => {
-    const updates: any = { userId, date };
-    
-    if (field === "eveningAppreciated") {
-      updates.morningExcited = reflection?.morningExcited;
-      updates.morningSurprise = reflection?.morningSurprise;
-      updates.eveningAppreciated = value;
-      updates.eveningLearned = eveningLearned;
-    } else if (field === "eveningLearned") {
-      updates.morningExcited = reflection?.morningExcited;
-      updates.morningSurprise = reflection?.morningSurprise;
-      updates.eveningAppreciated = eveningAppreciated;
-      updates.eveningLearned = value;
-    }
+  const handleSave = (field: "eveningAppreciated" | "eveningLearned", value: string) => {
+    const updates: ReflectionUpdates = {
+      userId,
+      date,
+      morningExcited: reflection?.morningExcited,
+      morningSurprise: reflection?.morningSurprise,
+      eveningAppreciated: field === "eveningAppreciated" ? value : displayedEveningAppreciated,
+      eveningLearned: field === "eveningLearned" ? value : displayedEveningLearned,
+    };
 
     saveReflection(updates);
   };
@@ -55,13 +54,11 @@ export function EveningReflection({ userId, date }: EveningReflectionProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
-            A moment that I really appreciated today was...
-          </label>
+          <label className="text-sm font-medium text-muted-foreground">A moment that I really appreciated today was...</label>
           <Textarea
-            value={eveningAppreciated}
+            value={displayedEveningAppreciated}
             onChange={(e) => setEveningAppreciated(e.target.value)}
-            onBlur={() => handleSave("eveningAppreciated", eveningAppreciated)}
+            onBlur={() => handleSave("eveningAppreciated", displayedEveningAppreciated)}
             placeholder="What moment stood out?"
             rows={2}
             className="resize-none"
@@ -69,13 +66,11 @@ export function EveningReflection({ userId, date }: EveningReflectionProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
-            Something I learned or realized today was...
-          </label>
+          <label className="text-sm font-medium text-muted-foreground">Something I learned or realized today was...</label>
           <Textarea
-            value={eveningLearned}
+            value={displayedEveningLearned}
             onChange={(e) => setEveningLearned(e.target.value)}
-            onBlur={() => handleSave("eveningLearned", eveningLearned)}
+            onBlur={() => handleSave("eveningLearned", displayedEveningLearned)}
             placeholder="What insight did you gain?"
             rows={2}
             className="resize-none"

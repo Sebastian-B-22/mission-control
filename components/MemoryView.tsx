@@ -173,8 +173,8 @@ export function MemoryView() {
                 {query ? (
                   <>
                     <span className="font-medium text-gray-600">{displayedResults.length}</span>{" "}
-                    {displayedResults.length === 1 ? "result" : "results"} for "
-                    <span className="font-medium text-amber-600">{query}</span>"
+                    {displayedResults.length === 1 ? "result" : "results"} for &quot;
+                    <span className="font-medium text-amber-600">{query}</span>&quot;
                     {totalCount !== displayedResults.length && (
                       <span className="ml-1">
                         (filtered from {totalCount})

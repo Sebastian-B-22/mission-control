@@ -10,6 +10,7 @@ export const saveFiveToThrive = mutation({
       v.object({
         text: v.string(),
         completed: v.boolean(),
+        categoryId: v.optional(v.id("rpmCategories")),
         completedAt: v.optional(v.number()),
       })
     ),

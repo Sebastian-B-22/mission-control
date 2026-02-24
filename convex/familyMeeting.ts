@@ -28,11 +28,13 @@ export const addQuickWin = mutation({
     userId: v.id("users"),
     task: v.string(),
     date: v.string(),
+    categoryId: v.optional(v.id("rpmCategories")),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("quickWins", {
       userId: args.userId,
       task: args.task,
+      categoryId: args.categoryId,
       completed: false,
       date: args.date,
       createdAt: Date.now(),
@@ -88,6 +90,7 @@ export const carryOverUncheckedQuickWins = mutation({
       await ctx.db.insert("quickWins", {
         userId: args.userId,
         task: item.task,
+        categoryId: item.categoryId,
         completed: false,
         date: args.toDate,
         createdAt: Date.now(),

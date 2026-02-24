@@ -147,7 +147,12 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               {activeQueue.map((q) => (
                 <div key={q._id} className="border rounded p-2 space-y-2">
                   <div className="text-sm">{q.item}</div>
-                  <Select value={q.status} onValueChange={(v: any) => updateDiscussionStatus({ id: q._id, status: v })}>
+                  <Select
+                    value={q.status}
+                    onValueChange={(v: "queued" | "resolved" | "tabled" | "action-needed" | "archived") =>
+                      updateDiscussionStatus({ id: q._id, status: v })
+                    }
+                  >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="queued">Queued</SelectItem>
@@ -294,6 +299,18 @@ export function FamilyMeetingDashboard({ userId }: Props) {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>🎉 End of Year Reflection (Coming 2027)</CardTitle>
+          <CardDescription>
+            Yearly wrap-up: acknowledgements, goals, movie nights, game winners
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button disabled variant="outline">Available December 2026</Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

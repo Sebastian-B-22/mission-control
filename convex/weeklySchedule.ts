@@ -60,7 +60,7 @@ export const getWeeklySchedule = query({
       .collect();
 
     // Group by day and sort by time
-    const schedule: Record<string, any[]> = {
+    const schedule: Record<string, (typeof blocks)[number][]> = {
       monday: [],
       tuesday: [],
       wednesday: [],

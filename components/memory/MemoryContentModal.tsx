@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { X, Copy, Check, ExternalLink } from "lucide-react";
+import { X, Copy, Check } from "lucide-react";
 
 interface MemoryContentModalProps {
   filePath: string;
@@ -24,7 +24,7 @@ function renderMarkdown(content: string): string {
   let inList = false;
 
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
+    const line = lines[i];
 
     // Code blocks
     if (line.startsWith("```")) {

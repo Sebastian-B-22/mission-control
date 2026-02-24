@@ -61,7 +61,7 @@ export const updateTask = mutation({
   handler: async (ctx, args) => {
     const { id, status, ...updates } = args;
     
-    const updateData: any = { ...updates };
+    const updateData: Record<string, unknown> = { ...updates };
     
     if (status !== undefined) {
       updateData.status = status;

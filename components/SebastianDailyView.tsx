@@ -57,7 +57,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Zap className="h-6 w-6 text-amber-500" />
-            Today's Focus
+            Today&apos;s Focus
           </h2>
           <p className="text-muted-foreground mt-1">{today}</p>
         </div>

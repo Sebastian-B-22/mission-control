@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRightLeft, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface QuickWinsCardProps {
   userId: Id<"users">;
@@ -17,8 +18,11 @@ interface QuickWinsCardProps {
 
 export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
   const [task, setTask] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Id<"rpmCategories"> | undefined>(undefined);
 
   const quickWins = useQuery(api.familyMeeting.getQuickWins, { userId, date }) || [];
+  const rpmCategoriesQuery = useQuery(api.rpm.getCategoriesByUser, { userId });
+  const rpmCategories = useMemo(() => rpmCategoriesQuery ?? [], [rpmCategoriesQuery]);
   const addQuickWin = useMutation(api.familyMeeting.addQuickWin);
   const toggleQuickWin = useMutation(api.familyMeeting.toggleQuickWin);
   const deleteQuickWin = useMutation(api.familyMeeting.deleteQuickWin);
@@ -31,11 +35,16 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
   }, [date]);
 
   const completed = quickWins.filter((q) => q.completed).length;
+  const categoryNameById = useMemo(
+    () => new Map(rpmCategories.map((category) => [category._id, category.name])),
+    [rpmCategories]
+  );
 
   const handleAdd = async () => {
     if (!task.trim()) return;
-    await addQuickWin({ userId, date, task: task.trim() });
+    await addQuickWin({ userId, date, task: task.trim(), categoryId: selectedCategoryId });
     setTask("");
+    setSelectedCategoryId(undefined);
   };
 
   return (
@@ -45,16 +54,36 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
         <CardDescription>{completed}/{quickWins.length} complete • resets daily</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Add a quick task..."
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          />
-          <Button onClick={handleAdd} size="sm">
-            <Plus className="h-4 w-4" />
-          </Button>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Add a quick task..."
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+            />
+            <Button onClick={handleAdd} size="sm">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          <Select
+            value={selectedCategoryId ?? "none"}
+            onValueChange={(value) =>
+              setSelectedCategoryId(value === "none" ? undefined : (value as Id<"rpmCategories">))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Optional: Link to an RPM category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No category</SelectItem>
+              {rpmCategories.map((category) => (
+                <SelectItem key={category._id} value={category._id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
@@ -67,9 +96,16 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
                   checked={item.completed}
                   onCheckedChange={() => toggleQuickWin({ id: item._id, completed: !item.completed })}
                 />
-                <span className={`flex-1 text-sm ${item.completed ? "line-through text-muted-foreground" : ""}`}>
-                  {item.task}
-                </span>
+                <div className="flex-1">
+                  <span className={`text-sm ${item.completed ? "line-through text-muted-foreground" : ""}`}>
+                    {item.task}
+                  </span>
+                  {item.categoryId && categoryNameById.get(item.categoryId) && (
+                    <p className="text-xs text-muted-foreground">
+                      {categoryNameById.get(item.categoryId)}
+                    </p>
+                  )}
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => deleteQuickWin({ id: item._id })}>
                   ✕
                 </Button>

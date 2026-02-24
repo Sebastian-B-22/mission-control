@@ -129,7 +129,7 @@ export const importSchedule = internalMutation({
     for (const block of scheduleData) {
       const id = await ctx.db.insert("weeklySchedule", {
         userId: args.userId,
-        dayOfWeek: block.dayOfWeek as any,
+        dayOfWeek: block.dayOfWeek as "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday",
         startTime: block.startTime,
         endTime: block.endTime,
         activity: block.activity,

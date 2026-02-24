@@ -27,6 +27,7 @@ export function HomeschoolScheduleView({ userId }: HomeschoolSubViewProps) {
 }
 
 export function HomeschoolFocusView({ userId }: HomeschoolSubViewProps) {
+  void userId;
   return (
     <div className="space-y-6">
       <div>
@@ -46,7 +47,7 @@ export function HomeschoolFocusView({ userId }: HomeschoolSubViewProps) {
           <h2 className="text-xl font-semibold text-blue-600">Up Next</h2>
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Next Month's Focus</CardTitle>
+              <CardTitle className="text-lg">Next Month&apos;s Focus</CardTitle>
               <CardDescription>Planning ahead</CardDescription>
             </CardHeader>
             <CardContent>
@@ -63,6 +64,7 @@ export function HomeschoolFocusView({ userId }: HomeschoolSubViewProps) {
 }
 
 export function HomeschoolProjectsView({ userId }: HomeschoolSubViewProps) {
+  void userId;
   return (
     <div className="space-y-6">
       <div>
@@ -82,7 +84,7 @@ export function HomeschoolProjectsView({ userId }: HomeschoolSubViewProps) {
           <h2 className="text-xl font-semibold text-blue-600">Up Next</h2>
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Next Month's Projects</CardTitle>
+              <CardTitle className="text-lg">Next Month&apos;s Projects</CardTitle>
               <CardDescription>Projects in the pipeline</CardDescription>
             </CardHeader>
             <CardContent>
@@ -119,7 +121,7 @@ export function HomeschoolReadAloudView({ userId }: HomeschoolSubViewProps) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Books on Deck</CardTitle>
-              <CardDescription>What we'll read next</CardDescription>
+              <CardDescription>What we&apos;ll read next</CardDescription>
             </CardHeader>
             <CardContent>
               <textarea
@@ -159,6 +161,7 @@ export function HomeschoolFieldTripsView({ userId }: HomeschoolSubViewProps) {
 }
 
 export function HomeschoolTripsView({ userId }: HomeschoolSubViewProps) {
+  void userId;
   return (
     <div className="space-y-6">
       <div>

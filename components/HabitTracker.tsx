@@ -59,7 +59,7 @@ export function HabitTracker({ userId, date }: HabitTrackerProps) {
             No habits loaded for today yet.
           </p>
           <Button onClick={handlePopulateHabits}>
-            Load Today's Habits
+            Load Today&apos;s Habits
           </Button>
         </CardContent>
       </Card>

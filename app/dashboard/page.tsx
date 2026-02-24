@@ -5,10 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
 import { Id } from "@/convex/_generated/dataModel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,24 +16,13 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { HabitTracker } from "@/components/HabitTracker";
 import { FiveToThrive } from "@/components/FiveToThrive";
 import { MorningMindset } from "@/components/MorningMindset";
 import { EveningReflection } from "@/components/EveningReflection";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { FieldTripList } from "@/components/FieldTripList";
-import { WeeklySchedule } from "@/components/WeeklySchedule";
-import { HomeschoolObjectives } from "@/components/HomeschoolObjectives";
-import { MonthlyFocus } from "@/components/MonthlyFocus";
-import { ProjectsThisMonth } from "@/components/ProjectsThisMonth";
-import { ReadAloudList } from "@/components/ReadAloudListDB";
-import { TripsOnHorizon } from "@/components/TripsOnHorizon";
-import { BookLibrary } from "@/components/BookLibraryDB";
-import { TaskList } from "@/components/TaskList";
-import { SebastianKanban } from "@/components/SebastianKanban";
 import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import { ContentPipeline } from "@/components/ContentPipeline";
+import { MavenVerificationDashboard } from "@/components/MavenVerificationDashboard";
 import { MemoryView } from "@/components/MemoryView";
 import { EngagementHabits } from "@/components/EngagementHabits";
 import { SidebarNew } from "@/components/SidebarNew";
@@ -73,18 +59,6 @@ export default function DashboardPage() {
   const [purpose, setPurpose] = useState("");
   const [yearlyGoals, setYearlyGoals] = useState("");
   const [needleMovers, setNeedleMovers] = useState("");
-  const [importingSchedule, setImportingSchedule] = useState(false);
-  const [importMessage, setImportMessage] = useState<string | null>(null);
-  const [updatingPurposes, setUpdatingPurposes] = useState(false);
-  const [purposeMessage, setPurposeMessage] = useState<string | null>(null);
-  const [importingBooks, setImportingBooks] = useState(false);
-  const [bookMessage, setBookMessage] = useState<string | null>(null);
-  const [importingHTATasks, setImportingHTATasks] = useState(false);
-  const [htaMessage, setHTAMessage] = useState<string | null>(null);
-  const [importingSebastianTasks, setImportingSebastianTasks] = useState(false);
-  const [sebastianMessage, setSebastianMessage] = useState<string | null>(null);
-  const [updatingAllGoals, setUpdatingAllGoals] = useState(false);
-  const [allGoalsMessage, setAllGoalsMessage] = useState<string | null>(null);
   
   // Get or create user in Convex
   const convexUser = useQuery(
@@ -128,12 +102,6 @@ export default function DashboardPage() {
   );
 
   const updateCategory = useMutation(api.rpm.updateCategory);
-  const importSchedule = useMutation(api.admin.importWeeklySchedule);
-  const updateRPMPurposes = useMutation(api.admin.updateRPMPurposes);
-  const importBooks = useMutation(api.admin.importBookLibrary);
-  const importHTATasks = useMutation(api.admin.importHTATasks);
-  const updateAllRPMGoals = useMutation(api.admin.updateAllRPMGoals);
-  const seedSebastianTasks = useMutation(api.seedSebastianTasks.seedInitialTasks);
 
   // Get today's date in PST (with auto-update at midnight PST)
   const getPSTDate = () => {
@@ -197,121 +165,11 @@ export default function DashboardPage() {
     setNeedleMovers("");
   };
 
-  const handleImportSchedule = async () => {
-    if (!user) return;
-    
-    setImportingSchedule(true);
-    setImportMessage(null);
 
-    try {
-      const result = await importSchedule({
-        clerkId: user.id,
-        clearExisting: true,
-      });
-      setImportMessage(result.message || "Schedule imported successfully!");
-    } catch (error: any) {
-      setImportMessage("Error: " + (error.message || "Failed to import schedule"));
-    } finally {
-      setImportingSchedule(false);
-    }
-  };
 
-  const handleUpdatePurposes = async () => {
-    if (!user) return;
-    
-    setUpdatingPurposes(true);
-    setPurposeMessage(null);
 
-    try {
-      const result = await updateRPMPurposes({
-        clerkId: user.id,
-      });
-      setPurposeMessage(result.message || "Purposes updated successfully!");
-      // Reload to show updated purposes
-      setTimeout(() => setPurposeMessage(null), 3000);
-    } catch (error: any) {
-      setPurposeMessage("Error: " + (error.message || "Failed to update purposes"));
-    } finally {
-      setUpdatingPurposes(false);
-    }
-  };
 
-  const handleImportBooks = async () => {
-    if (!user) return;
-    
-    setImportingBooks(true);
-    setBookMessage(null);
 
-    try {
-      const result = await importBooks({
-        clerkId: user.id,
-      });
-      setBookMessage(result.message || "Books imported successfully!");
-      setTimeout(() => setBookMessage(null), 3000);
-    } catch (error: any) {
-      setBookMessage("Error: " + (error.message || "Failed to import books"));
-    } finally {
-      setImportingBooks(false);
-    }
-  };
-
-  const handleImportHTATasks = async () => {
-    if (!user) return;
-    
-    setImportingHTATasks(true);
-    setHTAMessage(null);
-
-    try {
-      const result = await importHTATasks({
-        clerkId: user.id,
-        clearFirst: true, // Always clear old tasks before importing
-      });
-      setHTAMessage(result.message || "HTA tasks imported successfully!");
-      setTimeout(() => setHTAMessage(null), 3000);
-    } catch (error: any) {
-      setHTAMessage("Error: " + (error.message || "Failed to import HTA tasks"));
-    } finally {
-      setImportingHTATasks(false);
-    }
-  };
-
-  const handleUpdateAllRPMGoals = async () => {
-    if (!user) return;
-    
-    setUpdatingAllGoals(true);
-    setAllGoalsMessage(null);
-
-    try {
-      const result = await updateAllRPMGoals({
-        clerkId: user.id,
-      });
-      setAllGoalsMessage(result.message || "All RPM goals updated successfully!");
-      setTimeout(() => setAllGoalsMessage(null), 5000);
-    } catch (error: any) {
-      setAllGoalsMessage("Error: " + (error.message || "Failed to update goals"));
-    } finally {
-      setUpdatingAllGoals(false);
-    }
-  };
-
-  const handleImportSebastianTasks = async () => {
-    if (!user) return;
-    
-    setImportingSebastianTasks(true);
-    setSebastianMessage(null);
-
-    try {
-      const result = await seedSebastianTasks({
-        clerkId: user.id,
-      });
-      setSebastianMessage(result.message || "Imported Sebastian's tasks successfully!");
-      setTimeout(() => setSebastianMessage(null), 5000);
-    } catch (error: any) {
-      setSebastianMessage("Error: " + (error.message || "Failed to import tasks"));
-    } finally {
-      setImportingSebastianTasks(false);
-    }
-  };
 
   const editingCategory = categories?.find((c) => c._id === editingCategoryId);
 
@@ -403,6 +261,7 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
+            <MavenVerificationDashboard />
             <ContentPipeline />
           </div>
         );
@@ -515,7 +374,7 @@ export default function DashboardPage() {
               Mission Control
             </h1>
             <p className="text-muted-foreground">
-              Hi {user?.firstName || "Corinne"}. Let's make today epic!
+              Hi {user?.firstName || "Corinne"}. Let&apos;s make today epic!
             </p>
           </div>
 

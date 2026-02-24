@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FiveToThriveProps {
   userId: Id<"users">;
@@ -17,18 +18,25 @@ interface FiveToThriveProps {
 
 export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   const [newTask, setNewTask] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Id<"rpmCategories"> | undefined>(undefined);
 
   // Query
   const fiveToThrive = useQuery(api.daily.getFiveToThrive, {
     userId,
     date,
   });
+  const rpmCategoriesQuery = useQuery(api.rpm.getCategoriesByUser, { userId });
+  const rpmCategories = useMemo(() => rpmCategoriesQuery ?? [], [rpmCategoriesQuery]);
 
   // Mutations
   const saveFiveToThrive = useMutation(api.daily.saveFiveToThrive);
   const toggleTask = useMutation(api.daily.toggleFiveToThriveTask);
 
   const tasks = fiveToThrive?.tasks || [];
+  const categoryNameById = useMemo(
+    () => new Map(rpmCategories.map((category) => [category._id, category.name])),
+    [rpmCategories]
+  );
 
   const handleAddTask = async () => {
     if (newTask.trim() && tasks.length < 5) {
@@ -37,6 +45,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
         {
           text: newTask,
           completed: false,
+          categoryId: selectedCategoryId,
         },
       ];
 
@@ -47,6 +56,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
       });
 
       setNewTask("");
+      setSelectedCategoryId(undefined);
     }
   };
 
@@ -107,18 +117,38 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
       <CardContent className="space-y-4">
         {/* Add Task Input */}
         {tasks.length < 5 && (
-          <div className="flex gap-2">
-            <Input
-              placeholder="Add your must-do for today..."
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="flex-1"
-            />
-            <Button onClick={handleAddTask} size="sm">
-              <Plus className="h-4 w-4 mr-1" />
-              Add
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add your must-do for today..."
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1"
+              />
+              <Button onClick={handleAddTask} size="sm">
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+            <Select
+              value={selectedCategoryId ?? "none"}
+              onValueChange={(value) =>
+                setSelectedCategoryId(value === "none" ? undefined : (value as Id<"rpmCategories">))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Optional: Link to an RPM category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No category</SelectItem>
+                {rpmCategories.map((category) => (
+                  <SelectItem key={category._id} value={category._id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
@@ -147,13 +177,18 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
                   checked={task.completed}
                   onCheckedChange={() => handleToggleTask(index)}
                 />
-                <span
-                  className={`flex-1 ${
-                    task.completed ? "line-through text-muted-foreground" : ""
-                  }`}
-                >
-                  {task.text}
-                </span>
+                <div className="flex-1">
+                  <span
+                    className={task.completed ? "line-through text-muted-foreground" : ""}
+                  >
+                    {task.text}
+                  </span>
+                  {task.categoryId && categoryNameById.get(task.categoryId) && (
+                    <p className="text-xs text-muted-foreground">
+                      {categoryNameById.get(task.categoryId)}
+                    </p>
+                  )}
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"

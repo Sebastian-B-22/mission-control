@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Plus, Trash2, Edit, CheckCircle2 } from "lucide-react";
 
 interface RPMCategoryPageProps {
   categoryId: Id<"rpmCategories">;
@@ -19,7 +18,8 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
   const [isAdding, setIsAdding] = useState(false);
 
   const category = useQuery(api.rpm.getCategoryById, { id: categoryId });
-  
+  const accomplishments = useQuery(api.rpm.getMonthlyAccomplishmentsByCategory, { categoryId });
+
   // Brain dump tasks (we'll use a simple array stored in category for now)
   // TODO: Create a proper brainDumpTasks table if needed
   const [brainDumpTasks, setBrainDumpTasks] = useState<string[]>([]);
@@ -111,6 +111,44 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* This Month's Accomplishments */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">This Month&apos;s Accomplishments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!accomplishments ? (
+            <p className="text-muted-foreground italic">Loading accomplishments...</p>
+          ) : accomplishments.count === 0 ? (
+            <p className="text-muted-foreground italic">No completed Quick Wins or 5 to Thrive items yet this month.</p>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm font-medium">{accomplishments.count} completed item{accomplishments.count === 1 ? "" : "s"}</p>
+              <ul className="space-y-2">
+                {accomplishments.items.map((item, index) => (
+                  <li key={`${item.source}-${item.completedAt}-${index}`} className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-600" />
+                    <div>
+                      <p className="text-sm text-gray-700">{item.text}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(item.completedAt).toLocaleString("en-US", {
+                          timeZone: "America/Los_Angeles",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                        {item.source === "quick-win" ? " • Quick Win" : " • 5 to Thrive"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Brain Dump Section */}
       <Card>

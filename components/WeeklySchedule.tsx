@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Edit2, Clock } from "lucide-react";
+import { Plus, Trash2, Clock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -143,7 +143,7 @@ export function WeeklySchedule({ userId }: WeeklyScheduleProps) {
                     No activities scheduled for {day.label}
                   </p>
                 ) : (
-                  schedule[day.key].map((block: any) => (
+                  schedule[day.key].map((block) => (
                     <div
                       key={block._id}
                       className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"

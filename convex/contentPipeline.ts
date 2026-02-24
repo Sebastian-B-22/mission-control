@@ -9,7 +9,7 @@
 
 import { v } from "convex/values";
 import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -93,17 +93,24 @@ export const createContent = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
+    const initialStage = args.stage ?? "review";
     const id = await ctx.db.insert("contentPipeline", {
       title: args.title,
       content: args.content,
       type: args.type,
-      stage: args.stage ?? "review",
+      stage: initialStage,
       createdBy: args.createdBy ?? "sebastian",
       assignedTo: args.assignedTo ?? "corinne",
       notes: args.notes,
       createdAt: now,
       updatedAt: now,
+      verificationStatus: initialStage === "review" ? "pending" : undefined,
     });
+
+    if (initialStage === "review") {
+      await ctx.scheduler.runAfter(0, internal.contentVerification.verifyContentAction, { contentId: id });
+    }
+
     return id;
   },
 });
@@ -128,6 +135,12 @@ export const updateStage = mutation({
     if (args.publishedUrl !== undefined) updates.publishedUrl = args.publishedUrl;
 
     await ctx.db.patch(args.id, updates);
+
+    if (args.stage === "review") {
+      await ctx.db.patch(args.id, { verificationStatus: "pending", updatedAt: Date.now() });
+      await ctx.scheduler.runAfter(0, internal.contentVerification.verifyContentAction, { contentId: args.id });
+    }
+
     return { success: true };
   },
 });
@@ -152,6 +165,12 @@ export const updateContent = mutation({
     if (args.type !== undefined) updates.type = args.type;
 
     await ctx.db.patch(args.id, updates);
+
+    if (item.stage === "review" && (args.content !== undefined || args.type !== undefined)) {
+      await ctx.db.patch(args.id, { verificationStatus: "pending", updatedAt: Date.now() });
+      await ctx.scheduler.runAfter(0, internal.contentVerification.verifyContentAction, { contentId: args.id });
+    }
+
     return { success: true };
   },
 });
@@ -180,17 +199,25 @@ export const createContentInternal = internalMutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    return await ctx.db.insert("contentPipeline", {
+    const initialStage = args.stage ?? "review";
+    const id = await ctx.db.insert("contentPipeline", {
       title: args.title,
       content: args.content,
       type: args.type,
-      stage: args.stage ?? "review",
+      stage: initialStage,
       createdBy: args.createdBy ?? "sebastian",
       assignedTo: args.assignedTo ?? "corinne",
       notes: args.notes,
       createdAt: now,
       updatedAt: now,
+      verificationStatus: initialStage === "review" ? "pending" : undefined,
     });
+
+    if (initialStage === "review") {
+      await ctx.scheduler.runAfter(0, internal.contentVerification.verifyContentAction, { contentId: id });
+    }
+
+    return id;
   },
 });
 
@@ -214,6 +241,12 @@ export const updateStageInternal = internalMutation({
     if (args.publishedUrl !== undefined) updates.publishedUrl = args.publishedUrl;
 
     await ctx.db.patch(args.id, updates);
+
+    if (args.stage === "review") {
+      await ctx.db.patch(args.id, { verificationStatus: "pending", updatedAt: Date.now() });
+      await ctx.scheduler.runAfter(0, internal.contentVerification.verifyContentAction, { contentId: args.id });
+    }
+
     return { success: true };
   },
 });

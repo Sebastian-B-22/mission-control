@@ -10,8 +10,7 @@ import {
   Menu,
   X,
   Calendar,
-  CheckSquare,
-  Target,
+    Target,
   Users,
   Home,
   Briefcase,
@@ -36,7 +35,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
   const [isOpen, setIsOpen] = useState(true);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
-  // Get Sebastian's tasks for quick status
+  // Get Sebastian&apos;s tasks for quick status
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
   const inProgressCount = sebastianTasks.filter(t => t.status === "in-progress").length;
   const todoCount = sebastianTasks.filter(t => t.status === "todo").length;
@@ -249,7 +248,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 {/* Sub-navigation */}
                 {item.expandable && item.section && isExpanded(item.section) && item.children && item.children.length > 0 && (
                   <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-100 pl-2">
-                    {item.children.map((child: any) => (
+                    {item.children.map((child) => (
                       <button
                         key={child.view}
                         onClick={() => {
@@ -300,7 +299,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
             </div>
             {(todoCount > 0 || inProgressCount > 0) && (
               <div className="mt-3 pt-3 border-t">
-                <p className="text-xs text-gray-500">Sebastian's Work:</p>
+                <p className="text-xs text-gray-500">Sebastian&apos;s Work:</p>
                 <div className="mt-1 space-y-1">
                   {inProgressCount > 0 && (
                     <p className="text-xs">

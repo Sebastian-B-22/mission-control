@@ -25,7 +25,7 @@ const http = httpRouter();
 // ─── Helper: validate agent API key ───────────────────────────────────────
 
 // Convex supports process.env for environment variables
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 declare const process: { env: Record<string, string | undefined> };
 
 function validateApiKey(request: Request): boolean {

@@ -1,8 +1,6 @@
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 
-declare const process: { env: Record<string, string | undefined> };
-
 // ─── Availability ──────────────────────────────────────────────────────────
 
 export const getAvailability = query({

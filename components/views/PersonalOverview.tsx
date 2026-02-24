@@ -6,7 +6,7 @@ import { Edit } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface PersonalOverviewProps {
-  categories: any[];
+  categories: Array<{ _id: Id<"rpmCategories">; name: string; role?: string; purpose?: string; monthlyFocus: string[] }>;
   onEditCategory: (id: Id<"rpmCategories">) => void;
   onViewCategory: (id: Id<"rpmCategories">) => void;
 }

@@ -74,7 +74,7 @@ export default function EveningCheckInPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Evening Reflection 🌙</CardTitle>
           <CardDescription>
-            Let's celebrate today and learn from it. How did you show up?
+            Let&apos;s celebrate today and learn from it. How did you show up?
           </CardDescription>
         </CardHeader>
         <CardContent>

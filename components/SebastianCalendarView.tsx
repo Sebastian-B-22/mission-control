@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -20,15 +21,16 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
     { time: "21:30", task: "Quo Monitor", emoji: "📱", description: "Daily scan for parent action items" },
   ];
 
-  const days = [
-    { key: "sunday", name: "Sunday", date: new Date(Date.now() - (new Date().getDay() - 0) * 86400000) },
-    { key: "monday", name: "Monday", date: new Date(Date.now() - (new Date().getDay() - 1) * 86400000) },
-    { key: "tuesday", name: "Tuesday", date: new Date(Date.now() - (new Date().getDay() - 2) * 86400000) },
-    { key: "wednesday", name: "Wednesday", date: new Date(Date.now() - (new Date().getDay() - 3) * 86400000) },
-    { key: "thursday", name: "Thursday", date: new Date(Date.now() - (new Date().getDay() - 4) * 86400000) },
-    { key: "friday", name: "Friday", date: new Date(Date.now() - (new Date().getDay() - 5) * 86400000) },
-    { key: "saturday", name: "Saturday", date: new Date(Date.now() - (new Date().getDay() - 6) * 86400000) },
-  ];
+  const [weekAnchor] = useState(() => new Date());
+  const currentDay = weekAnchor.getDay();
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const dayKeys = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
+
+  const days = dayKeys.map((key, index) => ({
+    key,
+    name: dayNames[index],
+    date: new Date(weekAnchor.getTime() - (currentDay - index) * 86400000),
+  }));
 
   const isToday = (date: Date) => {
     return date.toDateString() === new Date().toDateString();

@@ -73,15 +73,20 @@ export default defineSchema({
   fiveToThrive: defineTable({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format
+    categoryId: v.optional(v.id("rpmCategories")),
+    completedAt: v.optional(v.number()),
     tasks: v.array(
       v.object({
         text: v.string(),
         completed: v.boolean(),
+        categoryId: v.optional(v.id("rpmCategories")),
         completedAt: v.optional(v.number()),
       })
     ),
     createdAt: v.number(),
-  }).index("by_user_and_date", ["userId", "date"]),
+  })
+    .index("by_user_and_date", ["userId", "date"])
+    .index("by_user", ["userId"]),
 
   dailyReflections: defineTable({
     userId: v.id("users"),
@@ -234,11 +239,50 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
     publishedUrl: v.optional(v.string()),
+    verificationStatus: v.optional(
+      v.union(v.literal("pending"), v.literal("passed"), v.literal("failed"), v.literal("overridden"))
+    ),
+    verificationScore: v.optional(v.number()),
   })
     .index("by_stage", ["stage"])
     .index("by_type", ["type"])
     .index("by_created_by", ["createdBy"])
     .index("by_stage_type", ["stage", "type"]),
+
+  contentVerification: defineTable({
+    contentId: v.id("contentPipeline"),
+    verifiedAt: v.number(),
+    checks: v.object({
+      characterCount: v.object({
+        passed: v.boolean(),
+        count: v.number(),
+        limit: v.number(),
+        warnings: v.array(v.string()),
+      }),
+      links: v.object({
+        passed: v.boolean(),
+        broken: v.array(v.string()),
+        warnings: v.array(v.string()),
+      }),
+      tone: v.object({
+        passed: v.boolean(),
+        score: v.number(),
+        warnings: v.array(v.string()),
+      }),
+      formatting: v.object({
+        passed: v.boolean(),
+        issues: v.array(v.string()),
+      }),
+    }),
+    overallPassed: v.boolean(),
+    overallScore: v.number(),
+    issueReasons: v.array(v.string()),
+    overridden: v.optional(v.boolean()),
+    overriddenBy: v.optional(v.string()),
+    overriddenAt: v.optional(v.number()),
+  })
+    .index("by_content", ["contentId"])
+    .index("by_verified_at", ["verifiedAt"]),
 
   // ─── Camp Registration ────────────────────────────────────────────────
   campRegistrations: defineTable({
@@ -421,6 +465,7 @@ export default defineSchema({
   quickWins: defineTable({
     userId: v.id("users"),
     task: v.string(),
+    categoryId: v.optional(v.id("rpmCategories")),
     completed: v.boolean(),
     date: v.string(),
     createdAt: v.number(),
