@@ -55,11 +55,12 @@ export function FamilyMeetingDashboard({ userId }: Props) {
 
   const familyMembers = meeting?.familyMembers || defaultMembers;
 
-  useEffect(() => {
-    if (meeting === null) {
-      seedDemo({ userId, today, weekOf });
-    }
-  }, [meeting, seedDemo, today, userId, weekOf]);
+  // Disabled demo seed - start with clean data
+  // useEffect(() => {
+  //   if (meeting === null) {
+  //     seedDemo({ userId, today, weekOf });
+  //   }
+  // }, [meeting, seedDemo, today, userId, weekOf]);
 
   const suggestions = movieItems.filter((m) => m.type === "suggestion");
   const watched = movieItems.filter((m) => m.type === "watched");
