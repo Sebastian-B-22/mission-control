@@ -416,3 +416,47 @@ export const seedDemoData = mutation({
     return { ok: true };
   },
 });
+
+export const clearDemoData = mutation({
+  args: {
+    userId: v.id("users"),
+    weekOf: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Delete demo family meeting
+    const meetings = await ctx.db
+      .query("familyMeetings")
+      .withIndex("by_user_and_week", (q) => q.eq("userId", args.userId).eq("weekOf", args.weekOf))
+      .collect();
+    
+    for (const meeting of meetings) {
+      await ctx.db.delete(meeting._id);
+    }
+
+    // Delete demo discussion items
+    const discussions = await ctx.db
+      .query("discussionQueue")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    
+    for (const disc of discussions) {
+      if (disc.addedBy === "Sebastian" || disc.item.includes("Spring break") || disc.item.includes("Wednesday pickups")) {
+        await ctx.db.delete(disc._id);
+      }
+    }
+
+    // Delete demo movies
+    const movies = await ctx.db
+      .query("movieLibrary")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    
+    for (const movie of movies) {
+      if (movie.votes && movie.votes.includes("Sebastian")) {
+        await ctx.db.delete(movie._id);
+      }
+    }
+
+    return { cleared: true };
+  },
+});
