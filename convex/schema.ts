@@ -553,4 +553,54 @@ export default defineSchema({
     favorite: v.boolean(),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  // ─── Health Dashboard ───────────────────────────────────────────────────
+  // Whoop OAuth tokens (per user)
+  whoopTokens: defineTable({
+    userId: v.id("users"),
+    accessToken: v.string(),
+    refreshToken: v.string(),
+    expiresAt: v.number(),
+    scope: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // Daily health scores (aggregated from Whoop + manual entries)
+  dailyHealth: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    // Sleep data (from Whoop)
+    sleepHours: v.optional(v.number()),
+    sleepScore: v.optional(v.number()), // 0-33 points
+    // Steps data (manual entry for now)
+    steps: v.optional(v.number()),
+    stepsScore: v.optional(v.number()), // 0-33 points
+    // Active calories (from Whoop)
+    activeCalories: v.optional(v.number()),
+    caloriesScore: v.optional(v.number()), // 0-34 points
+    // Overall health score (0-100)
+    healthScore: v.number(),
+    isPerfectDay: v.boolean(), // healthScore === 100
+    // Source metadata
+    whoopSynced: v.optional(v.boolean()),
+    whoopSyncedAt: v.optional(v.number()),
+    manualEntry: v.optional(v.boolean()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_date", ["userId", "date"]),
+
+  // Health goals (progressive targets)
+  healthGoals: defineTable({
+    userId: v.id("users"),
+    sleepGoalHours: v.number(), // default: 7
+    stepsGoal: v.number(), // default: 3500
+    caloriesGoal: v.number(), // default: 350
+    perfectDaysGoal: v.number(), // default: 20 (per month)
+    currentLevel: v.number(), // 1 = 20 days, 2 = 25 days, 3 = 30 days
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

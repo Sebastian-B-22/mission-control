@@ -460,3 +460,67 @@ export const clearDemoData = mutation({
     return { cleared: true };
   },
 });
+
+export const fixFamilyMembers = mutation({
+  args: {
+    weekOf: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Find all meetings for this week with old family members
+    const meetings = await ctx.db
+      .query("familyMeetings")
+      .filter((q) => q.eq(q.field("weekOf"), args.weekOf))
+      .collect();
+    
+    let fixed = 0;
+    for (const meeting of meetings) {
+      if (meeting.familyMembers.includes("Sebastian") || 
+          meeting.familyMembers.includes("Kid 1") || 
+          meeting.familyMembers.includes("Kid 2")) {
+        await ctx.db.patch(meeting._id, {
+          familyMembers: ["Corinne", "Joey", "Anthony", "Roma"]
+        });
+        fixed++;
+      }
+    }
+    
+    return { fixed, total: meetings.length };
+  },
+});
+
+export const clearExampleData = mutation({
+  args: {
+    weekOf: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Clear all meetings for this week
+    const meetings = await ctx.db
+      .query("familyMeetings")
+      .filter((q) => q.eq(q.field("weekOf"), args.weekOf))
+      .collect();
+    
+    for (const meeting of meetings) {
+      await ctx.db.patch(meeting._id, {
+        acknowledgements: [],
+        supportRequests: [],
+        goals: [],
+        mealPlan: [],
+        gameNights: [],
+      });
+    }
+
+    // Clear discussion queue
+    const discussions = await ctx.db.query("discussionQueue").collect();
+    for (const disc of discussions) {
+      await ctx.db.delete(disc._id);
+    }
+
+    // Clear movie library
+    const movies = await ctx.db.query("movieLibrary").collect();
+    for (const movie of movies) {
+      await ctx.db.delete(movie._id);
+    }
+
+    return { cleared: true, meetings: meetings.length };
+  },
+});

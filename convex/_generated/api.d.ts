@@ -22,6 +22,7 @@ import type * as familyMeeting from "../familyMeeting.js";
 import type * as fieldTrips from "../fieldTrips.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
+import type * as health from "../health.js";
 import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
 import type * as mavenFeedback from "../mavenFeedback.js";
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   fieldTrips: typeof fieldTrips;
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
+  health: typeof health;
   http: typeof http;
   jotformSync: typeof jotformSync;
   mavenFeedback: typeof mavenFeedback;

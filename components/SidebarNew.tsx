@@ -10,7 +10,7 @@ import {
   Menu,
   X,
   Calendar,
-    Target,
+  Target,
   Users,
   Home,
   Briefcase,
@@ -23,6 +23,7 @@ import {
   ChevronDown,
   TrendingUp,
   Handshake,
+  Heart,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -74,6 +75,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Family Meeting",
       icon: Handshake,
       view: "family-meeting",
+    },
+    {
+      name: "Health",
+      icon: Heart,
+      view: "health",
     },
     {
       name: "Personal RPM",

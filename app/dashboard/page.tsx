@@ -19,7 +19,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { HabitTracker } from "@/components/HabitTracker";
 import { FiveToThrive } from "@/components/FiveToThrive";
 import { MorningMindset } from "@/components/MorningMindset";
+import { AgentIdeasWidget } from "@/components/AgentIdeasWidget";
 import { EveningReflection } from "@/components/EveningReflection";
+import { HealthWidget } from "@/components/HealthWidget";
+import { HealthDashboard } from "@/components/views/HealthDashboard";
 import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import { ContentPipeline } from "@/components/ContentPipeline";
 import { MavenVerificationDashboard } from "@/components/MavenVerificationDashboard";
@@ -216,10 +219,15 @@ export default function DashboardPage() {
                 })}
               </h2>
             </div>
+            {/* Agent Ideas Widget - prominently displayed at top */}
+            <AgentIdeasWidget />
             <MorningMindset userId={convexUser._id} date={today} />
             {user?.id && <SurpriseCard clerkId={user.id} />}
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <HealthWidget userId={convexUser._id} />
               <HabitTracker userId={convexUser._id} date={today} />
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
               <FiveToThrive userId={convexUser._id} date={today} />
               <QuickWinsCard userId={convexUser._id} date={today} />
             </div>
@@ -288,6 +296,9 @@ export default function DashboardPage() {
 
       case "family-meeting":
         return <FamilyMeetingDashboard userId={convexUser._id} />;
+
+      case "health":
+        return <HealthDashboard userId={convexUser._id} />;
 
       // HTA views
       case "hta-overview":
