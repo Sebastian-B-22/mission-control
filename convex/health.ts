@@ -154,6 +154,25 @@ export const isWhoopConnected = query({
   },
 });
 
+// Get Whoop tokens for a user (for sync)
+export const getWhoopTokens = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db
+      .query("whoopTokens")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+  },
+});
+
+// Get user by ID (to get clerkId for token refresh)
+export const getUserById = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db.get(userId);
+  },
+});
+
 // ─── Mutations ──────────────────────────────────────────────────────────────
 
 // Record daily health data (manual entry or Whoop sync)

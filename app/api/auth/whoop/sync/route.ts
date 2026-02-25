@@ -36,14 +36,17 @@ async function getValidTokens(userId: Id<"users">) {
 
     const newTokens = await refreshResponse.json();
 
-    // Store new tokens
-    await convex.mutation(api.health.storeWhoopTokens, {
-      userId,
-      accessToken: newTokens.access_token,
-      refreshToken: newTokens.refresh_token,
-      expiresIn: newTokens.expires_in,
-      scope: newTokens.scope,
-    });
+    // Store new tokens - need to get clerkId from user record
+    const user = await convex.query(api.health.getUserById, { userId });
+    if (user?.clerkId) {
+      await convex.mutation(api.health.storeWhoopTokens, {
+        clerkId: user.clerkId,
+        accessToken: newTokens.access_token,
+        refreshToken: newTokens.refresh_token,
+        expiresAt: Date.now() + (newTokens.expires_in * 1000),
+        scope: newTokens.scope,
+      });
+    }
 
     return newTokens.access_token;
   }
