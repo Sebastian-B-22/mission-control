@@ -579,6 +579,8 @@ export default defineSchema({
     // Active calories (from Whoop)
     activeCalories: v.optional(v.number()),
     caloriesScore: v.optional(v.number()), // 0-34 points
+    // Weight (from Withings via Apple Health)
+    weight: v.optional(v.number()), // in lbs
     // Overall health score (0-100)
     healthScore: v.number(),
     isPerfectDay: v.boolean(), // healthScore === 100

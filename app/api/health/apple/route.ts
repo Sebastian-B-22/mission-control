@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     // Process metrics by date
-    const dataByDate: Record<string, { steps?: number; sleepHours?: number; activeCalories?: number }> = {};
+    const dataByDate: Record<string, { steps?: number; sleepHours?: number; activeCalories?: number; weight?: number }> = {};
 
     for (const metric of payload.data.metrics) {
       const metricName = metric.name.toLowerCase();
@@ -93,6 +93,14 @@ export async function POST(request: Request) {
             calories = calories / 4.184;
           }
           dataByDate[dateStr].activeCalories = Math.round(currentCals + calories);
+        } else if (metricName === "weight" || metricName === "body_mass") {
+          // Weight - use most recent reading for the day
+          let weight = entry.qty || 0;
+          // Convert kg to lbs if needed (store in lbs)
+          if (metric.units.toLowerCase() === "kg") {
+            weight = weight * 2.20462;
+          }
+          dataByDate[dateStr].weight = Math.round(weight * 10) / 10;
         }
       }
     }
@@ -145,6 +153,7 @@ export async function POST(request: Request) {
           sleepHours: data.sleepHours ?? existingHealth?.sleepHours,
           steps: data.steps ?? existingHealth?.steps,
           activeCalories: data.activeCalories ?? existingHealth?.activeCalories,
+          weight: data.weight ?? existingHealth?.weight,
           whoopSynced: existingHealth?.whoopSynced || false,
         });
 
@@ -180,6 +189,6 @@ export async function GET(request: Request) {
   return NextResponse.json({
     status: "ok",
     message: "Health Auto Export API is ready",
-    supportedMetrics: ["step_count", "sleep_analysis", "active_energy"],
+    supportedMetrics: ["step_count", "sleep_analysis", "active_energy", "weight", "body_mass"],
   });
 }

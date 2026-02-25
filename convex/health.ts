@@ -183,10 +183,11 @@ export const recordDailyHealth = mutation({
     sleepHours: v.optional(v.number()),
     steps: v.optional(v.number()),
     activeCalories: v.optional(v.number()),
+    weight: v.optional(v.number()),
     whoopSynced: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { userId, date, sleepHours, steps, activeCalories, whoopSynced } = args;
+    const { userId, date, sleepHours, steps, activeCalories, weight, whoopSynced } = args;
 
     // Calculate scores
     const sleepScore = calculateSleepScore(sleepHours);
@@ -210,6 +211,7 @@ export const recordDailyHealth = mutation({
         stepsScore,
         activeCalories: activeCalories ?? existing.activeCalories,
         caloriesScore,
+        weight: weight ?? existing.weight,
         healthScore,
         isPerfectDay,
         whoopSynced: whoopSynced ?? existing.whoopSynced,
@@ -229,6 +231,7 @@ export const recordDailyHealth = mutation({
         stepsScore,
         activeCalories,
         caloriesScore,
+        weight,
         healthScore,
         isPerfectDay,
         whoopSynced: whoopSynced ?? false,
