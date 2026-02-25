@@ -23,7 +23,6 @@ import {
   ChevronDown,
   TrendingUp,
   Handshake,
-  Heart,
 } from "lucide-react";
 
 interface SidebarProps {
