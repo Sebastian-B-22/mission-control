@@ -288,7 +288,7 @@ function ContentCard({
               onClick={onApprove}
             >
               <Check className="h-3 w-3 mr-1" />
-              {item.type === "x-reply" || item.title?.startsWith("Reply:") ? "Approve (manual)" : "Approve → Post"}
+              {item.title?.startsWith("Reply:") ? "Approve (manual)" : "Approve → Post"}
             </Button>
           )}
 

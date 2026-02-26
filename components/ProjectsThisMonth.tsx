@@ -8,14 +8,16 @@ import { Input } from "@/components/ui/input";
 import { Plus, Trash2, Folder } from "lucide-react";
 
 const defaultProjects = [
-  "Life-Size Body Mapping (4-week project)",
-  "CGM Experiment (Weeks 1-4)",
-  "Blood Work Analysis",
-  "Flour Milling & Bread Making",
-  "3D Printing (setup & anatomical models)",
-  "Italian Nursery Rhyme (weekly)",
-  "Compound Interest Tracking (daily)",
-  "DEXA Scan (end of February)",
+  "Finish Tuttle Twins Vol 2 + Liberty Kids series",
+  "Start Sprinting Program (PepSpeed)",
+  "CGM Experiment (tracking & analysis)",
+  "Einstein Human Body Kit (Day 4→25, every other day)",
+  "Blood and Guts experiments (build into schedule)",
+  "Anthony + Compass 3D Design (Blender)",
+  "Smoothie experiments for Anthony",
+  "Schedule blood work (reminder Mar 4)",
+  "Schedule DEXA scan (end of March)",
+  "California Science Center field trip",
 ];
 
 export function ProjectsThisMonth() {
@@ -50,7 +52,7 @@ export function ProjectsThisMonth() {
           <Folder className="h-5 w-5 text-blue-500" />
           <CardTitle>Projects This Month</CardTitle>
         </div>
-        <CardDescription>Active projects & deliverables</CardDescription>
+        <CardDescription>March deliverables & milestones</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

@@ -246,27 +246,38 @@ export const recordDailyHealth = mutation({
 
 // Update steps manually (since Apple Health integration is later)
 
-// Update steps from iOS Shortcut
+// Update steps (accepts either userId or clerkId)
 export const updateSteps = mutation({
   args: {
-    clerkId: v.string(),
+    userId: v.optional(v.id("users")),
+    clerkId: v.optional(v.string()),
     date: v.string(),
     steps: v.number(),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
-      .first();
+    let finalUserId = args.userId;
 
-    if (!user) {
-      throw new Error("User not found");
+    // If clerkId provided instead of userId, look up the user
+    if (!finalUserId && args.clerkId) {
+      const user = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
+        .first();
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+      finalUserId = user._id;
+    }
+
+    if (!finalUserId) {
+      throw new Error("Either userId or clerkId is required");
     }
 
     const existing = await ctx.db
       .query("dailyHealth")
       .withIndex("by_user_and_date", (q) =>
-        q.eq("userId", user._id).eq("date", args.date)
+        q.eq("userId", finalUserId!).eq("date", args.date)
       )
       .first();
 
@@ -287,7 +298,7 @@ export const updateSteps = mutation({
       });
     } else {
       await ctx.db.insert("dailyHealth", {
-        userId: user._id,
+        userId: finalUserId!,
         date: args.date,
         steps: args.steps,
         stepsScore,
@@ -352,6 +363,23 @@ export const storeWhoopTokens = mutation({
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
+    }
+
+    return { success: true };
+  },
+});
+
+// Disconnect Whoop
+export const disconnectWhoop = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const tokens = await ctx.db
+      .query("whoopTokens")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (tokens) {
+      await ctx.db.delete(tokens._id);
     }
 
     return { success: true };

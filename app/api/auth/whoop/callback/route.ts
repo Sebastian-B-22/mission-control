@@ -13,16 +13,21 @@ const REDIRECT_URI = process.env.NODE_ENV === "production"
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(request: Request) {
+  console.log("WHOOP callback hit:", request.url);
+  
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const error = searchParams.get("error");
+  const errorDescription = searchParams.get("error_description");
+
+  console.log("Callback params:", { code: code?.slice(0, 10) + "...", state, error, errorDescription });
 
   // Handle errors
   if (error) {
-    console.error("Whoop OAuth error:", error);
+    console.error("Whoop OAuth error:", error, errorDescription);
     return NextResponse.redirect(
-      new URL("/dashboard?whoop_error=" + error, request.url)
+      new URL("/dashboard?whoop_error=" + error + "&desc=" + encodeURIComponent(errorDescription || ""), request.url)
     );
   }
 
@@ -61,13 +66,14 @@ export async function GET(request: Request) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error("Whoop token exchange failed:", errorText);
+      console.error("Whoop token exchange failed:", tokenResponse.status, errorText);
       return NextResponse.redirect(
-        new URL("/dashboard?whoop_error=token_exchange_failed", request.url)
+        new URL("/dashboard?whoop_error=token_exchange_failed&status=" + tokenResponse.status + "&detail=" + encodeURIComponent(errorText.slice(0, 100)), request.url)
       );
     }
 
     const tokens = await tokenResponse.json();
+    console.log("WHOOP tokens received, expires_in:", tokens.expires_in, "scope:", tokens.scope);
 
     // Store tokens in Convex
     await convex.mutation(api.health.storeWhoopTokens, {

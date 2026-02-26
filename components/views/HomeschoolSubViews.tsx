@@ -34,31 +34,7 @@ export function HomeschoolFocusView({ userId }: HomeschoolSubViewProps) {
         <h1 className="text-3xl font-bold">Monthly Focus</h1>
         <p className="text-muted-foreground mt-1">Current & upcoming learning themes</p>
       </div>
-      
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* This Month */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-green-600">This Month</h2>
-          <MonthlyFocus />
-        </div>
-
-        {/* Up Next */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-blue-600">Up Next</h2>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Next Month&apos;s Focus</CardTitle>
-              <CardDescription>Planning ahead</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <textarea
-                className="w-full min-h-[200px] p-3 border rounded-lg text-sm"
-                placeholder="Add next month's focus areas here..."
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <MonthlyFocus />
     </div>
   );
 }

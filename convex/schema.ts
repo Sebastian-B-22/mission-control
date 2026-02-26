@@ -222,6 +222,7 @@ export default defineSchema({
     content: v.string(),
     type: v.union(
       v.literal("x-post"),
+      v.literal("x-reply"),
       v.literal("email"),
       v.literal("blog"),
       v.literal("landing-page"),
@@ -605,4 +606,125 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  // ─── Homeschool Management System ───────────────────────────────────────
+  // Quarterly planning with trip tie-ins
+  hsQuarters: defineTable({
+    name: v.string(), // "Q1 2026 - Texas Adventure"
+    startDate: v.string(), // YYYY-MM-DD
+    endDate: v.string(),
+    theme: v.string(), // "Texas History & Frontier"
+    objectives: v.array(v.string()),
+    tripTieIn: v.optional(v.string()), // "April 2026 Texas trip"
+    notes: v.optional(v.string()),
+  })
+    .index("by_dates", ["startDate", "endDate"]),
+
+  // Monthly focus within quarters
+  hsMonthlyFocus: defineTable({
+    quarterId: v.id("hsQuarters"),
+    month: v.string(), // "April 2026" or "2026-04"
+    theme: v.string(),
+    objectives: v.array(v.string()),
+    keyResources: v.array(v.string()),
+    notes: v.optional(v.string()),
+  })
+    .index("by_quarter", ["quarterId"]),
+
+  // Resource inventory (books, games, kits, digital)
+  hsResources: defineTable({
+    name: v.string(),
+    type: v.string(), // "book" | "game" | "kit" | "digital" | "equipment" | "supply" | "membership"
+    category: v.string(), // "math" | "reading" | "science" | "pe" | etc.
+    subjects: v.array(v.string()), // ["math", "problem-solving"]
+    series: v.optional(v.string()), // "Percy Jackson"
+    isDigital: v.boolean(),
+    url: v.optional(v.string()),
+    location: v.optional(v.string()), // "bookshelf-1" | "garage" | "joeys-moms-house"
+    ageRange: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    notes: v.optional(v.string()),
+    lastUsed: v.optional(v.number()),
+    timesUsed: v.optional(v.number()),
+  })
+    .index("by_type", ["type"])
+    .index("by_category", ["category"])
+    .searchIndex("search_resources", {
+      searchField: "name",
+      filterFields: ["type", "category"],
+    }),
+
+  // Weekly template (Mon-Fri structure)
+  hsWeeklyTemplate: defineTable({
+    dayOfWeek: v.number(), // 1=Monday ... 5=Friday
+    dayName: v.string(),
+    blocks: v.array(v.object({
+      id: v.string(),
+      startTime: v.string(), // "09:00"
+      endTime: v.string(), // "10:00"
+      subject: v.string(),
+      defaultActivity: v.optional(v.string()),
+      isDigital: v.optional(v.boolean()),
+      notes: v.optional(v.string()),
+      color: v.optional(v.string()),
+    })),
+  })
+    .index("by_day", ["dayOfWeek"]),
+
+  // Daily schedule (generated from template, editable)
+  hsDailySchedule: defineTable({
+    date: v.string(), // YYYY-MM-DD
+    dayOfWeek: v.number(),
+    blocks: v.array(v.object({
+      id: v.string(),
+      startTime: v.string(),
+      endTime: v.string(),
+      subject: v.string(),
+      activity: v.optional(v.string()),
+      resourceIds: v.optional(v.array(v.id("hsResources"))),
+      resourceNames: v.optional(v.array(v.string())),
+      completed: v.optional(v.boolean()),
+      completedAt: v.optional(v.number()),
+      skipped: v.optional(v.boolean()),
+      skipReason: v.optional(v.string()),
+      notes: v.optional(v.string()),
+    })),
+    notes: v.optional(v.string()),
+  })
+    .index("by_date", ["date"]),
+
+  // Completion tracking
+  hsCompletions: defineTable({
+    date: v.string(),
+    blockId: v.string(),
+    subject: v.string(),
+    activity: v.optional(v.string()),
+    resourceIds: v.optional(v.array(v.id("hsResources"))),
+    student: v.optional(v.string()), // "anthony" | "roma" | "both"
+    completedAt: v.number(),
+    skipped: v.optional(v.boolean()),
+    skipReason: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  })
+    .index("by_date", ["date"])
+    .index("by_subject", ["subject"]),
+
+  // Student progress milestones
+  hsStudentProgress: defineTable({
+    student: v.string(), // "anthony" | "roma"
+    subject: v.string(),
+    milestone: v.string(),
+    achievedAt: v.number(),
+    notes: v.optional(v.string()),
+  })
+    .index("by_student", ["student"])
+    .index("by_subject", ["subject"]),
+
+  // ─── Registration Counters ──────────────────────────────────────────────
+  // Live registration counts updated by Scout's nightly Jotform sync
+  registrationCounts: defineTable({
+    program: v.string(), // "spring-pali", "spring-agoura", "camps", "pdp", "7v7"
+    count: v.number(),
+    lastUpdated: v.number(),
+  }).index("by_program", ["program"]),
 });

@@ -82,7 +82,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
               <p className="text-sm text-muted-foreground">Nothing in progress</p>
             ) : (
               inProgress.map((task) => (
-                <div key={task._id} className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                <div key={task._id} className="p-3 bg-amber-950/50 rounded-lg border border-amber-800">
                   <div className="flex items-start gap-2">
                     <span className="text-lg flex-shrink-0">{getCategoryEmoji(task.category)}</span>
                     <div className="flex-1">
@@ -114,7 +114,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
               <p className="text-sm text-muted-foreground">No urgent tasks</p>
             ) : (
               highPriorityTodo.map((task) => (
-                <div key={task._id} className="p-3 bg-red-50 rounded-lg border border-red-200">
+                <div key={task._id} className="p-3 bg-red-950/50 rounded-lg border border-red-800">
                   <div className="flex items-start gap-2">
                     <span className="text-lg flex-shrink-0">{getCategoryEmoji(task.category)}</span>
                     <div className="flex-1">
@@ -146,7 +146,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
               <p className="text-sm text-muted-foreground">Nothing completed yet</p>
             ) : (
               completedToday.map((task) => (
-                <div key={task._id} className="p-3 bg-green-50 rounded-lg border border-green-200 opacity-80">
+                <div key={task._id} className="p-3 bg-green-950/50 rounded-lg border border-green-800 opacity-80">
                   <div className="flex items-start gap-2">
                     <span className="text-lg flex-shrink-0">{getCategoryEmoji(task.category)}</span>
                     <div className="flex-1">

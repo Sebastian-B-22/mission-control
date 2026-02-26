@@ -53,7 +53,7 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
       case "medium":
         return "bg-amber-100 text-amber-800 border-amber-200";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-zinc-800 text-zinc-200 border-zinc-700";
     }
   };
 
@@ -138,8 +138,8 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
                         key={task._id}
                         className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
                           task.status === "done"
-                            ? "bg-gray-50 opacity-60"
-                            : "bg-white hover:shadow-md"
+                            ? "bg-zinc-800 opacity-60"
+                            : "bg-zinc-900 hover:bg-zinc-800"
                         }`}
                       >
                         {/* Status Icon */}
@@ -211,7 +211,7 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
       {/* Tasks Without Dates */}
       {tasksByMonth.noDate.length > 0 && (
         <Card>
-          <CardHeader className="bg-gray-100">
+          <CardHeader className="bg-zinc-800">
             <CardTitle className="text-lg">⚠️ Tasks Without Dates</CardTitle>
             <p className="text-sm text-muted-foreground">
               {tasksByMonth.noDate.length} tasks need to be scheduled

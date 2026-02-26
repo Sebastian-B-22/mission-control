@@ -45,6 +45,8 @@ import { AspireCampsView } from "@/components/views/AspireCampsView";
 import { AspirePDPView } from "@/components/views/AspirePDPView";
 import { Aspire7v7View } from "@/components/views/Aspire7v7View";
 import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
+import { HomeschoolDailyView } from "@/components/views/HomeschoolDailyView";
+import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesView";
 import {
   HomeschoolScheduleView,
   HomeschoolFocusView,
@@ -219,8 +221,6 @@ export default function DashboardPage() {
                 })}
               </h2>
             </div>
-            {/* Agent Ideas Widget - prominently displayed at top */}
-            <AgentIdeasWidget />
             <MorningMindset userId={convexUser._id} date={today} />
             {user?.id && <SurpriseCard clerkId={user.id} />}
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -255,6 +255,23 @@ export default function DashboardPage() {
 
       case "sebastian":
         return <SebastianWorkspace userId={convexUser._id} />;
+
+      case "agent-ideas":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <span>💡</span> Agent Ideas
+                </h2>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Ideas and suggestions from your AI agents
+                </p>
+              </div>
+            </div>
+            <AgentIdeasWidget />
+          </div>
+        );
 
       case "content-pipeline":
         return (
@@ -344,6 +361,10 @@ export default function DashboardPage() {
       // Homeschool views
       case "homeschool-overview":
         return <HomeschoolOverview userId={convexUser._id} />;
+      case "homeschool-daily":
+        return <HomeschoolDailyView userId={convexUser._id} />;
+      case "homeschool-resources":
+        return <HomeschoolResourcesView />;
       case "homeschool-schedule":
         return <HomeschoolScheduleView userId={convexUser._id} />;
       case "homeschool-focus":
@@ -378,7 +399,7 @@ export default function DashboardPage() {
         onViewChange={setCurrentView} 
       />
 
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
