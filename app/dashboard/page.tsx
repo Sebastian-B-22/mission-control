@@ -48,7 +48,7 @@ import { AspirePDPView } from "@/components/views/AspirePDPView";
 import { Aspire7v7View } from "@/components/views/Aspire7v7View";
 import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
 import { HomeschoolDailyView } from "@/components/views/HomeschoolDailyView";
-import { HomeschoolProgressView } from "@/components/views/HomeschoolProgressView";
+import HomeschoolProgressView from "@/components/views/HomeschoolProgressView";
 import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesView";
 import {
   HomeschoolScheduleView,
