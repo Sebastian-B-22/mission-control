@@ -98,6 +98,36 @@ function getNextStage(current: ContentStage): ContentStage | null {
   return idx < STAGE_ORDER.length - 1 ? STAGE_ORDER[idx + 1] : null;
 }
 
+// ─── Content with Clickable Links ─────────────────────────────────────────
+
+function ContentWithLinks({ text, className = "" }: { text: string; className?: string }) {
+  // Split text by URLs and render links as clickable
+  const urlRegex = /(https?:\/\/[^\s<]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return (
+    <span className={className}>
+      {parts.map((part, i) => {
+        if (part.match(urlRegex)) {
+          return (
+            <a
+              key={i}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline break-all"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </span>
+  );
+}
+
 // ─── Copy Button ──────────────────────────────────────────────────────────
 
 function CopyButton({ text, size = "default" }: { text: string; size?: "default" | "large" }) {
@@ -499,7 +529,7 @@ function ContentModal({
               />
             ) : (
               <div className="bg-gray-800/80 rounded-lg p-4 text-sm text-gray-200 whitespace-pre-wrap leading-relaxed border border-gray-700">
-                {item.content}
+                <ContentWithLinks text={item.content} />
               </div>
             )}
           </div>
@@ -513,7 +543,7 @@ function ContentModal({
                   <Badge className="bg-gray-700 text-gray-200">{item.content.length} chars</Badge>
                 </div>
                 <div className="rounded-md bg-black/20 border border-gray-700 p-3 text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
-                  {item.content}
+                  <ContentWithLinks text={item.content} />
                 </div>
               </div>
 

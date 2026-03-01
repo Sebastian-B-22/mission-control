@@ -24,6 +24,7 @@ import { EveningReflection } from "@/components/EveningReflection";
 import { HealthWidget } from "@/components/HealthWidget";
 import { HealthDashboard } from "@/components/views/HealthDashboard";
 import { SebastianWorkspace } from "@/components/SebastianWorkspace";
+import AgentHuddle from "@/components/AgentHuddle";
 import { ContentPipeline } from "@/components/ContentPipeline";
 import { MavenVerificationDashboard } from "@/components/MavenVerificationDashboard";
 import { MemoryView } from "@/components/MemoryView";
@@ -37,6 +38,7 @@ import { ProfessionalOverview } from "@/components/views/ProfessionalOverview";
 import { HTAOverview } from "@/components/views/HTAOverview";
 import { HTASubView } from "@/components/views/HTASubView";
 import { AspireOverview } from "@/components/views/AspireOverview";
+import { CoachHubView } from "@/components/views/CoachHubView";
 import { FamilyCRM } from "@/components/FamilyCRM";
 import { PersonalCRM, SurpriseCard } from "@/components/PersonalCRM";
 import { AspireSubView } from "@/components/views/AspireSubView";
@@ -46,6 +48,7 @@ import { AspirePDPView } from "@/components/views/AspirePDPView";
 import { Aspire7v7View } from "@/components/views/Aspire7v7View";
 import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
 import { HomeschoolDailyView } from "@/components/views/HomeschoolDailyView";
+import { HomeschoolProgressView } from "@/components/views/HomeschoolProgressView";
 import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesView";
 import {
   HomeschoolScheduleView,
@@ -256,6 +259,39 @@ export default function DashboardPage() {
       case "sebastian":
         return <SebastianWorkspace userId={convexUser._id} />;
 
+      // Agent Huddle channels
+      case "agent-huddle-main":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="main" />
+          </div>
+        );
+      case "agent-huddle-aspire-ops":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="aspire-ops" />
+          </div>
+        );
+      case "agent-huddle-hta-launch":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="hta-launch" />
+          </div>
+        );
+      case "agent-huddle-family":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="family" />
+          </div>
+        );
+      case "agent-huddle-ideas":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="ideas" />
+          </div>
+        );
+
+      // Legacy views
       case "agent-ideas":
         return (
           <div className="space-y-6">
@@ -270,6 +306,13 @@ export default function DashboardPage() {
               </div>
             </div>
             <AgentIdeasWidget />
+          </div>
+        );
+
+      case "agent-huddle":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="main" />
           </div>
         );
 
@@ -348,6 +391,8 @@ export default function DashboardPage() {
         return <Aspire7v7View userId={convexUser._id} />;
       case "aspire-families":
         return <FamilyCRM />;
+      case "aspire-coach-hub":
+        return <CoachHubView />;
 
       case "personal-crm":
         return (
@@ -363,6 +408,8 @@ export default function DashboardPage() {
         return <HomeschoolOverview userId={convexUser._id} />;
       case "homeschool-daily":
         return <HomeschoolDailyView userId={convexUser._id} />;
+      case "homeschool-progress":
+        return <HomeschoolProgressView />;
       case "homeschool-resources":
         return <HomeschoolResourcesView />;
       case "homeschool-schedule":

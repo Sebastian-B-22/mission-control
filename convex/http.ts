@@ -1056,4 +1056,231 @@ http.route({
   handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// AGENT HUDDLE ENDPOINTS
+// Inter-agent communication organized by channels
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Channel definitions
+const HUDDLE_CHANNELS = {
+  main: { name: "Main Huddle", description: "Daily standups, announcements" },
+  "aspire-ops": { name: "Aspire Ops", description: "Registrations, scheduling, coaches" },
+  "hta-launch": { name: "HTA Launch", description: "Marketing, product, launch prep" },
+  family: { name: "Family", description: "Kids' learning, projects" },
+  ideas: { name: "Ideas", description: "Brainstorming, discussions" },
+};
+
+// GET /huddle - Get recent messages
+// Query params: channel (optional), limit (default 50), since (timestamp)
+http.route({
+  path: "/huddle", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const url = new URL(req.url);
+    const channel = url.searchParams.get("channel") || undefined;
+    const limit = parseInt(url.searchParams.get("limit") || "50");
+    const since = url.searchParams.get("since") 
+      ? parseInt(url.searchParams.get("since")!) 
+      : undefined;
+    
+    const messages = await ctx.runQuery(internal.agentHuddle.getRecentInternal, {
+      channel,
+      limit,
+      since,
+    });
+    
+    return jsonResponse({ 
+      messages,
+      channels: HUDDLE_CHANNELS,
+    });
+  }),
+});
+
+// POST /huddle - Post a message
+// Body: { agent: string, message: string, channel: string, mentions?: string[], replyTo?: string }
+http.route({
+  path: "/huddle", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const body = await req.json() as {
+      agent: string;
+      message: string;
+      channel?: string;
+      mentions?: string[];
+      replyTo?: string;
+    };
+    
+    if (!body.agent || !body.message) {
+      return jsonResponse({ error: "Missing required fields: agent, message" }, 400);
+    }
+    
+    // Validate agent name
+    const validAgents = ["sebastian", "scout", "maven", "compass", "james", "corinne"];
+    if (!validAgents.includes(body.agent.toLowerCase())) {
+      return jsonResponse({ error: `Invalid agent. Must be one of: ${validAgents.join(", ")}` }, 400);
+    }
+    
+    // Default to main channel
+    const channel = body.channel || "main";
+    
+    // Validate channel
+    if (!Object.keys(HUDDLE_CHANNELS).includes(channel)) {
+      return jsonResponse({ 
+        error: `Invalid channel. Must be one of: ${Object.keys(HUDDLE_CHANNELS).join(", ")}` 
+      }, 400);
+    }
+    
+    const messageId = await ctx.runMutation(internal.agentHuddle.postInternal, {
+      agent: body.agent.toLowerCase(),
+      message: body.message,
+      channel,
+      mentions: body.mentions,
+      replyTo: body.replyTo as Id<"agentHuddle"> | undefined,
+    });
+    
+    return jsonResponse({ success: true, messageId, channel });
+  }),
+});
+
+// GET /huddle/channels - List available channels
+http.route({
+  path: "/huddle/channels", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    return jsonResponse({ channels: HUDDLE_CHANNELS });
+  }),
+});
+
+// OPTIONS for CORS preflight
+http.route({
+  path: "/huddle", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/huddle/channels", method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AGENT TRIGGER ENDPOINTS
+// Polling-based system for waking agents when huddle messages arrive
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /huddle/triggers - Get pending triggers for OpenClaw to process
+http.route({
+  path: "/huddle/triggers", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    
+    const triggers = await ctx.runQuery(internal.agentTrigger.getPendingTriggers, { limit });
+    
+    return jsonResponse({ 
+      triggers,
+      count: triggers.length,
+      pollTime: Date.now(),
+    });
+  }),
+});
+
+// POST /huddle/triggers/:id/processing - Mark trigger as processing
+http.route({
+  path: "/huddle/triggers/processing", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const body = await req.json() as { triggerId: string };
+    if (!body.triggerId) {
+      return jsonResponse({ error: "Missing triggerId" }, 400);
+    }
+    
+    try {
+      await ctx.runMutation(internal.agentTrigger.markProcessing, {
+        triggerId: body.triggerId as Id<"agentTriggers">,
+      });
+      return jsonResponse({ success: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return jsonResponse({ error: message }, 500);
+    }
+  }),
+});
+
+// POST /huddle/triggers/:id/complete - Mark trigger as completed
+http.route({
+  path: "/huddle/triggers/complete", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const body = await req.json() as { triggerId: string };
+    if (!body.triggerId) {
+      return jsonResponse({ error: "Missing triggerId" }, 400);
+    }
+    
+    try {
+      await ctx.runMutation(internal.agentTrigger.markCompleted, {
+        triggerId: body.triggerId as Id<"agentTriggers">,
+      });
+      return jsonResponse({ success: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return jsonResponse({ error: message }, 500);
+    }
+  }),
+});
+
+// POST /huddle/triggers/:id/failed - Mark trigger as failed
+http.route({
+  path: "/huddle/triggers/failed", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const body = await req.json() as { triggerId: string; error: string };
+    if (!body.triggerId) {
+      return jsonResponse({ error: "Missing triggerId" }, 400);
+    }
+    
+    try {
+      await ctx.runMutation(internal.agentTrigger.markFailed, {
+        triggerId: body.triggerId as Id<"agentTriggers">,
+        error: body.error || "Unknown error",
+      });
+      return jsonResponse({ success: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return jsonResponse({ error: message }, 500);
+    }
+  }),
+});
+
+// GET /huddle/triggers/stats - Get trigger statistics
+http.route({
+  path: "/huddle/triggers/stats", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+    
+    const stats = await ctx.runQuery(api.agentTrigger.getTriggerStats, {});
+    return jsonResponse(stats);
+  }),
+});
+
+// OPTIONS for CORS preflight
+[
+  "/huddle/triggers",
+  "/huddle/triggers/processing",
+  "/huddle/triggers/complete",
+  "/huddle/triggers/failed",
+  "/huddle/triggers/stats",
+].forEach((path) => {
+  http.route({
+    path, method: "OPTIONS",
+    handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+  });
+});
+
 export default http;

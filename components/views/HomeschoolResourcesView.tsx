@@ -56,7 +56,7 @@ export function HomeschoolResourcesView() {
   // @ts-ignore - API types need regeneration
   const categoryResources = useQuery(
     (api as any).homeschool?.getResources,
-    selectedCategory ? { category: selectedCategory, limit: 100 } : "skip"
+    selectedCategory ? { category: selectedCategory, limit: 500 } : "skip"
   );
 
   // @ts-ignore - API types need regeneration

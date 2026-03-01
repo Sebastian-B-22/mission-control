@@ -524,3 +524,132 @@ export const clearExampleData = mutation({
     return { cleared: true, meetings: meetings.length };
   },
 });
+
+// Admin: bulk import movies (creates user if needed for single-user setup)
+export const importMovies = mutation({
+  args: {
+    watched: v.array(v.object({
+      title: v.string(),
+      notes: v.optional(v.string()),
+      rating: v.optional(v.number()),
+    })),
+    suggestions: v.array(v.object({
+      title: v.string(),
+      suggestedBy: v.string(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    // Find a REAL user (not admin-import) for single-user setup
+    const allUsers = await ctx.db.query("users").collect();
+    let user = allUsers.find(u => u.clerkId !== "admin-import") || allUsers[0];
+    
+    if (!user) {
+      // Create a default user for single-user setup
+      const userId = await ctx.db.insert("users", {
+        clerkId: "admin-import",
+        email: "corinne@aspiresoccercoaching.com",
+        name: "Corinne",
+        createdAt: Date.now(),
+      });
+      const newUser = await ctx.db.get(userId);
+      if (!newUser) {
+        throw new Error("Could not create user");
+      }
+      user = newUser;
+    }
+
+    const results = { watched: 0, suggestions: 0, skipped: 0 };
+    
+    // Get existing movies to avoid duplicates
+    const existingMovies = await ctx.db
+      .query("movieLibrary")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    const existingTitles = new Set(existingMovies.map(m => m.title.toLowerCase()));
+
+    // Add watched movies
+    for (const movie of args.watched) {
+      if (existingTitles.has(movie.title.toLowerCase())) {
+        results.skipped++;
+        continue;
+      }
+      
+      await ctx.db.insert("movieLibrary", {
+        userId: user._id,
+        title: movie.title,
+        type: "watched",
+        suggestedBy: "Family",
+        watchedOn: new Date().toISOString().split("T")[0],
+        rating: movie.rating || 5,
+        notes: movie.notes,
+        votes: [],
+        favorite: true,
+        createdAt: Date.now(),
+      });
+      results.watched++;
+      existingTitles.add(movie.title.toLowerCase());
+    }
+
+    // Add suggestions
+    for (const movie of args.suggestions) {
+      if (existingTitles.has(movie.title.toLowerCase())) {
+        results.skipped++;
+        continue;
+      }
+      
+      await ctx.db.insert("movieLibrary", {
+        userId: user._id,
+        title: movie.title,
+        type: "suggestion",
+        suggestedBy: movie.suggestedBy,
+        votes: [],
+        favorite: false,
+        createdAt: Date.now(),
+      });
+      results.suggestions++;
+      existingTitles.add(movie.title.toLowerCase());
+    }
+
+    return results;
+  },
+});
+
+// Admin: migrate movies from admin-import user to the real user
+export const migrateMoviesToRealUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const allUsers = await ctx.db.query("users").collect();
+    const adminUser = allUsers.find(u => u.clerkId === "admin-import");
+    const realUser = allUsers.find(u => u.clerkId !== "admin-import");
+    
+    if (!adminUser) {
+      return { message: "No admin-import user found", migrated: 0 };
+    }
+    
+    if (!realUser) {
+      return { message: "No real user found - please log into Mission Control first", migrated: 0 };
+    }
+    
+    // Get all movies from admin user
+    const adminMovies = await ctx.db
+      .query("movieLibrary")
+      .withIndex("by_user", (q) => q.eq("userId", adminUser._id))
+      .collect();
+    
+    // Migrate each movie to real user
+    let migrated = 0;
+    for (const movie of adminMovies) {
+      await ctx.db.patch(movie._id, { userId: realUser._id });
+      migrated++;
+    }
+    
+    // Delete the admin-import user
+    await ctx.db.delete(adminUser._id);
+    
+    return { 
+      message: `Migrated ${migrated} movies to ${realUser.name} (${realUser.email})`,
+      migrated,
+      toUser: realUser.name
+    };
+  },
+});

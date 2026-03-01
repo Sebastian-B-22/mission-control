@@ -172,7 +172,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
   };
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800 border-l-4 border-l-purple-500">
+    <Card className="bg-zinc-900 border-zinc-800">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center justify-between text-zinc-100">
           <div className="flex items-center gap-2">

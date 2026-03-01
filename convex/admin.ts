@@ -76,18 +76,168 @@ export const manuallyInitializeUser = mutation({
   },
 });
 
-// Import weekly schedule
+// Quick reimport for first user (single-user setup) - full schedule reset
+export const reimportSchedule = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Find first user
+    const allUsers = await ctx.db.query("users").collect();
+    const user = allUsers[0];
+    if (!user) throw new Error("No users found");
+
+    // Clear existing schedule
+    const existing = await ctx.db
+      .query("weeklySchedule")
+      .withIndex("by_user_and_day", (q) => q.eq("userId", user._id))
+      .collect();
+    for (const block of existing) {
+      await ctx.db.delete(block._id);
+    }
+
+    // Full schedule data
+    const scheduleData = [
+      // MONDAY
+      { dayOfWeek: "monday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
+      { dayOfWeek: "monday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
+      { dayOfWeek: "monday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
+      { dayOfWeek: "monday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
+      { dayOfWeek: "monday", startTime: "09:30", endTime: "10:00", activity: "Writing with Skill" },
+      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "Anthony: Synthesis Teams / Roma: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Roma: Synthesis Teams / Anthony: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "12:00", endTime: "14:00", activity: "Passion Projects + Mom Work Block", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design", color: "mom-work" },
+      { dayOfWeek: "monday", startTime: "14:00", endTime: "14:30", activity: "Rosetta Stone Italian + Life Skills", notes: "Family session - Italian OR How to Be a Person / Manners book" },
+      { dayOfWeek: "monday", startTime: "14:30", endTime: "15:00", activity: "Free Time / Transition" },
+      { dayOfWeek: "monday", startTime: "15:00", endTime: "16:30", activity: "Rock Climbing", notes: "Family - 90 min" },
+      { dayOfWeek: "monday", startTime: "16:30", endTime: "17:30", activity: "Free Time & Dinner" },
+      { dayOfWeek: "monday", startTime: "17:30", endTime: "18:30", activity: "Screen Time" },
+      { dayOfWeek: "monday", startTime: "18:30", endTime: "19:30", activity: "Free Time / Family Time" },
+      { dayOfWeek: "monday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
+      
+      // TUESDAY
+      { dayOfWeek: "tuesday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free time" },
+      { dayOfWeek: "tuesday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
+      { dayOfWeek: "tuesday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
+      { dayOfWeek: "tuesday", startTime: "08:30", endTime: "09:30", activity: "Math Academy, Membean + Spelling Safari", notes: "While Mom at Jiu-Jitsu", color: "mom-work" },
+      { dayOfWeek: "tuesday", startTime: "09:30", endTime: "10:30", activity: "PE with Joey", notes: "March: Throwing & Rolling Games" },
+      { dayOfWeek: "tuesday", startTime: "10:30", endTime: "11:30", activity: "Health/Body Study", notes: "Systems, nutrition, CGM data review" },
+      { dayOfWeek: "tuesday", startTime: "11:30", endTime: "12:00", activity: "Lunch & Free time" },
+      { dayOfWeek: "tuesday", startTime: "12:00", endTime: "13:00", activity: "Anthony: Wonder Math Class / Mom Work Block", notes: "Roma: Math Academy, independent activities", color: "mom-work" },
+      { dayOfWeek: "tuesday", startTime: "13:00", endTime: "14:00", activity: "Roma: Wonder Math Class + Mom Work Block", color: "mom-work" },
+      { dayOfWeek: "tuesday", startTime: "14:30", endTime: "15:00", activity: "Rosetta Stone Italian" },
+      { dayOfWeek: "tuesday", startTime: "15:00", endTime: "15:30", activity: "Pet Time / Free Time" },
+      { dayOfWeek: "tuesday", startTime: "15:30", endTime: "17:00", activity: "Screen Time" },
+      { dayOfWeek: "tuesday", startTime: "17:00", endTime: "18:00", activity: "Free Time" },
+      { dayOfWeek: "tuesday", startTime: "18:00", endTime: "19:00", activity: "Dinner" },
+      { dayOfWeek: "tuesday", startTime: "19:00", endTime: "19:30", activity: "Free Time" },
+      { dayOfWeek: "tuesday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
+      
+      // WEDNESDAY
+      { dayOfWeek: "wednesday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
+      { dayOfWeek: "wednesday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
+      { dayOfWeek: "wednesday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
+      { dayOfWeek: "wednesday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
+      { dayOfWeek: "wednesday", startTime: "09:30", endTime: "11:30", activity: "Learning Block", notes: "Health/Science, Math, History, Writing, Shakespeare" },
+      { dayOfWeek: "wednesday", startTime: "11:30", endTime: "12:00", activity: "Lunch" },
+      { dayOfWeek: "wednesday", startTime: "12:00", endTime: "14:00", activity: "Passion Projects + Free Time + Mom Work Block", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design", color: "mom-work" },
+      { dayOfWeek: "wednesday", startTime: "14:00", endTime: "14:30", activity: "Rosetta Stone Italian + Life Skills", notes: "Family session - Italian OR How to Be a Person / Manners book" },
+      { dayOfWeek: "wednesday", startTime: "14:30", endTime: "15:30", activity: "Snack & Reset/Quiet Time" },
+      { dayOfWeek: "wednesday", startTime: "15:30", endTime: "16:00", activity: "Prep for Activities" },
+      { dayOfWeek: "wednesday", startTime: "16:00", endTime: "17:00", activity: "Kids' Boxing" },
+      { dayOfWeek: "wednesday", startTime: "17:00", endTime: "18:00", activity: "Kids' Jiu-Jitsu" },
+      { dayOfWeek: "wednesday", startTime: "18:00", endTime: "19:00", activity: "Mom's Jiu-Jitsu / Kids: Screen Time", color: "mom-work" },
+      { dayOfWeek: "wednesday", startTime: "19:00", endTime: "19:30", activity: "Dinner" },
+      { dayOfWeek: "wednesday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
+      
+      // THURSDAY
+      { dayOfWeek: "thursday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
+      { dayOfWeek: "thursday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
+      { dayOfWeek: "thursday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
+      { dayOfWeek: "thursday", startTime: "08:30", endTime: "09:00", activity: "Yoga + Dance Party" },
+      { dayOfWeek: "thursday", startTime: "09:00", endTime: "10:00", activity: "Kids: Math Academy, Membean + Spelling Safari / Mom @ Jiu-Jitsu", color: "mom-work" },
+      { dayOfWeek: "thursday", startTime: "10:00", endTime: "10:30", activity: "Car Learning", notes: "Podcasts: Greeking Out, Homeschool History, Brains On, The Past and the Curious, Dead Funny History" },
+      { dayOfWeek: "thursday", startTime: "10:30", endTime: "11:00", activity: "Roma: Magic Practice / Anthony: Beyblades", notes: "Before Ninja" },
+      { dayOfWeek: "thursday", startTime: "11:00", endTime: "12:00", activity: "Ninja Warrior" },
+      { dayOfWeek: "thursday", startTime: "12:00", endTime: "13:30", activity: "Homeschool Group + Play Date", notes: "Social time" },
+      { dayOfWeek: "thursday", startTime: "14:00", endTime: "15:30", activity: "Cooking / Meal Prep", notes: "Recipes: Hummus, Coconut Cashew Milk, Bread, Peanut Butter" },
+      { dayOfWeek: "thursday", startTime: "16:00", endTime: "17:00", activity: "Outschool Drawing" },
+      { dayOfWeek: "thursday", startTime: "17:00", endTime: "17:30", activity: "Screen Time" },
+      { dayOfWeek: "thursday", startTime: "17:30", endTime: "18:00", activity: "Travel to Soccer" },
+      { dayOfWeek: "thursday", startTime: "18:00", endTime: "20:00", activity: "Roma's Soccer + Mom Coaches", notes: "Anthony with Joey or at field" },
+      { dayOfWeek: "thursday", startTime: "20:00", endTime: "20:30", activity: "Late Dinner / Snack" },
+      { dayOfWeek: "thursday", startTime: "20:30", endTime: "21:00", activity: "Independent Reading & Bedtime", notes: "No formal read-aloud - late night" },
+      
+      // FRIDAY
+      { dayOfWeek: "friday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
+      { dayOfWeek: "friday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
+      { dayOfWeek: "friday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
+      { dayOfWeek: "friday", startTime: "08:30", endTime: "09:00", activity: "Sprinting Program + Juggling" },
+      { dayOfWeek: "friday", startTime: "09:00", endTime: "11:00", activity: "Learning Block (Mom @ Irish Dance 9-10AM)", notes: "Health/Science, Shakespeare, Financial Literacy, Math, Civics, Italian" },
+      { dayOfWeek: "friday", startTime: "11:00", endTime: "14:00", activity: "Sky Zone or Field Trip", notes: "Alternate weeks" },
+      { dayOfWeek: "friday", startTime: "14:00", endTime: "16:00", activity: "Passion Projects / Free Time", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design" },
+      { dayOfWeek: "friday", startTime: "16:00", endTime: "17:00", activity: "Screen Time" },
+      { dayOfWeek: "friday", startTime: "17:30", endTime: "18:30", activity: "Kids' Jiu-Jitsu / Mom Work Block", color: "mom-work" },
+      { dayOfWeek: "friday", startTime: "19:00", endTime: "20:30", activity: "Dinner + Movie Night", notes: "Check Family Meeting movie list" },
+      { dayOfWeek: "friday", startTime: "20:30", endTime: "21:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
+      
+      // SATURDAY
+      { dayOfWeek: "saturday", startTime: "08:00", endTime: "12:00", activity: "Spring League Games / Catch-Up", notes: "Games start Mar 7 - flexible timing" },
+      { dayOfWeek: "saturday", startTime: "12:00", endTime: "18:00", activity: "Family Projects or Playdate" },
+      { dayOfWeek: "saturday", startTime: "18:00", endTime: "21:00", activity: "Free Time", notes: "Movies, games, rest" },
+      
+      // SUNDAY
+      { dayOfWeek: "sunday", startTime: "08:00", endTime: "09:30", activity: "Sunday Morning Chill & Cuddles & Free Time" },
+      { dayOfWeek: "sunday", startTime: "09:30", endTime: "11:30", activity: "House Cleaning / Reset", notes: "Everyone helps" },
+      { dayOfWeek: "sunday", startTime: "11:30", endTime: "12:30", activity: "Cooking / Meal Prep", notes: "Peanut butter, hummus, nut milk, bread for week + flour milling" },
+      { dayOfWeek: "sunday", startTime: "12:30", endTime: "13:00", activity: "Lunch" },
+      { dayOfWeek: "sunday", startTime: "13:00", endTime: "14:00", activity: "Screen Time" },
+      { dayOfWeek: "sunday", startTime: "14:00", endTime: "15:00", activity: "Family Italian Practice or Origami or Card Magic Pro", notes: "Flexible family learning" },
+      { dayOfWeek: "sunday", startTime: "15:00", endTime: "17:00", activity: "Free Time" },
+      { dayOfWeek: "sunday", startTime: "17:00", endTime: "17:30", activity: "Family Meeting" },
+      { dayOfWeek: "sunday", startTime: "17:30", endTime: "18:30", activity: "Family Game Night" },
+      { dayOfWeek: "sunday", startTime: "18:30", endTime: "19:00", activity: "Dinner" },
+      { dayOfWeek: "sunday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud", notes: "5 min compound interest" },
+    ];
+
+    // Insert all schedule blocks
+    let insertedCount = 0;
+    for (const block of scheduleData) {
+      await ctx.db.insert("weeklySchedule", {
+        userId: user._id,
+        dayOfWeek: block.dayOfWeek as "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday",
+        startTime: block.startTime,
+        endTime: block.endTime,
+        activity: block.activity,
+        notes: block.notes,
+        color: block.color,
+        createdAt: Date.now(),
+      });
+      insertedCount++;
+    }
+
+    return { userId: user._id, cleared: existing.length, inserted: insertedCount, message: "Schedule reimported successfully!" };
+  },
+});
+
+// Import weekly schedule - can use clerkId OR find first user
 export const importWeeklySchedule = mutation({
   args: { 
-    clerkId: v.string(),
+    clerkId: v.optional(v.string()),
     clearExisting: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    // Find the user
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
-      .first();
+    // Find the user - by clerkId if provided, otherwise first user
+    let user;
+    if (args.clerkId) {
+      const clerkId = args.clerkId;
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
+        .first();
+    } else {
+      // Find first user (for single-user setup)
+      const allUsers = await ctx.db.query("users").collect();
+      user = allUsers[0];
+    }
 
     if (!user) {
       throw new Error("User not found");
@@ -96,86 +246,86 @@ export const importWeeklySchedule = mutation({
     // Schedule data
     const scheduleData = [
       // MONDAY
-      { dayOfWeek: "monday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading" },
+      { dayOfWeek: "monday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
       { dayOfWeek: "monday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
       { dayOfWeek: "monday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
-      { dayOfWeek: "monday", startTime: "08:30", endTime: "09:30", activity: "SPRINTING PROGRAM + JUGGLING" },
-      { dayOfWeek: "monday", startTime: "09:30", endTime: "10:00", activity: "READ-ALOUD", notes: "Disappearing Spoon or Blood and Guts" },
-      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "Anthony: Synthesis Teams / Roma: 1:1 WITH MOM", notes: "Math Academy help, writing" },
-      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Roma: Synthesis Teams / Anthony: 1:1 WITH MOM", notes: "Math Academy help, writing" },
-      { dayOfWeek: "monday", startTime: "12:00", endTime: "14:00", activity: "PASSION PROJECTS + MOM WORK BLOCK", notes: "3D printing, DJ, Card Magic, origami, stop motion" },
-      { dayOfWeek: "monday", startTime: "14:00", endTime: "14:30", activity: "ROSETTA STONE ITALIAN", notes: "FAMILY session" },
+      { dayOfWeek: "monday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
+      { dayOfWeek: "monday", startTime: "09:30", endTime: "10:00", activity: "Writing with Skill" },
+      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "Anthony: Synthesis Teams / Roma: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Roma: Synthesis Teams / Anthony: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "12:00", endTime: "14:00", activity: "Passion Projects + Mom Work Block", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design", color: "mom-work" },
+      { dayOfWeek: "monday", startTime: "14:00", endTime: "14:30", activity: "Rosetta Stone Italian + Life Skills", notes: "Family session - Italian OR How to Be a Person / Manners book" },
       { dayOfWeek: "monday", startTime: "14:30", endTime: "15:00", activity: "Free time / transition" },
       { dayOfWeek: "monday", startTime: "15:00", endTime: "16:30", activity: "ROCK CLIMBING", notes: "family - 90 min" },
       { dayOfWeek: "monday", startTime: "16:30", endTime: "17:30", activity: "Free time & Dinner" },
-      { dayOfWeek: "monday", startTime: "17:30", endTime: "18:30", activity: "SCREEN TIME" },
+      { dayOfWeek: "monday", startTime: "17:30", endTime: "18:30", activity: "Screen Time" },
       { dayOfWeek: "monday", startTime: "18:30", endTime: "19:30", activity: "Free time / Family time" },
-      { dayOfWeek: "monday", startTime: "19:30", endTime: "20:00", activity: "COMPOUND INTEREST + READ-ALOUD & BEDTIME", notes: "5 min compound interest" },
+      { dayOfWeek: "monday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
       
       // TUESDAY
-      { dayOfWeek: "tuesday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free time" },
+      { dayOfWeek: "tuesday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
       { dayOfWeek: "tuesday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
       { dayOfWeek: "tuesday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
-      { dayOfWeek: "tuesday", startTime: "08:30", endTime: "09:30", activity: "PROJECT OR READING WITH JOEY", notes: "while Mom at Jiu-Jitsu" },
-      { dayOfWeek: "tuesday", startTime: "09:30", endTime: "10:30", activity: "PE WITH JOEY" },
-      { dayOfWeek: "tuesday", startTime: "10:30", endTime: "11:30", activity: "HEALTH/BODY STUDY", notes: "systems, nutrition, CGM data review" },
-      { dayOfWeek: "tuesday", startTime: "11:30", endTime: "12:00", activity: "Lunch & Free time" },
-      { dayOfWeek: "tuesday", startTime: "12:00", endTime: "13:00", activity: "ANTHONY: WONDER MATH CLASS / MOM WORK BLOCK", notes: "Roma: Math Academy, independent activities" },
-      { dayOfWeek: "tuesday", startTime: "13:00", endTime: "15:30", activity: "PARK MEETUP", notes: "Homeschool group - social time" },
+      { dayOfWeek: "tuesday", startTime: "08:30", endTime: "09:30", activity: "Project or Reading with Joey", notes: "While Mom at Jiu-Jitsu", color: "mom-work" },
+      { dayOfWeek: "tuesday", startTime: "09:30", endTime: "10:30", activity: "PE with Joey", notes: "March: Throwing & Rolling Games" },
+      { dayOfWeek: "tuesday", startTime: "10:30", endTime: "11:30", activity: "Health/Body Study", notes: "Einstein Body Kit, Blood & Guts, CGM data review, nutrition discussion" },
+      { dayOfWeek: "tuesday", startTime: "11:30", endTime: "12:00", activity: "Lunch & Free Time" },
+      { dayOfWeek: "tuesday", startTime: "12:00", endTime: "13:00", activity: "Anthony: Wonder Math Class / Mom Work Block", notes: "Roma: Math Academy, independent activities", color: "mom-work" },
+      { dayOfWeek: "tuesday", startTime: "13:00", endTime: "15:30", activity: "Park Meetup + Play Date", notes: "Homeschool group - social time" },
       { dayOfWeek: "tuesday", startTime: "15:30", endTime: "16:00", activity: "Travel to horseback riding" },
       { dayOfWeek: "tuesday", startTime: "16:00", endTime: "17:00", activity: "HORSEBACK RIDING", notes: "both kids" },
       { dayOfWeek: "tuesday", startTime: "17:30", endTime: "18:00", activity: "Dinner" },
-      { dayOfWeek: "tuesday", startTime: "18:00", endTime: "19:00", activity: "SCREEN TIME" },
+      { dayOfWeek: "tuesday", startTime: "18:00", endTime: "19:00", activity: "Screen Time" },
       { dayOfWeek: "tuesday", startTime: "19:00", endTime: "19:30", activity: "Free time" },
-      { dayOfWeek: "tuesday", startTime: "19:30", endTime: "20:00", activity: "COMPOUND INTEREST + READ-ALOUD & BEDTIME", notes: "5 min compound interest" },
+      { dayOfWeek: "tuesday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
       
       // WEDNESDAY
       { dayOfWeek: "wednesday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
       { dayOfWeek: "wednesday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
       { dayOfWeek: "wednesday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
-      { dayOfWeek: "wednesday", startTime: "08:30", endTime: "09:30", activity: "SPRINTING PROGRAM + JUGGLING" },
-      { dayOfWeek: "wednesday", startTime: "09:30", endTime: "11:30", activity: "LEARNING BLOCK", notes: "Health/Science, Math, History, Life Skills, etc" },
+      { dayOfWeek: "wednesday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
+      { dayOfWeek: "wednesday", startTime: "09:30", endTime: "11:30", activity: "Learning Block", notes: "Health/Science, Math, History, Writing, Shakespeare" },
       { dayOfWeek: "wednesday", startTime: "11:30", endTime: "12:00", activity: "Lunch" },
-      { dayOfWeek: "wednesday", startTime: "12:00", endTime: "14:00", activity: "PASSION PROJECTS + FREE TIME + MOM WORK BLOCK" },
-      { dayOfWeek: "wednesday", startTime: "14:00", endTime: "14:30", activity: "ROSETTA STONE ITALIAN", notes: "FAMILY session" },
+      { dayOfWeek: "wednesday", startTime: "12:00", endTime: "14:00", activity: "Passion Projects + Free Time + Mom Work Block", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design", color: "mom-work" },
+      { dayOfWeek: "wednesday", startTime: "14:00", endTime: "14:30", activity: "Rosetta Stone Italian + Life Skills", notes: "Family session - Italian OR How to Be a Person / Manners book" },
       { dayOfWeek: "wednesday", startTime: "14:30", endTime: "15:30", activity: "Snack & Reset/Quiet Time" },
       { dayOfWeek: "wednesday", startTime: "15:30", endTime: "16:00", activity: "Prep for activities" },
-      { dayOfWeek: "wednesday", startTime: "16:00", endTime: "17:00", activity: "KIDS' BOXING" },
+      { dayOfWeek: "wednesday", startTime: "16:00", endTime: "17:00", activity: "Kids' Boxing" },
       { dayOfWeek: "wednesday", startTime: "17:00", endTime: "18:00", activity: "KIDS' JIU-JITSU" },
-      { dayOfWeek: "wednesday", startTime: "18:00", endTime: "19:00", activity: "MOM'S JIU-JITSU / KIDS: SCREEN TIME" },
+      { dayOfWeek: "wednesday", startTime: "18:00", endTime: "19:00", activity: "Mom's Jiu-Jitsu / Kids: Screen Time" },
       { dayOfWeek: "wednesday", startTime: "19:00", endTime: "19:30", activity: "Dinner" },
-      { dayOfWeek: "wednesday", startTime: "19:30", endTime: "20:00", activity: "COMPOUND INTEREST + READ-ALOUD & BEDTIME", notes: "5 min compound interest" },
+      { dayOfWeek: "wednesday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
       
       // THURSDAY
       { dayOfWeek: "thursday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
       { dayOfWeek: "thursday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
       { dayOfWeek: "thursday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
-      { dayOfWeek: "thursday", startTime: "08:30", endTime: "09:00", activity: "YOGA + DANCE PARTY" },
-      { dayOfWeek: "thursday", startTime: "09:00", endTime: "10:00", activity: "MOM'S JIU-JITSU / Kids: MATH ACADEMY + MEMBEAN/TEACHTALES + WORKBOOKS" },
-      { dayOfWeek: "thursday", startTime: "10:00", endTime: "10:30", activity: "CAR LEARNING", notes: "drive to Ninja: podcasts, discussions, math facts" },
-      { dayOfWeek: "thursday", startTime: "10:30", endTime: "11:00", activity: "ROMA: MAGIC PRACTICE / ANTHONY: BEYBLADES", notes: "before Ninja" },
-      { dayOfWeek: "thursday", startTime: "11:00", endTime: "12:00", activity: "NINJA WARRIOR" },
-      { dayOfWeek: "thursday", startTime: "12:00", endTime: "13:30", activity: "PLAY DATE", notes: "social time" },
-      { dayOfWeek: "thursday", startTime: "14:00", endTime: "15:30", activity: "COOKING / MEAL PREP", notes: "flour milling, bread making, nutrition experiments" },
-      { dayOfWeek: "thursday", startTime: "16:00", endTime: "17:00", activity: "OUTSCHOOL DRAWING" },
-      { dayOfWeek: "thursday", startTime: "17:00", endTime: "17:30", activity: "SCREEN TIME" },
+      { dayOfWeek: "thursday", startTime: "08:30", endTime: "09:00", activity: "Yoga + Dance Party" },
+      { dayOfWeek: "thursday", startTime: "09:00", endTime: "10:00", activity: "Mom's Jiu-Jitsu / Kids: Math Academy + Membean + Workbooks", color: "mom-work" },
+      { dayOfWeek: "thursday", startTime: "10:00", endTime: "10:30", activity: "Car Learning", notes: "Podcasts: Greeking Out, Homeschool History, Brains On, The Past and the Curious, Dead Funny History" },
+      { dayOfWeek: "thursday", startTime: "10:30", endTime: "11:00", activity: "Roma: Magic Practice / Anthony: Beyblades", notes: "before Ninja" },
+      { dayOfWeek: "thursday", startTime: "11:00", endTime: "12:00", activity: "Ninja Warrior" },
+      { dayOfWeek: "thursday", startTime: "12:00", endTime: "13:30", activity: "Homeschool Group + Play Date", notes: "Social time" },
+      { dayOfWeek: "thursday", startTime: "14:00", endTime: "15:30", activity: "Cooking / Meal Prep", notes: "Recipes: Hummus, Coconut Cashew Milk, Bread, Peanut Butter" },
+      { dayOfWeek: "thursday", startTime: "16:00", endTime: "17:00", activity: "Outschool Drawing" },
+      { dayOfWeek: "thursday", startTime: "17:00", endTime: "17:30", activity: "Screen Time" },
       { dayOfWeek: "thursday", startTime: "17:30", endTime: "18:00", activity: "Travel to soccer" },
-      { dayOfWeek: "thursday", startTime: "18:00", endTime: "20:00", activity: "ROMA'S SOCCER + MOM COACHES", notes: "Anthony with Joey or at field" },
+      { dayOfWeek: "thursday", startTime: "18:00", endTime: "20:00", activity: "Roma's Soccer + Mom Coaches", notes: "Anthony with Joey or at field" },
       { dayOfWeek: "thursday", startTime: "20:00", endTime: "20:30", activity: "Late dinner / snack" },
-      { dayOfWeek: "thursday", startTime: "20:30", endTime: "21:00", activity: "INDEPENDENT READING & BEDTIME", notes: "no formal read-aloud - late night" },
+      { dayOfWeek: "thursday", startTime: "20:30", endTime: "21:00", activity: "Independent Reading & Bedtime", notes: "no formal read-aloud - late night" },
       
       // FRIDAY
       { dayOfWeek: "friday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
       { dayOfWeek: "friday", startTime: "07:30", endTime: "08:00", activity: "Breakfast" },
       { dayOfWeek: "friday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
-      { dayOfWeek: "friday", startTime: "08:30", endTime: "09:30", activity: "SPRINTING PROGRAM + JUGGLING" },
-      { dayOfWeek: "friday", startTime: "09:30", endTime: "11:30", activity: "LEARNING BLOCK", notes: "Health, Tuttle Twins, Origami, Shakespeare, life skills" },
-      { dayOfWeek: "friday", startTime: "11:30", endTime: "14:00", activity: "SKY ZONE OR FIELD TRIP", notes: "alternate weeks" },
-      { dayOfWeek: "friday", startTime: "14:00", endTime: "16:00", activity: "Free time" },
-      { dayOfWeek: "friday", startTime: "16:00", endTime: "17:00", activity: "SCREEN TIME / FREE TIME" },
-      { dayOfWeek: "friday", startTime: "17:30", endTime: "18:30", activity: "KIDS' JIU-JITSU / MOM WORK BLOCK" },
-      { dayOfWeek: "friday", startTime: "19:00", endTime: "20:30", activity: "DINNER + MOVIE NIGHT" },
-      { dayOfWeek: "friday", startTime: "20:30", endTime: "21:00", activity: "COMPOUND INTEREST + READ-ALOUD & BEDTIME", notes: "5 min compound interest" },
+      { dayOfWeek: "friday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
+      { dayOfWeek: "friday", startTime: "09:30", endTime: "11:30", activity: "Learning Block (Mom @ Irish Dance 9-10AM)", notes: "Health/Science, Shakespeare, Financial Literacy, Math, Civics, Italian" },
+      { dayOfWeek: "friday", startTime: "11:30", endTime: "14:00", activity: "Sky Zone or Field Trip", notes: "Alternate weeks" },
+      { dayOfWeek: "friday", startTime: "14:00", endTime: "16:00", activity: "Passion Projects / Free Time", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design" },
+      { dayOfWeek: "friday", startTime: "16:00", endTime: "17:00", activity: "Screen Time" },
+      { dayOfWeek: "friday", startTime: "17:30", endTime: "18:30", activity: "Kids' Jiu-Jitsu / Mom Work Block", color: "mom-work" },
+      { dayOfWeek: "friday", startTime: "19:00", endTime: "20:30", activity: "Dinner + Movie Night", notes: "Check Family Meeting movie list" },
+      { dayOfWeek: "friday", startTime: "20:30", endTime: "21:00", activity: "Compound Interest + Read-Aloud & Bedtime", notes: "5 min compound interest" },
       
       // SATURDAY
       { dayOfWeek: "saturday", startTime: "10:00", endTime: "12:00", activity: "CATCH-UP SCHOOLWORK OR ROCK CLIMBING OR Free Time", notes: "Flexible - catch up if needed" },
@@ -187,13 +337,13 @@ export const importWeeklySchedule = mutation({
       { dayOfWeek: "sunday", startTime: "09:30", endTime: "11:30", activity: "HOUSE CLEANING / RESET", notes: "everyone helps" },
       { dayOfWeek: "sunday", startTime: "11:30", endTime: "12:30", activity: "MEAL PREP SESSION", notes: "peanut butter, hummus, nut milk, bread for week + flour milling practice" },
       { dayOfWeek: "sunday", startTime: "12:30", endTime: "13:00", activity: "Lunch" },
-      { dayOfWeek: "sunday", startTime: "13:00", endTime: "14:00", activity: "SCREEN TIME" },
+      { dayOfWeek: "sunday", startTime: "13:00", endTime: "14:00", activity: "Screen Time" },
       { dayOfWeek: "sunday", startTime: "14:00", endTime: "15:00", activity: "FAMILY ITALIAN PRACTICE OR ORIGAMI OR CARD MAGIC PRO", notes: "flexible family learning" },
       { dayOfWeek: "sunday", startTime: "15:00", endTime: "17:00", activity: "FREE TIME" },
       { dayOfWeek: "sunday", startTime: "17:00", endTime: "17:30", activity: "FAMILY MEETING" },
       { dayOfWeek: "sunday", startTime: "17:30", endTime: "18:30", activity: "FAMILY GAME NIGHT" },
       { dayOfWeek: "sunday", startTime: "18:30", endTime: "19:00", activity: "Dinner" },
-      { dayOfWeek: "sunday", startTime: "19:30", endTime: "20:00", activity: "COMPOUND INTEREST + READ-ALOUD", notes: "5 min compound interest" },
+      { dayOfWeek: "sunday", startTime: "19:30", endTime: "20:00", activity: "Compound Interest + Read-Aloud", notes: "5 min compound interest" },
     ];
 
     // Clear existing if requested
@@ -941,5 +1091,114 @@ export const getAllUsers = query({
   args: {},
   handler: async (ctx) => {
     return await ctx.db.query("users").collect();
+  },
+});
+
+// Admin: fix user clerkId (update admin-import to real Clerk ID)
+export const fixUserClerkId = mutation({
+  args: {
+    oldClerkId: v.string(),
+    newClerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("clerkId"), args.oldClerkId))
+      .first();
+    
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+    
+    await ctx.db.patch(user._id, { clerkId: args.newClerkId });
+    return { success: true, message: `Updated clerkId to ${args.newClerkId}` };
+  },
+});
+
+// Admin: import movies (creates user if needed for single-user setup)
+export const importMovies = mutation({
+  args: {
+    watched: v.array(v.object({
+      title: v.string(),
+      notes: v.optional(v.string()),
+      rating: v.optional(v.number()),
+    })),
+    suggestions: v.array(v.object({
+      title: v.string(),
+      suggestedBy: v.string(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    // Find or create user for single-user setup
+    let user = await ctx.db.query("users").first();
+    
+    if (!user) {
+      // Create a default user for single-user setup
+      const userId = await ctx.db.insert("users", {
+        clerkId: "admin-import",
+        email: "corinne@aspiresoccercoaching.com",
+        name: "Corinne",
+        createdAt: Date.now(),
+      });
+      user = await ctx.db.get(userId);
+    }
+    
+    if (!user) {
+      throw new Error("Could not find or create user");
+    }
+
+    const results = { watched: 0, suggestions: 0, skipped: 0 };
+    
+    // Get existing movies to avoid duplicates
+    const existingMovies = await ctx.db
+      .query("movieLibrary")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    const existingTitles = new Set(existingMovies.map(m => m.title.toLowerCase()));
+
+    // Add watched movies
+    for (const movie of args.watched) {
+      if (existingTitles.has(movie.title.toLowerCase())) {
+        results.skipped++;
+        continue;
+      }
+      
+      await ctx.db.insert("movieLibrary", {
+        userId: user._id,
+        title: movie.title,
+        type: "watched",
+        suggestedBy: "Family",
+        watchedOn: new Date().toISOString().split("T")[0],
+        rating: movie.rating || 5,
+        notes: movie.notes,
+        votes: [],
+        favorite: true,
+        createdAt: Date.now(),
+      });
+      results.watched++;
+      existingTitles.add(movie.title.toLowerCase());
+    }
+
+    // Add suggestions
+    for (const movie of args.suggestions) {
+      if (existingTitles.has(movie.title.toLowerCase())) {
+        results.skipped++;
+        continue;
+      }
+      
+      await ctx.db.insert("movieLibrary", {
+        userId: user._id,
+        title: movie.title,
+        type: "suggestion",
+        suggestedBy: movie.suggestedBy,
+        votes: [],
+        favorite: false,
+        createdAt: Date.now(),
+      });
+      results.suggestions++;
+      existingTitles.add(movie.title.toLowerCase());
+    }
+
+    return results;
   },
 });

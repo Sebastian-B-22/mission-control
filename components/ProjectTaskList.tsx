@@ -24,6 +24,7 @@ interface ProjectTaskListProps {
   title: string;
   description: string;
   showAssignments?: boolean;
+  headerExtra?: React.ReactNode;
 }
 
 export function ProjectTaskList({
@@ -33,6 +34,7 @@ export function ProjectTaskList({
   title,
   description,
   showAssignments = true,
+  headerExtra,
 }: ProjectTaskListProps) {
   const [newTask, setNewTask] = useState("");
   const [newTaskAssignee, setNewTaskAssignee] = useState<string>("unassigned");
@@ -107,7 +109,10 @@ export function ProjectTaskList({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>{title}</CardTitle>
+            {headerExtra}
+          </div>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -123,7 +128,10 @@ export function ProjectTaskList({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>{title}</CardTitle>
+          {headerExtra}
+        </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

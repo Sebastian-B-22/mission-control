@@ -98,9 +98,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="border-l-4 border-l-pink-500">
           <CardHeader>
-            <CardTitle>Acknowledgements & Shout-Outs</CardTitle>
+            <CardTitle className="text-pink-400">💝 Acknowledgements & Shout-Outs</CardTitle>
             <CardDescription>Track who recognized who this week.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -130,9 +130,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-blue-500">
           <CardHeader>
-            <CardTitle>Discussion Queue</CardTitle>
+            <CardTitle className="text-blue-400">💬 Discussion Queue</CardTitle>
             <CardDescription>Add during the week, resolve during Sunday meeting.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -169,9 +169,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-amber-500">
           <CardHeader>
-            <CardTitle>Calendar Review (Next 7 Days)</CardTitle>
+            <CardTitle className="text-amber-400">📅 Calendar Review (Next 7 Days)</CardTitle>
             <CardDescription>Support requests + conflict flags.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -204,9 +204,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-green-500">
           <CardHeader>
-            <CardTitle>Goals & Habit Trackers</CardTitle>
+            <CardTitle className="text-green-400">🎯 Goals & Habit Trackers</CardTitle>
             <CardDescription>Weekly goals per person.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -239,9 +239,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-purple-500">
           <CardHeader>
-            <CardTitle>Friday Movie Nights 🎬</CardTitle>
+            <CardTitle className="text-purple-400">🎬 Friday Movie Nights</CardTitle>
             <CardDescription>Suggestions, voting, watched history.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -274,9 +274,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-cyan-500">
           <CardHeader>
-            <CardTitle>Game Night Log</CardTitle>
+            <CardTitle className="text-cyan-400">🎲 Game Night Log</CardTitle>
             <CardDescription>Track game, winner, and fun moments.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -301,9 +301,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
         </Card>
       </div>
 
-      <Card>
+      <Card className="border-l-4 border-l-orange-500">
         <CardHeader>
-          <CardTitle>🎉 End of Year Reflection (Coming 2027)</CardTitle>
+          <CardTitle className="text-orange-400">🎉 End of Year Reflection (Coming 2027)</CardTitle>
           <CardDescription>
             Yearly wrap-up: acknowledgements, goals, movie nights, game winners
           </CardDescription>

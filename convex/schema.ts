@@ -134,6 +134,14 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user_and_day", ["userId", "dayOfWeek"]),
 
+  // Daily homeschool recap notes - what we actually did
+  dailyRecap: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    notes: v.string(),
+    updatedAt: v.number(),
+  }).index("by_user_and_date", ["userId", "date"]),
+
   dailyCheckIns: defineTable({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format
@@ -192,6 +200,7 @@ export default defineSchema({
     title: v.string(),
     author: v.optional(v.string()),
     completed: v.boolean(),
+    status: v.optional(v.union(v.literal("reading"), v.literal("up-next"))), // reading = currently reading, up-next = books on deck
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 
@@ -230,9 +239,13 @@ export default defineSchema({
     ),
     stage: v.union(
       v.literal("idea"),
+      v.literal("priority"),
+      v.literal("later"),
+      v.literal("needs-work"),
       v.literal("review"),
       v.literal("approved"),
-      v.literal("published")
+      v.literal("published"),
+      v.literal("dismissed")
     ),
     createdBy: v.string(),           // "sebastian" | "maven" | "scout"
     assignedTo: v.string(),          // "corinne" (who reviews)
@@ -727,4 +740,58 @@ export default defineSchema({
     count: v.number(),
     lastUpdated: v.number(),
   }).index("by_program", ["program"]),
+
+  // ─── Agent Huddle ──────────────────────────────────────────────────────
+  // Inter-agent communication - organized by channels
+  agentHuddle: defineTable({
+    agent: v.string(), // "sebastian", "scout", "maven", "compass", "james", "corinne"
+    message: v.string(),
+    channel: v.optional(v.string()), // "main", "aspire-ops", "hta-launch", "family", "ideas" - defaults to "main"
+    replyTo: v.optional(v.id("agentHuddle")), // Thread support
+    mentions: v.optional(v.array(v.string())), // ["scout", "maven"] for @mentions
+    topic: v.optional(v.string()), // Legacy field
+    createdAt: v.number(),
+  })
+    .index("by_created", ["createdAt"])
+    .index("by_agent", ["agent"])
+    .index("by_channel", ["channel", "createdAt"]),
+
+  // ─── Agent Triggers ──────────────────────────────────────────────────────
+  // Queue for waking up agents when huddle messages arrive
+  agentTriggers: defineTable({
+    huddleMessageId: v.id("agentHuddle"),
+    channel: v.string(),
+    fromAgent: v.string(), // Who posted the message
+    targetAgents: v.array(v.string()), // Which agents should be woken
+    message: v.string(), // The message content
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed")
+    ),
+    createdAt: v.number(),
+    processedAt: v.optional(v.number()),
+    error: v.optional(v.string()),
+  })
+    .index("by_status", ["status"])
+    .index("by_created", ["createdAt"]),
+
+  // ─── Homeschool Platform Progress ───────────────────────────────────────
+  // Aggregated progress data from Math Academy, Rosetta Stone, etc.
+  homeschoolProgress: defineTable({
+    studentName: v.string(), // "Anthony" | "Roma"
+    platform: v.string(), // "math-academy" | "rosetta-stone" | "synthesis" | etc.
+    lastActivity: v.number(), // timestamp
+    todayCompleted: v.boolean(),
+    weeklyMinutes: v.number(),
+    streak: v.optional(v.number()),
+    level: v.optional(v.string()), // Course name, unit, etc.
+    details: v.any(), // Platform-specific data (XP, words learned, etc.)
+    scrapedAt: v.number(), // When this data was collected
+  })
+    .index("by_student", ["studentName"])
+    .index("by_platform", ["platform"])
+    .index("by_student_platform", ["studentName", "platform"])
+    .index("by_scraped_at", ["scrapedAt"]),
 });

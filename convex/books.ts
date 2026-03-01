@@ -51,7 +51,7 @@ export const deleteBookFromLibrary = mutation({
   },
 });
 
-// Read-Aloud Books
+// Read-Aloud Books (currently reading)
 export const getReadAloudBooks = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
@@ -60,8 +60,26 @@ export const getReadAloudBooks = query({
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
     
-    // Sort alphabetically by title
-    return books.sort((a, b) => a.title.localeCompare(b.title));
+    // Filter to only "reading" or undefined status (backward compat), sort alphabetically
+    return books
+      .filter(b => !b.status || b.status === "reading")
+      .sort((a, b) => a.title.localeCompare(b.title));
+  },
+});
+
+// Up Next / Books on Deck
+export const getUpNextBooks = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const books = await ctx.db
+      .query("readAloudBooks")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    
+    // Filter to only "up-next" status, sort alphabetically
+    return books
+      .filter(b => b.status === "up-next")
+      .sort((a, b) => a.title.localeCompare(b.title));
   },
 });
 
@@ -70,6 +88,7 @@ export const addReadAloudBook = mutation({
     userId: v.id("users"),
     title: v.string(),
     author: v.optional(v.string()),
+    status: v.optional(v.union(v.literal("reading"), v.literal("up-next"))),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("readAloudBooks", {
@@ -77,8 +96,25 @@ export const addReadAloudBook = mutation({
       title: args.title,
       author: args.author,
       completed: false,
+      status: args.status || "reading",
       createdAt: Date.now(),
     });
+  },
+});
+
+// Move book from up-next to currently reading
+export const moveToReading = mutation({
+  args: { id: v.id("readAloudBooks") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { status: "reading" });
+  },
+});
+
+// Move book to up-next
+export const moveToUpNext = mutation({
+  args: { id: v.id("readAloudBooks") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { status: "up-next" });
   },
 });
 

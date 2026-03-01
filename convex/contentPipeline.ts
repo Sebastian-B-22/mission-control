@@ -23,9 +23,13 @@ const CONTENT_TYPE = v.union(
 
 const CONTENT_STAGE = v.union(
   v.literal("idea"),
+  v.literal("priority"),
+  v.literal("later"),
+  v.literal("needs-work"),
   v.literal("review"),
   v.literal("approved"),
-  v.literal("published")
+  v.literal("published"),
+  v.literal("dismissed")
 );
 
 // ─── Public Queries ────────────────────────────────────────────────────────
@@ -266,5 +270,17 @@ export const listAllInternal = internalQuery({
     if (args.createdBy) items = items.filter((i) => i.createdBy === args.createdBy);
 
     return items.sort((a, b) => b.updatedAt - a.updatedAt);
+  },
+});
+
+// Cleanup function to delete all content
+export const deleteAll = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("contentPipeline").collect();
+    for (const item of all) {
+      await ctx.db.delete(item._id);
+    }
+    return { deleted: all.length };
   },
 });

@@ -64,9 +64,12 @@ export const getMonthHealth = query({
 export const getMonthStats = query({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
+    // Use PST timezone for date calculations
     const now = new Date();
-    const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    const today = now.toISOString().split("T")[0];
+    const pstOffset = -8 * 60; // PST is UTC-8
+    const pstTime = new Date(now.getTime() + (pstOffset - now.getTimezoneOffset()) * 60000);
+    const yearMonth = `${pstTime.getFullYear()}-${String(pstTime.getMonth() + 1).padStart(2, "0")}`;
+    const today = pstTime.toISOString().split("T")[0];
 
     // Get all health data for this month
     const monthHealth = await ctx.db

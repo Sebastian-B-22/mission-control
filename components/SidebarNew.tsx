@@ -22,6 +22,7 @@ import {
   ChevronDown,
   TrendingUp,
   Handshake,
+  Users,
 } from "lucide-react";
 import { SoccerBall } from "@/components/icons/SoccerBall";
 
@@ -44,9 +45,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
   const pipelineReview = useQuery(api.contentPipeline.listByStage, { stage: "review" }) || [];
   const reviewCount = pipelineReview.length;
 
-  // Get registration counts for Aspire badges
-  const registrationCounts = useQuery(api.registrations.getAllCounts) || [];
-  const countsMap = new Map(registrationCounts.map(c => [c.program, c.count]));
+  // Registration counts now shown on pages, not sidebar
 
   // Get RPM categories
   const categories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
@@ -81,6 +80,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "homeschool",
       children: [
+        { name: "Progress", view: "homeschool-progress" },
         { name: "Daily", view: "homeschool-daily" },
         { name: "Weekly", view: "homeschool-schedule" },
         { name: "Monthly", view: "homeschool-focus" },
@@ -131,27 +131,12 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "aspire",
       children: [
-        { name: "👨‍👩‍👧‍👦 Family CRM", view: "aspire-families" },
-        { 
-          name: "Spring League", 
-          view: "aspire-spring",
-          badge: `Pali: ${countsMap.get("spring-pali") || 0} | Agoura: ${countsMap.get("spring-agoura") || 0}`
-        },
-        { 
-          name: "Camps", 
-          view: "aspire-camps",
-          badge: countsMap.get("camps") || 0
-        },
-        { 
-          name: "PDP", 
-          view: "aspire-pdp",
-          badge: countsMap.get("pdp") || 0
-        },
-        { 
-          name: "7v7", 
-          view: "aspire-7v7",
-          badge: countsMap.get("7v7") || 0
-        },
+        { name: "Coach Hub", view: "aspire-coach-hub" },
+        { name: "Family CRM", view: "aspire-families" },
+        { name: "Spring League", view: "aspire-spring" },
+        { name: "Camps", view: "aspire-camps" },
+        { name: "PDP", view: "aspire-pdp" },
+        { name: "7v7", view: "aspire-7v7" },
         { name: "Pali", view: "aspire-pali" },
         { name: "Agoura", view: "aspire-agoura" },
       ]
@@ -177,10 +162,25 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "sebastian",
       children: [
+        { name: "Projects & Backlog", view: "sebastian" },
         { name: "Agent Ideas", view: "agent-ideas" },
         { name: "Content Pipeline", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
         { name: "Engagement", view: "engagement-habits" },
         { name: "Memory Search", view: "memory" },
+      ]
+    },
+    {
+      name: "Agent Ops",
+      icon: Users,
+      view: "agent-huddle-main",
+      expandable: true,
+      section: "agents",
+      children: [
+        { name: "Main Huddle", view: "agent-huddle-main" },
+        { name: "Aspire Ops", view: "agent-huddle-aspire-ops" },
+        { name: "HTA Launch", view: "agent-huddle-hta-launch" },
+        { name: "Family", view: "agent-huddle-family" },
+        { name: "Ideas", view: "agent-huddle-ideas" },
       ]
     },
   ];
@@ -314,6 +314,27 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 <div className="flex flex-col">
                   <span className="text-zinc-300 font-medium">Maven</span>
                   <span className="text-zinc-500 text-[10px]">Marketing</span>
+                </div>
+                <span className="text-green-600 font-medium">● Live</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-col">
+                  <span className="text-zinc-300 font-medium">Compass</span>
+                  <span className="text-zinc-500 text-[10px]">Anthony&apos;s Bot</span>
+                </div>
+                <span className="text-zinc-500 font-medium">● Offline</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-col">
+                  <span className="text-zinc-300 font-medium">James</span>
+                  <span className="text-zinc-500 text-[10px]">Roma&apos;s Bot</span>
+                </div>
+                <span className="text-zinc-500 font-medium">● Offline</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-col">
+                  <span className="text-zinc-300 font-medium">Joy</span>
+                  <span className="text-zinc-500 text-[10px]">Carolyn&apos;s Assistant</span>
                 </div>
                 <span className="text-green-600 font-medium">● Live</span>
               </div>

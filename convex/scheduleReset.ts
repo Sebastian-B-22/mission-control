@@ -1,105 +1,7 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation } from "./_generated/server";
 
-const dayOfWeekValidator = v.union(
-  v.literal("monday"),
-  v.literal("tuesday"),
-  v.literal("wednesday"),
-  v.literal("thursday"),
-  v.literal("friday"),
-  v.literal("saturday"),
-  v.literal("sunday")
-);
-
-export const createScheduleBlock = mutation({
-  args: {
-    userId: v.id("users"),
-    dayOfWeek: dayOfWeekValidator,
-    startTime: v.string(),
-    endTime: v.string(),
-    activity: v.string(),
-    notes: v.optional(v.string()),
-    color: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("weeklySchedule", {
-      ...args,
-      createdAt: Date.now(),
-    });
-  },
-});
-
-export const updateScheduleBlock = mutation({
-  args: {
-    id: v.id("weeklySchedule"),
-    startTime: v.optional(v.string()),
-    endTime: v.optional(v.string()),
-    activity: v.optional(v.string()),
-    notes: v.optional(v.string()),
-    color: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-  },
-});
-
-export const deleteScheduleBlock = mutation({
-  args: { id: v.id("weeklySchedule") },
-  handler: async (ctx, args) => {
-    await ctx.db.delete(args.id);
-  },
-});
-
-export const getWeeklySchedule = query({
-  args: { userId: v.id("users") },
-  handler: async (ctx, args) => {
-    const blocks = await ctx.db
-      .query("weeklySchedule")
-      .withIndex("by_user_and_day", (q) => q.eq("userId", args.userId))
-      .collect();
-
-    // Group by day and sort by time
-    const schedule: Record<string, (typeof blocks)[number][]> = {
-      monday: [],
-      tuesday: [],
-      wednesday: [],
-      thursday: [],
-      friday: [],
-      saturday: [],
-      sunday: [],
-    };
-
-    blocks.forEach((block) => {
-      schedule[block.dayOfWeek].push(block);
-    });
-
-    // Sort each day's blocks by start time
-    Object.keys(schedule).forEach((day) => {
-      schedule[day].sort((a, b) => a.startTime.localeCompare(b.startTime));
-    });
-
-    return schedule;
-  },
-});
-
-export const getScheduleByDay = query({
-  args: {
-    userId: v.id("users"),
-    dayOfWeek: dayOfWeekValidator,
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("weeklySchedule")
-      .withIndex("by_user_and_day", (q) =>
-        q.eq("userId", args.userId).eq("dayOfWeek", args.dayOfWeek)
-      )
-      .collect();
-  },
-});
-
-// Reset schedule with updated data - finds first user automatically
-export const resetSchedule = mutation({
+// Quick reimport for first user - full schedule reset
+export const reset = mutation({
   args: {},
   handler: async (ctx) => {
     // Find first user
@@ -116,7 +18,7 @@ export const resetSchedule = mutation({
       await ctx.db.delete(block._id);
     }
 
-    // Updated schedule data
+    // Full schedule data
     const scheduleData = [
       // MONDAY
       { dayOfWeek: "monday", startTime: "07:00", endTime: "07:30", activity: "Journal + Reading + Free Time" },
@@ -235,54 +137,6 @@ export const resetSchedule = mutation({
       insertedCount++;
     }
 
-    return { userId: user._id, cleared: existing.length, inserted: insertedCount, message: "Schedule updated!" };
-  },
-});
-
-export const bulkImportSchedule = mutation({
-  args: {
-    userId: v.id("users"),
-    clearExisting: v.optional(v.boolean()),
-    blocks: v.array(
-      v.object({
-        dayOfWeek: dayOfWeekValidator,
-        startTime: v.string(),
-        endTime: v.string(),
-        activity: v.string(),
-        notes: v.optional(v.string()),
-        color: v.optional(v.string()),
-      })
-    ),
-  },
-  handler: async (ctx, args) => {
-    // Optionally clear existing schedule
-    if (args.clearExisting) {
-      const existing = await ctx.db
-        .query("weeklySchedule")
-        .withIndex("by_user_and_day", (q) => q.eq("userId", args.userId))
-        .collect();
-      
-      for (const block of existing) {
-        await ctx.db.delete(block._id);
-      }
-    }
-
-    // Insert all new blocks
-    const insertedIds = [];
-    for (const block of args.blocks) {
-      const id = await ctx.db.insert("weeklySchedule", {
-        userId: args.userId,
-        dayOfWeek: block.dayOfWeek,
-        startTime: block.startTime,
-        endTime: block.endTime,
-        activity: block.activity,
-        notes: block.notes,
-        color: block.color,
-        createdAt: Date.now(),
-      });
-      insertedIds.push(id);
-    }
-
-    return { count: insertedIds.length, ids: insertedIds };
+    return { userId: user._id, cleared: existing.length, inserted: insertedCount, message: "Schedule reimported successfully!" };
   },
 });

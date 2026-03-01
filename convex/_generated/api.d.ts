@@ -9,6 +9,8 @@
  */
 
 import type * as admin from "../admin.js";
+import type * as agentHuddle from "../agentHuddle.js";
+import type * as agentTrigger from "../agentTrigger.js";
 import type * as books from "../books.js";
 import type * as camp from "../camp.js";
 import type * as checkIns from "../checkIns.js";
@@ -16,6 +18,7 @@ import type * as contacts from "../contacts.js";
 import type * as contentPipeline from "../contentPipeline.js";
 import type * as contentVerification from "../contentVerification.js";
 import type * as daily from "../daily.js";
+import type * as dailyRecap from "../dailyRecap.js";
 import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
 import type * as familyMeeting from "../familyMeeting.js";
@@ -24,12 +27,14 @@ import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
 import type * as health from "../health.js";
 import type * as homeschool from "../homeschool.js";
+import type * as homeschoolProgress from "../homeschoolProgress.js";
 import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
 import type * as mavenFeedback from "../mavenFeedback.js";
 import type * as projectTasks from "../projectTasks.js";
 import type * as registrations from "../registrations.js";
 import type * as rpm from "../rpm.js";
+import type * as scheduleReset from "../scheduleReset.js";
 import type * as sebastianTasks from "../sebastianTasks.js";
 import type * as seedSebastianTasks from "../seedSebastianTasks.js";
 import type * as teamMembers from "../teamMembers.js";
@@ -45,6 +50,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
+  agentHuddle: typeof agentHuddle;
+  agentTrigger: typeof agentTrigger;
   books: typeof books;
   camp: typeof camp;
   checkIns: typeof checkIns;
@@ -52,6 +59,7 @@ declare const fullApi: ApiFromModules<{
   contentPipeline: typeof contentPipeline;
   contentVerification: typeof contentVerification;
   daily: typeof daily;
+  dailyRecap: typeof dailyRecap;
   engagementHabits: typeof engagementHabits;
   families: typeof families;
   familyMeeting: typeof familyMeeting;
@@ -60,12 +68,14 @@ declare const fullApi: ApiFromModules<{
   habits: typeof habits;
   health: typeof health;
   homeschool: typeof homeschool;
+  homeschoolProgress: typeof homeschoolProgress;
   http: typeof http;
   jotformSync: typeof jotformSync;
   mavenFeedback: typeof mavenFeedback;
   projectTasks: typeof projectTasks;
   registrations: typeof registrations;
   rpm: typeof rpm;
+  scheduleReset: typeof scheduleReset;
   sebastianTasks: typeof sebastianTasks;
   seedSebastianTasks: typeof seedSebastianTasks;
   teamMembers: typeof teamMembers;
