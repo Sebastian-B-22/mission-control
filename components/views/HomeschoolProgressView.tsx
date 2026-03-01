@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,7 @@ const platformConfig: Record<string, { icon: React.ReactNode; color: string; lab
   "typing-com": {
     icon: <BookOpen className="h-4 w-4" />,
     color: "bg-pink-500",
-    label: "Typing.com",
+    label: "Typing",
   },
 };
 
@@ -76,10 +76,9 @@ interface ProgressCardProps {
     level?: string;
     details?: any;
   }>;
-  onMarkComplete: (platform: string) => void;
-}
+  }
 
-function StudentProgressCard({ studentName, platforms, onMarkComplete }: ProgressCardProps) {
+function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
   const completedCount = platforms.filter(p => p.todayCompleted).length;
   const totalPlatforms = platforms.length;
   const allDone = completedCount === totalPlatforms && totalPlatforms > 0;
@@ -136,18 +135,6 @@ function StudentProgressCard({ studentName, platforms, onMarkComplete }: Progres
                       {formatRelativeTime(p.lastActivity)}
                     </div>
                   </div>
-                  
-                  {p.todayCompleted ? (
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onMarkComplete(p.platform)}
-                    >
-                      Mark Done
-                    </Button>
-                  )}
                 </div>
               </div>
             );
@@ -205,12 +192,6 @@ function PlatformDetailsCard({ platform, details }: { platform: string; details:
 
 export default function HomeschoolProgressView() {
   const allProgress = useQuery(api.homeschoolProgress.getAllProgress);
-  const todayStatus = useQuery(api.homeschoolProgress.getTodayStatus);
-  const markComplete = useMutation(api.homeschoolProgress.markCompleted);
-  
-  const handleMarkComplete = async (studentName: string, platform: string) => {
-    await markComplete({ studentName, platform });
-  };
   
   if (!allProgress) {
     return (
@@ -235,46 +216,6 @@ export default function HomeschoolProgressView() {
         </Button>
       </div>
       
-      {/* Quick Status */}
-      {todayStatus && (
-        <div className="grid grid-cols-2 gap-4">
-          {students.map((student) => {
-            const status = todayStatus[student];
-            if (!status) return null;
-            
-            const allDone = status.pending.length === 0 && status.completed.length > 0;
-            
-            return (
-              <Card key={student} className={allDone ? "border-green-500" : ""}>
-                <CardContent className="pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{student}</span>
-                    <div className="flex gap-2">
-                      {allDone ? (
-                        <Badge className="bg-green-500">All Done ✓</Badge>
-                      ) : (
-                        <>
-                          {status.completed.length > 0 && (
-                            <Badge variant="outline" className="text-green-600">
-                              {status.completed.length} done
-                            </Badge>
-                          )}
-                          {status.pending.length > 0 && (
-                            <Badge variant="outline" className="text-orange-600" title="Platforms not used today">
-                              {status.pending.length} not done today
-                            </Badge>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-      
       {/* Detailed Progress */}
       <div className="grid md:grid-cols-2 gap-6">
         {students.map((studentName) => {
@@ -291,7 +232,6 @@ export default function HomeschoolProgressView() {
               key={studentName}
               studentName={studentName}
               platforms={platforms}
-              onMarkComplete={(platform) => handleMarkComplete(studentName, platform)}
             />
           );
         })}
@@ -330,7 +270,6 @@ export default function HomeschoolProgressView() {
         <CardContent>
           <div className="text-sm text-orange-700">
             {students.map((student) => {
-              const status = todayStatus?.[student];
               const studentProgress = allProgress[student];
               
               if (!studentProgress) {
