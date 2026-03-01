@@ -218,7 +218,7 @@ export default function HomeschoolProgressView() {
     );
   }
   
-  const students = ["Anthony", "Roma"];
+  const students = ["Anthony", "Roma", "Family"];
   
   return (
     <div className="space-y-6 p-6">

@@ -317,19 +317,25 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 </div>
                 <span className="text-green-600 font-medium">● Live</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
+              <div 
+                className="flex items-center justify-between text-xs cursor-pointer hover:bg-zinc-800 rounded px-1 -mx-1"
+                onClick={() => onViewChange("agent-compass")}
+              >
                 <div className="flex flex-col">
                   <span className="text-zinc-300 font-medium">Compass</span>
                   <span className="text-zinc-500 text-[10px]">Anthony&apos;s Bot</span>
                 </div>
-                <span className="text-zinc-500 font-medium">● Offline</span>
+                <span className="text-green-600 font-medium">● Live</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
+              <div 
+                className="flex items-center justify-between text-xs cursor-pointer hover:bg-zinc-800 rounded px-1 -mx-1"
+                onClick={() => onViewChange("agent-james")}
+              >
                 <div className="flex flex-col">
                   <span className="text-zinc-300 font-medium">James</span>
                   <span className="text-zinc-500 text-[10px]">Roma&apos;s Bot</span>
                 </div>
-                <span className="text-zinc-500 font-medium">● Offline</span>
+                <span className="text-green-600 font-medium">● Live</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <div className="flex flex-col">

@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
 import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -288,6 +289,56 @@ export default function DashboardPage() {
         return (
           <div className="h-[calc(100vh-120px)]">
             <AgentHuddle initialChannel="ideas" />
+          </div>
+        );
+      
+      case "agent-compass":
+        return (
+          <div className="space-y-6 p-6">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🧭</span>
+              <div>
+                <h1 className="text-2xl font-bold">Compass</h1>
+                <p className="text-gray-500">Anthony&apos;s AI Companion</p>
+              </div>
+              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
+            </div>
+            <div className="grid gap-4">
+              <Card>
+                <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-gray-400">Coming soon - Compass activity feed and interaction history</p>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="h-[calc(100vh-350px)]">
+              <AgentHuddle initialChannel="family" />
+            </div>
+          </div>
+        );
+      
+      case "agent-james":
+        return (
+          <div className="space-y-6 p-6">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🎮</span>
+              <div>
+                <h1 className="text-2xl font-bold">James</h1>
+                <p className="text-gray-500">Roma&apos;s AI Companion</p>
+              </div>
+              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
+            </div>
+            <div className="grid gap-4">
+              <Card>
+                <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-gray-400">Coming soon - James activity feed and interaction history</p>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="h-[calc(100vh-350px)]">
+              <AgentHuddle initialChannel="family" />
+            </div>
           </div>
         );
 
