@@ -41,6 +41,28 @@ const AGENT_CONFIG: Record<string, { emoji: string; label: string; color: string
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
+// Simple markdown parser for messages
+function parseMarkdown(text: string): React.ReactNode {
+  // Split by markdown patterns and preserve them
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+  
+  return parts.map((part, i) => {
+    // Bold: **text**
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    // Italic: *text*
+    if (part.startsWith('*') && part.endsWith('*') && !part.startsWith('**')) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    // Code: `text`
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={i} className="bg-gray-700 px-1 rounded text-sm">{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+}
+
 function formatTime(timestamp: number): string {
   const date = new Date(timestamp);
   const now = new Date();
@@ -95,7 +117,7 @@ function MessageBubble({ message }: { message: HuddleMessage }) {
             ? "bg-pink-900/30 text-pink-100" 
             : "bg-gray-800 text-gray-100"
         }`}>
-          {message.message}
+          {parseMarkdown(message.message)}
         </div>
         {message.mentions && message.mentions.length > 0 && (
           <div className="mt-1 flex gap-1 flex-wrap">
