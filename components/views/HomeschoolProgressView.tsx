@@ -114,13 +114,13 @@ function StudentProgressCard({ studentName, platforms, onMarkComplete }: Progres
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${config.color} text-white`}>
+                  <div className={`p-2 rounded-full ${config.color} text-white flex-shrink-0`}>
                     {config.icon}
                   </div>
-                  <div>
-                    <div className="font-medium">{config.label}</div>
-                    <div className="text-sm text-gray-500">
-                      {p.level || "No level data"}
+                  <div className="min-w-0">
+                    <div className="font-bold text-sm">{config.label}</div>
+                    <div className="text-xs text-gray-400 truncate">
+                      {p.level || "No progress yet"}
                     </div>
                   </div>
                 </div>
@@ -258,8 +258,8 @@ export default function HomeschoolProgressView() {
                             </Badge>
                           )}
                           {status.pending.length > 0 && (
-                            <Badge variant="outline" className="text-orange-600">
-                              {status.pending.length} pending
+                            <Badge variant="outline" className="text-orange-600" title="Platforms not used today">
+                              {status.pending.length} not done today
                             </Badge>
                           )}
                         </>
