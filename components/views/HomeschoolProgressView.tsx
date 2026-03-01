@@ -110,7 +110,9 @@ function StudentProgressCard({ studentName, platforms, onMarkComplete }: Progres
               <div
                 key={p.platform}
                 className={`flex items-center justify-between p-3 rounded-lg border ${
-                  p.todayCompleted ? "bg-green-50 border-green-200" : "bg-gray-50"
+                  p.todayCompleted 
+                    ? "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800" 
+                    : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -118,8 +120,8 @@ function StudentProgressCard({ studentName, platforms, onMarkComplete }: Progres
                     {config.icon}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-sm">{config.label}</div>
-                    <div className="text-xs text-gray-400 truncate">
+                    <div className="font-bold text-sm text-gray-900 dark:text-white">{config.label || p.platform}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {p.level || "No progress yet"}
                     </div>
                   </div>
