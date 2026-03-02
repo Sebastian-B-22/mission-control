@@ -60,6 +60,7 @@ import {
   HomeschoolFieldTripsView,
   HomeschoolTripsView,
 } from "@/components/views/HomeschoolSubViews";
+import { FinanceView } from "@/components/views/FinanceView";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -407,6 +408,9 @@ export default function DashboardPage() {
 
       case "family-meeting":
         return <FamilyMeetingDashboard userId={convexUser._id} />;
+
+      case "finance":
+        return <FinanceView />;
 
       case "health":
         return <HealthDashboard userId={convexUser._id} />;

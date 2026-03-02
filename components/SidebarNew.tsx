@@ -23,6 +23,7 @@ import {
   TrendingUp,
   Handshake,
   Users,
+  DollarSign,
 } from "lucide-react";
 import { SoccerBall } from "@/components/icons/SoccerBall";
 
@@ -96,6 +97,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Family Meeting",
       icon: Handshake,
       view: "family-meeting",
+    },
+    {
+      name: "Finance",
+      icon: DollarSign,
+      view: "finance",
     },
     {
       name: "Personal RPM",

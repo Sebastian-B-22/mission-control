@@ -45,6 +45,11 @@ const platformConfig: Record<string, { icon: React.ReactNode; color: string; lab
     color: "bg-pink-500",
     label: "Typing",
   },
+  "spelling-safari": {
+    icon: <BookOpen className="h-4 w-4" />,
+    color: "bg-orange-500",
+    label: "Spelling Safari",
+  },
 };
 
 function formatMinutes(minutes: number): string {
