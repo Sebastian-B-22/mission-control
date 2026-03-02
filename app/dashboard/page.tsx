@@ -293,6 +293,86 @@ export default function DashboardPage() {
           </div>
         );
       
+      case "agent-scout":
+        return (
+          <div className="space-y-6 p-6">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🔍</span>
+              <div>
+                <h1 className="text-2xl font-bold">Scout</h1>
+                <p className="text-gray-500">Operations Agent</p>
+              </div>
+              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-lg font-semibold text-blue-400">Operations</p>
+                  <p className="text-xs text-gray-500 mt-1">Registrations, rosters, scheduling, compliance</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Schedule</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-sm">Heartbeat: 8am, 11am, 2pm, 5pm</p>
+                  <p className="text-xs text-gray-500 mt-1">Night Shift: 2 AM (growth tasks)</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Recent Work</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-sm">Spring League parent emails</p>
+                  <p className="text-xs text-gray-500 mt-1">Coach cert tracking</p>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="h-[calc(100vh-380px)]">
+              <AgentHuddle initialChannel="aspire-ops" />
+            </div>
+          </div>
+        );
+      
+      case "agent-maven":
+        return (
+          <div className="space-y-6 p-6">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📣</span>
+              <div>
+                <h1 className="text-2xl font-bold">Maven</h1>
+                <p className="text-gray-500">Marketing Agent</p>
+              </div>
+              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-lg font-semibold text-purple-400">Marketing</p>
+                  <p className="text-xs text-gray-500 mt-1">Content creation, social media, research</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Schedule</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-sm">Daily: 7:30am content, 9am research</p>
+                  <p className="text-xs text-gray-500 mt-1">Night Shift: 2 AM (growth tasks)</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Output</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-sm">Content Pipeline drafts</p>
+                  <p className="text-xs text-gray-500 mt-1">Reddit/X engagement</p>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="h-[calc(100vh-380px)]">
+              <AgentHuddle initialChannel="hta-launch" />
+            </div>
+          </div>
+        );
+      
       case "agent-compass":
         return (
           <div className="space-y-6 p-6">
@@ -304,15 +384,34 @@ export default function DashboardPage() {
               </div>
               <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
             </div>
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
-                <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
                 <CardContent>
-                  <p className="text-gray-400">Coming soon - Compass activity feed and interaction history</p>
+                  <p className="text-lg font-semibold text-amber-400">Anthony&apos;s Companion</p>
+                  <p className="text-xs text-gray-500 mt-1">Helps with learning, projects, and daily habits</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Chat</CardTitle></CardHeader>
+                <CardContent>
+                  <a href="https://t.me/CompassAspireBot" target="_blank" rel="noopener noreferrer" 
+                     className="text-blue-400 hover:text-blue-300 flex items-center gap-2">
+                    <span>@CompassAspireBot</span>
+                    <span className="text-xs">↗</span>
+                  </a>
+                  <p className="text-xs text-gray-500 mt-1">Telegram (Anthony&apos;s account)</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Schedule</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-sm">6 PM Daily Habit Check-in</p>
+                  <p className="text-xs text-gray-500 mt-1">Heartbeat every 15 min</p>
                 </CardContent>
               </Card>
             </div>
-            <div className="h-[calc(100vh-350px)]">
+            <div className="h-[calc(100vh-380px)]">
               <AgentHuddle initialChannel="family" />
             </div>
           </div>
@@ -329,15 +428,34 @@ export default function DashboardPage() {
               </div>
               <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
             </div>
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
-                <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
                 <CardContent>
-                  <p className="text-gray-400">Coming soon - James activity feed and interaction history</p>
+                  <p className="text-lg font-semibold text-pink-400">Roma&apos;s Companion</p>
+                  <p className="text-xs text-gray-500 mt-1">Helps with learning, creativity, and projects</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Chat</CardTitle></CardHeader>
+                <CardContent>
+                  <a href="https://t.me/JamesAspireBot" target="_blank" rel="noopener noreferrer" 
+                     className="text-blue-400 hover:text-blue-300 flex items-center gap-2">
+                    <span>@JamesAspireBot</span>
+                    <span className="text-xs">↗</span>
+                  </a>
+                  <p className="text-xs text-gray-500 mt-1">Telegram (Roma&apos;s account)</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Current Project</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-sm text-amber-400">🎯 Roma&apos;s Spelling App</p>
+                  <p className="text-xs text-gray-500 mt-1">Design phase - gathering Roma&apos;s preferences</p>
                 </CardContent>
               </Card>
             </div>
-            <div className="h-[calc(100vh-350px)]">
+            <div className="h-[calc(100vh-380px)]">
               <AgentHuddle initialChannel="family" />
             </div>
           </div>
