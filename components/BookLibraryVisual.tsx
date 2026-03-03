@@ -1,0 +1,372 @@
+"use client";
+
+import { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Plus, 
+  Trash2, 
+  BookOpen, 
+  Search, 
+  Loader2,
+  BookMarked,
+  BookCheck,
+  Library
+} from "lucide-react";
+
+interface BookLibraryVisualProps {
+  userId: Id<"users">;
+}
+
+// Fetch book cover from Open Library API
+async function fetchBookCover(title: string, author?: string): Promise<string | null> {
+  try {
+    // Search Open Library for the book
+    const query = encodeURIComponent(`${title} ${author || ""}`);
+    const response = await fetch(
+      `https://openlibrary.org/search.json?q=${query}&limit=1`
+    );
+    const data = await response.json();
+    
+    if (data.docs && data.docs.length > 0) {
+      const book = data.docs[0];
+      // Get cover from cover_i (cover ID) or isbn
+      if (book.cover_i) {
+        return `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
+      }
+      if (book.isbn && book.isbn.length > 0) {
+        return `https://covers.openlibrary.org/b/isbn/${book.isbn[0]}-M.jpg`;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching book cover:", error);
+    return null;
+  }
+}
+
+// Book cover component with fallback
+function BookCover({ 
+  coverUrl, 
+  title, 
+  size = "medium" 
+}: { 
+  coverUrl?: string; 
+  title: string;
+  size?: "small" | "medium" | "large";
+}) {
+  const [error, setError] = useState(false);
+  
+  const sizeClasses = {
+    small: "w-16 h-24",
+    medium: "w-24 h-36",
+    large: "w-32 h-48"
+  };
+  
+  if (!coverUrl || error) {
+    return (
+      <div className={`${sizeClasses[size]} bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-md flex items-center justify-center shadow-md`}>
+        <BookOpen className="w-8 h-8 text-amber-600 dark:text-amber-300 opacity-50" />
+      </div>
+    );
+  }
+  
+  return (
+    <img
+      src={coverUrl}
+      alt={title}
+      className={`${sizeClasses[size]} object-cover rounded-md shadow-md hover:shadow-lg transition-shadow`}
+      onError={() => setError(true)}
+    />
+  );
+}
+
+export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
+  const books = useQuery(api.books.getBookLibrary, { userId });
+  const addBook = useMutation(api.books.addBookToLibrary);
+  const updateStatus = useMutation(api.books.updateBookStatus);
+  const updateCover = useMutation(api.books.updateBookCover);
+  const deleteBook = useMutation(api.books.deleteBookFromLibrary);
+
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newAuthor, setNewAuthor] = useState("");
+  const [newReader, setNewReader] = useState<string>("both");
+  const [isSearching, setIsSearching] = useState(false);
+  const [activeTab, setActiveTab] = useState<"reading" | "finished" | "want-to-read">("reading");
+
+  // Group books by status
+  const booksByStatus = {
+    "reading": books?.filter(b => b.status === "reading") || [],
+    "finished": books?.filter(b => b.status === "finished" || b.read) || [],
+    "want-to-read": books?.filter(b => b.status === "want-to-read" || (!b.status && !b.read)) || [],
+  };
+
+  const handleAdd = async () => {
+    if (!newTitle.trim()) return;
+    
+    setIsSearching(true);
+    
+    // Fetch cover from Open Library
+    const coverUrl = await fetchBookCover(newTitle, newAuthor);
+    
+    await addBook({
+      userId,
+      title: newTitle.trim(),
+      author: newAuthor.trim() || undefined,
+      coverUrl: coverUrl || undefined,
+      reader: newReader,
+      status: "want-to-read",
+    });
+    
+    setNewTitle("");
+    setNewAuthor("");
+    setNewReader("both");
+    setShowAddForm(false);
+    setIsSearching(false);
+  };
+
+  const handleStatusChange = async (id: Id<"bookLibrary">, status: "want-to-read" | "reading" | "finished") => {
+    await updateStatus({ id, status });
+  };
+
+  const handleDelete = async (id: Id<"bookLibrary">) => {
+    if (confirm("Remove this book from the library?")) {
+      await deleteBook({ id });
+    }
+  };
+
+  // Try to fetch missing covers for existing books
+  const handleFetchMissingCover = async (book: { _id: Id<"bookLibrary">; title: string; author?: string }) => {
+    const coverUrl = await fetchBookCover(book.title, book.author);
+    if (coverUrl) {
+      await updateCover({ id: book._id, coverUrl });
+    }
+  };
+
+  if (!books) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Library className="h-5 w-5 text-amber-500" />
+            <CardTitle>Book Library</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading books...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const tabs = [
+    { id: "reading" as const, label: "Currently Reading", icon: BookMarked, count: booksByStatus.reading.length },
+    { id: "want-to-read" as const, label: "Want to Read", icon: BookOpen, count: booksByStatus["want-to-read"].length },
+    { id: "finished" as const, label: "Finished", icon: BookCheck, count: booksByStatus.finished.length },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Library className="h-5 w-5 text-amber-500" />
+            <CardTitle>Book Library</CardTitle>
+          </div>
+          <Button
+            onClick={() => setShowAddForm(!showAddForm)}
+            variant="outline"
+            size="sm"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add Book
+          </Button>
+        </div>
+        <CardDescription>
+          {books.length} books • Track what you're reading
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Add Book Form */}
+        {showAddForm && (
+          <div className="p-4 border rounded-lg bg-muted/30 space-y-3">
+            <div className="flex items-center gap-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Add a book (cover fetched automatically)</span>
+            </div>
+            <Input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Book title..."
+              className="bg-background"
+            />
+            <Input
+              value={newAuthor}
+              onChange={(e) => setNewAuthor(e.target.value)}
+              placeholder="Author (helps find the right cover)..."
+              className="bg-background"
+            />
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Reader:</span>
+              <select
+                value={newReader}
+                onChange={(e) => setNewReader(e.target.value)}
+                className="text-sm border rounded px-2 py-1 bg-background"
+              >
+                <option value="both">Both Kids</option>
+                <option value="anthony">Anthony</option>
+                <option value="roma">Roma</option>
+                <option value="family">Family Read-Aloud</option>
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleAdd} 
+                size="sm" 
+                className="flex-1"
+                disabled={isSearching || !newTitle.trim()}
+              >
+                {isSearching ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Finding cover...
+                  </>
+                ) : (
+                  "Add Book"
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setNewTitle("");
+                  setNewAuthor("");
+                }}
+                variant="outline"
+                size="sm"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Tabs */}
+        <div className="flex gap-1 border-b">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "border-amber-500 text-amber-600 dark:text-amber-400"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+              <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                {tab.count}
+              </Badge>
+            </button>
+          ))}
+        </div>
+
+        {/* Book Grid */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+          {booksByStatus[activeTab].map((book) => (
+            <div
+              key={book._id}
+              className="group relative flex flex-col items-center"
+            >
+              {/* Cover */}
+              <div 
+                className="relative cursor-pointer"
+                onClick={() => !book.coverUrl && handleFetchMissingCover(book)}
+              >
+                <BookCover 
+                  coverUrl={book.coverUrl} 
+                  title={book.title}
+                  size="medium"
+                />
+                {/* Hover overlay with actions */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-col items-center justify-center gap-1 p-1">
+                  {activeTab !== "reading" && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-6 text-xs w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(book._id, "reading");
+                      }}
+                    >
+                      Start Reading
+                    </Button>
+                  )}
+                  {activeTab !== "finished" && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-6 text-xs w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusChange(book._id, "finished");
+                      }}
+                    >
+                      Mark Finished
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="h-6 text-xs w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(book._id);
+                    }}
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    Remove
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Title & Author */}
+              <div className="mt-2 text-center w-full px-1">
+                <p className="text-xs font-medium line-clamp-2 leading-tight">
+                  {book.title}
+                </p>
+                {book.author && (
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {book.author}
+                  </p>
+                )}
+                {book.reader && book.reader !== "both" && (
+                  <Badge variant="outline" className="mt-1 text-xs h-4 px-1">
+                    {book.reader === "family" ? "📚" : book.reader === "anthony" ? "A" : "R"}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          ))}
+          
+          {booksByStatus[activeTab].length === 0 && (
+            <div className="col-span-full py-8 text-center text-muted-foreground">
+              <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No books in this category yet</p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

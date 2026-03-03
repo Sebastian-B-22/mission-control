@@ -9,7 +9,7 @@ import { ProjectsThisMonth } from "@/components/ProjectsThisMonth";
 import { ReadAloudList } from "@/components/ReadAloudListDB";
 import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { FieldTripList } from "@/components/FieldTripList";
-import { BookLibrary } from "@/components/BookLibraryDB";
+import { BookLibraryVisual } from "@/components/BookLibraryVisual";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -221,7 +221,7 @@ export function HomeschoolLibraryView({ userId }: HomeschoolSubViewProps) {
         <h1 className="text-3xl font-bold">Book Library</h1>
         <p className="text-muted-foreground mt-1">Full collection</p>
       </div>
-      <BookLibrary userId={userId} />
+      <BookLibraryVisual userId={userId} />
     </div>
   );
 }

@@ -191,7 +191,15 @@ export default defineSchema({
     title: v.string(),
     author: v.optional(v.string()),
     category: v.optional(v.string()),
-    read: v.boolean(),
+    coverUrl: v.optional(v.string()), // Open Library cover URL
+    isbn: v.optional(v.string()),
+    reader: v.optional(v.string()), // "anthony" | "roma" | "both" | "family"
+    status: v.optional(v.union(
+      v.literal("want-to-read"),
+      v.literal("reading"),
+      v.literal("finished")
+    )),
+    read: v.boolean(), // legacy - keeping for backwards compat
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 

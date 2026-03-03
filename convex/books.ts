@@ -21,6 +21,14 @@ export const addBookToLibrary = mutation({
     title: v.string(),
     author: v.optional(v.string()),
     category: v.optional(v.string()),
+    coverUrl: v.optional(v.string()),
+    isbn: v.optional(v.string()),
+    reader: v.optional(v.string()),
+    status: v.optional(v.union(
+      v.literal("want-to-read"),
+      v.literal("reading"),
+      v.literal("finished")
+    )),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("bookLibrary", {
@@ -28,8 +36,39 @@ export const addBookToLibrary = mutation({
       title: args.title,
       author: args.author,
       category: args.category,
-      read: false,
+      coverUrl: args.coverUrl,
+      isbn: args.isbn,
+      reader: args.reader,
+      status: args.status || "want-to-read",
+      read: args.status === "finished",
       createdAt: Date.now(),
+    });
+  },
+});
+
+export const updateBookCover = mutation({
+  args: {
+    id: v.id("bookLibrary"),
+    coverUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { coverUrl: args.coverUrl });
+  },
+});
+
+export const updateBookStatus = mutation({
+  args: {
+    id: v.id("bookLibrary"),
+    status: v.union(
+      v.literal("want-to-read"),
+      v.literal("reading"),
+      v.literal("finished")
+    ),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { 
+      status: args.status,
+      read: args.status === "finished"
     });
   },
 });
