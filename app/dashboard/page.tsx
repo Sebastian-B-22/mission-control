@@ -48,6 +48,7 @@ import { AspireCampsView } from "@/components/views/AspireCampsView";
 import { AspirePDPView } from "@/components/views/AspirePDPView";
 import { Aspire7v7View } from "@/components/views/Aspire7v7View";
 import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
+import { PushNotificationBanner } from "@/components/PushNotificationBanner";
 import { HomeschoolDailyView } from "@/components/views/HomeschoolDailyView";
 import HomeschoolProgressView from "@/components/views/HomeschoolProgressView";
 import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesView";
@@ -290,6 +291,12 @@ export default function DashboardPage() {
         return (
           <div className="h-[calc(100vh-120px)]">
             <AgentHuddle initialChannel="ideas" />
+          </div>
+        );
+      case "agent-huddle-joy-support":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="joy-support" />
           </div>
         );
       
@@ -632,6 +639,9 @@ export default function DashboardPage() {
 
           {/* Render current view content */}
           {renderContent()}
+
+          {/* Push notification prompt */}
+          <PushNotificationBanner userId={convexUser._id} />
 
       {/* Edit Category Dialog */}
       <Dialog open={!!editingCategoryId} onOpenChange={() => setEditingCategoryId(null)}>

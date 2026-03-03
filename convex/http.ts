@@ -30,10 +30,18 @@ declare const process: { env: Record<string, string | undefined> };
 
 function validateApiKey(request: Request): boolean {
   const provided = request.headers.get("X-Agent-Key");
-  // Use Convex env var AGENT_API_KEY if set, otherwise fall back to default dev key
-  // Set this in: https://dashboard.convex.dev/d/harmless-salamander-44/settings/environment-variables
-  const expected = process.env.AGENT_API_KEY ?? "sk-sebastian-mc-2026";
-  return provided === expected;
+  // Validate against list of allowed agent API keys
+  // Set AGENT_API_KEY in Convex env vars for production, or use defaults for dev
+  const validKeys = [
+    process.env.AGENT_API_KEY,
+    "sk-sebastian-mc-2026",
+    "sk-scout-mc-2026",
+    "sk-maven-mc-2026",
+    "sk-james-mc-2026",
+    "sk-compass-mc-2026",
+  ].filter((k): k is string => !!k);
+  
+  return provided !== null && validKeys.includes(provided);
 }
 
 function corsHeaders() {
@@ -1068,6 +1076,7 @@ const HUDDLE_CHANNELS = {
   "hta-launch": { name: "HTA Launch", description: "Marketing, product, launch prep" },
   family: { name: "Family", description: "Kids' learning, projects" },
   ideas: { name: "Ideas", description: "Brainstorming, discussions" },
+  "joy-support": { name: "Joy Support", description: "Joy asking Sebastian for help with Carolyn" },
 };
 
 // GET /huddle - Get recent messages
@@ -1281,6 +1290,21 @@ http.route({
     path, method: "OPTIONS",
     handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
   });
+});
+
+// Debug endpoint for family meeting
+http.route({
+  path: "/debug/family-meeting",
+  method: "GET",
+  handler: httpAction(async (ctx) => {
+    const weekOf = "2026-03-01";
+    
+    const result = await ctx.runQuery(internal.familyMeeting.debugGetMeeting, { weekOf });
+    
+    return new Response(JSON.stringify(result, null, 2), {
+      headers: { "Content-Type": "application/json" }
+    });
+  }),
 });
 
 export default http;

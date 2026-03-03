@@ -187,6 +187,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "HTA Launch", view: "agent-huddle-hta-launch" },
         { name: "Family", view: "agent-huddle-family" },
         { name: "Ideas", view: "agent-huddle-ideas" },
+        { name: "Joy Support", view: "agent-huddle-joy-support" },
       ]
     },
   ];

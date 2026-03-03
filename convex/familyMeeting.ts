@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 
 const familyMeetingStatus = v.union(
   v.literal("queued"),
@@ -650,6 +650,27 @@ export const migrateMoviesToRealUser = mutation({
       message: `Migrated ${migrated} movies to ${realUser.name} (${realUser.email})`,
       migrated,
       toUser: realUser.name
+    };
+  },
+});
+
+
+// Debug function - list ALL family meetings
+export const debugGetMeeting = internalQuery({
+  args: { weekOf: v.string() },
+  handler: async (ctx, args) => {
+    // Get ALL family meetings
+    const allMeetings = await ctx.db.query("familyMeetings").collect();
+    
+    return {
+      totalMeetings: allMeetings.length,
+      allMeetings: allMeetings.map(m => ({ 
+        id: m._id,
+        weekOf: m.weekOf, 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        userId: m.userId as any as string, 
+        acks: m.acknowledgements?.length 
+      })),
     };
   },
 });

@@ -23,10 +23,11 @@ export const CHANNEL_ROUTING: Record<string, string[]> = {
   "family": ["compass", "james", "sebastian"],
   "main": ["scout", "maven", "compass", "james", "sebastian"],
   "ideas": ["scout", "maven", "compass", "james", "sebastian"],
+  "joy-support": ["sebastian"],  // Joy asks, Sebastian answers
 };
 
 // All known agents
-const ALL_AGENTS = ["sebastian", "scout", "maven", "compass", "james", "corinne"];
+const ALL_AGENTS = ["sebastian", "scout", "maven", "compass", "james", "corinne", "joy"];
 
 // ─── Helper: Parse @mentions ────────────────────────────────────────────────
 

@@ -794,4 +794,17 @@ export default defineSchema({
     .index("by_platform", ["platform"])
     .index("by_student_platform", ["studentName", "platform"])
     .index("by_scraped_at", ["scrapedAt"]),
+
+  // ─── Push Notification Subscriptions ────────────────────────────────────
+  // Web push subscriptions for real-time notifications
+  pushSubscriptions: defineTable({
+    userId: v.id("users"),
+    endpoint: v.string(),
+    p256dh: v.string(), // Public key
+    auth: v.string(), // Auth secret
+    userAgent: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_endpoint", ["endpoint"]),
 });

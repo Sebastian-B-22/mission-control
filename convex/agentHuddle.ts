@@ -10,6 +10,7 @@ export const CHANNELS = {
   "hta-launch": { name: "HTA Launch", description: "Marketing, product, launch prep", icon: "🚀" },
   family: { name: "Family", description: "Kids' learning, projects, activities", icon: "👨‍👩‍👧‍👦" },
   ideas: { name: "Ideas", description: "Brainstorming, proposals, discussions", icon: "💡" },
+  "joy-support": { name: "Joy Support", description: "Joy asking Sebastian for help", icon: "🌸" },
 };
 
 // ─── Queries ────────────────────────────────────────────────────────────────

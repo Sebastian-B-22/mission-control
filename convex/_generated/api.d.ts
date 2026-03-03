@@ -32,6 +32,8 @@ import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
 import type * as mavenFeedback from "../mavenFeedback.js";
 import type * as projectTasks from "../projectTasks.js";
+import type * as push from "../push.js";
+import type * as pushActions from "../pushActions.js";
 import type * as registrations from "../registrations.js";
 import type * as rpm from "../rpm.js";
 import type * as scheduleReset from "../scheduleReset.js";
@@ -73,6 +75,8 @@ declare const fullApi: ApiFromModules<{
   jotformSync: typeof jotformSync;
   mavenFeedback: typeof mavenFeedback;
   projectTasks: typeof projectTasks;
+  push: typeof push;
+  pushActions: typeof pushActions;
   registrations: typeof registrations;
   rpm: typeof rpm;
   scheduleReset: typeof scheduleReset;
