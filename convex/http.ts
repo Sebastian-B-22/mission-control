@@ -1307,4 +1307,58 @@ http.route({
   }),
 });
 
+// ─── Homeschool Progress ─────────────────────────────────────────────────────
+
+// POST /homeschool/progress - Save progress data from scrapers
+http.route({
+  path: "/homeschool/progress",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) {
+      return errorResponse("Unauthorized", 401);
+    }
+    
+    const body = await request.json();
+    
+    if (!body.studentName || !body.platform) {
+      return errorResponse("Missing required fields: studentName, platform");
+    }
+    
+    await ctx.runMutation(api.homeschoolProgress.saveProgress, {
+      studentName: body.studentName,
+      platform: body.platform,
+      lastActivity: body.lastActivity || new Date().toISOString(),
+      todayCompleted: body.todayCompleted ?? false,
+      weeklyMinutes: body.weeklyMinutes ?? 0,
+      streak: body.streak,
+      level: body.level,
+      details: body.details || {},
+      scrapedAt: new Date().toISOString(),
+    });
+    
+    return jsonResponse({ success: true });
+  }),
+});
+
+// GET /homeschool/progress - Get all progress data
+http.route({
+  path: "/homeschool/progress",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) {
+      return errorResponse("Unauthorized", 401);
+    }
+    
+    const progress = await ctx.runQuery(api.homeschoolProgress.getAllProgress, {});
+    return jsonResponse(progress);
+  }),
+});
+
+// OPTIONS for CORS
+http.route({
+  path: "/homeschool/progress",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
 export default http;
