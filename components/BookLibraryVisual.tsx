@@ -16,7 +16,9 @@ import {
   Loader2,
   BookMarked,
   BookCheck,
-  Library
+  Library,
+  Filter,
+  X
 } from "lucide-react";
 
 interface BookLibraryVisualProps {
@@ -98,13 +100,53 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const [newAuthor, setNewAuthor] = useState("");
   const [newReader, setNewReader] = useState<string>("both");
   const [isSearching, setIsSearching] = useState(false);
-  const [activeTab, setActiveTab] = useState<"reading" | "finished" | "want-to-read">("reading");
+  const [activeTab, setActiveTab] = useState<"reading" | "finished" | "want-to-read">("want-to-read");
+  
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedAuthor, setSelectedAuthor] = useState<string>("all");
+  
+  // Get unique categories and authors for filters
+  const categories = books ? [...new Set(books.map(b => b.category).filter(Boolean))] : [];
+  const authors = books ? [...new Set(books.map(b => b.author).filter(Boolean))] : [];
 
-  // Group books by status
+  // Filter books by search and filters
+  const filteredBooks = books?.filter(book => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesTitle = book.title.toLowerCase().includes(query);
+      const matchesAuthor = book.author?.toLowerCase().includes(query);
+      if (!matchesTitle && !matchesAuthor) return false;
+    }
+    
+    // Category filter
+    if (selectedCategory !== "all" && book.category !== selectedCategory) {
+      return false;
+    }
+    
+    // Author filter
+    if (selectedAuthor !== "all" && book.author !== selectedAuthor) {
+      return false;
+    }
+    
+    return true;
+  }) || [];
+  
+  // Group filtered books by status
   const booksByStatus = {
-    "reading": books?.filter(b => b.status === "reading") || [],
-    "finished": books?.filter(b => b.status === "finished" || b.read) || [],
-    "want-to-read": books?.filter(b => b.status === "want-to-read" || (!b.status && !b.read)) || [],
+    "reading": filteredBooks.filter(b => b.status === "reading"),
+    "finished": filteredBooks.filter(b => b.status === "finished" || b.read),
+    "want-to-read": filteredBooks.filter(b => b.status === "want-to-read" || (!b.status && !b.read)),
+  };
+  
+  const hasActiveFilters = searchQuery || selectedCategory !== "all" || selectedAuthor !== "all";
+  
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("all");
+    setSelectedAuthor("all");
   };
 
   const handleAdd = async () => {
@@ -258,6 +300,73 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
             </div>
           </div>
         )}
+
+        {/* Search and Filters */}
+        <div className="space-y-3">
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by title or author..."
+              className="pl-9 bg-background"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+              </button>
+            )}
+          </div>
+          
+          {/* Filter dropdowns */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="text-sm border rounded px-2 py-1 bg-background"
+            >
+              <option value="all">All Categories</option>
+              {categories.sort().map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedAuthor}
+              onChange={(e) => setSelectedAuthor(e.target.value)}
+              className="text-sm border rounded px-2 py-1 bg-background max-w-[200px]"
+            >
+              <option value="all">All Authors</option>
+              {authors.sort().map(author => (
+                <option key={author} value={author}>{author}</option>
+              ))}
+            </select>
+            
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-7 text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear filters
+              </Button>
+            )}
+            
+            {hasActiveFilters && (
+              <span className="text-sm text-muted-foreground ml-auto">
+                {filteredBooks.length} of {books?.length} books
+              </span>
+            )}
+          </div>
+        </div>
 
         {/* Tabs */}
         <div className="flex gap-1 border-b">
