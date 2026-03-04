@@ -102,6 +102,7 @@ export default defineSchema({
     userId: v.id("users"),
     name: v.string(),
     location: v.string(),
+    imageUrl: v.optional(v.string()), // Place image from Google/Unsplash
     date: v.optional(v.string()), // YYYY-MM-DD format
     notes: v.optional(v.string()),
     order: v.number(),
@@ -240,6 +241,7 @@ export default defineSchema({
     userId: v.id("users"),
     title: v.string(),
     author: v.optional(v.string()),
+    coverUrl: v.optional(v.string()), // Open Library cover URL
     completed: v.boolean(),
     status: v.optional(v.union(v.literal("reading"), v.literal("up-next"))), // reading = currently reading, up-next = books on deck
     createdAt: v.number(),

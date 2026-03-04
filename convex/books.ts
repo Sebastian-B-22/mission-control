@@ -127,6 +127,7 @@ export const addReadAloudBook = mutation({
     userId: v.id("users"),
     title: v.string(),
     author: v.optional(v.string()),
+    coverUrl: v.optional(v.string()),
     status: v.optional(v.union(v.literal("reading"), v.literal("up-next"))),
   },
   handler: async (ctx, args) => {
@@ -134,10 +135,21 @@ export const addReadAloudBook = mutation({
       userId: args.userId,
       title: args.title,
       author: args.author,
+      coverUrl: args.coverUrl,
       completed: false,
       status: args.status || "reading",
       createdAt: Date.now(),
     });
+  },
+});
+
+export const updateReadAloudCover = mutation({
+  args: {
+    id: v.id("readAloudBooks"),
+    coverUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { coverUrl: args.coverUrl });
   },
 });
 
