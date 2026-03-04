@@ -90,6 +90,7 @@ function BookCover({
 
 export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const books = useQuery(api.books.getBookLibrary, { userId });
+  const readAloudBooks = useQuery(api.books.getReadAloudBooks, { userId }); // Currently reading from read alouds
   const addBook = useMutation(api.books.addBookToLibrary);
   const updateStatus = useMutation(api.books.updateBookStatus);
   const updateCover = useMutation(api.books.updateBookCover);
@@ -135,8 +136,19 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   }) || [];
   
   // Group filtered books by status
+  // "Currently Reading" now pulls from readAloudBooks (the Read Aloud tab)
+  const currentlyReading = readAloudBooks?.map(b => ({
+    ...b,
+    _id: b._id as unknown as Id<"bookLibrary">, // Type cast for compatibility
+    status: "reading" as const,
+    read: false,
+    category: undefined,
+    isbn: undefined,
+    reader: "family",
+  })) || [];
+  
   const booksByStatus = {
-    "reading": filteredBooks.filter(b => b.status === "reading"),
+    "reading": currentlyReading,
     "finished": filteredBooks.filter(b => b.status === "finished" || b.read),
     "want-to-read": filteredBooks.filter(b => b.status === "want-to-read" || (!b.status && !b.read)),
   };
@@ -399,16 +411,25 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
               {/* Cover */}
               <div 
                 className="relative cursor-pointer"
-                onClick={() => !book.coverUrl && handleFetchMissingCover(book)}
+                onClick={() => activeTab !== "reading" && !book.coverUrl && handleFetchMissingCover(book)}
               >
                 <BookCover 
                   coverUrl={book.coverUrl} 
                   title={book.title}
                   size="medium"
                 />
-                {/* Hover overlay with actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-col items-center justify-center gap-1 p-1">
-                  {activeTab !== "reading" && (
+                {/* Hover overlay with actions - different for Currently Reading (read alouds) */}
+                {activeTab === "reading" ? (
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-col items-center justify-center gap-1 p-2">
+                    <Badge className="bg-amber-500 text-white text-xs">
+                      📚 Read Aloud
+                    </Badge>
+                    <p className="text-white text-xs text-center mt-1">
+                      Manage in Read Alouds tab
+                    </p>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-col items-center justify-center gap-1 p-1">
                     <Button
                       size="sm"
                       variant="secondary"
@@ -420,33 +441,33 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
                     >
                       Start Reading
                     </Button>
-                  )}
-                  {activeTab !== "finished" && (
+                    {activeTab !== "finished" && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-6 text-xs w-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(book._id, "finished");
+                        }}
+                      >
+                        Mark Finished
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      variant="secondary"
+                      variant="destructive"
                       className="h-6 text-xs w-full"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleStatusChange(book._id, "finished");
+                        handleDelete(book._id);
                       }}
                     >
-                      Mark Finished
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Remove
                     </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    className="h-6 text-xs w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(book._id);
-                    }}
-                  >
-                    <Trash2 className="h-3 w-3 mr-1" />
-                    Remove
-                  </Button>
-                </div>
+                  </div>
+                )}
               </div>
               
               {/* Title & Author */}
