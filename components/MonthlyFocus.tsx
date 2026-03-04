@@ -18,8 +18,8 @@ const topicColors: Record<string, string> = {
 };
 
 const focusAreas = [
-  { emoji: "🏃", text: "Sprinting Program (PepSpeed) - PRIORITY START", topics: ["P.E."] },
-  { emoji: "📊", text: "CGM Experiment (starting now!)", topics: ["Health", "Nutrition"] },
+  { emoji: "🏃", text: "Sprinting Program (PepSpeed)", topics: ["P.E."] },
+  { emoji: "📊", text: "CGM Experiment", topics: ["Health", "Nutrition"] },
   { emoji: "🫀", text: "Health & Body Systems + Einstein Human Body Kit", topics: ["Science"] },
   { emoji: "🍎", text: "Nutrition Science + Smoothie experiments for Anthony", topics: ["Nutrition"] },
   { emoji: "📚", text: "Finish Tuttle Twins Vol 2 + Liberty Kids series", topics: ["History"] },
