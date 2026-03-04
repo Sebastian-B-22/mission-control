@@ -101,7 +101,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const [newAuthor, setNewAuthor] = useState("");
   const [newReader, setNewReader] = useState<string>("both");
   const [isSearching, setIsSearching] = useState(false);
-  const [activeTab, setActiveTab] = useState<"reading" | "finished" | "want-to-read">("want-to-read");
+  const [activeTab, setActiveTab] = useState<"reading" | "finished-roma" | "finished-anthony" | "finished-both" | "want-to-read">("want-to-read");
   
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,9 +147,12 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
     reader: "family",
   })) || [];
   
+  const finishedBooks = filteredBooks.filter(b => b.status === "finished" || b.read);
   const booksByStatus = {
     "reading": currentlyReading,
-    "finished": filteredBooks.filter(b => b.status === "finished" || b.read),
+    "finished-roma": finishedBooks.filter(b => b.reader === "roma"),
+    "finished-anthony": finishedBooks.filter(b => b.reader === "anthony"),
+    "finished-both": finishedBooks.filter(b => b.reader === "both" || b.reader === "family" || !b.reader),
     "want-to-read": filteredBooks.filter(b => b.status === "want-to-read" || (!b.status && !b.read)),
   };
   
@@ -225,7 +228,9 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const tabs = [
     { id: "reading" as const, label: "Currently Reading", icon: BookMarked, count: booksByStatus.reading.length },
     { id: "want-to-read" as const, label: "Want to Read", icon: BookOpen, count: booksByStatus["want-to-read"].length },
-    { id: "finished" as const, label: "Finished", icon: BookCheck, count: booksByStatus.finished.length },
+    { id: "finished-roma" as const, label: "Finished (Roma)", icon: BookCheck, count: booksByStatus["finished-roma"].length },
+    { id: "finished-anthony" as const, label: "Finished (Anthony)", icon: BookCheck, count: booksByStatus["finished-anthony"].length },
+    { id: "finished-both" as const, label: "Finished (Both)", icon: BookCheck, count: booksByStatus["finished-both"].length },
   ];
 
   return (
@@ -441,7 +446,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
                     >
                       Start Reading
                     </Button>
-                    {activeTab !== "finished" && (
+                    {!activeTab.startsWith("finished") && (
                       <Button
                         size="sm"
                         variant="secondary"
