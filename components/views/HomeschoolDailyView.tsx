@@ -555,7 +555,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       
       {/* Crazy Day Rescue Plan */}
       {showCrazyDayRescue && rescuePlan && (
-        <Card className="bg-gradient-to-r from-red-950/50 to-orange-950/50 border-red-800">
+        <Card className="bg-gradient-to-r from-zinc-800/80 to-zinc-900/80 border-red-800">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-bold text-red-400">
@@ -627,7 +627,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       )}
       
       {/* Date display - compact */}
-      <div className="text-center py-2 bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-lg border border-amber-800/50">
+      <div className="text-center py-2 bg-gradient-to-r from-zinc-800/50 to-zinc-800/50 rounded-lg border border-zinc-700">
         <p className="text-lg font-semibold text-amber-500">{dateStr}</p>
         {isToday && <p className="text-xs text-amber-600">✨ Today</p>}
       </div>

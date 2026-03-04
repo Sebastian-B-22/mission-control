@@ -11,6 +11,18 @@ interface PersonalOverviewProps {
   onViewCategory: (id: Id<"rpmCategories">) => void;
 }
 
+// Color palette for categories
+const categoryColors = [
+  "border-l-4 border-l-pink-500",
+  "border-l-4 border-l-blue-500",
+  "border-l-4 border-l-green-500",
+  "border-l-4 border-l-amber-500",
+  "border-l-4 border-l-purple-500",
+  "border-l-4 border-l-cyan-500",
+  "border-l-4 border-l-rose-500",
+  "border-l-4 border-l-indigo-500",
+];
+
 export function PersonalOverview({ categories, onEditCategory, onViewCategory }: PersonalOverviewProps) {
   return (
     <div className="space-y-6">
@@ -20,10 +32,10 @@ export function PersonalOverview({ categories, onEditCategory, onViewCategory }:
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <Card 
             key={category._id} 
-            className="hover:shadow-lg transition-shadow cursor-pointer group"
+            className={`hover:shadow-lg transition-shadow cursor-pointer group ${categoryColors[index % categoryColors.length]}`}
             onClick={() => onViewCategory(category._id)}
           >
             <CardHeader>

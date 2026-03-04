@@ -60,7 +60,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
         </CardHeader>
         <CardContent>
           {category.purpose ? (
-            <p className="text-gray-700 leading-relaxed">{category.purpose}</p>
+            <p className="text-foreground leading-relaxed">{category.purpose}</p>
           ) : (
             <p className="text-muted-foreground italic">No purpose defined yet</p>
           )}
@@ -80,7 +80,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
                 {category.yearlyGoals.map((goal, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-amber-500 mt-1">●</span>
-                    <span className="text-gray-700">{goal}</span>
+                    <span className="text-foreground">{goal}</span>
                   </li>
                 ))}
               </ul>
@@ -101,7 +101,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
                 {category.monthlyFocus.map((focus, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-red-500 mt-1">●</span>
-                    <span className="text-gray-700">{focus}</span>
+                    <span className="text-foreground">{focus}</span>
                   </li>
                 ))}
               </ul>
@@ -130,7 +130,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
                   <li key={`${item.source}-${item.completedAt}-${index}`} className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-600" />
                     <div>
-                      <p className="text-sm text-gray-700">{item.text}</p>
+                      <p className="text-sm text-foreground">{item.text}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(item.completedAt).toLocaleString("en-US", {
                           timeZone: "America/Los_Angeles",
@@ -196,9 +196,9 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
               {brainDumpTasks.map((task, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg group hover:bg-muted transition-colors"
                 >
-                  <span className="flex-1 text-sm text-gray-700">{task}</span>
+                  <span className="flex-1 text-sm text-foreground">{task}</span>
                   <Button
                     size="sm"
                     variant="ghost"
