@@ -24,6 +24,7 @@ import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
 import type * as familyMeeting from "../familyMeeting.js";
 import type * as fieldTrips from "../fieldTrips.js";
+import type * as games from "../games.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
 import type * as health from "../health.js";
@@ -69,6 +70,7 @@ declare const fullApi: ApiFromModules<{
   families: typeof families;
   familyMeeting: typeof familyMeeting;
   fieldTrips: typeof fieldTrips;
+  games: typeof games;
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
   health: typeof health;

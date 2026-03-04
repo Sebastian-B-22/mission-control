@@ -247,6 +247,27 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 
+  gameLibrary: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    publisher: v.optional(v.string()),
+    category: v.optional(v.string()), // "board-game" | "card-game" | "video-game" | "outdoor" | "puzzle" | "educational"
+    imageUrl: v.optional(v.string()),
+    minPlayers: v.optional(v.number()),
+    maxPlayers: v.optional(v.number()),
+    ageRange: v.optional(v.string()),
+    playTime: v.optional(v.string()), // "15 min" | "30 min" | "1 hour" | "2+ hours"
+    status: v.optional(v.union(
+      v.literal("own"),
+      v.literal("want"),
+      v.literal("borrowed")
+    )),
+    favorite: v.optional(v.boolean()),
+    lastPlayed: v.optional(v.string()), // YYYY-MM-DD
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
   sebastianTasks: defineTable({
     userId: v.id("users"),
     title: v.string(),

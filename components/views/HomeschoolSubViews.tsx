@@ -10,6 +10,7 @@ import { ReadAloudList } from "@/components/ReadAloudListDB";
 import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { FieldTripList } from "@/components/FieldTripList";
 import { BookLibraryVisual } from "@/components/BookLibraryVisual";
+import { GameLibraryVisual } from "@/components/GameLibraryVisual";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -235,6 +236,18 @@ export function HomeschoolLibraryView({ userId }: HomeschoolSubViewProps) {
         <p className="text-muted-foreground mt-1">Full collection</p>
       </div>
       <BookLibraryVisual userId={userId} />
+    </div>
+  );
+}
+
+export function HomeschoolGamesView({ userId }: HomeschoolSubViewProps) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Game Library</h1>
+        <p className="text-muted-foreground mt-1">Family game night collection</p>
+      </div>
+      <GameLibraryVisual userId={userId} />
     </div>
   );
 }

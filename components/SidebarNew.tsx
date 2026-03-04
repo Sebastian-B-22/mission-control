@@ -88,6 +88,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Projects", view: "homeschool-projects" },
         { name: "Read Aloud List", view: "homeschool-readaloud" },
         { name: "Book Library", view: "homeschool-library" },
+        { name: "Game Library", view: "homeschool-games" },
         { name: "Resource Library", view: "homeschool-resources" },
         { name: "Field Trips", view: "homeschool-fieldtrips" },
         { name: "Travel", view: "homeschool-trips" },

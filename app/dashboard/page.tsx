@@ -59,6 +59,7 @@ import {
   HomeschoolProjectsView,
   HomeschoolReadAloudView,
   HomeschoolLibraryView,
+  HomeschoolGamesView,
   HomeschoolFieldTripsView,
   HomeschoolTripsView,
 } from "@/components/views/HomeschoolSubViews";
@@ -603,6 +604,8 @@ export default function DashboardPage() {
         return <HomeschoolReadAloudView userId={convexUser._id} />;
       case "homeschool-library":
         return <HomeschoolLibraryView userId={convexUser._id} />;
+      case "homeschool-games":
+        return <HomeschoolGamesView userId={convexUser._id} />;
       case "homeschool-fieldtrips":
         return <HomeschoolFieldTripsView userId={convexUser._id} />;
       case "homeschool-trips":
