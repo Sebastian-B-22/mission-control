@@ -838,6 +838,18 @@ export default defineSchema({
     .index("by_student_platform", ["studentName", "platform"])
     .index("by_scraped_at", ["scrapedAt"]),
 
+  // ─── Synced Cron Jobs ───────────────────────────────────────────────────
+  cronJobs: defineTable({
+    jobId: v.string(),
+    name: v.string(),
+    schedule: v.string(),
+    nextRun: v.string(), // ISO or relative
+    lastRun: v.string(), // ISO or relative
+    status: v.string(), // "active" | "disabled"
+    agentId: v.optional(v.string()),
+    syncedAt: v.number(),
+  }).index("by_jobId", ["jobId"]),
+
   // ─── Push Notification Subscriptions ────────────────────────────────────
   // Web push subscriptions for real-time notifications
   pushSubscriptions: defineTable({

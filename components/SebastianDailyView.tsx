@@ -14,6 +14,7 @@ interface SebastianDailyViewProps {
 
 export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
   const tasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
+  const cronJobs = useQuery(api.cronJobs.getCronJobs) || [];
   
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -31,19 +32,55 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
     return isToday;
   });
 
-  // Daily recurring tasks - matches actual cron jobs
-  const dailyTasks = [
-    { time: "7:30 AM", task: "Maven Content Digest", status: "scheduled", emoji: "📣" },
-    { time: "8:00 AM", task: "Morning Brief", status: "scheduled", emoji: "☀️" },
-    { time: "8:15 AM", task: "Email Triage", status: "scheduled", emoji: "📧" },
-    { time: "8:30 AM", task: "Health Data Sync", status: "scheduled", emoji: "❤️" },
-    { time: "9:00 AM", task: "Maven Research Scan", status: "scheduled", emoji: "🔍" },
-    { time: "7:00 PM", task: "Kids Screens Off", status: "scheduled", emoji: "📵" },
-    { time: "9:00 PM", task: "Evening Check-in", status: "scheduled", emoji: "🌙" },
-    { time: "9:30 PM", task: "Quo Monitor", status: "scheduled", emoji: "📱" },
-    { time: "11:00 PM", task: "Memory Backup", status: "scheduled", emoji: "💾" },
-    { time: "2:00 AM", task: "Agent Night Shift", status: "scheduled", emoji: "🦉" },
-  ];
+  // Process Cron Jobs for Daily View
+  // Filter for active jobs that run at a specific time (daily)
+  const dailyTasks = cronJobs
+    .filter(job => job.status === "active")
+    .map(job => {
+      // Try to extract time from cron schedule
+      // Format: "cron MIN HOUR * * * ..."
+      const cronMatch = job.schedule.match(/cron (\d+) (\d+) .*/);
+      let timeStr = "";
+      let sortTime = 0;
+      
+      if (cronMatch) {
+        const min = parseInt(cronMatch[1]);
+        const hour = parseInt(cronMatch[2]);
+        const date = new Date();
+        date.setHours(hour, min, 0, 0);
+        timeStr = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+        sortTime = hour * 60 + min;
+      } else if (job.schedule.startsWith("every")) {
+        timeStr = "Recurring";
+        sortTime = 9999; // Put at end
+      } else {
+        return null; // Skip non-daily/weird schedules for this view
+      }
+
+      // Assign emojis based on keywords
+      let emoji = "🤖";
+      const name = job.name.toLowerCase();
+      if (name.includes("morning")) emoji = "☀️";
+      else if (name.includes("evening") || name.includes("night")) emoji = "🌙";
+      else if (name.includes("email")) emoji = "📧";
+      else if (name.includes("health")) emoji = "❤️";
+      else if (name.includes("quo")) emoji = "📱";
+      else if (name.includes("screen")) emoji = "📵";
+      else if (name.includes("memory")) emoji = "💾";
+      else if (name.includes("maven")) emoji = "📣";
+      else if (name.includes("scout")) emoji = "🔍";
+      
+      return {
+        id: job.jobId,
+        time: timeStr,
+        task: job.name,
+        status: job.status === "active" ? "scheduled" : "paused",
+        emoji,
+        sortTime
+      };
+    })
+    .filter((task): task is NonNullable<typeof task> => task !== null)
+    .sort((a, b) => a.sortTime - b.sortTime);
 
   const getCategoryEmoji = (category: string) => {
     const emojis: Record<string, string> = {
@@ -173,43 +210,38 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
       {/* Daily Recurring Tasks */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Daily Recurring Tasks
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Daily Recurring Tasks
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs">
+              Live from Cron
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {dailyTasks.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 rounded-lg border bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{item.emoji}</span>
-                  <div>
-                    <p className="font-medium text-zinc-900 dark:text-zinc-100">{item.task}</p>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.time}</p>
+            {dailyTasks.length > 0 ? (
+              dailyTasks.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 rounded-lg border bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{item.emoji}</span>
+                    <div>
+                      <p className="font-medium text-zinc-900 dark:text-zinc-100">{item.task}</p>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.time}</p>
+                    </div>
                   </div>
+                  <Badge variant="outline" className="text-xs">
+                    {item.status}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className="text-xs">
-                  {item.status}
-                </Badge>
-              </div>
-            ))}
-            {new Date().getDay() === 0 && (
-              <div className="flex items-center justify-between p-3 rounded-lg border bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">📊</span>
-                  <div>
-                    <p className="font-medium text-zinc-900 dark:text-zinc-100">Weekly RPM Review</p>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">9:15 PM (Sunday only)</p>
-                  </div>
-                </div>
-                <Badge variant="outline" className="text-xs">
-                  scheduled
-                </Badge>
-              </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Loading active tasks...</p>
             )}
           </div>
         </CardContent>

@@ -26,10 +26,15 @@ export const updateFieldTrip = mutation({
     date: v.optional(v.string()),
     notes: v.optional(v.string()),
     order: v.optional(v.number()),
+    imageUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
+    // Filter out undefined values to avoid overwriting with undefined
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(id, cleanUpdates);
   },
 });
 

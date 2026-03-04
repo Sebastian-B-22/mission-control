@@ -17,6 +17,7 @@ import type * as checkIns from "../checkIns.js";
 import type * as contacts from "../contacts.js";
 import type * as contentPipeline from "../contentPipeline.js";
 import type * as contentVerification from "../contentVerification.js";
+import type * as cronJobs from "../cronJobs.js";
 import type * as daily from "../daily.js";
 import type * as dailyRecap from "../dailyRecap.js";
 import type * as engagementHabits from "../engagementHabits.js";
@@ -61,6 +62,7 @@ declare const fullApi: ApiFromModules<{
   contacts: typeof contacts;
   contentPipeline: typeof contentPipeline;
   contentVerification: typeof contentVerification;
+  cronJobs: typeof cronJobs;
   daily: typeof daily;
   dailyRecap: typeof dailyRecap;
   engagementHabits: typeof engagementHabits;
