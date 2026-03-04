@@ -39,8 +39,9 @@ function FieldTripCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   
-  // Generate image URL if not set
-  const imageUrl = trip.imageUrl || `https://source.unsplash.com/400x200/?${encodeURIComponent(trip.location + " landmark")}`;
+  // Use Picsum for reliable placeholder images with location-based seed
+  const seed = trip.name.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 1000;
+  const imageUrl = trip.imageUrl || `https://picsum.photos/seed/${seed}/400/200`;
   
   return (
     <div className="group relative overflow-hidden rounded-lg border bg-card hover:shadow-md transition-shadow">

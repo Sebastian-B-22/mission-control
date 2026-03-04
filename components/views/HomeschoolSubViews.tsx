@@ -52,34 +52,47 @@ function UpNextBooks({ userId }: { userId: Id<"users"> }) {
       </CardHeader>
       <CardContent className="space-y-4">
         {books && books.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {books.map((book) => (
               <div
                 key={book._id}
-                className="flex items-center gap-2 p-2 rounded hover:bg-accent/50 group"
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 group"
               >
-                <div className="flex-1">
-                  <div className="text-sm font-medium">{book.title}</div>
+                {/* Book Cover */}
+                {book.coverUrl ? (
+                  <img
+                    src={book.coverUrl}
+                    alt={book.title}
+                    className="w-10 h-14 object-cover rounded shadow-sm flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-14 bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900 dark:to-orange-800 rounded flex items-center justify-center flex-shrink-0">
+                    <BookMarked className="w-4 h-4 text-orange-500 opacity-50" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">{book.title}</div>
                   {book.author && (
-                    <div className="text-xs text-muted-foreground">{book.author}</div>
+                    <div className="text-xs text-muted-foreground truncate">{book.author}</div>
                   )}
                 </div>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={() => moveToReading({ id: book._id })}
-                  className="opacity-0 group-hover:opacity-100 text-green-600"
+                  className="opacity-0 group-hover:opacity-100 h-7"
                   title="Move to Currently Reading"
                 >
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-3 w-3 mr-1" />
+                  Start
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => deleteBook({ id: book._id })}
-                  className="opacity-0 group-hover:opacity-100 text-destructive"
+                  className="opacity-0 group-hover:opacity-100 text-destructive h-7 w-7 p-0"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
             ))}

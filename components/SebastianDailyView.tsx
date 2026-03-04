@@ -33,13 +33,16 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
 
   // Daily recurring tasks - matches actual cron jobs
   const dailyTasks = [
+    { time: "7:30 AM", task: "Maven Content Digest", status: "scheduled", emoji: "📣" },
     { time: "8:00 AM", task: "Morning Brief", status: "scheduled", emoji: "☀️" },
     { time: "8:15 AM", task: "Email Triage", status: "scheduled", emoji: "📧" },
     { time: "8:30 AM", task: "Health Data Sync", status: "scheduled", emoji: "❤️" },
+    { time: "9:00 AM", task: "Maven Research Scan", status: "scheduled", emoji: "🔍" },
+    { time: "7:00 PM", task: "Kids Screens Off", status: "scheduled", emoji: "📵" },
     { time: "9:00 PM", task: "Evening Check-in", status: "scheduled", emoji: "🌙" },
     { time: "9:30 PM", task: "Quo Monitor", status: "scheduled", emoji: "📱" },
-    { time: "10:30 PM", task: "Screens-off Reminder", status: "scheduled", emoji: "📵" },
     { time: "11:00 PM", task: "Memory Backup", status: "scheduled", emoji: "💾" },
+    { time: "2:00 AM", task: "Agent Night Shift", status: "scheduled", emoji: "🦉" },
   ];
 
   const getCategoryEmoji = (category: string) => {

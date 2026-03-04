@@ -256,53 +256,7 @@ export function ReadAloudList({ userId }: ReadAloudListProps) {
           </div>
         </div>
 
-        {/* Up Next */}
-        {upNextBooks && upNextBooks.length > 0 && (
-          <div className="pt-4 border-t">
-            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-              📚 Up Next
-              <Badge variant="outline">{upNextBooks.length}</Badge>
-            </h3>
-            <div className="space-y-2">
-              {upNextBooks.map((book) => (
-                <div
-                  key={book._id}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 group"
-                >
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => !book.coverUrl && handleFetchCover(book)}
-                  >
-                    <BookCover coverUrl={book.coverUrl} title={book.title} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{book.title}</p>
-                    {book.author && (
-                      <p className="text-xs text-muted-foreground truncate">{book.author}</p>
-                    )}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => moveToReading({ id: book._id })}
-                    className="opacity-0 group-hover:opacity-100"
-                  >
-                    <ArrowRight className="h-4 w-4 mr-1" />
-                    Start
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(book._id)}
-                    className="opacity-0 group-hover:opacity-100 h-8 w-8 p-0"
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Up Next section removed - shown in separate UpNextBooks component */}
       </CardContent>
     </Card>
   );
