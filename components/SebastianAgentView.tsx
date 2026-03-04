@@ -151,7 +151,7 @@ export function SebastianAgentView() {
             {recentHandoffs.map((handoff, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 rounded-lg border bg-gray-50"
+                className="flex items-center justify-between p-3 rounded-lg border bg-zinc-100 dark:bg-zinc-800"
               >
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ export function SebastianAgentView() {
       </Card>
 
       {/* Future Agents */}
-      <Card className="bg-gray-50">
+      <Card className="bg-zinc-50 dark:bg-zinc-800/50">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-muted-foreground" />
@@ -189,7 +189,7 @@ export function SebastianAgentView() {
               { name: "Builder", emoji: "🏗️", role: "HTA Product Manager", eta: "Summer-Fall 2026" },
               { name: "Champion", emoji: "🏆", role: "Raving Fans Builder", eta: "Winter 2026-27" },
             ].map((agent) => (
-              <div key={agent.name} className="p-3 rounded-lg border bg-white opacity-60">
+              <div key={agent.name} className="p-3 rounded-lg border bg-white dark:bg-zinc-800 opacity-70">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xl">{agent.emoji}</span>
                   <p className="font-medium text-sm">{agent.name}</p>

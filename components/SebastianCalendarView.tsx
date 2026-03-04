@@ -14,11 +14,12 @@ interface SebastianCalendarViewProps {
 export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
   const tasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
 
-  // Daily recurring tasks
+  // Daily recurring tasks - matches actual cron jobs
   const dailyRecurring = [
-    { time: "08:00", task: "Morning Brief", emoji: "☀️", description: "Daily motivation + schedule + priorities" },
-    { time: "21:00", task: "Evening Check-in", emoji: "🌙", description: "Reflection + wins + prep for tomorrow" },
-    { time: "21:30", task: "Quo Monitor", emoji: "📱", description: "Daily scan for parent action items" },
+    { time: "08:00", task: "Morning Brief", emoji: "☀️" },
+    { time: "08:15", task: "Email Triage", emoji: "📧" },
+    { time: "21:00", task: "Evening Check-in", emoji: "🌙" },
+    { time: "21:30", task: "Quo Monitor", emoji: "📱" },
   ];
 
   const [weekAnchor] = useState(() => new Date());

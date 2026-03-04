@@ -79,12 +79,12 @@ export function MemoryView() {
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="p-2 bg-amber-100 rounded-lg">
-            <Brain className="h-5 w-5 text-amber-600" />
+          <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
+            <Brain className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Memory Search</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Memory Search</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Search everything Sebastian remembers — daily notes, long-term memory, knowledge base
             </p>
           </div>
@@ -92,7 +92,7 @@ export function MemoryView() {
       </div>
 
       {/* Search Bar */}
-      <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+      <div className="bg-gray-50 dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-100 dark:border-zinc-700">
         <MemorySearchBar
           onSearch={setQuery}
           initialValue={query}

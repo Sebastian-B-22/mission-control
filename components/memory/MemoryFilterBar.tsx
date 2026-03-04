@@ -51,7 +51,7 @@ export function MemoryFilterBar({
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all border ${
               selectedType === t.value
                 ? "bg-amber-500 text-white border-amber-500 shadow-sm"
-                : "bg-white text-gray-600 border-gray-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700"
+                : "bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:border-amber-200 dark:hover:border-amber-700 hover:text-amber-700 dark:hover:text-amber-400"
             }`}
           >
             <span>{t.icon}</span>
@@ -66,7 +66,7 @@ export function MemoryFilterBar({
         <select
           value={selectedCategory}
           onChange={(e) => onCategoryChange(e.target.value)}
-          className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 cursor-pointer"
+          className="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 cursor-pointer"
         >
           {CATEGORY_FILTERS.map((c) => (
             <option key={c.value} value={c.value}>
@@ -77,23 +77,23 @@ export function MemoryFilterBar({
 
         {/* Date from */}
         <div className="flex items-center gap-1.5">
-          <label className="text-xs text-gray-500 whitespace-nowrap">From:</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">From:</label>
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => onDateFromChange(e.target.value)}
-            className="px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+            className="px-2.5 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
           />
         </div>
 
         {/* Date to */}
         <div className="flex items-center gap-1.5">
-          <label className="text-xs text-gray-500 whitespace-nowrap">To:</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">To:</label>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => onDateToChange(e.target.value)}
-            className="px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+            className="px-2.5 py-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
           />
         </div>
 
@@ -104,7 +104,7 @@ export function MemoryFilterBar({
               onDateFromChange("");
               onDateToChange("");
             }}
-            className="text-xs text-amber-600 hover:text-amber-800 transition-colors underline-offset-2 hover:underline"
+            className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 transition-colors underline-offset-2 hover:underline"
           >
             Clear dates
           </button>
