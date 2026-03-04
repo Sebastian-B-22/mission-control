@@ -12,13 +12,14 @@ interface ProfessionalOverviewProps {
 }
 
 // Color palette for Professional RPM categories
+// Match exact category names from database
 const categoryColors: Record<string, string> = {
   "Bad Ass Business Owner": "border-l-4 border-l-amber-500",
   "HTA Empire Builder": "border-l-4 border-l-emerald-500",
-  "Staff Empowerment": "border-l-4 border-l-blue-500",
-  "Marketing & Networking": "border-l-4 border-l-pink-500",
-  "Operational Systems": "border-l-4 border-l-cyan-500",
-  "Program Innovation": "border-l-4 border-l-purple-500",
+  "Staff Empowerment & Kickass Workplace": "border-l-4 border-l-blue-500",
+  "Marketing & Networking Genius": "border-l-4 border-l-pink-500",
+  "Operational Systems Guru": "border-l-4 border-l-cyan-500",
+  "Program Innovation & Excellence": "border-l-4 border-l-purple-500",
 };
 
 const defaultColor = "border-l-4 border-l-gray-500";
