@@ -15,17 +15,33 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
   const tasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
   const cronJobs = useQuery(api.cronJobs.getCronJobs) || [];
 
+  const [showAllCron, setShowAllCron] = useState(false);
+
   // Process Cron Jobs
   const dailyRecurring = cronJobs
     .filter(job => job.status === "active")
+    .filter(job => {
+      if (showAllCron) return true;
+      const name = job.name.toLowerCase();
+      // Hide noisy infra jobs by default
+      const noisy = ["huddle", "trigger poll", "activity alert", "security", "backup", "monitor", "check"].some(s => name.includes(s));
+      return !noisy;
+    })
     .map(job => {
       // Format: "cron MIN HOUR DAY MONTH WEEKDAY ..."
+      if (!job.schedule.startsWith("cron ")) return null;
       const parts = job.schedule.replace("cron ", "").split(" ");
-      if (parts.length < 5) return null; // Skip non-cron schedules
+      if (parts.length < 5) return null;
 
-      const min = parseInt(parts[0]);
-      const hour = parseInt(parts[1]);
+      // Only show fixed-time cron jobs (avoid */5, ranges like 8-22, lists, etc.)
+      const isNumber = (s: string) => /^\d+$/.test(s);
+      if (!isNumber(parts[0]) || !isNumber(parts[1])) return null;
+
+      const min = parseInt(parts[0], 10);
+      const hour = parseInt(parts[1], 10);
       const weekday = parts[4];
+
+      if (Number.isNaN(min) || Number.isNaN(hour)) return null;
 
       const date = new Date();
       date.setHours(hour, min, 0, 0);
@@ -77,6 +93,18 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
       <div className="flex items-center gap-2">
         <Calendar className="h-6 w-6" />
         <h2 className="text-2xl font-bold">Weekly Calendar</h2>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          Showing {showAllCron ? "all active cron" : "important fixed-time cron"}
+        </div>
+        <button
+          className="text-xs px-2 py-1 rounded border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          onClick={() => setShowAllCron(v => !v)}
+        >
+          {showAllCron ? "Hide noisy" : "Show all"}
+        </button>
       </div>
 
       {/* Week Grid */}
