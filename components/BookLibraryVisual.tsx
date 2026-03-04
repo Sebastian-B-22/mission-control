@@ -484,9 +484,9 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
                   <Badge 
                     variant="outline" 
                     className={`mt-1 text-xs h-5 px-1.5 ${
-                      book.reader === "roma" ? "border-pink-500 text-pink-400" :
-                      book.reader === "anthony" ? "border-blue-500 text-blue-400" :
-                      "border-green-500 text-green-400"
+                      book.reader === "roma" ? "border-cyan-500 text-cyan-400" :
+                      book.reader === "anthony" ? "border-orange-500 text-orange-400" :
+                      "border-purple-500 text-purple-400"
                     }`}
                   >
                     {book.reader === "roma" ? "Roma" : 
