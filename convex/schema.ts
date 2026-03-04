@@ -139,8 +139,41 @@ export default defineSchema({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format
     notes: v.string(),
+    mediaUrls: v.optional(v.array(v.string())), // Photos/videos for the day
     updatedAt: v.number(),
   }).index("by_user_and_date", ["userId", "date"]),
+
+  // ─── Homeschool Activity Tracking ───────────────────────────────────────
+  // Manual activity logging for subjects/activities not auto-tracked
+  homeschoolActivities: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    student: v.string(), // "anthony" | "roma" | "both"
+    category: v.string(), // "writing" | "history" | "math" | "literature" | "life-skills" | "pe"
+    activity: v.string(), // "Writing with Skill" | "Tuttle Twins" | "Jiu-jitsu" etc.
+    completed: v.boolean(),
+    durationMinutes: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    mediaUrl: v.optional(v.string()), // Photo/video proof
+    createdAt: v.number(),
+  })
+    .index("by_user_date", ["userId", "date"])
+    .index("by_student_date", ["student", "date"])
+    .index("by_category", ["category"]),
+
+  // Weekly/Monthly summaries (generated)
+  homeschoolWeeklySummary: defineTable({
+    userId: v.id("users"),
+    weekOf: v.string(), // YYYY-MM-DD (Monday of week)
+    student: v.string(),
+    totalMinutes: v.number(),
+    activitiesByCategory: v.any(), // { "pe": 180, "writing": 60, ... }
+    completedActivities: v.array(v.string()),
+    highlights: v.optional(v.string()),
+    generatedAt: v.number(),
+  })
+    .index("by_user_week", ["userId", "weekOf"])
+    .index("by_student_week", ["student", "weekOf"]),
 
   dailyCheckIns: defineTable({
     userId: v.id("users"),

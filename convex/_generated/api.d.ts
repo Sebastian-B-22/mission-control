@@ -27,6 +27,7 @@ import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
 import type * as health from "../health.js";
 import type * as homeschool from "../homeschool.js";
+import type * as homeschoolActivities from "../homeschoolActivities.js";
 import type * as homeschoolProgress from "../homeschoolProgress.js";
 import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
@@ -70,6 +71,7 @@ declare const fullApi: ApiFromModules<{
   habits: typeof habits;
   health: typeof health;
   homeschool: typeof homeschool;
+  homeschoolActivities: typeof homeschoolActivities;
   homeschoolProgress: typeof homeschoolProgress;
   http: typeof http;
   jotformSync: typeof jotformSync;

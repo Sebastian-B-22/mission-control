@@ -51,6 +51,7 @@ import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
 import { PushNotificationBanner } from "@/components/PushNotificationBanner";
 import { HomeschoolDailyView } from "@/components/views/HomeschoolDailyView";
 import HomeschoolProgressView from "@/components/views/HomeschoolProgressView";
+import { HomeschoolProgressViewNew } from "@/components/views/HomeschoolProgressViewNew";
 import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesView";
 import {
   HomeschoolScheduleView,
@@ -589,7 +590,7 @@ export default function DashboardPage() {
       case "homeschool-daily":
         return <HomeschoolDailyView userId={convexUser._id} />;
       case "homeschool-progress":
-        return <HomeschoolProgressView />;
+        return <HomeschoolProgressViewNew userId={convexUser._id} />;
       case "homeschool-resources":
         return <HomeschoolResourcesView />;
       case "homeschool-schedule":
