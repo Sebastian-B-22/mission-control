@@ -6,7 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, type ChangeEvent } from "react";
 import { 
   Clock, 
   BookOpen, 
@@ -24,9 +24,12 @@ import {
   Dices,
   MessageCircle,
   Laptop,
-  BookMarked
+  BookMarked,
+  UploadCloud,
+  Trash2
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface HomeschoolDailyViewProps {
   userId: Id<"users">;
@@ -314,6 +317,15 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
   // Get existing recap for this date
   const existingRecap = useQuery(api.dailyRecap.getRecap, { userId, date: dateKey });
   const saveRecapMutation = useMutation(api.dailyRecap.saveRecap);
+  const generateUploadUrl = useMutation(api.dailyRecap.generateUploadUrl);
+  const addMediaMutation = useMutation(api.dailyRecap.addMedia);
+  const removeMediaMutation = useMutation(api.dailyRecap.removeMedia);
+
+  const [uploading, setUploading] = useState<
+    Array<{ id: string; name: string; progress: number; status: "uploading" | "done" | "error"; error?: string }>
+  >([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Update local state when recap loads
   useEffect(() => {
@@ -334,6 +346,74 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       setRecapSaving(false);
     }
   }, [userId, dateKey, saveRecapMutation]);
+
+  const uploadViaXhr = (url: string, file: File, onProgress: (p: number) => void) => {
+    return new Promise<string>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", url);
+      xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+      xhr.responseType = "json";
+
+      xhr.upload.onprogress = (e) => {
+        if (!e.lengthComputable) return;
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      };
+
+      xhr.onload = () => {
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(new Error(`Upload failed (${xhr.status})`));
+          return;
+        }
+        const storageId = (xhr.response as any)?.storageId;
+        if (!storageId) {
+          reject(new Error("Upload succeeded but no storageId returned"));
+          return;
+        }
+        resolve(storageId);
+      };
+
+      xhr.onerror = () => reject(new Error("Upload request failed"));
+      xhr.send(file);
+    });
+  };
+
+  const uploadFiles = async (files: File[]) => {
+    const filtered = files.filter((f) => f.type.startsWith("image/") || f.type.startsWith("video/"));
+    if (filtered.length === 0) return;
+
+    for (const file of filtered) {
+      const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+      setUploading((prev) => [...prev, { id, name: file.name, progress: 0, status: "uploading" }]);
+
+      try {
+        const uploadUrl = await generateUploadUrl({});
+        const storageId = await uploadViaXhr(uploadUrl, file, (progress) => {
+          setUploading((prev) => prev.map((u) => (u.id === id ? { ...u, progress } : u)));
+        });
+
+        await addMediaMutation({ userId, date: dateKey, storageId: storageId as any });
+
+        setUploading((prev) => prev.map((u) => (u.id === id ? { ...u, progress: 100, status: "done" } : u)));
+      } catch (err: any) {
+        setUploading((prev) => prev.map((u) => (u.id === id ? { ...u, status: "error", error: err?.message ?? "Upload failed" } : u)));
+      }
+    }
+
+    // Clear completed uploads after a short delay.
+    setTimeout(() => {
+      setUploading((prev) => prev.filter((u) => u.status !== "done"));
+    }, 1500);
+  };
+
+  const onPickFiles = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    void uploadFiles(files);
+    e.target.value = "";
+  };
+
+  const onDeleteMedia = async (url: string) => {
+    await removeMediaMutation({ userId, date: dateKey, url });
+  };
   
   // Crazy Day Rescue - quick homeschool survival kit
   const generateRescuePlan = () => {
@@ -780,6 +860,120 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
               Save Notes
             </Button>
           </div>
+
+          {/* Media uploader */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xs font-medium text-zinc-300">📷 Photos / Videos</h4>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs h-7"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <UploadCloud className="w-3 h-3 mr-1" /> Upload
+              </Button>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              className="hidden"
+              onChange={onPickFiles}
+            />
+
+            <div
+              className="border border-dashed border-zinc-700 rounded-lg p-4 bg-zinc-800/50 text-xs text-zinc-400"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const files = Array.from(e.dataTransfer.files ?? []);
+                void uploadFiles(files);
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <UploadCloud className="w-4 h-4 text-amber-500" />
+                <span>Drag & drop images/videos here (or click Upload)</span>
+              </div>
+            </div>
+
+            {/* Upload progress */}
+            {uploading.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {uploading.map((u) => (
+                  <div key={u.id} className="bg-zinc-800 rounded border border-zinc-700 p-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-xs text-zinc-300 truncate">{u.name}</div>
+                      <div className="text-[10px] text-zinc-500 whitespace-nowrap">
+                        {u.status === "error" ? "Error" : `${u.progress}%`}
+                      </div>
+                    </div>
+                    <div className="mt-1 h-1.5 bg-zinc-900 rounded">
+                      <div
+                        className={`h-1.5 rounded ${u.status === "error" ? "bg-red-500" : "bg-amber-500"}`}
+                        style={{ width: `${u.progress}%` }}
+                      />
+                    </div>
+                    {u.status === "error" && u.error && (
+                      <div className="mt-1 text-[10px] text-red-400">{u.error}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Thumbnails */}
+            {(existingRecap?.mediaUrls?.length ?? 0) > 0 && (
+              <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {(existingRecap?.mediaUrls ?? []).map((url) => {
+                  const isVideo = /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
+                  return (
+                    <div key={url} className="relative group">
+                      <button
+                        type="button"
+                        className="block w-full aspect-square overflow-hidden rounded border border-zinc-700 bg-zinc-900"
+                        onClick={() => setPreviewUrl(url)}
+                      >
+                        {isVideo ? (
+                          <video src={url} className="w-full h-full object-cover" />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={url} alt="Uploaded media" className="w-full h-full object-cover" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-black/70 text-white rounded p-1"
+                        onClick={() => void onDeleteMedia(url)}
+                        title="Remove"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Full-size preview */}
+          <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
+            <DialogContent className="max-w-4xl bg-zinc-900 border-zinc-700">
+              {previewUrl && (/\.(mp4|webm|mov|m4v)(\?|$)/i.test(previewUrl) ? (
+                <video src={previewUrl} controls className="w-full max-h-[75vh]" />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={previewUrl ?? ""} alt="Full size" className="w-full max-h-[75vh] object-contain" />
+              ))}
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
