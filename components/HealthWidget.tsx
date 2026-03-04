@@ -154,7 +154,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
 
   if (!monthStats) {
     return (
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-zinc-800 border-zinc-800">
         <CardContent className="pt-6">
           <div className="animate-pulse flex items-center justify-center h-32">
             <Heart className="h-8 w-8 text-zinc-700 animate-pulse" />
@@ -172,7 +172,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
   };
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
+    <Card className="bg-zinc-800 border-zinc-800">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center justify-between text-zinc-100">
           <div className="flex items-center gap-2">

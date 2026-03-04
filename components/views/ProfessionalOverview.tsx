@@ -11,6 +11,18 @@ interface ProfessionalOverviewProps {
   onViewCategory: (id: Id<"rpmCategories">) => void;
 }
 
+// Color palette for Professional RPM categories
+const categoryColors: Record<string, string> = {
+  "Bad Ass Business Owner": "border-l-4 border-l-amber-500",
+  "HTA Empire Builder": "border-l-4 border-l-emerald-500",
+  "Staff Empowerment": "border-l-4 border-l-blue-500",
+  "Marketing & Networking": "border-l-4 border-l-pink-500",
+  "Operational Systems": "border-l-4 border-l-cyan-500",
+  "Program Innovation": "border-l-4 border-l-purple-500",
+};
+
+const defaultColor = "border-l-4 border-l-gray-500";
+
 export function ProfessionalOverview({ categories, onEditCategory, onViewCategory }: ProfessionalOverviewProps) {
   return (
     <div className="space-y-6">
@@ -23,7 +35,7 @@ export function ProfessionalOverview({ categories, onEditCategory, onViewCategor
         {categories.map((category) => (
           <Card 
             key={category._id} 
-            className="hover:shadow-lg transition-shadow cursor-pointer group"
+            className={`hover:shadow-lg transition-shadow cursor-pointer group ${categoryColors[category.name] || defaultColor}`}
             onClick={() => onViewCategory(category._id)}
           >
             <CardHeader>

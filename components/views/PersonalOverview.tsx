@@ -11,17 +11,23 @@ interface PersonalOverviewProps {
   onViewCategory: (id: Id<"rpmCategories">) => void;
 }
 
-// Color palette for categories
-const categoryColors = [
-  "border-l-4 border-l-pink-500",
-  "border-l-4 border-l-blue-500",
-  "border-l-4 border-l-green-500",
-  "border-l-4 border-l-amber-500",
-  "border-l-4 border-l-purple-500",
-  "border-l-4 border-l-cyan-500",
-  "border-l-4 border-l-rose-500",
-  "border-l-4 border-l-indigo-500",
-];
+// Color palette for Personal RPM categories (Corinne's order)
+// 1. Raising Resilient Humans → Purple
+// 2. Financial Independence & Freedom → Green
+// 3. Home Haven & Sanctuary → Teal
+// 4. Bangin' Ass Body → Red
+// 5. Extraordinary Friendships → Blue
+// 6. Phenomenal Relationship → Orange
+const categoryColors: Record<string, string> = {
+  "Raising Resilient Humans": "border-l-4 border-l-purple-500",
+  "Financial Independence & Freedom": "border-l-4 border-l-green-500",
+  "Home Haven & Sanctuary": "border-l-4 border-l-teal-500",
+  "Bangin' Ass Body": "border-l-4 border-l-red-500",
+  "Extraordinary Friendships": "border-l-4 border-l-blue-500",
+  "Phenomenal Relationship": "border-l-4 border-l-orange-500",
+};
+
+const defaultColor = "border-l-4 border-l-gray-500";
 
 export function PersonalOverview({ categories, onEditCategory, onViewCategory }: PersonalOverviewProps) {
   return (
@@ -32,10 +38,10 @@ export function PersonalOverview({ categories, onEditCategory, onViewCategory }:
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {categories.map((category, index) => (
+        {categories.map((category) => (
           <Card 
             key={category._id} 
-            className={`hover:shadow-lg transition-shadow cursor-pointer group ${categoryColors[index % categoryColors.length]}`}
+            className={`hover:shadow-lg transition-shadow cursor-pointer group ${categoryColors[category.name] || defaultColor}`}
             onClick={() => onViewCategory(category._id)}
           >
             <CardHeader>

@@ -139,7 +139,7 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
                         className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
                           task.status === "done"
                             ? "bg-zinc-800 opacity-60"
-                            : "bg-zinc-900 hover:bg-zinc-800"
+                            : "bg-zinc-800 hover:bg-zinc-800"
                         }`}
                       >
                         {/* Status Icon */}

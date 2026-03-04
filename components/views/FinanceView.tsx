@@ -106,7 +106,7 @@ export function FinanceView() {
 
       {/* Net Worth & Cash Flow Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-800 border-zinc-800">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <p className="text-sm text-zinc-400">Net Worth</p>
@@ -120,7 +120,7 @@ export function FinanceView() {
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-800 border-zinc-800">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <p className="text-sm text-zinc-400">Income (30d)</p>
@@ -131,7 +131,7 @@ export function FinanceView() {
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-800 border-zinc-800">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <p className="text-sm text-zinc-400">Expenses (30d)</p>
@@ -150,7 +150,7 @@ export function FinanceView() {
       {/* Accounts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Accounts */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-800 border-zinc-800">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Building2 className="h-5 w-5 text-blue-400" />
@@ -184,7 +184,7 @@ export function FinanceView() {
         </Card>
 
         {/* Business Accounts */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-800 border-zinc-800">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Building2 className="h-5 w-5 text-amber-400" />
@@ -219,7 +219,7 @@ export function FinanceView() {
       </div>
 
       {/* Recent Transactions */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-zinc-800 border-zinc-800">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Recent Transactions</CardTitle>

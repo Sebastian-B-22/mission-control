@@ -574,48 +574,48 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
               Pick 2-3 of these and call it a win! 💪
             </p>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
                 <div className="flex items-center gap-2 text-amber-500 font-medium text-xs mb-1">
                   <Dices className="w-3 h-3" />
                   Math Game
                 </div>
                 <p className="text-xs text-zinc-300">{rescuePlan.mathGame}</p>
               </div>
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
                 <div className="flex items-center gap-2 text-green-500 font-medium text-xs mb-1">
                   <Dices className="w-3 h-3" />
                   Vocab Game
                 </div>
                 <p className="text-xs text-zinc-300">{rescuePlan.vocabGame}</p>
               </div>
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
                 <div className="flex items-center gap-2 text-blue-500 font-medium text-xs mb-1">
                   <Laptop className="w-3 h-3" />
                   Online
                 </div>
                 <p className="text-xs text-zinc-300">{rescuePlan.onlineOption}</p>
               </div>
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
                 <div className="flex items-center gap-2 text-purple-500 font-medium text-xs mb-1">
                   <MessageCircle className="w-3 h-3" />
                   Bot Project
                 </div>
                 <p className="text-xs text-zinc-300">{rescuePlan.botProject}</p>
               </div>
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
                 <div className="flex items-center gap-2 text-pink-500 font-medium text-xs mb-1">
                   <BookMarked className="w-3 h-3" />
                   Reading
                 </div>
                 <p className="text-xs text-zinc-300">{rescuePlan.bookSuggestion}</p>
               </div>
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
                 <div className="flex items-center gap-2 text-red-400 font-medium text-xs mb-1">
                   🤒 Sick Day Video
                 </div>
                 <p className="text-xs text-zinc-300">{rescuePlan.sickDayVideo}</p>
               </div>
-              <div className="bg-zinc-900 rounded-lg p-2.5 border border-zinc-800 md:col-span-2">
+              <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800 md:col-span-2">
                 <div className="flex items-center gap-2 text-red-400 font-medium text-xs mb-1">
                   🤒 Sick Day Podcast
                 </div>
@@ -652,7 +652,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
             return (
               <div 
                 key={block._id} 
-                className={`border rounded-lg bg-zinc-900 transition-all ${showSuggestions ? "cursor-pointer hover:bg-zinc-800" : ""}`}
+                className={`border rounded-lg bg-zinc-800 transition-all ${showSuggestions ? "cursor-pointer hover:bg-zinc-800" : ""}`}
                 onClick={() => showSuggestions && toggleBlockExpanded(block._id)}
               >
                 {/* Main row - very compact */}
@@ -723,7 +723,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
                     </p>
                     <div className="space-y-2">
                       {allSuggestions.map((s, i) => (
-                        <div key={i} className="bg-zinc-900 rounded p-2">
+                        <div key={i} className="bg-zinc-800 rounded p-2">
                           <div className="text-xs font-medium text-amber-400 mb-1">{s.topic}</div>
                           <div className="flex items-center gap-2 text-xs text-zinc-300">
                             <BookOpen className="w-3 h-3 text-green-500 flex-shrink-0" />
@@ -745,7 +745,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       </div>
 
       {/* Daily Notes / Recap Section */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card className="bg-zinc-800 border-zinc-800">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium text-zinc-300 flex items-center gap-2">

@@ -249,7 +249,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                     className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                       currentView === item.view || currentView.startsWith(item.view.split('-')[0])
                         ? "bg-zinc-800 text-amber-400 font-medium"
-                        : "text-zinc-300 hover:bg-zinc-900"
+                        : "text-zinc-300 hover:bg-zinc-800"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -291,7 +291,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                         className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${
                           currentView === child.view
                             ? "bg-zinc-800 text-amber-400 font-medium"
-                            : "text-zinc-400 hover:bg-zinc-900"
+                            : "text-zinc-400 hover:bg-zinc-800"
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -312,7 +312,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
           </nav>
 
           {/* Agent Status Card */}
-          <Card className="mt-6 p-4 bg-zinc-900 border-zinc-800">
+          <Card className="mt-6 p-4 bg-zinc-800 border-zinc-800">
             <h3 className="text-sm font-semibold mb-3 text-zinc-200">Agent Squad</h3>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
