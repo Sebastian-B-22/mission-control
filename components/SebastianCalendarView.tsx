@@ -49,7 +49,7 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
           <Card
             key={day.key}
             className={`${
-              isToday(day.date) ? "border-2 border-amber-500 bg-amber-50/50" : ""
+              isToday(day.date) ? "border-2 border-amber-500 bg-amber-50/50 dark:bg-amber-900/20" : ""
             }`}
           >
             <CardHeader className="pb-2">
@@ -65,24 +65,24 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
               {dailyRecurring.map((item, i) => (
                 <div
                   key={i}
-                  className="p-2 text-xs rounded bg-gray-100 border hover:bg-gray-200 transition-colors"
+                  className="p-2 text-xs rounded bg-zinc-100 dark:bg-zinc-800 border dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>{item.emoji}</span>
-                    <span className="font-medium">{item.time}</span>
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{item.time}</span>
                   </div>
-                  <p className="text-xs mt-1 leading-tight">{item.task}</p>
+                  <p className="text-xs mt-1 leading-tight text-zinc-700 dark:text-zinc-300">{item.task}</p>
                 </div>
               ))}
 
               {/* Sunday-only: Weekly RPM */}
               {day.key === "sunday" && (
-                <div className="p-2 text-xs rounded bg-purple-100 border border-purple-200 hover:bg-purple-200 transition-colors">
+                <div className="p-2 text-xs rounded bg-purple-100 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors">
                   <div className="flex items-center gap-1">
                     <span>📊</span>
-                    <span className="font-medium">21:15</span>
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">21:15</span>
                   </div>
-                  <p className="text-xs mt-1 leading-tight">Weekly RPM Review</p>
+                  <p className="text-xs mt-1 leading-tight text-zinc-700 dark:text-zinc-300">Weekly RPM Review</p>
                 </div>
               )}
 
@@ -93,17 +93,17 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
       </div>
 
       {/* Legend */}
-      <Card className="bg-gray-50">
+      <Card className="bg-zinc-50 dark:bg-zinc-800/50">
         <CardHeader>
           <CardTitle className="text-sm">Legend</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
-            <div className="w-4 h-4 rounded bg-gray-100 border"></div>
+            <div className="w-4 h-4 rounded bg-zinc-100 dark:bg-zinc-800 border dark:border-zinc-700"></div>
             <span>Daily recurring tasks (automated via cron)</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="w-4 h-4 rounded bg-purple-100 border border-purple-200"></div>
+            <div className="w-4 h-4 rounded bg-purple-100 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-700"></div>
             <span>Weekly tasks (Sunday only)</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -121,14 +121,14 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
         <CardContent>
           <div className="space-y-2">
             {tasks.filter(t => t.status === "in-progress" || t.status === "todo").slice(0, 5).map((task) => (
-              <div key={task._id} className="flex items-center justify-between p-2 rounded border text-sm">
+              <div key={task._id} className="flex items-center justify-between p-2 rounded border dark:border-zinc-700 text-sm">
                 <span>{task.title}</span>
                 <span className={`text-xs px-2 py-0.5 rounded ${
                   task.priority === "high" 
-                    ? "bg-red-100 text-red-800" 
+                    ? "bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300" 
                     : task.priority === "medium"
-                    ? "bg-amber-100 text-amber-800"
-                    : "bg-gray-100 text-gray-800"
+                    ? "bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300"
+                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300"
                 }`}>
                   {task.priority}
                 </span>

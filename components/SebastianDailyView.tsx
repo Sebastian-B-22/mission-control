@@ -176,13 +176,13 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
             {dailyTasks.map((item, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between p-3 rounded-lg border bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{item.emoji}</span>
                   <div>
-                    <p className="font-medium">{item.task}</p>
-                    <p className="text-sm text-muted-foreground">{item.time}</p>
+                    <p className="font-medium text-zinc-900 dark:text-zinc-100">{item.task}</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.time}</p>
                   </div>
                 </div>
                 <Badge variant="outline" className="text-xs">
@@ -191,15 +191,15 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
               </div>
             ))}
             {new Date().getDay() === 0 && (
-              <div className="flex items-center justify-between p-3 rounded-lg border bg-purple-50 hover:bg-purple-100 transition-colors">
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">📊</span>
                   <div>
-                    <p className="font-medium">Weekly RPM Review</p>
-                    <p className="text-sm text-muted-foreground">9:15 PM (Sunday only)</p>
+                    <p className="font-medium text-zinc-900 dark:text-zinc-100">Weekly RPM Review</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">9:15 PM (Sunday only)</p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-xs bg-purple-100">
+                <Badge variant="outline" className="text-xs">
                   scheduled
                 </Badge>
               </div>
@@ -210,35 +210,35 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
 
       {/* Quick Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card className="bg-zinc-100 dark:bg-zinc-800/50">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">{tasks.filter(t => t.status === "backlog").length}</div>
-              <p className="text-sm text-muted-foreground mt-1">Backlog</p>
+              <div className="text-2xl font-bold text-zinc-700 dark:text-zinc-300">{tasks.filter(t => t.status === "backlog").length}</div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Backlog</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-blue-50 dark:bg-blue-900/30">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{tasks.filter(t => t.status === "todo").length}</div>
-              <p className="text-sm text-muted-foreground mt-1">To Do</p>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{tasks.filter(t => t.status === "todo").length}</div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">To Do</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-amber-50 dark:bg-amber-900/30">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-amber-600">{inProgress.length}</div>
-              <p className="text-sm text-muted-foreground mt-1">In Progress</p>
+              <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{inProgress.length}</div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">In Progress</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-green-50 dark:bg-green-900/30">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{tasks.filter(t => t.status === "done").length}</div>
-              <p className="text-sm text-muted-foreground mt-1">Done (All Time)</p>
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{tasks.filter(t => t.status === "done").length}</div>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Done (All Time)</p>
             </div>
           </CardContent>
         </Card>
