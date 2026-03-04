@@ -98,6 +98,17 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Family Meeting",
       icon: Handshake,
       view: "family-meeting",
+      expandable: true,
+      section: "family",
+      children: [
+        { name: "Acknowledgements", view: "family-acknowledgements" },
+        { name: "Discussion Queue", view: "family-discussion" },
+        { name: "Goals", view: "family-goals" },
+        { name: "Support Requests", view: "family-support" },
+        { name: "Meal Planning", view: "family-meals" },
+        { name: "Movie Night", view: "family-movies" },
+        { name: "Game Nights", view: "family-games" },
+      ]
     },
     {
       name: "Finance",

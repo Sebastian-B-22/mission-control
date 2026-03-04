@@ -535,6 +535,20 @@ export default function DashboardPage() {
 
       case "family-meeting":
         return <FamilyMeetingDashboard userId={convexUser._id} />;
+      case "family-acknowledgements":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="acknowledgements" />;
+      case "family-discussion":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="discussion" />;
+      case "family-goals":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="goals" />;
+      case "family-support":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="support" />;
+      case "family-meals":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="meals" />;
+      case "family-movies":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="movies" />;
+      case "family-games":
+        return <FamilyMeetingDashboard userId={convexUser._id} section="games" />;
 
       case "finance":
         return <FinanceView />;

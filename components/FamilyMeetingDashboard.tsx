@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface Props {
   userId: Id<"users">;
+  section?: "acknowledgements" | "discussion" | "goals" | "support" | "meals" | "movies" | "games";
 }
 
 const defaultMembers = ["Corinne", "Joey", "Anthony", "Roma"];
@@ -22,7 +23,7 @@ function startOfWeekSunday(date = new Date()) {
   return d.toISOString().split("T")[0];
 }
 
-export function FamilyMeetingDashboard({ userId }: Props) {
+export function FamilyMeetingDashboard({ userId, section }: Props) {
   const today = new Date().toISOString().split("T")[0];
   const weekOf = startOfWeekSunday();
 
@@ -90,15 +91,31 @@ export function FamilyMeetingDashboard({ userId }: Props) {
     });
   };
 
+  // Helper to determine which sections to show
+  const showSection = (sectionName: string) => !section || section === sectionName;
+  
+  // Section titles for sub-views
+  const sectionTitles: Record<string, string> = {
+    acknowledgements: "💝 Acknowledgements & Shout-Outs",
+    discussion: "💬 Discussion Queue",
+    goals: "🎯 Goals & Habit Trackers",
+    support: "🙏 Support Requests",
+    meals: "🍽️ Meal Planning",
+    movies: "🎬 Friday Movie Nights",
+    games: "🎲 Game Night Log",
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Family Meeting Dashboard</h2>
+        <h2 className="text-2xl font-bold">
+          {section ? sectionTitles[section] || "Family Meeting" : "Family Meeting Dashboard"}
+        </h2>
         <p className="text-sm text-muted-foreground">Week of {weekOf}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-l-4 border-l-pink-500">
+      <div className={section ? "space-y-6" : "grid gap-6 lg:grid-cols-2"}>
+        {showSection("acknowledgements") && <Card className="border-l-4 border-l-pink-500">
           <CardHeader>
             <CardTitle className="text-pink-400">💝 Acknowledgements & Shout-Outs</CardTitle>
             <CardDescription>Track who recognized who this week.</CardDescription>
@@ -128,9 +145,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
-        <Card className="border-l-4 border-l-blue-500">
+        {showSection("discussion") && <Card className="border-l-4 border-l-blue-500">
           <CardHeader>
             <CardTitle className="text-blue-400">💬 Discussion Queue</CardTitle>
             <CardDescription>Add during the week, resolve during Sunday meeting.</CardDescription>
@@ -167,9 +184,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
-        <Card className="border-l-4 border-l-amber-500">
+        {showSection("support") && <Card className="border-l-4 border-l-amber-500">
           <CardHeader>
             <CardTitle className="text-amber-400">📅 Calendar Review (Next 7 Days)</CardTitle>
             <CardDescription>Support requests + conflict flags.</CardDescription>
@@ -202,9 +219,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
-        <Card className="border-l-4 border-l-green-500">
+        {showSection("goals") && <Card className="border-l-4 border-l-green-500">
           <CardHeader>
             <CardTitle className="text-green-400">🎯 Goals & Habit Trackers</CardTitle>
             <CardDescription>Weekly goals per person.</CardDescription>
@@ -237,9 +254,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
-        <Card className="border-l-4 border-l-purple-500">
+        {showSection("movies") && <Card className="border-l-4 border-l-purple-500">
           <CardHeader>
             <CardTitle className="text-purple-400">🎬 Friday Movie Nights</CardTitle>
             <CardDescription>Suggestions, voting, watched history.</CardDescription>
@@ -272,9 +289,9 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
-        <Card className="border-l-4 border-l-cyan-500">
+        {showSection("games") && <Card className="border-l-4 border-l-cyan-500">
           <CardHeader>
             <CardTitle className="text-cyan-400">🎲 Game Night Log</CardTitle>
             <CardDescription>Track game, winner, and fun moments.</CardDescription>
@@ -298,10 +315,35 @@ export function FamilyMeetingDashboard({ userId }: Props) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card>}
+
+        {showSection("meals") && <Card className="border-l-4 border-l-rose-500">
+          <CardHeader>
+            <CardTitle className="text-rose-400">🍽️ Meal Planning</CardTitle>
+            <CardDescription>Plan meals for the week.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-2">
+              {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => (
+                <div key={day} className="flex items-center gap-2">
+                  <span className="w-24 text-sm font-medium">{day}</span>
+                  <Input 
+                    placeholder={`${day}'s meal`}
+                    value={meetingDoc.mealPlan?.[i]?.meal || ""}
+                    onChange={async (e) => {
+                      const newMealPlan = [...(meetingDoc.mealPlan || Array(7).fill({ day: "", meal: "" }))];
+                      newMealPlan[i] = { day, meal: e.target.value };
+                      await persistMeeting({ mealPlan: newMealPlan });
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>}
       </div>
 
-      <Card className="border-l-4 border-l-orange-500">
+      {!section && <Card className="border-l-4 border-l-orange-500">
         <CardHeader>
           <CardTitle className="text-orange-400">🎉 End of Year Reflection (Coming 2027)</CardTitle>
           <CardDescription>
@@ -311,7 +353,7 @@ export function FamilyMeetingDashboard({ userId }: Props) {
         <CardContent>
           <Button disabled variant="outline">Available December 2026</Button>
         </CardContent>
-      </Card>
+      </Card>}
     </div>
   );
 }
