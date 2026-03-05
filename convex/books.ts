@@ -56,6 +56,21 @@ export const updateBookCover = mutation({
   },
 });
 
+export const updateBookReader = mutation({
+  args: {
+    id: v.id("bookLibrary"),
+    reader: v.union(
+      v.literal("anthony"),
+      v.literal("roma"),
+      v.literal("both"),
+      v.literal("family")
+    ),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { reader: args.reader });
+  },
+});
+
 export const updateBookStatus = mutation({
   args: {
     id: v.id("bookLibrary"),

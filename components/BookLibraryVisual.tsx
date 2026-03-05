@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -93,6 +100,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const readAloudBooks = useQuery(api.books.getReadAloudBooks, { userId }); // Currently reading from read alouds
   const addBook = useMutation(api.books.addBookToLibrary);
   const updateStatus = useMutation(api.books.updateBookStatus);
+  const updateReader = useMutation(api.books.updateBookReader);
   const updateCover = useMutation(api.books.updateBookCover);
   const deleteBook = useMutation(api.books.deleteBookFromLibrary);
 
@@ -481,18 +489,24 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
                   </p>
                 )}
                 {activeTab === "finished" && (
-                  <Badge 
-                    variant="outline" 
-                    className={`mt-1 text-xs h-5 px-1.5 ${
-                      book.reader === "roma" ? "border-cyan-500 text-cyan-400" :
-                      book.reader === "anthony" ? "border-orange-500 text-orange-400" :
-                      "border-purple-500 text-purple-400"
-                    }`}
-                  >
-                    {book.reader === "roma" ? "Roma" : 
-                     book.reader === "anthony" ? "Anthony" : 
-                     "Both"}
-                  </Badge>
+                  <div className="mt-1 flex justify-center">
+                    <Select
+                      value={book.reader || "both"}
+                      onValueChange={async (value) => {
+                        await updateReader({ id: book._id, reader: value as any });
+                      }}
+                    >
+                      <SelectTrigger className="h-6 px-2 text-xs w-auto">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="roma">Roma</SelectItem>
+                        <SelectItem value="anthony">Anthony</SelectItem>
+                        <SelectItem value="both">Both</SelectItem>
+                        <SelectItem value="family">Family</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
               </div>
             </div>
