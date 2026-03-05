@@ -479,7 +479,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                           onCheckedChange={() => handleToggle(act._id, act.completed)}
                         />
                         <div className="flex-1">
-                          <p className={`text-sm ${act.completed ? "line-through text-muted-foreground" : ""}`}>
+                          <p className={`text-sm ${act.completed ? "text-muted-foreground" : ""}`}>
                             {act.activity}
                           </p>
                           <p className="text-xs text-muted-foreground">

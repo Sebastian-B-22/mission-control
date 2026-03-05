@@ -38,10 +38,22 @@ export const importRecapToProgress = mutation({
     if (has("membean")) candidates.push({ category: "writing", activity: "Membean" });
     if (has("rosetta")) candidates.push({ category: "writing", activity: "Rosetta Stone" });
 
-    // History
-    if (has("tuttle twins")) candidates.push({ category: "history", activity: "Tuttle Twins" });
-    if (has("story of the world")) candidates.push({ category: "history", activity: "Story of the World" });
+    // History + Financial Literacy
+    // Tuttle Twins: if recap mentions supply/demand/pricing, log under Financial Literacy.
+    if (has("tuttle twins")) {
+      if (has("supply") || has("demand") || has("pricing") || has("price")) {
+        candidates.push({ category: "financial", activity: "Tuttle Twins (Supply & Demand)", notes });
+      } else {
+        candidates.push({ category: "history", activity: "Tuttle Twins", notes });
+      }
+    }
 
+    // Only log Story of the World when explicitly mentioned.
+    if (has("story of the world")) {
+      candidates.push({ category: "history", activity: "Story of the World", notes });
+    }
+
+    // Combine Donner + Nathan Hale into a single history record when both are present.
     if (has("donner") && has("nathan hale")) {
       candidates.push({ category: "history", activity: "Donner Party (Nathan Hale's Hazardous Tales)", notes });
     } else {
@@ -50,12 +62,17 @@ export const importRecapToProgress = mutation({
     }
 
     // Science - keep it specific
-    if (has("science") || has("experiment") || has("esophagus") || has("learning lab") || has("science kit")) {
+    if (has("science") || has("experiment") || has("esophagus") || has("learning lab") || has("science kit") || has("health & body")) {
+      // Prefer explicit "Science:" line, otherwise use best-effort from known phrases.
       let detail = "Experiment";
       const lines = notes.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-      const scienceLine = lines.find((l) => l.toLowerCase().includes("science"));
+      const scienceLine = lines.find((l) => l.toLowerCase().startsWith("science"));
       if (scienceLine) {
-        detail = scienceLine.replace(/^science\s*[:\-]\s*/i, "").slice(0, 80) || detail;
+        detail = scienceLine.replace(/^science\s*[:\-]\s*/i, "").slice(0, 120) || detail;
+      } else if (has("health & body") && has("esophagus")) {
+        detail = "Health & Body Experiment (day 4) - Esophagus";
+      } else if (has("science kit") && has("day 4") && has("esophagus")) {
+        detail = "Health & Body Experiment (day 4) - Esophagus";
       } else if (has("esophagus")) {
         detail = "Esophagus experiment";
       } else if (has("learning lab")) {
