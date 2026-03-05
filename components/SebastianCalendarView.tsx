@@ -27,49 +27,57 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
       const noisy = ["huddle", "trigger poll", "activity alert", "security", "backup", "monitor", "check"].some(s => name.includes(s));
       return !noisy;
     })
-    .map(job => {
-      // Format: "cron MIN HOUR DAY MONTH WEEKDAY ..."
-      if (!job.schedule.startsWith("cron ")) return null;
+    .flatMap(job => {
+      // Format: "cron MIN HOUR DAY MONTH WEEKDAY ..." (may include tz suffix)
+      if (!job.schedule.startsWith("cron ")) return [];
       const parts = job.schedule.replace("cron ", "").split(" ");
-      if (parts.length < 5) return null;
+      if (parts.length < 5) return [];
 
-      // Only show fixed-time cron jobs (avoid */5, ranges like 8-22, lists, etc.)
-      const isNumber = (s: string) => /^\d+$/.test(s);
-      if (!isNumber(parts[0]) || !isNumber(parts[1])) return null;
+      // Only show fixed-time cron jobs; allow comma-separated hour lists (e.g. "8,11,14,17")
+      const parseNumberList = (s: string): number[] | null => {
+        if (/^\d+$/.test(s)) return [parseInt(s, 10)];
+        if (/^\d+(,\d+)+$/.test(s)) return s.split(",").map(v => parseInt(v, 10));
+        return null;
+      };
 
-      const min = parseInt(parts[0], 10);
-      const hour = parseInt(parts[1], 10);
+      const mins = parseNumberList(parts[0]);
+      const hours = parseNumberList(parts[1]);
+      if (!mins || !hours) return [];
+
       const weekday = parts[4];
 
-      if (Number.isNaN(min) || Number.isNaN(hour)) return null;
+      const out: Array<{ type: string; time: string; task: string; emoji: string; sortTime: number }> = [];
+      for (const hour of hours) {
+        for (const min of mins) {
+          if (Number.isNaN(min) || Number.isNaN(hour)) continue;
+          const date = new Date();
+          date.setHours(hour, min, 0, 0);
+          const timeStr = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: false });
+          const sortTime = hour * 60 + min;
 
-      const date = new Date();
-      date.setHours(hour, min, 0, 0);
-      const timeStr = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: false }); // 24h format for compact calendar
-      const sortTime = hour * 60 + min;
+          // Detect emojis
+          let emoji = "🤖";
+          const name = job.name.toLowerCase();
+          if (name.includes("morning")) emoji = "☀️";
+          else if (name.includes("evening") || name.includes("night")) emoji = "🌙";
+          else if (name.includes("email")) emoji = "📧";
+          else if (name.includes("health")) emoji = "❤️";
+          else if (name.includes("quo")) emoji = "📱";
+          else if (name.includes("maven")) emoji = "📣";
+          else if (name.includes("scout")) emoji = "🔍";
 
-      // Detect emojis
-      let emoji = "🤖";
-      const name = job.name.toLowerCase();
-      if (name.includes("morning")) emoji = "☀️";
-      else if (name.includes("evening") || name.includes("night")) emoji = "🌙";
-      else if (name.includes("email")) emoji = "📧";
-      else if (name.includes("health")) emoji = "❤️";
-      else if (name.includes("quo")) emoji = "📱";
-      else if (name.includes("maven")) emoji = "📣";
-      else if (name.includes("scout")) emoji = "🔍";
-
-      // Return object with schedule type
-      if (weekday === "*" || weekday === "0-6" || weekday === "1-5") {
-        return { type: "daily", time: timeStr, task: job.name, emoji, sortTime };
-      } else if (weekday === "0") {
-        return { type: "sunday", time: timeStr, task: job.name, emoji, sortTime };
-      } else if (weekday === "1") {
-        return { type: "monday", time: timeStr, task: job.name, emoji, sortTime };
+          if (weekday === "*" || weekday === "0-6" || weekday === "1-5") {
+            out.push({ type: "daily", time: timeStr, task: job.name, emoji, sortTime });
+          } else if (weekday === "0") {
+            out.push({ type: "sunday", time: timeStr, task: job.name, emoji, sortTime });
+          } else if (weekday === "1") {
+            out.push({ type: "monday", time: timeStr, task: job.name, emoji, sortTime });
+          }
+        }
       }
-      return null;
+
+      return out;
     })
-    .filter((task): task is NonNullable<typeof task> => task !== null)
     .sort((a, b) => a.sortTime - b.sortTime);
 
   const [weekAnchor] = useState(() => new Date());
