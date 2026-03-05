@@ -304,6 +304,8 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
   } | null>(null);
   const [recapNotes, setRecapNotes] = useState("");
   const [recapSaving, setRecapSaving] = useState(false);
+  const [recapImporting, setRecapImporting] = useState(false);
+  const [recapImportMessage, setRecapImportMessage] = useState<string | null>(null);
 
   // Format date for Convex queries
   const dateStr = selectedDate.toLocaleDateString("en-US", { 
@@ -320,6 +322,10 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
   const generateUploadUrl = useMutation(api.dailyRecap.generateUploadUrl);
   const addMediaMutation = useMutation(api.dailyRecap.addMedia);
   const removeMediaMutation = useMutation(api.dailyRecap.removeMedia);
+
+  // For recap -> progress parsing
+  const existingActivities = useQuery(api.homeschoolActivities.getActivitiesByDate, { userId, date: dateKey }) || [];
+  const logActivityMutation = useMutation(api.homeschoolActivities.logActivity);
 
   const [uploading, setUploading] = useState<
     Array<{ id: string; name: string; progress: number; status: "uploading" | "done" | "error"; error?: string }>
@@ -346,6 +352,82 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       setRecapSaving(false);
     }
   }, [userId, dateKey, saveRecapMutation]);
+
+  const importRecapToProgress = useCallback(async () => {
+    const notes = recapNotes.trim();
+    if (!notes) return;
+
+    setRecapImporting(true);
+    setRecapImportMessage(null);
+
+    try {
+      const lower = notes.toLowerCase();
+
+      const candidates: Array<{ category: string; activity: string; notes?: string }> = [];
+
+      const has = (s: string) => lower.includes(s);
+
+      // Academics (auto tracked / online)
+      if (has("math academy")) candidates.push({ category: "academics", activity: "Math Academy" });
+      if (has("membean")) candidates.push({ category: "academics", activity: "Membean" });
+      if (has("rosetta")) candidates.push({ category: "academics", activity: "Rosetta Stone" });
+
+      // History
+      if (has("tuttle twins")) candidates.push({ category: "history", activity: "Tuttle Twins" });
+      if (has("story of the world") || has("nathan hale") || has("donner")) {
+        candidates.push({ category: "history", activity: "Story of the World", notes: notes });
+      }
+
+      // Science / experiments (v1: treat as academics)
+      if (has("science") || has("experiment") || has("esophagus") || has("learning lab")) {
+        candidates.push({ category: "academics", activity: "Science", notes: notes });
+      }
+
+      // PE
+      if (has("boxing")) candidates.push({ category: "pe", activity: "Boxing" });
+      if (has("jiu")) candidates.push({ category: "pe", activity: "Jiu-jitsu" });
+      if (has("horse")) candidates.push({ category: "pe", activity: "Other PE", notes: notes });
+      if (has("ninja")) candidates.push({ category: "pe", activity: "Ninja Academy" });
+
+      // Reading / literature (v1)
+      if (has("read aloud") || has("read-aloud")) candidates.push({ category: "literature", activity: "Read Aloud", notes: notes });
+      if (has("wings of fire") || has("redwall") || has("they read")) {
+        candidates.push({ category: "literature", activity: "Reading", notes: notes });
+      }
+
+      // Deduplicate candidates
+      const uniq = new Map<string, { category: string; activity: string; notes?: string }>();
+      for (const c of candidates) {
+        uniq.set(`${c.category}::${c.activity}`, c);
+      }
+
+      // Skip anything already logged for this day
+      const existingSet = new Set(existingActivities.map((a) => `${a.category}::${a.activity}`));
+
+      let inserted = 0;
+      for (const c of uniq.values()) {
+        const key = `${c.category}::${c.activity}`;
+        if (existingSet.has(key)) continue;
+
+        await logActivityMutation({
+          userId,
+          date: dateKey,
+          student: "both",
+          category: c.category,
+          activity: c.activity,
+          completed: true,
+          notes: c.notes,
+        });
+        inserted++;
+      }
+
+      setRecapImportMessage(inserted === 0 ? "No new items to log (already logged)." : `Logged ${inserted} item(s) to Progress.`);
+    } catch (e: any) {
+      setRecapImportMessage(e?.message || "Failed to log recap to Progress");
+    } finally {
+      setRecapImporting(false);
+    }
+  }, [recapNotes, existingActivities, logActivityMutation, userId, dateKey]);
 
   const uploadViaXhr = (url: string, file: File, onProgress: (p: number) => void) => {
     return new Promise<string>((resolve, reject) => {
@@ -846,20 +928,35 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
             placeholder="Notes on what we accomplished, changes from the plan, ideas for next time..."
             className="w-full h-24 bg-zinc-800 border border-zinc-700 rounded-lg p-3 text-sm text-zinc-300 placeholder:text-zinc-500 resize-none focus:outline-none focus:ring-1 focus:ring-amber-500"
           />
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mt-2 gap-2">
             <p className="text-xs text-muted-foreground">
               💡 These notes help plan next week and track progress over time
             </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => saveRecap(recapNotes)}
-              disabled={recapSaving || !recapNotes.trim()}
-              className="text-xs h-7"
-            >
-              Save Notes
-            </Button>
+            <div className="flex items-center gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={importRecapToProgress}
+                disabled={recapImporting || !recapNotes.trim()}
+                className="text-xs h-7"
+                title="Convert recap notes into Progress checkmarks"
+              >
+                {recapImporting ? "Logging..." : "Log to Progress"}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => saveRecap(recapNotes)}
+                disabled={recapSaving || !recapNotes.trim()}
+                className="text-xs h-7"
+              >
+                Save Notes
+              </Button>
+            </div>
           </div>
+          {recapImportMessage && (
+            <p className="mt-2 text-xs text-muted-foreground">{recapImportMessage}</p>
+          )}
 
           {/* Media uploader */}
           <div className="mt-4">
