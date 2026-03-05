@@ -354,13 +354,18 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
   }, [userId, dateKey, saveRecapMutation]);
 
   const importRecapToProgress = useCallback(async () => {
-    const notes = recapNotes.trim();
+    // Use the persisted recap when available to avoid accidentally parsing the "plan" UI
+    // or a stale local state.
+    const notes = (existingRecap?.notes ?? recapNotes).trim();
     if (!notes) return;
 
     setRecapImporting(true);
     setRecapImportMessage(null);
 
     try {
+      // Ensure the recap is saved before we log anything.
+      await saveRecapMutation({ userId, date: dateKey, notes });
+
       const lower = notes.toLowerCase();
 
       const candidates: Array<{ category: string; activity: string; notes?: string }> = [];
@@ -427,7 +432,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
     } finally {
       setRecapImporting(false);
     }
-  }, [recapNotes, existingActivities, logActivityMutation, userId, dateKey]);
+  }, [recapNotes, existingRecap?.notes, existingActivities, logActivityMutation, userId, dateKey, saveRecapMutation]);
 
   const uploadViaXhr = (url: string, file: File, onProgress: (p: number) => void) => {
     return new Promise<string>((resolve, reject) => {

@@ -79,7 +79,9 @@ const CATEGORIES = {
 
 export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewProps) {
   const [selectedDate, setSelectedDate] = useState(() => {
-    return new Date().toISOString().split("T")[0];
+    // Use America/Los_Angeles to avoid UTC date rollover on iPad/phone
+    const tzNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+    return tzNow.toISOString().split("T")[0];
   });
   const [activeTab, setActiveTab] = useState<"daily" | "weekly">("daily");
   const [selectedStudent, setSelectedStudent] = useState<"anthony" | "roma" | "both">("both");
@@ -118,7 +120,10 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
     setSelectedDate(current.toISOString().split("T")[0]);
   };
 
-  const isToday = selectedDate === new Date().toISOString().split("T")[0];
+  const isToday = (() => {
+    const tzNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+    return selectedDate === tzNow.toISOString().split("T")[0];
+  })();
 
   const handleQuickLog = async (category: string, activity: string) => {
     await quickLog({
