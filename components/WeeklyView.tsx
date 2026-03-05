@@ -254,9 +254,12 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
       )}
 
       <Card className="bg-zinc-50 dark:bg-zinc-800/50">
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 space-y-2">
           <p className="text-xs text-muted-foreground">
-            Calendar events are synced from your Mac mini (merged Google accounts) into Mission Control. If you don’t see events yet, we just need to turn on the sync job.
+            Calendar events are synced from your Mac mini (merged Google accounts) into Mission Control.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Setup note (for sync scripts): your userId is <span className="font-mono">{userId}</span>
           </p>
         </CardContent>
       </Card>
