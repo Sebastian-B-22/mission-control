@@ -61,7 +61,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
   const rpmCategories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
 
   const [goalText, setGoalText] = useState("");
-  const [goalCategoryId, setGoalCategoryId] = useState<string>("");
+  const [goalCategoryId, setGoalCategoryId] = useState<string>("none");
 
   const days = useMemo(() => {
     return Array.from({ length: 7 }).map((_, i) => {
@@ -140,7 +140,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                     userId,
                     weekOf,
                     text: goalText.trim(),
-                    categoryId: goalCategoryId ? (goalCategoryId as any) : undefined,
+                    categoryId: goalCategoryId !== "none" ? (goalCategoryId as any) : undefined,
                   });
                   setGoalText("");
                 }
@@ -153,7 +153,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                   <SelectValue placeholder="Assign RPM category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No category</SelectItem>
+                  <SelectItem value="none">No category</SelectItem>
                   {rpmCategories.map((c) => (
                     <SelectItem key={c._id} value={c._id}>
                       {c.name}
@@ -169,7 +169,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                     userId,
                     weekOf,
                     text: goalText.trim(),
-                    categoryId: goalCategoryId ? (goalCategoryId as any) : undefined,
+                    categoryId: goalCategoryId !== "none" ? (goalCategoryId as any) : undefined,
                   });
                   setGoalText("");
                 }}
