@@ -78,10 +78,19 @@ const CATEGORIES = {
 };
 
 export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewProps) {
+  const getPstDateKey = () => {
+    const fmt = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    // en-CA yields YYYY-MM-DD
+    return fmt.format(new Date());
+  };
+
   const [selectedDate, setSelectedDate] = useState(() => {
-    // Use America/Los_Angeles to avoid UTC date rollover on iPad/phone
-    const tzNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
-    return tzNow.toISOString().split("T")[0];
+    return getPstDateKey();
   });
   const [activeTab, setActiveTab] = useState<"daily" | "weekly">("daily");
   const [selectedStudent, setSelectedStudent] = useState<"anthony" | "roma" | "both">("both");
@@ -120,10 +129,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
     setSelectedDate(current.toISOString().split("T")[0]);
   };
 
-  const isToday = (() => {
-    const tzNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
-    return selectedDate === tzNow.toISOString().split("T")[0];
-  })();
+  const isToday = selectedDate === getPstDateKey();
 
   const handleQuickLog = async (category: string, activity: string) => {
     await quickLog({
