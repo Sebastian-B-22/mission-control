@@ -377,26 +377,42 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
 
       const has = (s: string) => lower.includes(s);
 
-      // Academics (auto tracked / online)
-      if (has("math academy")) candidates.push({ category: "academics", activity: "Math Academy" });
-      if (has("membean")) candidates.push({ category: "academics", activity: "Membean" });
-      if (has("rosetta")) candidates.push({ category: "academics", activity: "Rosetta Stone" });
+      // Online (but we still want a record below)
+      if (has("math academy")) candidates.push({ category: "math", activity: "Math Academy" });
+      if (has("membean")) candidates.push({ category: "writing", activity: "Membean" });
+      if (has("rosetta")) candidates.push({ category: "writing", activity: "Rosetta Stone" });
 
       // History
       if (has("tuttle twins")) candidates.push({ category: "history", activity: "Tuttle Twins" });
       if (has("story of the world")) {
         candidates.push({ category: "history", activity: "Story of the World", notes: notes });
       }
-      if (has("nathan hale")) {
-        candidates.push({ category: "history", activity: "Nathan Hale", notes: notes });
-      }
-      if (has("donner")) {
-        candidates.push({ category: "history", activity: "Donner Party", notes: notes });
+      // If you mention Donner + Nathan Hale, treat as one specific reading record.
+      if (has("donner") && has("nathan hale")) {
+        candidates.push({ category: "history", activity: "Donner Party (Nathan Hale's Hazardous Tales)", notes: notes });
+      } else {
+        if (has("nathan hale")) {
+          candidates.push({ category: "history", activity: "Nathan Hale", notes: notes });
+        }
+        if (has("donner")) {
+          candidates.push({ category: "history", activity: "Donner Party", notes: notes });
+        }
       }
 
-      // Science / experiments
+      // Science / experiments - keep it specific
       if (has("science") || has("experiment") || has("esophagus") || has("learning lab") || has("science kit")) {
-        candidates.push({ category: "science", activity: "Experiment", notes: notes });
+        // Try to extract a specific description from the recap.
+        let detail = "Experiment";
+        const lines = notes.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+        const scienceLine = lines.find((l) => l.toLowerCase().includes("science"));
+        if (scienceLine) {
+          detail = scienceLine.replace(/^science\s*[:\-]\s*/i, "").slice(0, 80);
+        } else if (has("esophagus")) {
+          detail = "Esophagus experiment";
+        } else if (has("learning lab")) {
+          detail = "Learning Lab experiment";
+        }
+        candidates.push({ category: "science", activity: detail, notes: notes });
       }
 
       // PE

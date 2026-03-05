@@ -31,7 +31,7 @@ interface HomeschoolProgressViewNewProps {
 const CATEGORIES = {
   writing: {
     label: "Writing",
-    activities: ["Writing with Skill"],
+    activities: ["Writing with Skill", "Membean"],
     icon: "✍️",
     color: "bg-blue-500",
   },
@@ -42,8 +42,8 @@ const CATEGORIES = {
     color: "bg-amber-500",
   },
   math: {
-    label: "Math (Supplemental)",
-    activities: ["Wonder Math"],
+    label: "Math",
+    activities: ["Math Academy", "Wonder Math"],
     icon: "🔢",
     color: "bg-purple-500",
   },
@@ -70,6 +70,12 @@ const CATEGORIES = {
     activities: ["Piano", "Singing", "Listening", "Other"],
     icon: "🎵",
     color: "bg-indigo-500",
+  },
+  financial: {
+    label: "Financial Literacy",
+    activities: ["Money Management", "Budgeting", "Investing", "Other"],
+    icon: "💵",
+    color: "bg-emerald-500",
   },
   "life-skills": {
     label: "Life Skills",

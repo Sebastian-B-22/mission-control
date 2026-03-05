@@ -11,7 +11,7 @@ export const ACTIVITY_CONFIG = {
   },
   writing: {
     label: "Writing",
-    activities: ["Writing with Skill"],
+    activities: ["Writing with Skill", "Membean"],
     icon: "✍️",
   },
   history: {
@@ -20,8 +20,8 @@ export const ACTIVITY_CONFIG = {
     icon: "🌍",
   },
   math: {
-    label: "Math (Supplemental)",
-    activities: ["Wonder Math"],
+    label: "Math",
+    activities: ["Math Academy", "Wonder Math"],
     icon: "🔢",
   },
   literature: {
@@ -43,6 +43,11 @@ export const ACTIVITY_CONFIG = {
     label: "Music",
     activities: ["Piano", "Singing", "Listening", "Other"],
     icon: "🎵",
+  },
+  financial: {
+    label: "Financial Literacy",
+    activities: ["Money Management", "Budgeting", "Investing", "Other"],
+    icon: "💵",
   },
   "life-skills": {
     label: "Life Skills",
