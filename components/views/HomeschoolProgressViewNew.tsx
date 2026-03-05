@@ -30,8 +30,8 @@ interface HomeschoolProgressViewNewProps {
 // Activity categories configuration
 const CATEGORIES = {
   writing: {
-    label: "Writing",
-    activities: ["Writing with Skill", "Membean"],
+    label: "Language Arts",
+    activities: ["Writing with Skill", "Membean", "Spelling", "Italian", "Rosetta Stone"],
     icon: "✍️",
     color: "bg-blue-500",
   },
@@ -119,6 +119,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
   const [activeTab, setActiveTab] = useState<"daily" | "weekly">("daily");
   const [selectedStudent, setSelectedStudent] = useState<"anthony" | "roma" | "both">("both");
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [quickAddMessage, setQuickAddMessage] = useState<string | null>(null);
 
   // Queries
   const activities = useQuery(api.homeschoolActivities.getActivitiesByDate, {
@@ -166,13 +167,20 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
   const isToday = selectedDate === getPstDateKey();
 
   const handleQuickLog = async (category: string, activity: string) => {
-    await quickLog({
-      userId,
-      date: selectedDate,
-      student: selectedStudent,
-      category,
-      activity,
-    });
+    try {
+      setQuickAddMessage(null);
+      await quickLog({
+        userId,
+        date: selectedDate,
+        student: selectedStudent,
+        category,
+        activity,
+      });
+      setQuickAddMessage(`Logged: ${activity}`);
+    } catch (e: any) {
+      console.error("Quick add failed", e);
+      setQuickAddMessage(e?.message || "Quick add failed");
+    }
   };
 
   const handleToggle = async (id: Id<"homeschoolActivities">, completed: boolean) => {
@@ -369,7 +377,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
             ))}
           </div>
         </div>
-        <Button onClick={() => setShowQuickAdd(!showQuickAdd)} variant="outline">
+        <Button onClick={() => { setShowQuickAdd(!showQuickAdd); setQuickAddMessage(null); }} variant="outline" type="button">
           <Plus className="h-4 w-4 mr-2" />
           Quick Add
         </Button>
@@ -382,6 +390,9 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
             <p className="text-sm text-muted-foreground mb-3">
               Click to log as completed for {selectedStudent === "both" ? "both kids" : selectedStudent}:
             </p>
+            {quickAddMessage && (
+              <p className="text-xs text-muted-foreground mb-3">{quickAddMessage}</p>
+            )}
             <div className="space-y-4">
               {Object.entries(CATEGORIES).map(([key, config]) => (
                 <div key={key}>
@@ -393,6 +404,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                     {config.activities.map((activity) => (
                       <Button
                         key={activity}
+                        type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuickLog(key, activity)}

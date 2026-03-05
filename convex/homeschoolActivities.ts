@@ -10,8 +10,8 @@ export const ACTIVITY_CONFIG = {
     autoTracked: true,
   },
   writing: {
-    label: "Writing",
-    activities: ["Writing with Skill", "Membean"],
+    label: "Language Arts",
+    activities: ["Writing with Skill", "Membean", "Spelling", "Italian", "Rosetta Stone"],
     icon: "✍️",
   },
   history: {
