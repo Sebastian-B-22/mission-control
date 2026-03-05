@@ -20,12 +20,22 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
 // Check if push notifications are supported
 export function isPushSupported(): boolean {
-  return 'serviceWorker' in navigator && 'PushManager' in window;
+  // iOS Safari can lack Notification in some contexts; guard to avoid ReferenceError
+  return (
+    typeof window !== 'undefined' &&
+    typeof navigator !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window
+  );
 }
 
 // Get current notification permission
 export function getNotificationPermission(): NotificationPermission {
-  return Notification.permission;
+  if (typeof window === 'undefined' || !("Notification" in window)) {
+    return 'default';
+  }
+  return window.Notification.permission;
 }
 
 // Request notification permission
@@ -33,7 +43,11 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   if (!isPushSupported()) {
     throw new Error('Push notifications are not supported');
   }
-  return await Notification.requestPermission();
+  // Safe on iOS: Notification may not exist even if other APIs do
+  if (!("Notification" in window)) {
+    throw new Error('Notifications are not supported');
+  }
+  return await window.Notification.requestPermission();
 }
 
 // Register service worker
