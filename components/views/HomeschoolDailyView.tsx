@@ -314,7 +314,12 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
     month: "long", 
     day: "numeric" 
   });
-  const dateKey = selectedDate.toISOString().split("T")[0]; // YYYY-MM-DD
+  const dateKey = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(selectedDate); // YYYY-MM-DD in PST
 
   // Get existing recap for this date
   const existingRecap = useQuery(api.dailyRecap.getRecap, { userId, date: dateKey });

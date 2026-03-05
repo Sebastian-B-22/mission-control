@@ -123,10 +123,20 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
     });
   };
 
+  const formatPstDateKey = (d: Date) => {
+    const fmt = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    return fmt.format(d);
+  };
+
   const navigateDate = (direction: number) => {
     const current = new Date(selectedDate + "T12:00:00");
     current.setDate(current.getDate() + direction);
-    setSelectedDate(current.toISOString().split("T")[0]);
+    setSelectedDate(formatPstDateKey(current));
   };
 
   const isToday = selectedDate === getPstDateKey();
@@ -176,7 +186,6 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
             variant="outline" 
             size="icon" 
             onClick={() => navigateDate(1)}
-            disabled={isToday}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
