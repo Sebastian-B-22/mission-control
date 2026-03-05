@@ -8,6 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CalendarDays, List, LayoutGrid, Plus, Trash2 } from "lucide-react";
 
 function startOfWeekMonday(date: Date): Date {
@@ -51,7 +58,10 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
   const toggleDone = useMutation(api.weeklyGoals.toggleDone);
   const removeGoal = useMutation(api.weeklyGoals.remove);
 
+  const rpmCategories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
+
   const [goalText, setGoalText] = useState("");
+  const [goalCategoryId, setGoalCategoryId] = useState<string>("");
 
   const days = useMemo(() => {
     return Array.from({ length: 7 }).map((_, i) => {
@@ -119,28 +129,55 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
           <CardTitle className="text-base">Weekly Goals</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 md:flex-row">
             <Input
               value={goalText}
               onChange={(e) => setGoalText(e.target.value)}
               placeholder="Add a goal for this week"
               onKeyDown={async (e) => {
                 if (e.key === "Enter" && goalText.trim()) {
-                  await addGoal({ userId, weekOf, text: goalText.trim() });
+                  await addGoal({
+                    userId,
+                    weekOf,
+                    text: goalText.trim(),
+                    categoryId: goalCategoryId ? (goalCategoryId as any) : undefined,
+                  });
                   setGoalText("");
                 }
               }}
             />
-            <Button
-              onClick={async () => {
-                if (!goalText.trim()) return;
-                await addGoal({ userId, weekOf, text: goalText.trim() });
-                setGoalText("");
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
+
+            <div className="flex gap-2">
+              <Select value={goalCategoryId} onValueChange={setGoalCategoryId}>
+                <SelectTrigger className="w-[210px]">
+                  <SelectValue placeholder="Assign RPM category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No category</SelectItem>
+                  {rpmCategories.map((c) => (
+                    <SelectItem key={c._id} value={c._id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                onClick={async () => {
+                  if (!goalText.trim()) return;
+                  await addGoal({
+                    userId,
+                    weekOf,
+                    text: goalText.trim(),
+                    categoryId: goalCategoryId ? (goalCategoryId as any) : undefined,
+                  });
+                  setGoalText("");
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -160,9 +197,16 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                         await toggleDone({ goalId: g._id, done: e.target.checked });
                       }}
                     />
-                    <span className={g.done ? "line-through text-muted-foreground" : ""}>
-                      {g.text}
-                    </span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={g.done ? "line-through text-muted-foreground" : ""}>
+                        {g.text}
+                      </span>
+                      {g.categoryId ? (
+                        <Badge variant="secondary" className="text-[11px]">
+                          {rpmCategories.find((c) => c._id === g.categoryId)?.name || "RPM"}
+                        </Badge>
+                      ) : null}
+                    </div>
                   </label>
                   <Button
                     variant="ghost"

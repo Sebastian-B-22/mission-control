@@ -893,6 +893,7 @@ export default defineSchema({
     userId: v.id("users"),
     weekOf: v.string(), // YYYY-MM-DD (Monday)
     text: v.string(),
+    categoryId: v.optional(v.id("rpmCategories")),
     done: v.boolean(),
     order: v.number(),
     createdAt: v.number(),

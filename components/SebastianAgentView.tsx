@@ -71,7 +71,7 @@ export function SebastianAgentView() {
       role: "Roma's Companion",
       status: "live",
       model: "openai-codex/gpt-5.2",
-      color: "pink",
+      color: "green",
       responsibilities: [
         "Creative projects",
         "Video editing & storytelling",
@@ -82,7 +82,7 @@ export function SebastianAgentView() {
     {
       name: "Joy",
       emoji: "🌸",
-      role: "Joy Support",
+      role: "Carolyn's Assistant",
       status: "live",
       model: "openai-codex/gpt-5.2",
       color: "rose",

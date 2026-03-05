@@ -14,7 +14,12 @@ export const listByWeek = query({
 });
 
 export const add = mutation({
-  args: { userId: v.id("users"), weekOf: v.string(), text: v.string() },
+  args: {
+    userId: v.id("users"),
+    weekOf: v.string(),
+    text: v.string(),
+    categoryId: v.optional(v.id("rpmCategories")),
+  },
   handler: async (ctx, args) => {
     const now = Date.now();
     const existing = await ctx.db
@@ -28,6 +33,7 @@ export const add = mutation({
       userId: args.userId,
       weekOf: args.weekOf,
       text: args.text,
+      categoryId: args.categoryId,
       done: false,
       order: maxOrder + 1,
       createdAt: now,
