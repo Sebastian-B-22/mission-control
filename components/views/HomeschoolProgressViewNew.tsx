@@ -138,6 +138,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
   const logActivity = useMutation(api.homeschoolActivities.logActivity);
   const toggleActivity = useMutation(api.homeschoolActivities.toggleActivity);
   const quickLog = useMutation(api.homeschoolActivities.quickLog);
+  const dedupeForDate = useMutation(api.activitiesAdmin.dedupeForDate);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + "T12:00:00");
@@ -390,6 +391,27 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
             <p className="text-sm text-muted-foreground mb-3">
               Click to log as completed for {selectedStudent === "both" ? "both kids" : selectedStudent}:
             </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm text-muted-foreground">
+                Click to log as completed for {selectedStudent === "both" ? "both kids" : selectedStudent}:
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    setQuickAddMessage(null);
+                    const res = await dedupeForDate({ userId, date: selectedDate });
+                    setQuickAddMessage(`Cleaned duplicates (deleted ${res.deleted}).`);
+                  } catch (e: any) {
+                    setQuickAddMessage(e?.message || "Failed to clean duplicates");
+                  }
+                }}
+              >
+                Clean duplicates (today)
+              </Button>
+            </div>
             {quickAddMessage && (
               <p className="text-xs text-muted-foreground mb-3">{quickAddMessage}</p>
             )}

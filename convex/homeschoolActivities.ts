@@ -201,7 +201,25 @@ export const quickLog = mutation({
     durationMinutes: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("homeschoolActivities", {
+    // Toggle behavior: if exists for (userId,date,student,category,activity), flip completed.
+    const existing = await ctx.db
+      .query("homeschoolActivities")
+      .withIndex("by_user_date", (q) => q.eq("userId", args.userId).eq("date", args.date))
+      .collect();
+
+    const match = existing.find(
+      (a) =>
+        a.student === args.student &&
+        a.category === args.category &&
+        a.activity === args.activity
+    );
+
+    if (match) {
+      await ctx.db.patch(match._id, { completed: !match.completed });
+      return { id: match._id, toggled: true, completed: !match.completed };
+    }
+
+    const id = await ctx.db.insert("homeschoolActivities", {
       userId: args.userId,
       date: args.date,
       student: args.student,
@@ -211,6 +229,8 @@ export const quickLog = mutation({
       durationMinutes: args.durationMinutes,
       createdAt: Date.now(),
     });
+
+    return { id, created: true, completed: true };
   },
 });
 
