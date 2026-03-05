@@ -49,9 +49,27 @@ const CATEGORIES = {
   },
   literature: {
     label: "Literature",
-    activities: ["Shakespeare"],
+    activities: ["Shakespeare", "Read Aloud", "Reading"],
     icon: "📖",
     color: "bg-rose-500",
+  },
+  science: {
+    label: "Science",
+    activities: ["Experiment", "Nature", "Other"],
+    icon: "🧪",
+    color: "bg-sky-500",
+  },
+  art: {
+    label: "Art",
+    activities: ["Drawing", "Painting", "Craft", "Other"],
+    icon: "🎨",
+    color: "bg-pink-500",
+  },
+  music: {
+    label: "Music",
+    activities: ["Piano", "Singing", "Listening", "Other"],
+    icon: "🎵",
+    color: "bg-indigo-500",
   },
   "life-skills": {
     label: "Life Skills",
@@ -60,7 +78,7 @@ const CATEGORIES = {
     color: "bg-teal-500",
   },
   pe: {
-    label: "Physical Education",
+    label: "PE",
     activities: [
       "Soccer",
       "Jiu-jitsu",

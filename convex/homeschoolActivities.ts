@@ -26,8 +26,23 @@ export const ACTIVITY_CONFIG = {
   },
   literature: {
     label: "Literature",
-    activities: ["Shakespeare"],
+    activities: ["Shakespeare", "Read Aloud", "Reading"],
     icon: "📖",
+  },
+  science: {
+    label: "Science",
+    activities: ["Experiment", "Nature", "Other"],
+    icon: "🧪",
+  },
+  art: {
+    label: "Art",
+    activities: ["Drawing", "Painting", "Craft", "Other"],
+    icon: "🎨",
+  },
+  music: {
+    label: "Music",
+    activities: ["Piano", "Singing", "Listening", "Other"],
+    icon: "🎵",
   },
   "life-skills": {
     label: "Life Skills",
@@ -35,7 +50,7 @@ export const ACTIVITY_CONFIG = {
     icon: "🛠️",
   },
   pe: {
-    label: "Physical Education",
+    label: "PE",
     activities: [
       "Soccer",
       "Jiu-jitsu",

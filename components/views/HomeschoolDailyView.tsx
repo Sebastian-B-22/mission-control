@@ -384,13 +384,19 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
 
       // History
       if (has("tuttle twins")) candidates.push({ category: "history", activity: "Tuttle Twins" });
-      if (has("story of the world") || has("nathan hale") || has("donner")) {
+      if (has("story of the world")) {
         candidates.push({ category: "history", activity: "Story of the World", notes: notes });
       }
+      if (has("nathan hale")) {
+        candidates.push({ category: "history", activity: "Nathan Hale", notes: notes });
+      }
+      if (has("donner")) {
+        candidates.push({ category: "history", activity: "Donner Party", notes: notes });
+      }
 
-      // Science / experiments (v1: treat as academics)
-      if (has("science") || has("experiment") || has("esophagus") || has("learning lab")) {
-        candidates.push({ category: "academics", activity: "Science", notes: notes });
+      // Science / experiments
+      if (has("science") || has("experiment") || has("esophagus") || has("learning lab") || has("science kit")) {
+        candidates.push({ category: "science", activity: "Experiment", notes: notes });
       }
 
       // PE
