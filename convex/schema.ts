@@ -871,6 +871,34 @@ export default defineSchema({
     syncedAt: v.number(),
   }).index("by_jobId", ["jobId"]),
 
+  // ─── Weekly Planning ────────────────────────────────────────────────────
+  // Synced calendar events (from local sync script) for merged calendars.
+  calendarEvents: defineTable({
+    userId: v.id("users"),
+    source: v.string(), // "google"
+    account: v.string(), // e.g. corinne@... or corinnebriers@...
+    calendarId: v.string(),
+    externalId: v.optional(v.string()), // provider event id
+    title: v.string(),
+    location: v.optional(v.string()),
+    startMs: v.number(),
+    endMs: v.number(),
+    allDay: v.boolean(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_start", ["userId", "startMs"])
+    .index("by_user_end", ["userId", "endMs"]),
+
+  weeklyGoals: defineTable({
+    userId: v.id("users"),
+    weekOf: v.string(), // YYYY-MM-DD (Monday)
+    text: v.string(),
+    done: v.boolean(),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user_week", ["userId", "weekOf"]),
+
   // ─── Push Notification Subscriptions ────────────────────────────────────
   // Web push subscriptions for real-time notifications
   pushSubscriptions: defineTable({

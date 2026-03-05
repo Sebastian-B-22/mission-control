@@ -70,6 +70,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       view: "daily",
     },
     {
+      name: "Weekly",
+      icon: Calendar,
+      view: "weekly",
+    },
+    {
       name: "Health",
       icon: Heart,
       view: "health",

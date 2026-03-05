@@ -12,6 +12,7 @@ import type * as admin from "../admin.js";
 import type * as agentHuddle from "../agentHuddle.js";
 import type * as agentTrigger from "../agentTrigger.js";
 import type * as books from "../books.js";
+import type * as calendarEvents from "../calendarEvents.js";
 import type * as camp from "../camp.js";
 import type * as checkIns from "../checkIns.js";
 import type * as contacts from "../contacts.js";
@@ -45,6 +46,7 @@ import type * as seedSebastianTasks from "../seedSebastianTasks.js";
 import type * as teamMembers from "../teamMembers.js";
 import type * as updateRPMGoals from "../updateRPMGoals.js";
 import type * as users from "../users.js";
+import type * as weeklyGoals from "../weeklyGoals.js";
 import type * as weeklySchedule from "../weeklySchedule.js";
 
 import type {
@@ -58,6 +60,7 @@ declare const fullApi: ApiFromModules<{
   agentHuddle: typeof agentHuddle;
   agentTrigger: typeof agentTrigger;
   books: typeof books;
+  calendarEvents: typeof calendarEvents;
   camp: typeof camp;
   checkIns: typeof checkIns;
   contacts: typeof contacts;
@@ -91,6 +94,7 @@ declare const fullApi: ApiFromModules<{
   teamMembers: typeof teamMembers;
   updateRPMGoals: typeof updateRPMGoals;
   users: typeof users;
+  weeklyGoals: typeof weeklyGoals;
   weeklySchedule: typeof weeklySchedule;
 }>;
 

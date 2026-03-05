@@ -64,6 +64,7 @@ import {
   HomeschoolTripsView,
 } from "@/components/views/HomeschoolSubViews";
 import { FinanceView } from "@/components/views/FinanceView";
+import { WeeklyView } from "@/components/WeeklyView";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -242,6 +243,9 @@ export default function DashboardPage() {
             <EveningReflection userId={convexUser._id} date={today} />
           </div>
         );
+
+      case "weekly":
+        return <WeeklyView userId={convexUser._id} />;
 
       case "personal-overview":
         return (

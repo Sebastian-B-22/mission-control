@@ -11,7 +11,7 @@ export function SebastianAgentView() {
       emoji: "⚡",
       role: "Chief of Staff",
       status: "active",
-      model: "claude-sonnet-4-5",
+      model: "openai-codex/gpt-5.2",
       color: "amber",
       responsibilities: [
         "Strategy & coordination",
@@ -26,22 +26,22 @@ export function SebastianAgentView() {
       emoji: "🔍",
       role: "Operations Commander",
       status: "live",
-      model: "claude-sonnet-4-5",
+      model: "openai-codex/gpt-5.2",
       color: "blue",
       responsibilities: [
-        "Quo message monitoring (9:30 PM daily)",
-        "Registration data analysis",
+        "Registration ops + staffing",
+        "Practice/day/time breakdowns",
         "Parent action item detection",
         "Early warning system",
       ],
-      lastActivity: "Today 5:15 PM",
+      lastActivity: "Recently",
     },
     {
       name: "Maven",
       emoji: "📣",
       role: "Marketing Brain",
       status: "live",
-      model: "claude-sonnet-4-5",
+      model: "openai-codex/gpt-5.2",
       color: "purple",
       responsibilities: [
         "HTA content creation",
@@ -49,7 +49,48 @@ export function SebastianAgentView() {
         "Landing page copy",
         "Corinne's voice & tone",
       ],
-      lastActivity: "Today 7:30 AM",
+      lastActivity: "Recently",
+    },
+    {
+      name: "Compass",
+      emoji: "🧭",
+      role: "Anthony's Companion",
+      status: "live",
+      model: "openai-codex/gpt-5.2",
+      color: "cyan",
+      responsibilities: [
+        "Homework & learning help",
+        "Projects (3D printing, stop motion)",
+        "Daily encouragement",
+      ],
+      lastActivity: "Recently",
+    },
+    {
+      name: "James",
+      emoji: "🎮",
+      role: "Roma's Companion",
+      status: "live",
+      model: "openai-codex/gpt-5.2",
+      color: "pink",
+      responsibilities: [
+        "Creative projects",
+        "Video editing & storytelling",
+        "Daily encouragement",
+      ],
+      lastActivity: "Recently",
+    },
+    {
+      name: "Joy",
+      emoji: "🌸",
+      role: "Joy Support",
+      status: "live",
+      model: "openai-codex/gpt-5.2",
+      color: "rose",
+      responsibilities: [
+        "Joy support channel",
+        "Security + reliability checks",
+      ],
+      lastActivity: "Recently",
     },
   ];
 
@@ -91,7 +132,7 @@ export function SebastianAgentView() {
       </div>
 
       {/* Agent Status Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {agents.map((agent) => (
           <Card key={agent.name} className={`border-l-4 border-l-${agent.color}-500`}>
             <CardHeader>
@@ -185,7 +226,6 @@ export function SebastianAgentView() {
           <div className="grid gap-3 md:grid-cols-4">
             {[
               { name: "Closer", emoji: "💰", role: "Sales Optimizer", eta: "April-May 2026" },
-              { name: "Compass", emoji: "📊", role: "Finance Director", eta: "Summer 2026" },
               { name: "Builder", emoji: "🏗️", role: "HTA Product Manager", eta: "Summer-Fall 2026" },
               { name: "Champion", emoji: "🏆", role: "Raving Fans Builder", eta: "Winter 2026-27" },
             ].map((agent) => (
@@ -216,8 +256,8 @@ export function SebastianAgentView() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">AGENTS DEPLOYED</p>
-              <p className="text-2xl font-bold">3</p>
-              <p className="text-xs text-muted-foreground">Sebastian + Scout + Maven</p>
+              <p className="text-2xl font-bold">6</p>
+              <p className="text-xs text-muted-foreground">Sebastian + Scout + Maven + Compass + James + Joy</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">FULL SQUAD TARGET</p>
