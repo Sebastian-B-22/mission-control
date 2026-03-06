@@ -12,8 +12,8 @@ interface AspireSpringViewProps {
 
 export function AspireSpringView({ userId }: AspireSpringViewProps) {
   const counts = useQuery(api.registrations.getAllCounts) || [];
-  const paliCount = counts.find(c => c.program === "spring-pali")?.count || 0;
-  const agouraCount = counts.find(c => c.program === "spring-agoura")?.count || 0;
+  const paliCount = counts.find((c: any) => c.program === "spring-pali")?.count || 0;
+  const agouraCount = counts.find((c: any) => c.program === "spring-agoura")?.count || 0;
 
   return (
     <div className="space-y-6">

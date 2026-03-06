@@ -217,7 +217,7 @@ export function ReadAloudList({ userId }: ReadAloudListProps) {
             {books.length === 0 ? (
               <p className="text-sm text-muted-foreground">No books currently being read</p>
             ) : (
-              books.map((book) => (
+              books.map((book: any) => (
                 <div
                   key={book._id}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 group"

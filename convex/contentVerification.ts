@@ -120,15 +120,15 @@ export const verifyContentAction = internalAction({
     const linkCheck = await runLinkCheck(item.content);
 
     const published = await ctx.runQuery(api.contentPipeline.listByStage, { stage: "published" });
-    const baselinePool = published.filter((p) => p.createdBy === item.createdBy);
+    const baselinePool = published.filter((p: any) => p.createdBy === item.createdBy);
     const baselineItems = baselinePool.length > 0 ? baselinePool : published;
 
     const draftTone = extractToneSignals(item.content);
     const baselineTone = baselineItems.length
       ? baselineItems
-          .map((p) => extractToneSignals(p.content))
+          .map((p: any) => extractToneSignals(p.content))
           .reduce(
-            (acc, cur) => ({
+            (acc: any, cur: any) => ({
               words: acc.words + cur.words,
               firstPersonRatio: acc.firstPersonRatio + cur.firstPersonRatio,
               questionRatio: acc.questionRatio + cur.questionRatio,

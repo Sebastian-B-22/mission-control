@@ -34,9 +34,9 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
     return current.toISOString().split("T")[0];
   }, [date]);
 
-  const completed = quickWins.filter((q) => q.completed).length;
+  const completed = quickWins.filter((q: any) => q.completed).length;
   const categoryNameById = useMemo(
-    () => new Map(rpmCategories.map((category) => [category._id, category.name])),
+    () => new Map(rpmCategories.map((category: any) => [category._id, category.name])),
     [rpmCategories]
   );
 
@@ -77,7 +77,7 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">No category</SelectItem>
-              {rpmCategories.map((category) => (
+              {rpmCategories.map((category: any) => (
                 <SelectItem key={category._id} value={category._id}>
                   {category.name}
                 </SelectItem>
@@ -90,7 +90,7 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
           {quickWins.length === 0 ? (
             <p className="text-sm text-muted-foreground">No quick wins yet.</p>
           ) : (
-            quickWins.map((item) => (
+            quickWins.map((item: any) => (
               <div key={item._id} className="flex items-center gap-2 p-2 border rounded-lg">
                 <Checkbox
                   checked={item.completed}
@@ -102,7 +102,7 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
                   </span>
                   {item.categoryId && categoryNameById.get(item.categoryId) && (
                     <p className="text-xs text-muted-foreground">
-                      {categoryNameById.get(item.categoryId)}
+                      {String(categoryNameById.get(item.categoryId) ?? "")}
                     </p>
                   )}
                 </div>

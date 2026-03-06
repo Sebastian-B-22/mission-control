@@ -23,9 +23,9 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
   });
 
   // Categorize tasks
-  const inProgress = tasks.filter(t => t.status === "in-progress");
-  const highPriorityTodo = tasks.filter(t => t.status === "todo" && t.priority === "high");
-  const completedToday = tasks.filter(t => {
+  const inProgress = tasks.filter((t: any) => t.status === "in-progress");
+  const highPriorityTodo = tasks.filter((t: any) => t.status === "todo" && t.priority === "high");
+  const completedToday = tasks.filter((t: any) => {
     if (t.status !== "done" || !t.completedAt) return false;
     const completedDate = new Date(t.completedAt);
     const isToday = completedDate.toDateString() === new Date().toDateString();
@@ -35,8 +35,8 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
   // Process Cron Jobs for Daily View
   // Filter for active jobs that run at a specific time (daily)
   const dailyTasks = cronJobs
-    .filter(job => job.status === "active")
-    .map(job => {
+    .filter((job: any) => job.status === "active")
+    .map((job: any) => {
       // Try to extract time from cron schedule
       // Format: "cron MIN HOUR * * * ..."
       const cronMatch = job.schedule.match(/cron (\d+) (\d+) .*/);
@@ -79,8 +79,8 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         sortTime
       };
     })
-    .filter((task): task is NonNullable<typeof task> => task !== null)
-    .sort((a, b) => a.sortTime - b.sortTime);
+    .filter((task: any): task is NonNullable<typeof task> => task !== null)
+    .sort((a: any, b: any) => a.sortTime - b.sortTime);
 
   const getCategoryEmoji = (category: string) => {
     const emojis: Record<string, string> = {
@@ -125,7 +125,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
             {inProgress.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nothing in progress</p>
             ) : (
-              inProgress.map((task) => (
+              inProgress.map((task: any) => (
                 <div key={task._id} className="p-3 bg-amber-950/50 rounded-lg border border-amber-800">
                   <div className="flex items-start gap-2">
                     <span className="text-lg flex-shrink-0">{getCategoryEmoji(task.category)}</span>
@@ -157,7 +157,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
             {highPriorityTodo.length === 0 ? (
               <p className="text-sm text-muted-foreground">No urgent tasks</p>
             ) : (
-              highPriorityTodo.map((task) => (
+              highPriorityTodo.map((task: any) => (
                 <div key={task._id} className="p-3 bg-red-950/50 rounded-lg border border-red-800">
                   <div className="flex items-start gap-2">
                     <span className="text-lg flex-shrink-0">{getCategoryEmoji(task.category)}</span>
@@ -189,7 +189,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
             {completedToday.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nothing completed yet</p>
             ) : (
-              completedToday.map((task) => (
+              completedToday.map((task: any) => (
                 <div key={task._id} className="p-3 bg-green-950/50 rounded-lg border border-green-800 opacity-80">
                   <div className="flex items-start gap-2">
                     <span className="text-lg flex-shrink-0">{getCategoryEmoji(task.category)}</span>
@@ -223,7 +223,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         <CardContent>
           <div className="space-y-2">
             {dailyTasks.length > 0 ? (
-              dailyTasks.map((item) => (
+              dailyTasks.map((item: any) => (
                 <div
                   key={item.id}
                   className="flex items-center justify-between p-3 rounded-lg border bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
@@ -252,7 +252,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         <Card className="bg-zinc-100 dark:bg-zinc-800/50">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-zinc-700 dark:text-zinc-300">{tasks.filter(t => t.status === "backlog").length}</div>
+              <div className="text-2xl font-bold text-zinc-700 dark:text-zinc-300">{tasks.filter((t: any) => t.status === "backlog").length}</div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Backlog</p>
             </div>
           </CardContent>
@@ -260,7 +260,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         <Card className="bg-blue-50 dark:bg-blue-900/30">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{tasks.filter(t => t.status === "todo").length}</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{tasks.filter((t: any) => t.status === "todo").length}</div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">To Do</p>
             </div>
           </CardContent>
@@ -276,7 +276,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         <Card className="bg-green-50 dark:bg-green-900/30">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{tasks.filter(t => t.status === "done").length}</div>
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{tasks.filter((t: any) => t.status === "done").length}</div>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Done (All Time)</p>
             </div>
           </CardContent>

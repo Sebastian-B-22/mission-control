@@ -12,7 +12,7 @@ interface AspirePDPViewProps {
 
 export function AspirePDPView({ userId }: AspirePDPViewProps) {
   const counts = useQuery(api.registrations.getAllCounts) || [];
-  const pdpCount = counts.find(c => c.program === "pdp")?.count || 0;
+  const pdpCount = counts.find((c: any) => c.program === "pdp")?.count || 0;
 
   return (
     <div className="space-y-6">

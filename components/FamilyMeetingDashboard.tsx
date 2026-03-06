@@ -63,9 +63,9 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
   //   }
   // }, [meeting, seedDemo, today, userId, weekOf]);
 
-  const suggestions = movieItems.filter((m) => m.type === "suggestion");
-  const watched = movieItems.filter((m) => m.type === "watched");
-  const activeQueue = discussionQueue.filter((q) => q.status !== "archived");
+  const suggestions = movieItems.filter((m: any) => m.type === "suggestion");
+  const watched = movieItems.filter((m: any) => m.type === "watched");
+  const activeQueue = discussionQueue.filter((q: any) => q.status !== "archived");
 
   const meetingDoc = useMemo(() => {
     return {
@@ -124,11 +124,11 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
             <div className="grid gap-2 sm:grid-cols-2">
               <Select value={memberFrom} onValueChange={setMemberFrom}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{familyMembers.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                <SelectContent>{familyMembers.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={memberTo} onValueChange={setMemberTo}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{familyMembers.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                <SelectContent>{familyMembers.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <Textarea value={ackMessage} onChange={(e) => setAckMessage(e.target.value)} placeholder="What are you acknowledging?" />
@@ -140,7 +140,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               setAckMessage("");
             }}>Add Acknowledgement</Button>
             <div className="space-y-2">
-              {meetingDoc.acknowledgements.map((a, i) => (
+              {meetingDoc.acknowledgements.map((a: any, i: any) => (
                 <div key={i} className="text-sm border rounded p-2"><b>{a.from}</b> → <b>{a.to}</b>: {a.message}</div>
               ))}
             </div>
@@ -162,7 +162,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               }}>Add</Button>
             </div>
             <div className="space-y-2">
-              {activeQueue.map((q) => (
+              {activeQueue.map((q: any) => (
                 <div key={q._id} className="border rounded p-2 space-y-2">
                   <div className="text-sm">{q.item}</div>
                   <Select
@@ -195,7 +195,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
             <div className="grid gap-2 sm:grid-cols-2">
               <Select value={supportPerson} onValueChange={setSupportPerson}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{familyMembers.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                <SelectContent>{familyMembers.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
               </Select>
               <Input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Support request" />
             </div>
@@ -207,7 +207,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               setSupportText("");
             }}>Add Request</Button>
             <div className="space-y-2">
-              {meetingDoc.supportRequests.map((s, i) => (
+              {meetingDoc.supportRequests.map((s: any, i: any) => (
                 <div key={i} className="border rounded p-2 flex items-center justify-between">
                   <span className="text-sm"><b>{s.person}</b>: {s.request}</span>
                   <Button size="sm" variant={s.conflict ? "default" : "outline"} onClick={async () => {
@@ -230,7 +230,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
             <div className="grid gap-2">
               <Select value={goalPerson} onValueChange={setGoalPerson}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{familyMembers.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                <SelectContent>{familyMembers.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
               </Select>
               <Input value={goalText} onChange={(e) => setGoalText(e.target.value)} placeholder="Weekly goal" />
               <Input value={habitFocus} onChange={(e) => setHabitFocus(e.target.value)} placeholder="Habit focus" />
@@ -242,7 +242,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               setHabitFocus("");
             }}>Add Goal</Button>
             <div className="space-y-2">
-              {meetingDoc.goals.map((g, i) => (
+              {meetingDoc.goals.map((g: any, i: any) => (
                 <div key={i} className="border rounded p-2 flex items-center justify-between text-sm">
                   <span><b>{g.person}</b>: {g.goal} {g.habitFocus ? `• ${g.habitFocus}` : ""}</span>
                   <Button size="sm" variant={g.completed ? "default" : "outline"} onClick={async () => {
@@ -266,7 +266,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               <Input value={movieTitle} onChange={(e) => setMovieTitle(e.target.value)} placeholder="Movie suggestion" />
               <Select value={movieBy} onValueChange={setMovieBy}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{familyMembers.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                <SelectContent>{familyMembers.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <Button onClick={async () => {
@@ -275,7 +275,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               setMovieTitle("");
             }}>Add Movie</Button>
             <div className="space-y-2">
-              {suggestions.map((m) => (
+              {suggestions.map((m: any) => (
                 <div key={m._id} className="border rounded p-2 text-sm space-y-2">
                   <div className="flex items-center justify-between"><span>{m.title}</span><span>{m.votes.length} votes</span></div>
                   <div className="flex gap-2">
@@ -284,7 +284,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
                   </div>
                 </div>
               ))}
-              {watched.slice(0, 4).map((m) => (
+              {watched.slice(0, 4).map((m: any) => (
                 <div key={m._id} className="border rounded p-2 text-xs text-muted-foreground">Watched: {m.title} {m.rating ? `• ${m.rating}/5` : ""} {m.favorite ? "⭐" : ""}</div>
               ))}
             </div>
@@ -300,7 +300,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
             <Input value={gameName} onChange={(e) => setGameName(e.target.value)} placeholder="Game played" />
             <Select value={gameWinner} onValueChange={setGameWinner}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{familyMembers.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+              <SelectContent>{familyMembers.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
             </Select>
             <Textarea value={gameMoment} onChange={(e) => setGameMoment(e.target.value)} placeholder="Fun moment" />
             <Button onClick={async () => {
@@ -310,7 +310,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               setGameMoment("");
             }}>Add Game Night</Button>
             <div className="space-y-2">
-              {meetingDoc.gameNights.map((g, i) => (
+              {meetingDoc.gameNights.map((g: any, i: any) => (
                 <div key={i} className="border rounded p-2 text-sm">{g.date}: <b>{g.game}</b> - Winner: {g.winner || "-"} {g.moment ? `• ${g.moment}` : ""}</div>
               ))}
             </div>

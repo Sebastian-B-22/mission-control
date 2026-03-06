@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -30,6 +30,25 @@ import {
 
 interface BookLibraryVisualProps {
   userId: Id<"users">;
+}
+
+type RecommendedBook = {
+  id: string;
+  title: string;
+  author?: string;
+  notes?: string;
+  reader?: "both" | "anthony" | "roma" | "family";
+};
+
+const RECOMMENDED_STORAGE_KEY = "missionControl.bookRecommendations.v1";
+
+function normalizeBookKey(title: string, author?: string) {
+  return `${title}`.trim().toLowerCase() + "::" + `${author || ""}`.trim().toLowerCase();
+}
+
+function buildAmazonSearchUrl(title: string, author?: string) {
+  const q = `${title} ${author || ""}`.trim();
+  return `https://www.amazon.com/s?k=${encodeURIComponent(q)}`;
 }
 
 // Fetch book cover from Open Library API
@@ -109,7 +128,14 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const [newAuthor, setNewAuthor] = useState("");
   const [newReader, setNewReader] = useState<string>("both");
   const [isSearching, setIsSearching] = useState(false);
-  const [activeTab, setActiveTab] = useState<"reading" | "finished" | "want-to-read">("want-to-read");
+  const [activeTab, setActiveTab] = useState<"reading" | "finished" | "want-to-read" | "recommended">("want-to-read");
+
+  // Recommended list (localStorage-backed for v1)
+  const [recTitle, setRecTitle] = useState("");
+  const [recAuthor, setRecAuthor] = useState("");
+  const [recNotes, setRecNotes] = useState("");
+  const [recommended, setRecommended] = useState<RecommendedBook[]>([]);
+  const [isAddingRec, setIsAddingRec] = useState(false);
   
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,11 +143,32 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const [selectedAuthor, setSelectedAuthor] = useState<string>("all");
   
   // Get unique categories and authors for filters
-  const categories = books ? [...new Set(books.map(b => b.category).filter(Boolean))] : [];
-  const authors = books ? [...new Set(books.map(b => b.author).filter(Boolean))] : [];
+  const categories = (books ? [...new Set(books.map((b: any) => b.category).filter(Boolean))] : []) as string[];
+  const authors = (books ? [...new Set(books.map((b: any) => b.author).filter(Boolean))] : []) as string[];
+
+  // Load recommended list from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(RECOMMENDED_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) setRecommended(parsed);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Persist recommended list to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(RECOMMENDED_STORAGE_KEY, JSON.stringify(recommended));
+    } catch {
+      // ignore
+    }
+  }, [recommended]);
 
   // Filter books by search and filters
-  const filteredBooks = books?.filter(book => {
+  const filteredBooks = books?.filter((book: any) => {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -145,7 +192,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   
   // Group filtered books by status
   // "Currently Reading" now pulls from readAloudBooks (the Read Aloud tab)
-  const currentlyReading = readAloudBooks?.map(b => ({
+  const currentlyReading = readAloudBooks?.map((b: any) => ({ 
     ...b,
     _id: b._id as unknown as Id<"bookLibrary">, // Type cast for compatibility
     status: "reading" as const,
@@ -157,8 +204,8 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   
   const booksByStatus = {
     "reading": currentlyReading,
-    "finished": filteredBooks.filter(b => b.status === "finished" || b.read),
-    "want-to-read": filteredBooks.filter(b => b.status === "want-to-read" || (!b.status && !b.read)),
+    "finished": filteredBooks.filter((b: any) => b.status === "finished" || b.read),
+    "want-to-read": filteredBooks.filter((b: any) => b.status === "want-to-read" || (!b.status && !b.read)), 
   };
   
   const hasActiveFilters = searchQuery || selectedCategory !== "all" || selectedAuthor !== "all";
@@ -171,12 +218,12 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
 
   const handleAdd = async () => {
     if (!newTitle.trim()) return;
-    
+
     setIsSearching(true);
-    
+
     // Fetch cover from Open Library
     const coverUrl = await fetchBookCover(newTitle, newAuthor);
-    
+
     await addBook({
       userId,
       title: newTitle.trim(),
@@ -185,12 +232,46 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
       reader: newReader,
       status: "want-to-read",
     });
-    
+
     setNewTitle("");
     setNewAuthor("");
     setNewReader("both");
     setShowAddForm(false);
     setIsSearching(false);
+  };
+
+  const addRecommendation = () => {
+    if (!recTitle.trim()) return;
+    setIsAddingRec(true);
+    try {
+      const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+      const next: RecommendedBook = {
+        id,
+        title: recTitle.trim(),
+        author: recAuthor.trim() || undefined,
+        notes: recNotes.trim() || undefined,
+        reader: "both",
+      };
+      setRecommended((prev) => [next, ...prev]);
+      setRecTitle("");
+      setRecAuthor("");
+      setRecNotes("");
+    } finally {
+      setIsAddingRec(false);
+    }
+  };
+
+  const markRecommendationOrdered = async (rec: RecommendedBook) => {
+    const coverUrl = await fetchBookCover(rec.title, rec.author);
+    await addBook({
+      userId,
+      title: rec.title,
+      author: rec.author,
+      coverUrl: coverUrl || undefined,
+      reader: rec.reader || "both",
+      status: "want-to-read",
+    });
+    setRecommended((prev) => prev.filter((r) => r.id !== rec.id));
   };
 
   const handleStatusChange = async (id: Id<"bookLibrary">, status: "want-to-read" | "reading" | "finished") => {
@@ -230,10 +311,22 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
     );
   }
 
+  // Hide recommendations already in library (or read aloud list)
+  const ownedKeys = new Set(
+    [
+      ...(books || []).map((b: any) => normalizeBookKey(b.title, b.author)),
+      ...(readAloudBooks || []).map((b: any) => normalizeBookKey(b.title, b.author)),
+    ].filter(Boolean)
+  );
+  const visibleRecommended = recommended.filter(
+    (r) => !ownedKeys.has(normalizeBookKey(r.title, r.author))
+  );
+
   const tabs = [
     { id: "reading" as const, label: "Currently Reading", icon: BookMarked, count: booksByStatus.reading.length },
     { id: "want-to-read" as const, label: "Want to Read", icon: BookOpen, count: booksByStatus["want-to-read"].length },
     { id: "finished" as const, label: "Finished", icon: BookCheck, count: booksByStatus.finished.length },
+    { id: "recommended" as const, label: "Recommended", icon: BookOpen, count: visibleRecommended.length },
   ];
 
   return (
@@ -321,7 +414,106 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
           </div>
         )}
 
+        {/* Recommended */}
+        {activeTab === "recommended" && (
+          <div className="space-y-3">
+            <div className="p-4 border rounded-lg bg-muted/30 space-y-2">
+              <div className="text-sm font-medium">Add a recommendation</div>
+              <Input
+                value={recTitle}
+                onChange={(e) => setRecTitle(e.target.value)}
+                placeholder="Book title..."
+                className="bg-background"
+              />
+              <Input
+                value={recAuthor}
+                onChange={(e) => setRecAuthor(e.target.value)}
+                placeholder="Author (optional)"
+                className="bg-background"
+              />
+              <Input
+                value={recNotes}
+                onChange={(e) => setRecNotes(e.target.value)}
+                placeholder="Notes / who recommended it (optional)"
+                className="bg-background"
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={addRecommendation}
+                  disabled={isAddingRec || !recTitle.trim()}
+                >
+                  Add
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setRecTitle("");
+                    setRecAuthor("");
+                    setRecNotes("");
+                  }}
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+
+            {visibleRecommended.length === 0 ? (
+              <div className="py-4 text-sm text-muted-foreground">
+                No recommendations yet. Add one above.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {visibleRecommended.map((rec) => (
+                  <div
+                    key={rec.id}
+                    className="border rounded-lg p-3 bg-background flex items-start justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm truncate">{rec.title}</div>
+                      {rec.author && (
+                        <div className="text-xs text-muted-foreground truncate">{rec.author}</div>
+                      )}
+                      {rec.notes && (
+                        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          {rec.notes}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(buildAmazonSearchUrl(rec.title, rec.author), "_blank")}
+                      >
+                        Amazon
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-amber-500 hover:bg-amber-600 text-black"
+                        onClick={() => markRecommendationOrdered(rec)}
+                      >
+                        Ordered → Want to Read
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setRecommended((prev) => prev.filter((r) => r.id !== rec.id))}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Search and Filters */}
+        {activeTab !== "recommended" && (
         <div className="space-y-3">
           {/* Search bar */}
           <div className="relative">
@@ -387,6 +579,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
             )}
           </div>
         </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-1 border-b">
@@ -411,11 +604,12 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
 
         {/* Book Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-          {booksByStatus[activeTab].map((book) => (
-            <div
-              key={book._id}
-              className="group relative flex flex-col items-center"
-            >
+          {activeTab !== "recommended" &&
+            booksByStatus[activeTab].map((book: any) => (
+              <div
+                key={book._id}
+                className="group relative flex flex-col items-center"
+              >
               {/* Cover */}
               <div 
                 className="relative cursor-pointer"
@@ -512,7 +706,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
             </div>
           ))}
           
-          {booksByStatus[activeTab].length === 0 && (
+          {activeTab !== "recommended" && booksByStatus[activeTab].length === 0 && (
             <div className="col-span-full py-8 text-center text-muted-foreground">
               <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No books in this category yet</p>

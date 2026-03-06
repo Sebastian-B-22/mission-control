@@ -112,7 +112,7 @@ function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | n
             <div>
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Players ({family.children.length})</h3>
               <div className="space-y-2">
-                {family.children.map((child) => (
+                {family.children.map((child: any) => (
                   <div key={child._id} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">{child.firstName} {child.lastName}</span>
@@ -127,7 +127,7 @@ function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | n
                         )}
                       </div>
                     </div>
-                    {(child as typeof child & { enrollments?: Array<{ _id: string; program: string; region?: string; season?: string; division?: string; practiceDay?: string }> }).enrollments?.map((enr) => (
+                    {(child as typeof child & { enrollments?: Array<{ _id: string; program: string; region?: string; season?: string; division?: string; practiceDay?: string }> }).enrollments?.map((enr: any) => (
                       <div key={enr._id} className="flex flex-wrap gap-1 mt-1">
                         <Badge variant="outline" className={`text-xs ${PROGRAM_CONFIG[enr.program]?.color || "bg-gray-100 text-gray-700"}`}>
                           {PROGRAM_CONFIG[enr.program]?.label || enr.program}
@@ -209,13 +209,13 @@ export function FamilyCRM() {
   const stats = useQuery(api.families.getStats);
   const syncAll = useAction(api.jotformSync.syncAll);
 
-  const filtered = families.filter((f) => {
+  const filtered = families.filter((f: any) => {
     const matchesSearch =
       !search.trim() ||
       `${f.parentFirstName} ${f.parentLastName}`.toLowerCase().includes(search.toLowerCase()) ||
       f.email.toLowerCase().includes(search.toLowerCase()) ||
       f.phone.includes(search) ||
-      f.children.some((c) => `${c.firstName} ${c.lastName}`.toLowerCase().includes(search.toLowerCase()));
+      f.children.some((c: any) => `${c.firstName} ${c.lastName}`.toLowerCase().includes(search.toLowerCase()));
     const matchesProgram = programFilter === "all" || f.programs.includes(programFilter);
     return matchesSearch && matchesProgram;
   });
@@ -319,7 +319,7 @@ export function FamilyCRM() {
         </Card>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((family) => (
+          {filtered.map((family: any) => (
             <FamilyCard key={family._id} family={family} onClick={() => setSelectedFamily(family._id)} />
           ))}
         </div>

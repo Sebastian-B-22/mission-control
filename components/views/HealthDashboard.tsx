@@ -512,7 +512,7 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
                       onClick={() => {
                         const dateStr = date.toISOString().split("T")[0];
                         setSelectedDate(dateStr);
-                        const health = monthHealth?.find((h) => h.date === dateStr);
+                        const health = monthHealth?.find((h: any) => h.date === dateStr);
                         setStepsInput(health?.steps?.toString() ?? "");
                       }}
                     />

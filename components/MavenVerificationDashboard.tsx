@@ -27,7 +27,7 @@ export function MavenVerificationDashboard() {
         <CardContent className="space-y-1">
           {stats.commonIssues.length === 0 ? (
             <p className="text-sm text-gray-400">No major issues yet</p>
-          ) : stats.commonIssues.map((i) => (
+          ) : stats.commonIssues.map((i: any) => (
             <p key={i.issue} className="text-sm text-amber-300">• {i.issue} ({i.count})</p>
           ))}
         </CardContent>
@@ -44,7 +44,7 @@ export function MavenVerificationDashboard() {
       <Card className="bg-gray-900/60 border-gray-800">
         <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-300">Weekly Trend</CardTitle></CardHeader>
         <CardContent className="space-y-1">
-          {stats.weeklyTrend.map((d) => (
+          {stats.weeklyTrend.map((d: any) => (
             <div key={d.dayOffset} className="flex items-center justify-between text-xs">
               <span className="text-gray-500">Day {d.dayOffset + 1}</span>
               <span className="text-gray-300">{d.passRate}% ({d.count})</span>

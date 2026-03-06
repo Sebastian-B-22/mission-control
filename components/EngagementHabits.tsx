@@ -284,7 +284,7 @@ export function EngagementHabits({ userId }: EngagementHabitsProps) {
             <div className="space-y-2">
               <p className="text-xs text-gray-500 font-medium">Today&apos;s Activities</p>
               <div className="flex flex-wrap gap-1.5">
-                {todayActivities.map((activity) => {
+                {todayActivities.map((activity: any) => {
                   const config = ACTIVITY_CONFIG[activity.type as ActivityType];
                   return (
                     <Badge

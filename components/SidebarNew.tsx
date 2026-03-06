@@ -39,8 +39,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
 
   // Get Sebastian&apos;s tasks for quick status
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
-  const inProgressCount = sebastianTasks.filter(t => t.status === "in-progress").length;
-  const todoCount = sebastianTasks.filter(t => t.status === "todo").length;
+  const inProgressCount = sebastianTasks.filter((t: any) => t.status === "in-progress").length;
+  const todoCount = sebastianTasks.filter((t: any) => t.status === "todo").length;
 
   // Get content pipeline review count for badge
   const pipelineReview = useQuery(api.contentPipeline.listByStage, { stage: "review" }) || [];
@@ -50,8 +50,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
 
   // Get RPM categories
   const categories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
-  const personalCategories = categories.filter(c => c.type === "personal");
-  const professionalCategories = categories.filter(c => c.type === "professional");
+  const personalCategories = categories.filter((c: any) => c.type === "personal");
+  const professionalCategories = categories.filter((c: any) => c.type === "professional");
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => 
@@ -127,7 +127,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "personal",
       children: [
-        ...personalCategories.map(cat => ({
+        ...personalCategories.map((cat: any) => ({
           name: cat.name,
           view: `personal-category-${cat._id}`,
           categoryId: cat._id,
@@ -141,7 +141,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       view: "professional-overview",
       expandable: true,
       section: "professional",
-      children: professionalCategories.map(cat => ({
+      children: professionalCategories.map((cat: any) => ({
         name: cat.name,
         view: `professional-category-${cat._id}`,
         categoryId: cat._id,
@@ -286,7 +286,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 {/* Sub-navigation */}
                 {item.expandable && item.section && isExpanded(item.section) && item.children && item.children.length > 0 && (
                   <div className="ml-4 mt-1 space-y-1 border-l-2 border-zinc-800 pl-2">
-                    {item.children.map((child) => (
+                    {item.children.map((child: any) => (
                       <button
                         key={child.view}
                         onClick={() => {

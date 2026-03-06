@@ -122,8 +122,8 @@ export function ProjectTaskList({
     );
   }
 
-  const activeTasks = tasks.filter((t) => t.status !== "done");
-  const completedTasks = tasks.filter((t) => t.status === "done");
+  const activeTasks = tasks.filter((t: any) => t.status !== "done");
+  const completedTasks = tasks.filter((t: any) => t.status === "done");
 
   return (
     <Card>
@@ -152,7 +152,7 @@ export function ProjectTaskList({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="unassigned">Unassigned</SelectItem>
-                  {teamMembers.map((member) => (
+                  {teamMembers.map((member: any) => (
                     <SelectItem key={member._id} value={member._id}>
                       {member.name}
                     </SelectItem>
@@ -175,7 +175,7 @@ export function ProjectTaskList({
             </p>
           )}
 
-          {activeTasks.map((task) => (
+          {activeTasks.map((task: any) => (
             <div
               key={task._id}
               className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
@@ -203,7 +203,7 @@ export function ProjectTaskList({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="unassigned">Unassigned</SelectItem>
-                    {teamMembers.map((member) => (
+                    {teamMembers.map((member: any) => (
                       <SelectItem key={member._id} value={member._id}>
                         {member.name}
                       </SelectItem>
@@ -227,7 +227,7 @@ export function ProjectTaskList({
         {completedTasks.length > 0 && (
           <div className="pt-4 space-y-2">
             <h4 className="text-sm font-medium text-muted-foreground">Completed</h4>
-            {completedTasks.map((task) => (
+            {completedTasks.map((task: any) => (
               <div
                 key={task._id}
                 className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50 group"

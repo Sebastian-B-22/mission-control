@@ -288,7 +288,7 @@ export default function AgentHuddle({ initialChannel = "main" }: AgentHuddleProp
             </div>
           ) : (
             <>
-              {messages.map((msg) => (
+              {messages.map((msg: any) => (
                 <MessageBubble key={msg._id} message={msg as HuddleMessage} />
               ))}
               <div ref={messagesEndRef} />

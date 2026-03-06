@@ -32,13 +32,13 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
   
   // Get Sebastian's tasks for quick status
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
-  const inProgressCount = sebastianTasks.filter(t => t.status === "in-progress").length;
-  const todoCount = sebastianTasks.filter(t => t.status === "todo").length;
+  const inProgressCount = sebastianTasks.filter((t: any) => t.status === "in-progress").length;
+  const todoCount = sebastianTasks.filter((t: any) => t.status === "todo").length;
 
   // Get RPM categories for quick links
   const categories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
-  const personalCategories = categories.filter(c => c.type === "personal");
-  const professionalCategories = categories.filter(c => c.type === "professional");
+  const personalCategories = categories.filter((c: any) => c.type === "personal");
+  const professionalCategories = categories.filter((c: any) => c.type === "professional");
 
   const navigation = [
     {
@@ -52,7 +52,7 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
       icon: Home,
       tab: "personal",
       badge: null,
-      children: personalCategories.slice(0, 3).map(cat => ({
+      children: personalCategories.slice(0, 3).map((cat: any) => ({
         name: cat.name,
         onClick: () => {
           onTabChange("personal");
@@ -65,7 +65,7 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
       icon: Briefcase,
       tab: "professional",
       badge: null,
-      children: professionalCategories.slice(0, 3).map(cat => ({
+      children: professionalCategories.slice(0, 3).map((cat: any) => ({
         name: cat.name,
         onClick: () => {
           onTabChange("professional");
@@ -154,7 +154,7 @@ export function Sidebar({ userId, currentTab, onTabChange }: SidebarProps) {
                 {/* Sub-navigation for categories */}
                 {item.children && item.children.length > 0 && currentTab === item.tab && (
                   <div className="ml-4 mt-1 space-y-1">
-                    {item.children.map((child, idx) => (
+                    {item.children.map((child: any, idx: any) => (
                       <button
                         key={idx}
                         onClick={child.onClick}

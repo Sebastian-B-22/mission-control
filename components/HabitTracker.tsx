@@ -66,7 +66,7 @@ export function HabitTracker({ userId, date }: HabitTrackerProps) {
     );
   }
 
-  const completed = dailyHabits.filter((h) => h.completed).length;
+  const completed = dailyHabits.filter((h: any) => h.completed).length;
   const total = dailyHabits.length;
 
   return (
@@ -79,7 +79,7 @@ export function HabitTracker({ userId, date }: HabitTrackerProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {dailyHabits.map((habit) => (
+          {dailyHabits.map((habit: any) => (
             <div
               key={habit._id}
               className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/50 transition-colors"

@@ -144,11 +144,11 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [today]);
 
-  const personalCategories = categories?.filter((c) => c.type === "personal") || [];
-  const professionalCategories = categories?.filter((c) => c.type === "professional") || [];
+  const personalCategories = categories?.filter((c: any) => c.type === "personal") || [];
+  const professionalCategories = categories?.filter((c: any) => c.type === "professional") || [];
 
   const handleEditCategory = (categoryId: Id<"rpmCategories">) => {
-    const category = categories?.find((c) => c._id === categoryId);
+    const category = categories?.find((c: any) => c._id === categoryId);
     if (category) {
       setEditingCategoryId(categoryId);
       setPurpose(category.purpose || "");
@@ -185,7 +185,7 @@ export default function DashboardPage() {
 
 
 
-  const editingCategory = categories?.find((c) => c._id === editingCategoryId);
+  const editingCategory = categories?.find((c: any) => c._id === editingCategoryId);
 
   if (!convexUser) {
     return (

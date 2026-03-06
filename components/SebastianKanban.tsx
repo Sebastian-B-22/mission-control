@@ -345,7 +345,7 @@ export function SebastianKanban({ userId }: { userId: Id<"users"> }) {
   // Apply assignee filter
   const filteredTasks = assigneeFilter === "all"
     ? tasks
-    : tasks.filter((t) => t.assignedTo === assigneeFilter);
+    : tasks.filter((t: any) => t.assignedTo === assigneeFilter);
 
   const handleAddTask = async () => {
     if (!newTaskTitle.trim()) return;
@@ -388,15 +388,15 @@ export function SebastianKanban({ userId }: { userId: Id<"users"> }) {
     });
   };
 
-  const backlogTasks    = filteredTasks.filter((t) => t.status === "backlog");
-  const todoTasks       = filteredTasks.filter((t) => t.status === "todo");
-  const inProgressTasks = filteredTasks.filter((t) => t.status === "in-progress");
-  const doneTasks       = filteredTasks.filter((t) => t.status === "done");
+  const backlogTasks    = filteredTasks.filter((t: any) => t.status === "backlog");
+  const todoTasks       = filteredTasks.filter((t: any) => t.status === "todo");
+  const inProgressTasks = filteredTasks.filter((t: any) => t.status === "in-progress");
+  const doneTasks       = filteredTasks.filter((t: any) => t.status === "done");
 
   // Stats
   const totalTasks   = tasks.length;
-  const sebastianTasks = tasks.filter((t) => t.assignedTo === "sebastian").length;
-  const inProgress   = tasks.filter((t) => t.status === "in-progress").length;
+  const sebastianTasks = tasks.filter((t: any) => t.assignedTo === "sebastian").length;
+  const inProgress   = tasks.filter((t: any) => t.status === "in-progress").length;
 
   return (
     <div className="space-y-4">

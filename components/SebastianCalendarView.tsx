@@ -19,15 +19,15 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
 
   // Process Cron Jobs
   const dailyRecurring = cronJobs
-    .filter(job => job.status === "active")
-    .filter(job => {
+    .filter((job: any) => job.status === "active")
+    .filter((job: any) => {
       if (showAllCron) return true;
       const name = job.name.toLowerCase();
       // Hide noisy infra jobs by default
       const noisy = ["huddle", "trigger poll", "activity alert", "security", "backup", "monitor", "check"].some(s => name.includes(s));
       return !noisy;
     })
-    .flatMap(job => {
+    .flatMap((job: any) => {
       // Format: "cron MIN HOUR DAY MONTH WEEKDAY ..." (may include tz suffix)
       if (!job.schedule.startsWith("cron ")) return [];
       const parts = job.schedule.replace("cron ", "").split(" ");
@@ -78,7 +78,7 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
 
       return out;
     })
-    .sort((a, b) => a.sortTime - b.sortTime);
+    .sort((a: any, b: any) => a.sortTime - b.sortTime);
 
   const [weekAnchor] = useState(() => new Date());
   const currentDay = weekAnchor.getDay();
@@ -134,7 +134,7 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
             </CardHeader>
             <CardContent className="space-y-1 pt-2">
               {/* Cron Jobs for this day */}
-              {dailyRecurring.map((item, i) => {
+              {dailyRecurring.map((item: any, i: any) => {
                 // Determine if we show this item today
                 const show = 
                   item.type === "daily" || 
@@ -196,7 +196,7 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {tasks.filter(t => t.status === "in-progress" || t.status === "todo").slice(0, 5).map((task) => (
+            {tasks.filter((t: any) => t.status === "in-progress" || t.status === "todo").slice(0, 5).map((task: any) => (
               <div key={task._id} className="flex items-center justify-between p-2 rounded border dark:border-zinc-700 text-sm">
                 <span>{task.title}</span>
                 <span className={`text-xs px-2 py-0.5 rounded ${

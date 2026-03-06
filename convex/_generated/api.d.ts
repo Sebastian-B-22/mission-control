@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as activitiesAdmin from "../activitiesAdmin.js";
 import type * as admin from "../admin.js";
 import type * as agentHuddle from "../agentHuddle.js";
 import type * as agentTrigger from "../agentTrigger.js";
@@ -38,6 +39,7 @@ import type * as mavenFeedback from "../mavenFeedback.js";
 import type * as projectTasks from "../projectTasks.js";
 import type * as push from "../push.js";
 import type * as pushActions from "../pushActions.js";
+import type * as recapImport from "../recapImport.js";
 import type * as registrations from "../registrations.js";
 import type * as rpm from "../rpm.js";
 import type * as scheduleReset from "../scheduleReset.js";
@@ -56,6 +58,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activitiesAdmin: typeof activitiesAdmin;
   admin: typeof admin;
   agentHuddle: typeof agentHuddle;
   agentTrigger: typeof agentTrigger;
@@ -86,6 +89,7 @@ declare const fullApi: ApiFromModules<{
   projectTasks: typeof projectTasks;
   push: typeof push;
   pushActions: typeof pushActions;
+  recapImport: typeof recapImport;
   registrations: typeof registrations;
   rpm: typeof rpm;
   scheduleReset: typeof scheduleReset;

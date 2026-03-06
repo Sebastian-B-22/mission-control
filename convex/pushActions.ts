@@ -45,7 +45,7 @@ export const sendToUser = action({
     });
 
     const results = await Promise.allSettled(
-      subscriptions.map((sub) => {
+      subscriptions.map((sub: any) => {
         const pushSubscription = {
           endpoint: sub.endpoint,
           keys: {
@@ -105,7 +105,7 @@ export const sendToAll = action({
     });
 
     const results = await Promise.allSettled(
-      subscriptions.map((sub) => {
+      subscriptions.map((sub: any) => {
         const pushSubscription = {
           endpoint: sub.endpoint,
           keys: {

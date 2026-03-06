@@ -82,10 +82,10 @@ export function GameLibraryVisual({ userId }: GameLibraryVisualProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   
   // Get unique categories for filters
-  const categories = games ? [...new Set(games.map(g => g.category).filter(Boolean))] : [];
+  const categories = (games ? [...new Set(games.map((g: any) => g.category).filter(Boolean))] : []) as string[];
 
   // Filter games by search and filters
-  const filteredGames = games?.filter(game => {
+  const filteredGames = games?.filter((game: any) => {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -104,9 +104,9 @@ export function GameLibraryVisual({ userId }: GameLibraryVisualProps) {
   
   // Group filtered games by status
   const gamesByStatus = {
-    "own": filteredGames.filter(g => g.status === "own" || !g.status),
-    "want": filteredGames.filter(g => g.status === "want"),
-    "favorites": filteredGames.filter(g => g.favorite),
+    "own": filteredGames.filter((g: any) => g.status === "own" || !g.status),
+    "want": filteredGames.filter((g: any) => g.status === "want"),
+    "favorites": filteredGames.filter((g: any) => g.favorite),
   };
   
   const hasActiveFilters = searchQuery || selectedCategory !== "all";
@@ -347,7 +347,7 @@ export function GameLibraryVisual({ userId }: GameLibraryVisualProps) {
 
         {/* Game Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-          {gamesByStatus[activeTab].map((game) => (
+          {gamesByStatus[activeTab].map((game: any) => (
             <div
               key={game._id}
               className="group relative flex flex-col items-center"

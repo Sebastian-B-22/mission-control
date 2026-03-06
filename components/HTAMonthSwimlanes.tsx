@@ -21,17 +21,17 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
 
   // Group tasks by target month
   const tasksByMonth = {
-    february: tasks.filter(t => t.dueDate && t.dueDate.startsWith("2026-02")),
-    march: tasks.filter(t => t.dueDate && t.dueDate.startsWith("2026-03")),
-    april: tasks.filter(t => t.dueDate && t.dueDate.startsWith("2026-04")),
-    may: tasks.filter(t => t.dueDate && t.dueDate.startsWith("2026-05")),
-    june: tasks.filter(t => t.dueDate && t.dueDate.startsWith("2026-06")),
-    noDate: tasks.filter(t => !t.dueDate),
+    february: tasks.filter((t: any) => t.dueDate && t.dueDate.startsWith("2026-02")),
+    march: tasks.filter((t: any) => t.dueDate && t.dueDate.startsWith("2026-03")),
+    april: tasks.filter((t: any) => t.dueDate && t.dueDate.startsWith("2026-04")),
+    may: tasks.filter((t: any) => t.dueDate && t.dueDate.startsWith("2026-05")),
+    june: tasks.filter((t: any) => t.dueDate && t.dueDate.startsWith("2026-06")),
+    noDate: tasks.filter((t: any) => !t.dueDate),
   };
 
   const getMonthProgress = (monthTasks: typeof tasks) => {
     if (monthTasks.length === 0) return 0;
-    const completed = monthTasks.filter(t => t.status === "done").length;
+    const completed = monthTasks.filter((t: any) => t.status === "done").length;
     return Math.round((completed / monthTasks.length) * 100);
   };
 
@@ -106,7 +106,7 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
       {/* Month Swimlanes */}
       {monthData.map((month) => {
         const progress = getMonthProgress(month.tasks);
-        const completedCount = month.tasks.filter(t => t.status === "done").length;
+        const completedCount = month.tasks.filter((t: any) => t.status === "done").length;
 
         return (
           <Card key={month.key} className="overflow-hidden">
@@ -132,8 +132,8 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
               ) : (
                 <div className="space-y-3">
                   {month.tasks
-                    .sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""))
-                    .map((task) => (
+                    .sort((a: any, b: any) => (a.dueDate || "").localeCompare(b.dueDate || ""))
+                    .map((task: any) => (
                       <div
                         key={task._id}
                         className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
@@ -219,7 +219,7 @@ export function HTAMonthSwimlanes({ userId }: HTAMonthSwimlanesProps) {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="space-y-2">
-              {tasksByMonth.noDate.map((task) => (
+              {tasksByMonth.noDate.map((task: any) => (
                 <div
                   key={task._id}
                   className="flex items-center gap-2 p-2 rounded bg-amber-50 border border-amber-200 text-sm"

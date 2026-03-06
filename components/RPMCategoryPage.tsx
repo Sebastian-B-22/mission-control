@@ -77,7 +77,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
           <CardContent>
             {category.yearlyGoals.length > 0 ? (
               <ul className="space-y-2">
-                {category.yearlyGoals.map((goal, i) => (
+                {category.yearlyGoals.map((goal: any, i: any) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-amber-500 mt-1">●</span>
                     <span className="text-foreground">{goal}</span>
@@ -98,7 +98,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
           <CardContent>
             {category.monthlyFocus.length > 0 ? (
               <ul className="space-y-2">
-                {category.monthlyFocus.map((focus, i) => (
+                {category.monthlyFocus.map((focus: any, i: any) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-red-500 mt-1">●</span>
                     <span className="text-foreground">{focus}</span>
@@ -126,7 +126,7 @@ export function RPMCategoryPage({ categoryId }: RPMCategoryPageProps) {
             <div className="space-y-3">
               <p className="text-sm font-medium">{accomplishments.count} completed item{accomplishments.count === 1 ? "" : "s"}</p>
               <ul className="space-y-2">
-                {accomplishments.items.map((item, index) => (
+                {accomplishments.items.map((item: any, index: any) => (
                   <li key={`${item.source}-${item.completedAt}-${index}`} className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-600" />
                     <div>

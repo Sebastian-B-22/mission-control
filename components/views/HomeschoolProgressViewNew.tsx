@@ -37,9 +37,15 @@ const CATEGORIES = {
   },
   history: {
     label: "History",
-    activities: ["Tuttle Twins", "Story of the World"],
+    activities: [],
     icon: "🌍",
     color: "bg-amber-500",
+  },
+  financial: {
+    label: "Financial Literacy",
+    activities: ["Tuttle Twins (Supply & Demand)"],
+    icon: "💵",
+    color: "bg-emerald-500",
   },
   math: {
     label: "Math",
@@ -70,12 +76,6 @@ const CATEGORIES = {
     activities: ["Piano", "Singing", "Listening", "Other"],
     icon: "🎵",
     color: "bg-indigo-500",
-  },
-  financial: {
-    label: "Financial Literacy",
-    activities: ["Money Management", "Budgeting", "Investing", "Other"],
-    icon: "💵",
-    color: "bg-emerald-500",
   },
   "life-skills": {
     label: "Life Skills",
@@ -139,6 +139,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
   const toggleActivity = useMutation(api.homeschoolActivities.toggleActivity);
   const quickLog = useMutation(api.homeschoolActivities.quickLog);
   const dedupeForDate = useMutation(api.activitiesAdmin.dedupeForDate);
+  const rebuildFromRecap = useMutation(api.activitiesAdmin.rebuildFromRecap);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + "T12:00:00");
@@ -388,29 +389,46 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
       {showQuickAdd && (
         <Card className="border-2 border-dashed border-amber-500 bg-amber-50/50 dark:bg-amber-900/10">
           <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground mb-3">
-              Click to log as completed for {selectedStudent === "both" ? "both kids" : selectedStudent}:
-            </p>
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm text-muted-foreground">
                 Click to log as completed for {selectedStudent === "both" ? "both kids" : selectedStudent}:
               </p>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={async () => {
-                  try {
-                    setQuickAddMessage(null);
-                    const res = await dedupeForDate({ userId, date: selectedDate });
-                    setQuickAddMessage(`Cleaned duplicates (deleted ${res.deleted}).`);
-                  } catch (e: any) {
-                    setQuickAddMessage(e?.message || "Failed to clean duplicates");
-                  }
-                }}
-              >
-                Clean duplicates (today)
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      setQuickAddMessage(null);
+                      const res = await dedupeForDate({ userId, date: selectedDate });
+                      setQuickAddMessage(`Cleaned duplicates (deleted ${res.deleted}).`);
+                    } catch (e: any) {
+                      setQuickAddMessage(e?.message || "Failed to clean duplicates");
+                    }
+                  }}
+                >
+                  Clean duplicates
+                </Button>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    if (!confirm(`Rebuild activities for ${selectedDate} from your recap? This will reset the list for that day.`)) return;
+                    try {
+                      setQuickAddMessage(null);
+                      const res = await rebuildFromRecap({ userId, date: selectedDate });
+                      setQuickAddMessage(`Rebuilt from recap. Cleared ${res.cleared.deleted}, imported ${res.imported.inserted ?? 0}.`);
+                    } catch (e: any) {
+                      setQuickAddMessage(e?.message || "Failed to rebuild from recap");
+                    }
+                  }}
+                >
+                  Rebuild from recap
+                </Button>
+              </div>
             </div>
             {quickAddMessage && (
               <p className="text-xs text-muted-foreground mb-3">{quickAddMessage}</p>

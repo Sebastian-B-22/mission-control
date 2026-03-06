@@ -34,7 +34,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
 
   const tasks = fiveToThrive?.tasks || [];
   const categoryNameById = useMemo(
-    () => new Map(rpmCategories.map((category) => [category._id, category.name])),
+    () => new Map(rpmCategories.map((category: any) => [category._id, category.name])),
     [rpmCategories]
   );
 
@@ -71,7 +71,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   };
 
   const handleDeleteTask = async (index: number) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
+    const updatedTasks = tasks.filter((_: any, i: any) => i !== index);
 
     await saveFiveToThrive({
       userId,
@@ -94,7 +94,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
     }
   };
 
-  const completedCount = tasks.filter((t) => t.completed).length;
+  const completedCount = tasks.filter((t: any) => t.completed).length;
 
   return (
     <Card>
@@ -142,7 +142,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">No category</SelectItem>
-                {rpmCategories.map((category) => (
+                {rpmCategories.map((category: any) => (
                   <SelectItem key={category._id} value={category._id}>
                     {category.name}
                   </SelectItem>
@@ -165,7 +165,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
               No tasks yet. Add your top 5 priorities for today!
             </p>
           ) : (
-            tasks.map((task, index) => (
+            tasks.map((task: any, index: any) => (
               <div
                 key={index}
                 className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
@@ -185,7 +185,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
                   </span>
                   {task.categoryId && categoryNameById.get(task.categoryId) && (
                     <p className="text-xs text-muted-foreground">
-                      {categoryNameById.get(task.categoryId)}
+                      {String(categoryNameById.get(task.categoryId) ?? "")}
                     </p>
                   )}
                 </div>

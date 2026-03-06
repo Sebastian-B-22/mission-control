@@ -957,7 +957,7 @@ http.route({
         byReason: stats.byReason,
         recommendations,
       },
-      recentFeedback: feedback.slice(0, 20).map(f => ({
+      recentFeedback: feedback.slice(0, 20).map((f: any) => ({
         id: f._id,
         type: f.feedbackType,
         reason: f.reason,
