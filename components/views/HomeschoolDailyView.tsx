@@ -415,12 +415,26 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
         candidates.push({ category: "science", activity: detail, notes: notes });
       }
 
+      // Typing
+      if (has("typing")) candidates.push({ category: "life-skills", activity: "Typing", notes: notes });
+      
+      // Financial Literacy
+      if (has("compound interest") || has("financial literacy")) {
+        const detail = has("compound interest") ? "Compound Interest Activity" : "Financial Literacy";
+        candidates.push({ category: "financial", activity: detail, notes: notes });
+      }
+      
       // PE
       if (has("boxing")) candidates.push({ category: "pe", activity: "Boxing" });
       if (has("jiu")) candidates.push({ category: "pe", activity: "Jiu-jitsu" });
       if (has("horse")) candidates.push({ category: "pe", activity: "Other PE", notes: notes });
       if (has("ninja")) candidates.push({ category: "pe", activity: "Ninja Academy" });
 
+      // Writing
+      if (has("writing with skill") || has("writing skill")) {
+        candidates.push({ category: "writing", activity: "Writing with Skill", notes: notes });
+      }
+      
       // Reading / literature (v1)
       if (has("read aloud") || has("read-aloud")) candidates.push({ category: "literature", activity: "Read Aloud", notes: notes });
       if (has("wings of fire") || has("redwall") || has("they read")) {

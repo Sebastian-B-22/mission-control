@@ -467,6 +467,11 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
           const categoryActivities = activitiesByCategory[key] || [];
           const completed = categoryActivities.filter(a => a.completed).length;
           
+          // Don't render empty categories
+          if (categoryActivities.length === 0) {
+            return null;
+          }
+          
           return (
             <Card key={key}>
               <CardHeader className="pb-2">
@@ -475,19 +480,14 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                     <span className="text-lg">{config.icon}</span>
                     {config.label}
                   </span>
-                  {categoryActivities.length > 0 && (
-                    <Badge variant={completed === categoryActivities.length ? "default" : "secondary"}>
-                      {completed}/{categoryActivities.length}
-                    </Badge>
-                  )}
+                  <Badge variant={completed === categoryActivities.length ? "default" : "secondary"}>
+                    {completed}/{categoryActivities.length}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {categoryActivities.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No activities logged</p>
-                ) : (
-                  <div className="space-y-2">
-                    {categoryActivities.map((act) => (
+                <div className="space-y-2">
+                  {categoryActivities.map((act) => (
                       <div
                         key={act._id}
                         className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
