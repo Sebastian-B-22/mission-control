@@ -16,6 +16,7 @@ import type * as books from "../books.js";
 import type * as calendarEvents from "../calendarEvents.js";
 import type * as camp from "../camp.js";
 import type * as checkIns from "../checkIns.js";
+import type * as cleanupDuplicates from "../cleanupDuplicates.js";
 import type * as contacts from "../contacts.js";
 import type * as contentPipeline from "../contentPipeline.js";
 import type * as contentVerification from "../contentVerification.js";
@@ -66,6 +67,7 @@ declare const fullApi: ApiFromModules<{
   calendarEvents: typeof calendarEvents;
   camp: typeof camp;
   checkIns: typeof checkIns;
+  cleanupDuplicates: typeof cleanupDuplicates;
   contacts: typeof contacts;
   contentPipeline: typeof contentPipeline;
   contentVerification: typeof contentVerification;

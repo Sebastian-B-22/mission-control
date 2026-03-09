@@ -235,22 +235,52 @@ export const markCompleted = mutation({
 });
 
 /**
- * Clean up old progress records (keep last 30 days)
+ * Clean up old progress records (TEMP: deleting old platform names)
  */
 export const cleanupOldRecords = mutation({
   args: {},
   handler: async (ctx) => {
-    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    // TEMP: Delete old platform name entries
+    const oldPlatforms = ["Math Academy", "Membean", "Rosetta Stone", "Typing.com"];
     
-    const oldRecords = await ctx.db
-      .query("homeschoolProgress")
-      .filter((q) => q.lt(q.field("scrapedAt"), thirtyDaysAgo))
-      .collect();
-    
-    for (const record of oldRecords) {
-      await ctx.db.delete(record._id);
+    let deleted = 0;
+    for (const platform of oldPlatforms) {
+      const entries = await ctx.db
+        .query("homeschoolProgress")
+        .withIndex("by_platform", (q) => q.eq("platform", platform))
+        .collect();
+      
+      for (const entry of entries) {
+        await ctx.db.delete(entry._id);
+        deleted++;
+      }
     }
     
-    return { deleted: oldRecords.length };
+    return { deleted, message: "Deleted old platform name entries" };
+  },
+});
+
+/**
+ * Delete old platform name entries (capitalized versions)
+ */
+export const cleanupOldPlatformNames = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const oldPlatforms = ["Math Academy", "Membean", "Rosetta Stone", "Typing.com"];
+    
+    let deleted = 0;
+    for (const platform of oldPlatforms) {
+      const entries = await ctx.db
+        .query("homeschoolProgress")
+        .withIndex("by_platform", (q) => q.eq("platform", platform))
+        .collect();
+      
+      for (const entry of entries) {
+        await ctx.db.delete(entry._id);
+        deleted++;
+      }
+    }
+    
+    return { deleted };
   },
 });
