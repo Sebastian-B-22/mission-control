@@ -20,6 +20,32 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
+
+// Helper to make URLs in notes clickable
+function Linkify({ text }: { text: string }) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return (
+    <>
+      {parts.map((part, i) =>
+        urlRegex.test(part) ? (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-purple-400 hover:text-purple-300 underline break-all"
+          >
+            {part}
+          </a>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
 import {
   Dialog,
   DialogContent,
@@ -285,7 +311,7 @@ function ContentCard({
         {/* Notes */}
         {item.notes && (
           <div className="bg-gray-700/50 rounded p-2">
-            <p className="text-xs text-gray-300 line-clamp-2 italic">📎 {item.notes}</p>
+            <p className="text-xs text-gray-300 line-clamp-2 italic">📎 <Linkify text={item.notes} /></p>
           </div>
         )}
 
@@ -595,7 +621,7 @@ function ContentModal({
           ) : item.notes ? (
             <div className="bg-gray-800/60 rounded p-3 border border-gray-700">
               <p className="text-xs text-gray-400 mb-1">Notes</p>
-              <p className="text-sm text-gray-300 italic">{item.notes}</p>
+              <p className="text-sm text-gray-300 italic"><Linkify text={item.notes} /></p>
             </div>
           ) : null}
 
