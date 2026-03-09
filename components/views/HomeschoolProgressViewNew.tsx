@@ -511,7 +511,6 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                       </div>
                     ))}
                   </div>
-                )}
               </CardContent>
             </Card>
           );
