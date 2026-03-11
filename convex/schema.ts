@@ -836,6 +836,22 @@ export default defineSchema({
     lastUpdated: v.number(),
   }).index("by_program", ["program"]),
 
+  // ─── Pending / Next Up ───────────────────────────────────────────────
+  // Lightweight open items tracker
+  pendingItems: defineTable({
+    title: v.string(),
+    details: v.optional(v.string()),
+    owner: v.string(), // "corinne" | "sebastian" | "scout" | "maven" | ... | "unassigned"
+    status: v.union(v.literal("open"), v.literal("blocked"), v.literal("done")),
+    source: v.union(v.literal("huddle"), v.literal("telegram"), v.literal("manual")),
+    dueAt: v.optional(v.number()),
+    tags: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status", "updatedAt"])
+    .index("by_owner", ["owner", "updatedAt"]),
+
   // ─── Agent Huddle ──────────────────────────────────────────────────────
   // Inter-agent communication - organized by channels
   agentHuddle: defineTable({

@@ -101,6 +101,14 @@ http.route({
   }),
 });
 
+http.route({
+  path: "/pending-items/create",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, { status: 204, headers: corsHeaders() });
+  }),
+});
+
 // ─── GET /tasks - List tasks ───────────────────────────────────────────────
 //
 // Query params:
@@ -1440,6 +1448,59 @@ http.route({
   path: "/telegram/outbox/failed",
   method: "OPTIONS",
   handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+// ─── POST /pending-items/create - Create a Pending / Next Up item ─────────
+//
+// Body (JSON):
+//   title   (required)
+//   details (optional)
+//   owner   (optional)  - "corinne" | "sebastian" | ... | "unassigned"
+//   source  (optional)  - "huddle" | "telegram" | "manual" (default: "huddle")
+//   dueAt   (optional)  - ms timestamp
+//   tags    (optional)  - string[]
+//
+// Auth: X-Agent-Key header (same as other agent HTTP endpoints)
+http.route({
+  path: "/pending-items/create",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) {
+      return errorResponse("Unauthorized", 401);
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const title = String(body.title || "").trim();
+    if (!title) return errorResponse("Missing required field: title");
+
+    const details = body.details ? String(body.details) : undefined;
+    const owner = body.owner ? String(body.owner) : undefined;
+    const source = body.source ? String(body.source) : "huddle";
+    if (!['huddle','telegram','manual'].includes(source)) {
+      return errorResponse('Invalid source. Must be: huddle | telegram | manual');
+    }
+
+    const dueAt = body.dueAt !== undefined ? Number(body.dueAt) : undefined;
+    const tags = Array.isArray(body.tags) ? (body.tags as unknown[]).map((t) => String(t)) : undefined;
+
+    const id = await ctx.runMutation(api.pendingItems.create, {
+      title,
+      details,
+      owner,
+      source: source as "huddle" | "telegram" | "manual",
+      dueAt: dueAt && Number.isFinite(dueAt) ? dueAt : undefined,
+      tags,
+      status: "open",
+    });
+
+    return jsonResponse({ ok: true, id });
+  }),
 });
 
 export default http;

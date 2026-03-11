@@ -1,12 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
@@ -52,6 +55,59 @@ export function AgentHQ() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [sendOk, setSendOk] = useState<string | null>(null);
+
+  // Pending / Next Up
+  const createPendingItem = useMutation(api.pendingItems.create);
+  const setPendingItemStatus = useMutation(api.pendingItems.setStatus);
+
+  const [pendingOwnerFilter, setPendingOwnerFilter] = useState<string>("all");
+  const [pendingTagFilter, setPendingTagFilter] = useState<string>("");
+  const [pendingIncludeDone, setPendingIncludeDone] = useState(false);
+
+  const [piTitle, setPiTitle] = useState("");
+  const [piDetails, setPiDetails] = useState("");
+  const [piOwner, setPiOwner] = useState("corinne");
+  const [piTags, setPiTags] = useState("");
+  const [piSaving, setPiSaving] = useState(false);
+  const [piError, setPiError] = useState<string | null>(null);
+
+  const pendingItems = useQuery(api.pendingItems.list, {
+    owner: pendingOwnerFilter === "all" ? undefined : pendingOwnerFilter,
+    tag: pendingTagFilter.trim() ? pendingTagFilter.trim() : undefined,
+    includeDone: pendingIncludeDone,
+    limit: 80,
+  });
+
+  async function addPendingItem() {
+    const title = piTitle.trim();
+    if (!title) return;
+    setPiSaving(true);
+    setPiError(null);
+
+    try {
+      const tags = piTags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+      await createPendingItem({
+        title,
+        details: piDetails.trim() ? piDetails.trim() : undefined,
+        owner: piOwner.trim() ? piOwner.trim() : "unassigned",
+        status: "open",
+        source: "manual",
+        tags,
+      });
+
+      setPiTitle("");
+      setPiDetails("");
+      setPiTags("");
+    } catch (e) {
+      setPiError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setPiSaving(false);
+    }
+  }
 
   // One query for feed - filter client-side.
   const recent = useQuery(api.agentHuddle.getRecent, { limit: 80 }) as HuddleMsg[] | undefined;
@@ -131,6 +187,168 @@ export function AgentHQ() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Pending / Next Up */}
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-base">Pending / Next Up</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              A lightweight list of open items to track what needs doing next.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Quick add */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+              <div className="md:col-span-5 space-y-2">
+                <Label htmlFor="pi-title">Title</Label>
+                <Input
+                  id="pi-title"
+                  value={piTitle}
+                  onChange={(e) => setPiTitle(e.target.value)}
+                  placeholder="e.g. Follow up with Agoura roster"
+                />
+              </div>
+              <div className="md:col-span-3 space-y-2">
+                <Label htmlFor="pi-owner">Owner</Label>
+                <Input
+                  id="pi-owner"
+                  value={piOwner}
+                  onChange={(e) => setPiOwner(e.target.value)}
+                  placeholder="corinne / sebastian / scout"
+                />
+              </div>
+              <div className="md:col-span-4 space-y-2">
+                <Label htmlFor="pi-tags">Tags (comma-separated)</Label>
+                <Input
+                  id="pi-tags"
+                  value={piTags}
+                  onChange={(e) => setPiTags(e.target.value)}
+                  placeholder="aspire, registration"
+                />
+              </div>
+              <div className="md:col-span-12 space-y-2">
+                <Label htmlFor="pi-details">Details (optional)</Label>
+                <Textarea
+                  id="pi-details"
+                  value={piDetails}
+                  onChange={(e) => setPiDetails(e.target.value)}
+                  placeholder="Context, links, what ‘done’ means…"
+                  className="min-h-[70px]"
+                />
+              </div>
+              <div className="md:col-span-12 flex items-center gap-3">
+                <Button onClick={addPendingItem} disabled={piSaving || !piTitle.trim()}>
+                  {piSaving ? "Adding..." : "Add"}
+                </Button>
+                {piError && <p className="text-xs text-red-400">{piError}</p>}
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row md:items-end gap-3">
+              <div className="w-full md:w-[220px] space-y-2">
+                <Label htmlFor="pi-filter-owner">Filter owner</Label>
+                <Input
+                  id="pi-filter-owner"
+                  value={pendingOwnerFilter === "all" ? "" : pendingOwnerFilter}
+                  onChange={(e) => setPendingOwnerFilter(e.target.value.trim() ? e.target.value.trim() : "all")}
+                  placeholder="(blank = all)"
+                />
+              </div>
+              <div className="w-full md:w-[220px] space-y-2">
+                <Label htmlFor="pi-filter-tag">Filter tag</Label>
+                <Input
+                  id="pi-filter-tag"
+                  value={pendingTagFilter}
+                  onChange={(e) => setPendingTagFilter(e.target.value)}
+                  placeholder="e.g. aspire"
+                />
+              </div>
+              <div className="flex items-center gap-2 md:pb-2">
+                <Checkbox
+                  id="pi-include-done"
+                  checked={pendingIncludeDone}
+                  onCheckedChange={(v) => setPendingIncludeDone(Boolean(v))}
+                />
+                <Label htmlFor="pi-include-done" className="text-sm">
+                  Include done
+                </Label>
+              </div>
+            </div>
+
+            {/* List */}
+            <div className="space-y-2 max-h-[360px] overflow-auto pr-2">
+              {!pendingItems ? (
+                <p className="text-xs text-muted-foreground">Loading…</p>
+              ) : pendingItems.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No pending items.</p>
+              ) : (
+                pendingItems.map((item) => (
+                  <div key={item._id} className="border border-zinc-800 rounded-lg p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-medium text-sm truncate">{item.title}</span>
+                          <Badge variant={item.status === "blocked" ? "destructive" : item.status === "done" ? "secondary" : "outline"} className="text-[10px]">
+                            {item.status}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px]">
+                            owner: {item.owner}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px]">
+                            {item.source}
+                          </Badge>
+                        </div>
+                        {item.details && (
+                          <div className="mt-2 text-sm whitespace-pre-wrap text-zinc-200">{item.details}</div>
+                        )}
+                        {item.tags?.length ? (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {item.tags.map((t: string) => (
+                              <Badge key={t} variant="secondary" className="text-[10px]">
+                                {t}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="flex flex-col gap-2 shrink-0">
+                        {item.status !== "done" && (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => setPendingItemStatus({ id: item._id, status: "done" })}
+                          >
+                            Mark done
+                          </Button>
+                        )}
+                        {item.status !== "blocked" && item.status !== "done" && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setPendingItemStatus({ id: item._id, status: "blocked" })}
+                          >
+                            Block
+                          </Button>
+                        )}
+                        {item.status === "blocked" && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setPendingItemStatus({ id: item._id, status: "open" })}
+                          >
+                            Unblock
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Quick Send */}
         <Card className="lg:col-span-1">
           <CardHeader>
