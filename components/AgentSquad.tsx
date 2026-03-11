@@ -86,27 +86,9 @@ export function AgentSquad() {
   }
 
   if (offline) {
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            🤖 Agent Squad
-            <span className="text-xs font-normal text-gray-500 ml-auto">
-              Paperclip offline
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">
-            Paperclip server is not running. Start it with:{" "}
-            <code className="bg-gray-800 px-2 py-1 rounded text-xs">
-              cd ~/.openclaw/workspace/projects/paperclip && pnpm dev
-            </code>
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
+
 
   // Sort: CEO first, then by name
   const sortedAgents = [...agents].sort((a, b) => {
