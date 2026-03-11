@@ -1361,4 +1361,85 @@ http.route({
   handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// TELEGRAM OUTBOX ENDPOINTS
+// Queue-based delivery to Telegram topics (sent by the host via OpenClaw)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /telegram/outbox - Get pending outbox items
+// Query params: limit (default 20)
+http.route({
+  path: "/telegram/outbox",
+  method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "20");
+
+    const items = await ctx.runQuery(internal.telegramOutbox.getPendingInternal, { limit });
+
+    return jsonResponse({ items, count: items.length, pollTime: Date.now() });
+  }),
+});
+
+// POST /telegram/outbox/sent - Mark an outbox item as sent
+// Body: { id: string, telegramMessageId?: string }
+http.route({
+  path: "/telegram/outbox/sent",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+
+    const body = (await req.json()) as { id?: string; telegramMessageId?: string };
+    if (!body.id) return jsonResponse({ error: "Missing id" }, 400);
+
+    await ctx.runMutation(internal.telegramOutbox.markSentInternal, {
+      id: body.id as Id<"telegramOutbox">,
+      telegramMessageId: body.telegramMessageId,
+    });
+
+    return jsonResponse({ success: true });
+  }),
+});
+
+// POST /telegram/outbox/failed - Mark an outbox item as failed
+// Body: { id: string, error: string }
+http.route({
+  path: "/telegram/outbox/failed",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+
+    const body = (await req.json()) as { id?: string; error?: string };
+    if (!body.id || !body.error) {
+      return jsonResponse({ error: "Missing required fields: id, error" }, 400);
+    }
+
+    await ctx.runMutation(internal.telegramOutbox.markFailedInternal, {
+      id: body.id as Id<"telegramOutbox">,
+      error: body.error,
+    });
+
+    return jsonResponse({ success: true });
+  }),
+});
+
+// OPTIONS for CORS preflight
+http.route({
+  path: "/telegram/outbox",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+http.route({
+  path: "/telegram/outbox/sent",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+http.route({
+  path: "/telegram/outbox/failed",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
 export default http;

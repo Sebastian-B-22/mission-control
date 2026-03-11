@@ -70,8 +70,8 @@ export function getTargetAgents(
   // Remove the sender from targets (don't wake yourself)
   targets.delete(fromAgent.toLowerCase());
   
-  // Corinne doesn't get automated triggers (she's the human)
-  targets.delete("corinne");
+  // Note: Keep "corinne" in targets - the poll script will send her
+  // a Telegram notification instead of trying to wake an agent
   
   return Array.from(targets);
 }

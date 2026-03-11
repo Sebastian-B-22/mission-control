@@ -199,6 +199,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "agents",
       children: [
+        { name: "Agent HQ", view: "agent-hq" },
         { name: "Main Huddle", view: "agent-huddle-main" },
         { name: "Aspire Ops", view: "agent-huddle-aspire-ops" },
         { name: "HTA Launch", view: "agent-huddle-hta-launch" },

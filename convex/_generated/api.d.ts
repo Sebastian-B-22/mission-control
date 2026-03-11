@@ -47,6 +47,7 @@ import type * as scheduleReset from "../scheduleReset.js";
 import type * as sebastianTasks from "../sebastianTasks.js";
 import type * as seedSebastianTasks from "../seedSebastianTasks.js";
 import type * as teamMembers from "../teamMembers.js";
+import type * as telegramOutbox from "../telegramOutbox.js";
 import type * as updateRPMGoals from "../updateRPMGoals.js";
 import type * as users from "../users.js";
 import type * as weeklyGoals from "../weeklyGoals.js";
@@ -98,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   sebastianTasks: typeof sebastianTasks;
   seedSebastianTasks: typeof seedSebastianTasks;
   teamMembers: typeof teamMembers;
+  telegramOutbox: typeof telegramOutbox;
   updateRPMGoals: typeof updateRPMGoals;
   users: typeof users;
   weeklyGoals: typeof weeklyGoals;

@@ -66,6 +66,7 @@ import {
 import { FinanceView } from "@/components/views/FinanceView";
 import { WeeklyView } from "@/components/WeeklyView";
 import { AgentSquad } from "@/components/AgentSquad";
+import { AgentHQ } from "@/components/AgentHQ";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -269,6 +270,9 @@ export default function DashboardPage() {
 
       case "sebastian":
         return <SebastianWorkspace userId={convexUser._id} />;
+
+      case "agent-hq":
+        return <AgentHQ />;
 
       // Agent Huddle channels
       case "agent-huddle-main":

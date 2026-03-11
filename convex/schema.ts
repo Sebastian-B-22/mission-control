@@ -841,6 +841,26 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_created", ["createdAt"]),
 
+  // ─── Telegram Outbox ─────────────────────────────────────────────────────
+  // Server-side queue for messages that should be delivered to Telegram topics.
+  // The Mac mini poller can fetch pending items and send via OpenClaw.
+  telegramOutbox: defineTable({
+    text: v.string(),
+    // "operations" | "marketing" | "family" | "ideas" | "general"
+    topic: v.string(),
+    // Optional OpenClaw telegram account routing (default/scout/maven/compass/james)
+    accountId: v.optional(v.string()),
+    requestedBy: v.optional(v.string()),
+    status: v.union(v.literal("pending"), v.literal("sent"), v.literal("failed")),
+    createdAt: v.number(),
+    sentAt: v.optional(v.number()),
+    failedAt: v.optional(v.number()),
+    telegramMessageId: v.optional(v.string()),
+    error: v.optional(v.string()),
+  })
+    .index("by_status", ["status"])
+    .index("by_created", ["createdAt"]),
+
   // ─── Homeschool Platform Progress ───────────────────────────────────────
   // Aggregated progress data from Math Academy, Rosetta Stone, etc.
   homeschoolProgress: defineTable({
