@@ -65,6 +65,7 @@ import {
 } from "@/components/views/HomeschoolSubViews";
 import { FinanceView } from "@/components/views/FinanceView";
 import { WeeklyView } from "@/components/WeeklyView";
+import { AgentSquad } from "@/components/AgentSquad";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -230,6 +231,7 @@ export default function DashboardPage() {
                 })}
               </h2>
             </div>
+            <AgentSquad />
             <MorningMindset userId={convexUser._id} date={today} />
             {user?.id && <SurpriseCard clerkId={user.id} />}
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
