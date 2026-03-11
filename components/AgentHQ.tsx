@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import type { Doc } from "@/convex/_generated/dataModel";
+import type { Doc, Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,7 +49,7 @@ type HuddleMsg = Doc<"agentHuddle"> & {
   deliveredAt?: number;
 };
 
-export function AgentHQ() {
+export function AgentHQ({ userId }: { userId: Id<"users"> }) {
   const [topic, setTopic] = useState<TopicKey>("general");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -77,6 +77,28 @@ export function AgentHQ() {
     includeDone: pendingIncludeDone,
     limit: 80,
   });
+
+  // Overnight Inbox (since 9pm)
+  function since9pmMs() {
+    const now = new Date();
+    const ninePm = new Date(now);
+    ninePm.setHours(21, 0, 0, 0);
+    if (now.getTime() < ninePm.getTime()) {
+      ninePm.setDate(ninePm.getDate() - 1);
+    }
+    return ninePm.getTime();
+  }
+
+  const overnightSince = since9pmMs();
+
+  const overnightItems = useQuery(api.overnightInbox.listNewSince, {
+    sinceMs: overnightSince,
+    limit: 60,
+  });
+
+  const overnightArchive = useMutation(api.overnightInbox.archive);
+  const overnightPromoteToPending = useMutation(api.overnightInbox.promoteToPending);
+  const overnightPromoteToProjects = useMutation(api.overnightInbox.promoteToProjects);
 
   async function addPendingItem() {
     const title = piTitle.trim();
@@ -187,6 +209,91 @@ export function AgentHQ() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Overnight Inbox */}
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-base">Overnight Inbox (since 9pm)</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              New items pushed in by the Mac mini poller for quick morning triage.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {!overnightItems ? (
+              <p className="text-xs text-muted-foreground">Loading…</p>
+            ) : overnightItems.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No new items since 9pm.</p>
+            ) : (
+              <div className="space-y-2 max-h-[360px] overflow-auto pr-2">
+                {overnightItems.map((it) => (
+                  <div key={it._id} className="border border-zinc-800 rounded-lg p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="secondary" className="text-[10px]">{it.source}</Badge>
+                          {it.channel ? (
+                            <Badge variant="outline" className="text-[10px]">ch: {it.channel}</Badge>
+                          ) : null}
+                          {it.topic ? (
+                            <Badge variant="outline" className="text-[10px]">topic: {it.topic}</Badge>
+                          ) : null}
+                          {it.author ? (
+                            <Badge variant="outline" className="text-[10px]">by {it.author}</Badge>
+                          ) : null}
+                          <Badge variant="outline" className="text-[10px]">{formatTime(it.createdAt)}</Badge>
+                        </div>
+                        <div className="mt-2 text-sm whitespace-pre-wrap text-zinc-200">{it.text}</div>
+                        {it.tags?.length ? (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {it.tags.map((t: string) => (
+                              <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            await overnightPromoteToProjects({
+                              id: it._id,
+                              userId,
+                              status: "backlog",
+                            });
+                          }}
+                        >
+                          Promote to Projects
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={async () => {
+                            await overnightPromoteToPending({
+                              id: it._id,
+                              owner: "corinne",
+                            });
+                          }}
+                        >
+                          Promote to Pending
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            await overnightArchive({ id: it._id });
+                          }}
+                        >
+                          Archive
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Pending / Next Up */}
         <Card className="lg:col-span-3">
           <CardHeader>

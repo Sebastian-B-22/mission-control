@@ -1503,4 +1503,63 @@ http.route({
   }),
 });
 
+// ─── Overnight Inbox Ingest ───────────────────────────────────────────────
+// POST /overnight-inbox/ingest
+// Body (JSON):
+//   source  (required) - "huddle" | "telegram"
+//   text    (required) - string
+//   channel (optional)
+//   topic   (optional)
+//   author  (optional)
+//   tags    (optional) - string[]
+//   createdAt (optional) - ms timestamp
+//
+// Auth: X-Agent-Key header
+http.route({
+  path: "/overnight-inbox/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/overnight-inbox/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) {
+      return errorResponse("Unauthorized", 401);
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const source = String(body.source || "").trim();
+    if (!source) return errorResponse("Missing required field: source");
+    if (!['huddle','telegram'].includes(source)) {
+      return errorResponse("Invalid source. Must be: huddle | telegram");
+    }
+
+    const text = String(body.text || "").trim();
+    if (!text) return errorResponse("Missing required field: text");
+
+    const tags = Array.isArray(body.tags) ? (body.tags as unknown[]).map((t) => String(t)) : undefined;
+    const createdAt = body.createdAt !== undefined ? Number(body.createdAt) : undefined;
+
+    const id = await ctx.runMutation(api.overnightInbox.ingest, {
+      source: source as "huddle" | "telegram",
+      channel: body.channel ? String(body.channel) : undefined,
+      topic: body.topic ? String(body.topic) : undefined,
+      text,
+      author: body.author ? String(body.author) : undefined,
+      tags,
+      createdAt: createdAt && Number.isFinite(createdAt) ? createdAt : undefined,
+    });
+
+    return jsonResponse({ ok: true, id }, 201);
+  }),
+});
+
 export default http;

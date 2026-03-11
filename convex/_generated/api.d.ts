@@ -38,6 +38,7 @@ import type * as homeschoolProgress from "../homeschoolProgress.js";
 import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
 import type * as mavenFeedback from "../mavenFeedback.js";
+import type * as overnightInbox from "../overnightInbox.js";
 import type * as pendingItems from "../pendingItems.js";
 import type * as projectTasks from "../projectTasks.js";
 import type * as push from "../push.js";
@@ -92,6 +93,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   jotformSync: typeof jotformSync;
   mavenFeedback: typeof mavenFeedback;
+  overnightInbox: typeof overnightInbox;
   pendingItems: typeof pendingItems;
   projectTasks: typeof projectTasks;
   push: typeof push;

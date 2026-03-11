@@ -852,6 +852,31 @@ export default defineSchema({
     .index("by_status", ["status", "updatedAt"])
     .index("by_owner", ["owner", "updatedAt"]),
 
+  // ─── Overnight Inbox ───────────────────────────────────────────────────
+  // Captures overnight ideas/messages for manual triage in Agent HQ.
+  overnightInbox: defineTable({
+    source: v.union(v.literal("huddle"), v.literal("telegram")),
+    channel: v.optional(v.string()),
+    topic: v.optional(v.string()),
+    text: v.string(),
+    author: v.optional(v.string()),
+    createdAt: v.number(),
+    triageStatus: v.union(
+      v.literal("new"),
+      v.literal("promoted"),
+      v.literal("archived")
+    ),
+    promotedTo: v.optional(
+      v.object({
+        taskId: v.optional(v.id("sebastianTasks")),
+        pendingItemId: v.optional(v.id("pendingItems")),
+      })
+    ),
+    tags: v.array(v.string()),
+  })
+    .index("by_created", ["createdAt"])
+    .index("by_status", ["triageStatus", "createdAt"]),
+
   // ─── Agent Huddle ──────────────────────────────────────────────────────
   // Inter-agent communication - organized by channels
   agentHuddle: defineTable({

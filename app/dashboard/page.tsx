@@ -273,7 +273,7 @@ export default function DashboardPage() {
         return <SebastianWorkspace userId={convexUser._id} />;
 
       case "agent-hq":
-        return <AgentHQ />;
+        return <AgentHQ userId={convexUser._id} />;
 
       // Agent Huddle channels
       case "agent-huddle-main":
