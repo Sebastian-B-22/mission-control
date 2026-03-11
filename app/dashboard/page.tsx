@@ -28,6 +28,7 @@ import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import AgentHuddle from "@/components/AgentHuddle";
 import { ContentPipeline } from "@/components/ContentPipeline";
 import { MavenVerificationDashboard } from "@/components/MavenVerificationDashboard";
+import { EmailDraftsView } from "@/components/EmailDraftsView";
 import { MemoryView } from "@/components/MemoryView";
 import { EngagementHabits } from "@/components/EngagementHabits";
 import { SidebarNew } from "@/components/SidebarNew";
@@ -522,6 +523,9 @@ export default function DashboardPage() {
             <ContentPipeline />
           </div>
         );
+
+      case "email-drafts":
+        return <EmailDraftsView />;
 
       case "memory":
         return <MemoryView />;

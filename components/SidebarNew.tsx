@@ -188,6 +188,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Projects & Backlog", view: "sebastian" },
         { name: "Agent Ideas", view: "agent-ideas" },
         { name: "Content Pipeline", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
+        { name: "Email Drafts", view: "email-drafts" },
         { name: "Engagement", view: "engagement-habits" },
         { name: "Memory Search", view: "memory" },
       ]

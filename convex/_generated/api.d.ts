@@ -23,6 +23,7 @@ import type * as contentVerification from "../contentVerification.js";
 import type * as cronJobs from "../cronJobs.js";
 import type * as daily from "../daily.js";
 import type * as dailyRecap from "../dailyRecap.js";
+import type * as emailDrafts from "../emailDrafts.js";
 import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
 import type * as familyMeeting from "../familyMeeting.js";
@@ -75,6 +76,7 @@ declare const fullApi: ApiFromModules<{
   cronJobs: typeof cronJobs;
   daily: typeof daily;
   dailyRecap: typeof dailyRecap;
+  emailDrafts: typeof emailDrafts;
   engagementHabits: typeof engagementHabits;
   families: typeof families;
   familyMeeting: typeof familyMeeting;

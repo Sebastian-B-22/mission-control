@@ -362,6 +362,37 @@ export default defineSchema({
     .index("by_content", ["contentId"])
     .index("by_verified_at", ["verifiedAt"]),
 
+  // ─── Email Draft Editor (Phase 1) ─────────────────────────────────────
+  emailDrafts: defineTable({
+    title: v.string(),
+    bodyMarkdown: v.string(),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("review"),
+      v.literal("approved"),
+      v.literal("sent")
+    ),
+    tags: v.array(v.string()),
+    suggestions: v.array(
+      v.object({
+        id: v.string(),
+        proposedBodyMarkdown: v.string(),
+        author: v.string(),
+        createdAt: v.number(),
+        status: v.union(
+          v.literal("pending"),
+          v.literal("accepted"),
+          v.literal("rejected")
+        ),
+      })
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    lastEditedBy: v.string(),
+  })
+    .index("by_status", ["status"])
+    .index("by_updated", ["updatedAt"]),
+
   // ─── Camp Registration ────────────────────────────────────────────────
   campRegistrations: defineTable({
     season: v.string(),
