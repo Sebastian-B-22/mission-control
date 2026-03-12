@@ -124,10 +124,14 @@ export default function KidsTypingGame({ userId }: Props) {
   const anthonyBn = balances?.anthony?.barnes_points ?? 0;
   const familyBnPoints = romaBn + anthonyBn;
 
-  const familyBnPct = clampPct(familyBnPoints / BN_TRIP_POINTS_TARGET);
+  const bnTripUnlocked = romaBn >= BN_TRIP_MIN_PER_CHILD && anthonyBn >= BN_TRIP_MIN_PER_CHILD;
+  const familyBnPointsForBar = bnTripUnlocked
+    ? familyBnPoints
+    : Math.min(romaBn, BN_TRIP_MIN_PER_CHILD) + Math.min(anthonyBn, BN_TRIP_MIN_PER_CHILD);
+
+  const familyBnPct = clampPct(familyBnPointsForBar / BN_TRIP_POINTS_TARGET);
   const bnRomaPctToMin = clampPct(romaBn / BN_TRIP_MIN_PER_CHILD);
   const bnAnthonyPctToMin = clampPct(anthonyBn / BN_TRIP_MIN_PER_CHILD);
-  const bnTripUnlocked = romaBn >= BN_TRIP_MIN_PER_CHILD && anthonyBn >= BN_TRIP_MIN_PER_CHILD;
 
   const childRobloxPoints = balances?.[child]?.roblox_points ?? 0;
   const childRobloxPct = clampPct(childRobloxPoints / ROBLOX_GC_POINTS_TARGET);

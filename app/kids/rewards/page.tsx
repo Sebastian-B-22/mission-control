@@ -53,12 +53,18 @@ export default function KidsRewardsPage() {
   const anthonyBn = balances?.anthony?.barnes_points ?? 0;
 
   const familyBnPoints = romaBn + anthonyBn;
-  const familyBnPct = clampPct(familyBnPoints / BN_TRIP_POINTS_TARGET);
 
-  // Option A gating: both kids must reach the minimum.
+  // Option A gating: treat the trip as a shared goal that only completes when BOTH
+  // kids hit the minimum. While locked, cap each kid's contribution to the minimum
+  // so the family bar can't "finish" off one kid doing all the work.
+  const bnTripUnlocked = romaBn >= BN_TRIP_MIN_PER_CHILD && anthonyBn >= BN_TRIP_MIN_PER_CHILD;
+  const familyBnPointsForBar = bnTripUnlocked
+    ? familyBnPoints
+    : Math.min(romaBn, BN_TRIP_MIN_PER_CHILD) + Math.min(anthonyBn, BN_TRIP_MIN_PER_CHILD);
+  const familyBnPct = clampPct(familyBnPointsForBar / BN_TRIP_POINTS_TARGET);
+
   const bnRomaPctToMin = clampPct(romaBn / BN_TRIP_MIN_PER_CHILD);
   const bnAnthonyPctToMin = clampPct(anthonyBn / BN_TRIP_MIN_PER_CHILD);
-  const bnTripUnlocked = romaBn >= BN_TRIP_MIN_PER_CHILD && anthonyBn >= BN_TRIP_MIN_PER_CHILD;
 
   const childRobloxPoints = totals?.roblox_points ?? 0;
   const childRobloxPct = clampPct(childRobloxPoints / ROBLOX_GC_POINTS_TARGET);
