@@ -41,7 +41,7 @@ export default function KidsTypingPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-950 via-black to-indigo-950 text-white p-4">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-black to-cyan-950 text-white p-4">
       {/* Ambient aurora + shimmer */}
       <div className="pointer-events-none absolute inset-0 kids-aurora" />
       <div className="pointer-events-none absolute -inset-x-24 top-0 h-24 opacity-20 kids-shimmer" />

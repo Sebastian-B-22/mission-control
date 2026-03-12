@@ -242,6 +242,11 @@ export default function KidsTypingGame({ userId }: Props) {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant={child === "roma" ? "default" : "outline"}
+            className={
+              child === "roma"
+                ? "bg-cyan-400/90 text-black hover:bg-cyan-300"
+                : "border-white/15 bg-transparent hover:bg-white/5"
+            }
             onClick={() => {
               setChild("roma");
               reset();
@@ -251,6 +256,11 @@ export default function KidsTypingGame({ userId }: Props) {
           </Button>
           <Button
             variant={child === "anthony" ? "default" : "outline"}
+            className={
+              child === "anthony"
+                ? "bg-cyan-400/90 text-black hover:bg-cyan-300"
+                : "border-white/15 bg-transparent hover:bg-white/5"
+            }
             onClick={() => {
               setChild("anthony");
               reset();
@@ -265,6 +275,11 @@ export default function KidsTypingGame({ userId }: Props) {
               <Button
                 size="sm"
                 variant={rewardChoice === "bot" ? "default" : "outline"}
+                className={
+                  rewardChoice === "bot"
+                    ? "bg-cyan-400/90 text-black hover:bg-cyan-300"
+                    : "border-white/15 bg-transparent hover:bg-white/5"
+                }
                 onClick={() => setRewardChoice("bot")}
               >
                 Bot
@@ -272,6 +287,11 @@ export default function KidsTypingGame({ userId }: Props) {
               <Button
                 size="sm"
                 variant={rewardChoice === "barnes" ? "default" : "outline"}
+                className={
+                  rewardChoice === "barnes"
+                    ? "bg-cyan-400/90 text-black hover:bg-cyan-300"
+                    : "border-white/15 bg-transparent hover:bg-white/5"
+                }
                 onClick={() => setRewardChoice("barnes")}
               >
                 B&N
@@ -279,6 +299,11 @@ export default function KidsTypingGame({ userId }: Props) {
               <Button
                 size="sm"
                 variant={rewardChoice === "roblox" ? "default" : "outline"}
+                className={
+                  rewardChoice === "roblox"
+                    ? "bg-cyan-400/90 text-black hover:bg-cyan-300"
+                    : "border-white/15 bg-transparent hover:bg-white/5"
+                }
                 onClick={() => setRewardChoice("roblox")}
               >
                 Roblox
@@ -297,7 +322,7 @@ export default function KidsTypingGame({ userId }: Props) {
         </div>
       </div>
 
-      <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
+      <Card className="border-white/10 bg-slate-950/50 backdrop-blur">
         <CardHeader className="pb-3">
           <CardTitle className="text-xl">Wings Typing - Dragon Training</CardTitle>
           <p className="text-sm text-muted-foreground">
@@ -306,7 +331,7 @@ export default function KidsTypingGame({ userId }: Props) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div
-            className="relative overflow-hidden rounded-lg border border-white/10 bg-black/20 p-4"
+            className="relative overflow-hidden rounded-lg border border-white/10 bg-black/25 p-4"
             onClick={() => inputRef.current?.focus()}
           >
             <div className="pointer-events-none absolute inset-0 opacity-[0.07] kids-shimmer" />
@@ -321,9 +346,9 @@ export default function KidsTypingGame({ userId }: Props) {
                     key={i}
                     className={cn(
                       "whitespace-pre-wrap",
-                      ok && "text-green-400",
-                      bad && "text-red-400 underline",
-                      !isTyped && "text-gray-300"
+                      ok && "text-cyan-300",
+                      bad && "text-rose-300 underline decoration-rose-300/70",
+                      !isTyped && "text-slate-200/90"
                     )}
                   >
                     {ch}
@@ -342,19 +367,19 @@ export default function KidsTypingGame({ userId }: Props) {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <Card className="border-white/10 bg-black/20 backdrop-blur">
+            <Card className="border-white/10 bg-slate-900/30 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">WPM</CardTitle>
               </CardHeader>
               <CardContent className="text-3xl font-semibold">{wpm.toFixed(1)}</CardContent>
             </Card>
-            <Card className="border-white/10 bg-black/20 backdrop-blur">
+            <Card className="border-white/10 bg-slate-900/30 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">Accuracy</CardTitle>
               </CardHeader>
               <CardContent className="text-3xl font-semibold">{formatPct(accuracy)}</CardContent>
             </Card>
-            <Card className="border-white/10 bg-black/20 backdrop-blur">
+            <Card className="border-white/10 bg-slate-900/30 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">Progress</CardTitle>
               </CardHeader>
@@ -365,20 +390,27 @@ export default function KidsTypingGame({ userId }: Props) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={reset} variant="outline">
+            <Button
+              onClick={reset}
+              variant="outline"
+              className="border-white/15 bg-transparent hover:bg-white/5"
+            >
               New sentence
             </Button>
-            <Button onClick={() => inputRef.current?.focus()}>
+            <Button
+              onClick={() => inputRef.current?.focus()}
+              className="bg-cyan-400/90 text-black hover:bg-cyan-300"
+            >
               Focus keyboard
             </Button>
             {done && (
-              <span className="ml-2 text-green-400 font-semibold">Nice! Press Enter for the next one.</span>
+              <span className="ml-2 text-cyan-300 font-semibold">Nice! Press Enter for the next one.</span>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
+      <Card className="border-white/10 bg-slate-950/50 backdrop-blur">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Rewards (unredeemed)</CardTitle>
         </CardHeader>
