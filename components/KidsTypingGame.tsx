@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Id } from "@/convex/_generated/dataModel";
+import {
+  BN_TRIP_MIN_PER_CHILD,
+  BN_TRIP_POINTS_TARGET,
+  ROBLOX_GC_POINTS_TARGET,
+  clampPct,
+} from "@/lib/rewardTargets";
 
 export type ChildProfile = "roma" | "anthony";
 
@@ -113,6 +119,18 @@ export default function KidsTypingGame({ userId }: Props) {
   };
 
   const done = typed.length === prompt.length;
+
+  const romaBn = balances?.roma?.barnes_points ?? 0;
+  const anthonyBn = balances?.anthony?.barnes_points ?? 0;
+  const familyBnPoints = romaBn + anthonyBn;
+
+  const familyBnPct = clampPct(familyBnPoints / BN_TRIP_POINTS_TARGET);
+  const bnRomaPctToMin = clampPct(romaBn / BN_TRIP_MIN_PER_CHILD);
+  const bnAnthonyPctToMin = clampPct(anthonyBn / BN_TRIP_MIN_PER_CHILD);
+  const bnTripUnlocked = romaBn >= BN_TRIP_MIN_PER_CHILD && anthonyBn >= BN_TRIP_MIN_PER_CHILD;
+
+  const childRobloxPoints = balances?.[child]?.roblox_points ?? 0;
+  const childRobloxPct = clampPct(childRobloxPoints / ROBLOX_GC_POINTS_TARGET);
 
   const { correctChars, accuracy } = useMemo(() => {
     let correct = 0;
@@ -359,15 +377,73 @@ export default function KidsTypingGame({ userId }: Props) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Rewards (unredeemed)</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground space-y-1">
+        <CardContent className="space-y-4">
           <div>
-            <span className="font-semibold text-foreground">Roma</span>: {balances?.roma?.bonus_bot_minutes ?? 0} bot minutes, {balances?.roma?.barnes_points ?? 0} B&N points, {balances?.roma?.roblox_points ?? 0} Roblox points
+            <div className="flex items-baseline justify-between gap-3 text-sm">
+              <div className="font-semibold text-foreground">B&N trip (family)</div>
+              <div className="text-muted-foreground">
+                {familyBnPoints}/{BN_TRIP_POINTS_TARGET} pts
+              </div>
+            </div>
+            <div className="mt-1 text-[11px] text-muted-foreground">
+              Unlock rule: Roma ≥ {BN_TRIP_MIN_PER_CHILD} AND Anthony ≥ {BN_TRIP_MIN_PER_CHILD}
+            </div>
+            <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                className={bnTripUnlocked ? "h-full rounded-full bg-emerald-500" : "h-full rounded-full bg-amber-500"}
+                style={{ width: `${Math.round(familyBnPct * 100)}%` }}
+              />
+            </div>
+
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div>
+                <div className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
+                  <span>Roma</span>
+                  <span>
+                    {romaBn}/{BN_TRIP_MIN_PER_CHILD}
+                  </span>
+                </div>
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(bnRomaPctToMin * 100)}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
+                  <span>Anthony</span>
+                  <span>
+                    {anthonyBn}/{BN_TRIP_MIN_PER_CHILD}
+                  </span>
+                </div>
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(bnAnthonyPctToMin * 100)}%` }} />
+                </div>
+              </div>
+            </div>
           </div>
+
           <div>
-            <span className="font-semibold text-foreground">Anthony</span>: {balances?.anthony?.bonus_bot_minutes ?? 0} bot minutes, {balances?.anthony?.barnes_points ?? 0} B&N points, {balances?.anthony?.roblox_points ?? 0} Roblox points
+            <div className="flex items-baseline justify-between gap-3 text-sm">
+              <div className="font-semibold text-foreground">Roblox gift card ({child})</div>
+              <div className="text-muted-foreground">
+                {childRobloxPoints}/{ROBLOX_GC_POINTS_TARGET} pts
+              </div>
+            </div>
+            <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-indigo-500" style={{ width: `${Math.round(childRobloxPct * 100)}%` }} />
+            </div>
           </div>
-          <div className="pt-2">
-            <a className="underline" href="/kids/rewards">Open rewards panel</a>
+
+          <div className="text-sm text-muted-foreground space-y-1">
+            <div>
+              <span className="font-semibold text-foreground">Roma</span>: {balances?.roma?.bonus_bot_minutes ?? 0} bot minutes, {balances?.roma?.barnes_points ?? 0} B&N points, {balances?.roma?.roblox_points ?? 0} Roblox points
+            </div>
+            <div>
+              <span className="font-semibold text-foreground">Anthony</span>: {balances?.anthony?.bonus_bot_minutes ?? 0} bot minutes, {balances?.anthony?.barnes_points ?? 0} B&N points, {balances?.anthony?.roblox_points ?? 0} Roblox points
+            </div>
+          </div>
+
+          <div>
+            <a className="underline text-sm text-muted-foreground" href="/kids/rewards">Open rewards panel</a>
           </div>
         </CardContent>
       </Card>
