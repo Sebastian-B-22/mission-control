@@ -1077,4 +1077,46 @@ export default defineSchema({
   })
     .index("by_user_path", ["userId", "path"])
     .index("by_user_updated", ["userId", "updatedAt"]),
+
+  // ─── Kids Typing Game (Wings of Fire themed) ───────────────────────────
+  typingProfiles: defineTable({
+    userId: v.id("users"),
+    child: v.union(v.literal("roma"), v.literal("anthony")),
+    totalXp: v.number(),
+    totalSessions: v.number(),
+    bestWpm: v.optional(v.number()),
+    bestAccuracy: v.optional(v.number()),
+    lastRewardXpBot: v.number(), // highest XP milestone rewarded for bonus_bot_minutes
+    lastRewardXpBarnes: v.number(), // highest XP milestone rewarded for barnes_points
+    updatedAt: v.number(),
+  }).index("by_user_child", ["userId", "child"]),
+
+  typingSessions: defineTable({
+    userId: v.id("users"),
+    child: v.union(v.literal("roma"), v.literal("anthony")),
+    prompt: v.string(),
+    wpm: v.number(),
+    accuracy: v.number(),
+    xpEarned: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user_child_createdAt", ["userId", "child", "createdAt"])
+    .index("by_user_createdAt", ["userId", "createdAt"]),
+
+  rewardEvents: defineTable({
+    userId: v.id("users"),
+    child: v.union(v.literal("roma"), v.literal("anthony")),
+    rewardType: v.union(
+      v.literal("bonus_bot_minutes"),
+      v.literal("barnes_points")
+    ),
+    amount: v.number(),
+    source: v.optional(v.string()), // e.g. "typing"
+    note: v.optional(v.string()),
+    createdAt: v.number(),
+    redeemedAt: v.optional(v.number()),
+  })
+    .index("by_user_child_createdAt", ["userId", "child", "createdAt"])
+    .index("by_user_child_redeemedAt", ["userId", "child", "redeemedAt"])
+    .index("by_user_createdAt", ["userId", "createdAt"]),
 });
