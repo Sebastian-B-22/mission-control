@@ -297,7 +297,7 @@ export default function KidsTypingGame({ userId }: Props) {
         </div>
       </div>
 
-      <Card>
+      <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
         <CardHeader className="pb-3">
           <CardTitle className="text-xl">Wings Typing - Dragon Training</CardTitle>
           <p className="text-sm text-muted-foreground">
@@ -306,10 +306,11 @@ export default function KidsTypingGame({ userId }: Props) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div
-            className="rounded-lg border bg-black/20 p-4"
+            className="relative overflow-hidden rounded-lg border border-white/10 bg-black/20 p-4"
             onClick={() => inputRef.current?.focus()}
           >
-            <div className="text-3xl leading-relaxed tracking-wide">
+            <div className="pointer-events-none absolute inset-0 opacity-[0.07] kids-shimmer" />
+            <div className="relative text-3xl leading-relaxed tracking-wide">
               {prompt.split("").map((ch, i) => {
                 const typedCh = typed[i];
                 const isTyped = typedCh !== undefined;
@@ -341,19 +342,19 @@ export default function KidsTypingGame({ userId }: Props) {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <Card>
+            <Card className="border-white/10 bg-black/20 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">WPM</CardTitle>
               </CardHeader>
               <CardContent className="text-3xl font-semibold">{wpm.toFixed(1)}</CardContent>
             </Card>
-            <Card>
+            <Card className="border-white/10 bg-black/20 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">Accuracy</CardTitle>
               </CardHeader>
               <CardContent className="text-3xl font-semibold">{formatPct(accuracy)}</CardContent>
             </Card>
-            <Card>
+            <Card className="border-white/10 bg-black/20 backdrop-blur">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">Progress</CardTitle>
               </CardHeader>
@@ -377,7 +378,7 @@ export default function KidsTypingGame({ userId }: Props) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Rewards (unredeemed)</CardTitle>
         </CardHeader>
@@ -394,7 +395,11 @@ export default function KidsTypingGame({ userId }: Props) {
             </div>
             <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
               <div
-                className={bnTripUnlocked ? "h-full rounded-full bg-emerald-500" : "h-full rounded-full bg-amber-500"}
+                className={
+                  bnTripUnlocked
+                    ? "h-full rounded-full bg-amber-300 kids-glow-gold"
+                    : "h-full rounded-full bg-amber-500 kids-glow-ember"
+                }
                 style={{ width: `${Math.round(familyBnPct * 100)}%` }}
               />
             </div>
@@ -408,7 +413,10 @@ export default function KidsTypingGame({ userId }: Props) {
                   </span>
                 </div>
                 <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(bnRomaPctToMin * 100)}%` }} />
+                  <div
+                    className="h-full rounded-full bg-amber-400 kids-glow-gold"
+                    style={{ width: `${Math.round(bnRomaPctToMin * 100)}%` }}
+                  />
                 </div>
               </div>
               <div>
@@ -419,7 +427,10 @@ export default function KidsTypingGame({ userId }: Props) {
                   </span>
                 </div>
                 <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(bnAnthonyPctToMin * 100)}%` }} />
+                  <div
+                    className="h-full rounded-full bg-amber-400 kids-glow-gold"
+                    style={{ width: `${Math.round(bnAnthonyPctToMin * 100)}%` }}
+                  />
                 </div>
               </div>
             </div>
@@ -433,7 +444,10 @@ export default function KidsTypingGame({ userId }: Props) {
               </div>
             </div>
             <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-indigo-500" style={{ width: `${Math.round(childRobloxPct * 100)}%` }} />
+              <div
+                className="h-full rounded-full bg-indigo-400 kids-glow-indigo"
+                style={{ width: `${Math.round(childRobloxPct * 100)}%` }}
+              />
             </div>
           </div>
 

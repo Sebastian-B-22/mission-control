@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import KidsTypingGame from "@/components/KidsTypingGame";
+import Image from "next/image";
 
 export default function KidsTypingPage() {
   const router = useRouter();
@@ -40,13 +41,31 @@ export default function KidsTypingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
-      <div className="mx-auto max-w-4xl mb-4">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-950 via-black to-indigo-950 text-white p-4">
+      {/* Ambient aurora + shimmer */}
+      <div className="pointer-events-none absolute inset-0 kids-aurora" />
+      <div className="pointer-events-none absolute -inset-x-24 top-0 h-24 opacity-20 kids-shimmer" />
+
+      {/* Dragon silhouettes (original assets) */}
+      <div className="pointer-events-none absolute left-[-60px] top-[80px] w-[320px] sm:w-[420px] opacity-[0.10] blur-[0.2px] kids-float kids-glow-gold">
+        <Image src="/kids/dragon-silhouette-left.svg" alt="" width={700} height={500} />
+      </div>
+      <div className="pointer-events-none absolute right-[-80px] bottom-[-40px] w-[360px] sm:w-[520px] opacity-[0.10] blur-[0.2px] kids-float kids-glow-indigo">
+        <Image src="/kids/dragon-silhouette-right.svg" alt="" width={780} height={520} />
+      </div>
+
+      <div className="relative mx-auto max-w-4xl mb-4 flex items-center justify-between gap-4">
         <a className="underline text-sm text-muted-foreground" href="/dashboard">
           ← Back to dashboard
         </a>
+        <a className="underline text-sm text-muted-foreground" href="/kids/rewards">
+          Rewards vault →
+        </a>
       </div>
-      <KidsTypingGame userId={convexUser._id} />
+
+      <div className="relative">
+        <KidsTypingGame userId={convexUser._id} />
+      </div>
     </div>
   );
 }

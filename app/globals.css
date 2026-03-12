@@ -124,3 +124,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes kids-shimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  @keyframes kids-float {
+    0% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -10px, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+  }
+
+  .kids-aurora {
+    background-image:
+      radial-gradient(800px 400px at 10% 10%, rgba(99, 102, 241, 0.22), transparent 60%),
+      radial-gradient(600px 300px at 90% 20%, rgba(245, 158, 11, 0.18), transparent 55%),
+      radial-gradient(700px 420px at 40% 90%, rgba(249, 115, 22, 0.16), transparent 60%);
+  }
+
+  .kids-shimmer {
+    background-image: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+    background-size: 200% 100%;
+    animation: kids-shimmer 4.5s linear infinite;
+  }
+
+  .kids-float { animation: kids-float 8s ease-in-out infinite; }
+
+  .kids-glow-ember { filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.25)); }
+  .kids-glow-indigo { filter: drop-shadow(0 0 18px rgba(99, 102, 241, 0.24)); }
+  .kids-glow-gold { filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.28)); }
+}

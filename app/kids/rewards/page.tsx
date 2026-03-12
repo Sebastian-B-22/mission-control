@@ -86,8 +86,20 @@ export default function KidsRewardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
-      <div className="mx-auto max-w-4xl mb-4 flex items-center justify-between">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-950 via-black to-indigo-950 text-white p-4">
+      {/* Ambient aurora + shimmer */}
+      <div className="pointer-events-none absolute inset-0 kids-aurora" />
+      <div className="pointer-events-none absolute -inset-x-24 top-0 h-24 opacity-20 kids-shimmer" />
+
+      {/* Dragon silhouettes (original assets) */}
+      <div className="pointer-events-none absolute left-[-70px] top-[120px] w-[320px] sm:w-[440px] opacity-[0.10] blur-[0.2px] kids-float kids-glow-ember">
+        <Image src="/kids/dragon-silhouette-left.svg" alt="" width={740} height={520} />
+      </div>
+      <div className="pointer-events-none absolute right-[-90px] bottom-[-60px] w-[360px] sm:w-[540px] opacity-[0.10] blur-[0.2px] kids-float kids-glow-indigo">
+        <Image src="/kids/dragon-silhouette-right.svg" alt="" width={800} height={540} />
+      </div>
+
+      <div className="relative mx-auto max-w-4xl mb-4 flex items-center justify-between">
         <a className="underline text-sm text-muted-foreground" href="/kids/typing">
           ← Back to typing
         </a>
@@ -119,7 +131,7 @@ export default function KidsRewardsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl">Goals</CardTitle>
           </CardHeader>
@@ -138,7 +150,11 @@ export default function KidsRewardsPage() {
 
               <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className={bnTripUnlocked ? "h-full rounded-full bg-emerald-500" : "h-full rounded-full bg-amber-500"}
+                  className={
+                    bnTripUnlocked
+                      ? "h-full rounded-full bg-amber-300 kids-glow-gold"
+                      : "h-full rounded-full bg-amber-500 kids-glow-ember"
+                  }
                   style={{ width: `${Math.round(familyBnPct * 100)}%` }}
                 />
               </div>
@@ -152,7 +168,10 @@ export default function KidsRewardsPage() {
                     </span>
                   </div>
                   <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
-                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(bnRomaPctToMin * 100)}%` }} />
+                    <div
+                      className="h-full rounded-full bg-amber-400 kids-glow-gold"
+                      style={{ width: `${Math.round(bnRomaPctToMin * 100)}%` }}
+                    />
                   </div>
                 </div>
 
@@ -164,12 +183,15 @@ export default function KidsRewardsPage() {
                     </span>
                   </div>
                   <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
-                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(bnAnthonyPctToMin * 100)}%` }} />
+                    <div
+                      className="h-full rounded-full bg-amber-400 kids-glow-gold"
+                      style={{ width: `${Math.round(bnAnthonyPctToMin * 100)}%` }}
+                    />
                   </div>
                 </div>
 
                 {bnTripUnlocked && (
-                  <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs text-emerald-200">
+                  <div className="rounded-md border border-amber-400/30 bg-amber-400/10 p-2 text-xs text-amber-100">
                     Trip unlocked!
                   </div>
                 )}
@@ -185,7 +207,7 @@ export default function KidsRewardsPage() {
               </div>
               <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-indigo-500"
+                  className="h-full rounded-full bg-indigo-400 kids-glow-indigo"
                   style={{ width: `${Math.round(childRobloxPct * 100)}%` }}
                 />
               </div>
@@ -193,7 +215,7 @@ export default function KidsRewardsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl">Reward balances - {child}</CardTitle>
           </CardHeader>
@@ -204,7 +226,7 @@ export default function KidsRewardsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Unredeemed events</CardTitle>
           </CardHeader>
@@ -214,7 +236,10 @@ export default function KidsRewardsPage() {
             )}
 
             {events?.map((ev) => (
-              <div key={ev._id} className="flex items-center justify-between gap-3 rounded-md border p-3">
+              <div
+                key={ev._id}
+                className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-black/20 p-3"
+              >
                 <div>
                   <div className="font-semibold">{ev.rewardType} +{ev.amount}</div>
                   <div className="text-xs text-muted-foreground">
