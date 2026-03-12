@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -15,6 +15,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   Plus, 
   Trash2, 
@@ -54,23 +62,56 @@ function buildAmazonSearchUrl(title: string, author?: string) {
 // Fetch book cover from Open Library API
 async function fetchBookCover(title: string, author?: string): Promise<string | null> {
   try {
-    // Search Open Library for the book
-    const query = encodeURIComponent(`${title} ${author || ""}`);
-    const response = await fetch(
-      `https://openlibrary.org/search.json?q=${query}&limit=1`
-    );
+    const params = new URLSearchParams();
+    params.set("title", title);
+    if (author) params.set("author", author);
+    params.set("limit", "10");
+
+    const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
     const data = await response.json();
-    
-    if (data.docs && data.docs.length > 0) {
-      const book = data.docs[0];
-      // Get cover from cover_i (cover ID) or isbn
-      if (book.cover_i) {
-        return `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
+
+    const normalize = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/\([^)]*\)/g, " ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+
+    const wantTitle = normalize(title);
+    const wantAuthor = author ? normalize(author) : "";
+
+    const docs: any[] = Array.isArray(data?.docs) ? data.docs : [];
+    if (docs.length === 0) return null;
+
+    // Score results by title/author match, prefer those with cover_i.
+    let best: any = null;
+    let bestScore = -1;
+
+    for (const doc of docs) {
+      const docTitle = normalize(doc?.title || "");
+      const docAuthor = normalize((doc?.author_name?.[0] as string) || "");
+      let score = 0;
+
+      if (docTitle === wantTitle) score += 8;
+      if (docTitle.includes(wantTitle) || wantTitle.includes(docTitle)) score += 4;
+      if (wantAuthor) {
+        if (docAuthor === wantAuthor) score += 5;
+        if (docAuthor.includes(wantAuthor) || wantAuthor.includes(docAuthor)) score += 2;
       }
-      if (book.isbn && book.isbn.length > 0) {
-        return `https://covers.openlibrary.org/b/isbn/${book.isbn[0]}-M.jpg`;
+      if (doc?.cover_i) score += 2;
+      if (Array.isArray(doc?.isbn) && doc.isbn.length > 0) score += 1;
+
+      if (score > bestScore) {
+        bestScore = score;
+        best = doc;
       }
     }
+
+    if (!best) return null;
+
+    if (best.cover_i) return `https://covers.openlibrary.org/b/id/${best.cover_i}-M.jpg`;
+    if (best.isbn && best.isbn.length > 0) return `https://covers.openlibrary.org/b/isbn/${best.isbn[0]}-M.jpg`;
+
     return null;
   } catch (error) {
     console.error("Error fetching book cover:", error);
@@ -118,10 +159,23 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   const books = useQuery(api.books.getBookLibrary, { userId });
   const readAloudBooks = useQuery(api.books.getReadAloudBooks, { userId }); // Currently reading from read alouds
   const addBook = useMutation(api.books.addBookToLibrary);
+
+  const [editingCoverBook, setEditingCoverBook] = useState<null | {
+    _id: Id<"bookLibrary">;
+    title: string;
+    author?: string;
+    coverUrl?: string;
+  }>(null);
+  const [coverDraft, setCoverDraft] = useState("");
   const updateStatus = useMutation(api.books.updateBookStatus);
   const updateReader = useMutation(api.books.updateBookReader);
   const updateCover = useMutation(api.books.updateBookCover);
   const deleteBook = useMutation(api.books.deleteBookFromLibrary);
+
+  const coverEditAmazonUrl = useMemo(() => {
+    if (!editingCoverBook) return null;
+    return buildAmazonSearchUrl(editingCoverBook.title, editingCoverBook.author);
+  }, [editingCoverBook]);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -330,6 +384,7 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
   ];
 
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -658,6 +713,35 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
                     )}
                     <Button
                       size="sm"
+                      variant="secondary"
+                      className="h-6 text-xs w-full"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const coverUrl = await fetchBookCover(book.title, book.author);
+                        if (coverUrl) await updateCover({ id: book._id, coverUrl });
+                      }}
+                    >
+                      Refetch cover
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-6 text-xs w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingCoverBook({
+                          _id: book._id,
+                          title: book.title,
+                          author: book.author,
+                          coverUrl: book.coverUrl,
+                        });
+                        setCoverDraft(book.coverUrl || "");
+                      }}
+                    >
+                      Edit cover
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="destructive"
                       className="h-6 text-xs w-full"
                       onClick={(e) => {
@@ -715,5 +799,98 @@ export function BookLibraryVisual({ userId }: BookLibraryVisualProps) {
         </div>
       </CardContent>
     </Card>
+
+    <Dialog
+      open={!!editingCoverBook}
+      onOpenChange={(open) => {
+        if (!open) {
+          setEditingCoverBook(null);
+          setCoverDraft("");
+        }
+      }}
+    >
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit book cover</DialogTitle>
+          <DialogDescription>
+            Paste a direct image URL (ends with .jpg/.png). This is the fastest way to fix mismatched covers.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-2">
+          <div className="text-sm font-medium">
+            {editingCoverBook?.title}
+            {editingCoverBook?.author ? (
+              <span className="text-muted-foreground"> - {editingCoverBook.author}</span>
+            ) : null}
+          </div>
+
+          <Input
+            value={coverDraft}
+            onChange={(e) => setCoverDraft(e.target.value)}
+            placeholder="https://.../cover.jpg"
+          />
+
+          <div className="flex flex-wrap gap-2">
+            {coverEditAmazonUrl ? (
+              <a
+                href={coverEditAmazonUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs underline text-muted-foreground"
+              >
+                Search Amazon for this book
+              </a>
+            ) : null}
+          </div>
+
+          <div className="pt-2">
+            <div className="text-xs text-muted-foreground mb-2">Preview</div>
+            <div className="flex items-center gap-4">
+              <BookCover coverUrl={coverDraft || undefined} title={editingCoverBook?.title || ""} size="medium" />
+              <div className="text-xs text-muted-foreground">
+                Tip: if Amazon blocks hotlinking, use the publisher site image, Google Books thumbnail, or a direct image link.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setEditingCoverBook(null);
+              setCoverDraft("");
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={async () => {
+              if (!editingCoverBook) return;
+              const coverUrl = await fetchBookCover(editingCoverBook.title, editingCoverBook.author);
+              if (coverUrl) {
+                setCoverDraft(coverUrl);
+              }
+            }}
+          >
+            Try auto-find
+          </Button>
+          <Button
+            onClick={async () => {
+              if (!editingCoverBook) return;
+              if (!coverDraft.trim()) return;
+              await updateCover({ id: editingCoverBook._id, coverUrl: coverDraft.trim() });
+              setEditingCoverBook(null);
+              setCoverDraft("");
+            }}
+          >
+            Save cover
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
