@@ -265,10 +265,9 @@ export default function DashboardPage() {
             <AgentSquad />
             <MorningMindset userId={convexUser._id} date={today} />
             {user?.id && <SurpriseCard clerkId={user.id} />}
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-2">
               <HealthWidget userId={convexUser._id} />
               <HabitTracker userId={convexUser._id} date={today} />
-              <CostTrackerCard userId={convexUser._id} onOpen={() => setCurrentView("cost-tracker")} />
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               <FiveToThrive userId={convexUser._id} date={today} />
@@ -696,14 +695,30 @@ export default function DashboardPage() {
 
       <div className="lg:pl-64 min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
-          <DashboardTopBar
-            userId={convexUser._id}
-            onOpenOnboarding={() => setOnboardingOpen(true)}
-            onResetOnboarding={async () => {
-              await resetOnboarding({ userId: convexUser._id });
-              setOnboardingOpen(true);
-            }}
-          />
+          {(() => {
+            const sebastianViews = new Set([
+              "sebastian",
+              "agent-ideas",
+              "content-pipeline",
+              "email-drafts",
+              "engagement-habits",
+              "memory",
+              "memory-panel",
+            ]);
+
+            const showOpsTopBar = currentView.startsWith("agent-") || sebastianViews.has(currentView);
+
+            return showOpsTopBar ? (
+              <DashboardTopBar
+                userId={convexUser._id}
+                onOpenOnboarding={() => setOnboardingOpen(true)}
+                onResetOnboarding={async () => {
+                  await resetOnboarding({ userId: convexUser._id });
+                  setOnboardingOpen(true);
+                }}
+              />
+            ) : null;
+          })()}
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
               Mission Control

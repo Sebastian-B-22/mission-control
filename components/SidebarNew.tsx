@@ -121,11 +121,6 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       view: "finance",
     },
     {
-      name: "AI Costs",
-      icon: DollarSign,
-      view: "cost-tracker",
-    },
-    {
       name: "Personal RPM",
       icon: Home,
       view: "personal-overview",
@@ -207,6 +202,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       section: "agents",
       children: [
         { name: "Agent HQ", view: "agent-hq" },
+        { name: "AI Costs", view: "cost-tracker" },
         { name: "Main Huddle", view: "agent-huddle-main" },
         { name: "Aspire Ops", view: "agent-huddle-aspire-ops" },
         { name: "HTA Launch", view: "agent-huddle-hta-launch" },

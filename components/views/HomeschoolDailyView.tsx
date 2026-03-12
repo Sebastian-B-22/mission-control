@@ -953,7 +953,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       </div>
 
       {/* Daily Notes / Recap Section */}
-      <Card className="bg-zinc-800 border-zinc-800">
+      <Card>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium text-zinc-300 flex items-center gap-2">
