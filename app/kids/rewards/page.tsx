@@ -8,6 +8,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+import {
+  BN_TRIP_POINTS_TARGET,
+  ROBLOX_GC_POINTS_TARGET,
+  clampPct,
+} from "@/lib/rewardTargets";
 
 type Child = "roma" | "anthony";
 
@@ -42,6 +47,12 @@ export default function KidsRewardsPage() {
     if (!balances) return null;
     return balances[child];
   }, [balances, child]);
+
+  const familyBnPoints = (balances?.roma?.barnes_points ?? 0) + (balances?.anthony?.barnes_points ?? 0);
+  const familyBnPct = clampPct(familyBnPoints / BN_TRIP_POINTS_TARGET);
+
+  const childRobloxPoints = totals?.roblox_points ?? 0;
+  const childRobloxPct = clampPct(childRobloxPoints / ROBLOX_GC_POINTS_TARGET);
 
   if (!isLoaded || (isSignedIn && convexUser === undefined)) {
     return (
@@ -88,7 +99,47 @@ export default function KidsRewardsPage() {
           </div>
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">
-              Rates: Bot +5 min / 250 XP · Barnes +10 pts / 500 XP · Roblox +25 pts / 500 XP
+              Rates: Bot +5 min / 250 XP · B&N +10 pts / 500 XP · Roblox +25 pts / 500 XP
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl">Goals</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="font-semibold">B&N trip (family)</div>
+                <div className="text-sm text-muted-foreground">
+                  {familyBnPoints}/{BN_TRIP_POINTS_TARGET} pts
+                </div>
+              </div>
+              <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-emerald-500"
+                  style={{ width: `${Math.round(familyBnPct * 100)}%` }}
+                />
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                Roma: {balances?.roma?.barnes_points ?? 0} pts · Anthony: {balances?.anthony?.barnes_points ?? 0} pts
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="font-semibold">Roblox gift card ({child})</div>
+                <div className="text-sm text-muted-foreground">
+                  {childRobloxPoints}/{ROBLOX_GC_POINTS_TARGET} pts
+                </div>
+              </div>
+              <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-indigo-500"
+                  style={{ width: `${Math.round(childRobloxPct * 100)}%` }}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -99,7 +150,7 @@ export default function KidsRewardsPage() {
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-1">
             <div>Bonus bot minutes: {totals?.bonus_bot_minutes ?? 0}</div>
-            <div>Barnes points: {totals?.barnes_points ?? 0}</div>
+            <div>B&N points: {totals?.barnes_points ?? 0}</div>
             <div>Roblox points: {totals?.roblox_points ?? 0}</div>
           </CardContent>
         </Card>

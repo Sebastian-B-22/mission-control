@@ -1093,7 +1093,7 @@ export default defineSchema({
     robloxXpTotal: v.number(),
 
     lastRewardXpBot: v.number(), // highest botXpTotal milestone rewarded for bonus_bot_minutes
-    lastRewardXpBarnes: v.number(), // highest barnesXpTotal milestone rewarded for barnes_points
+    lastRewardXpBarnes: v.number(), // highest barnesXpTotal milestone rewarded for barnes_points (B&N)
     lastRewardXpRoblox: v.number(), // highest robloxXpTotal milestone rewarded for roblox_points
 
     updatedAt: v.number(),

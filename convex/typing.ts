@@ -167,7 +167,7 @@ export const addSession = mutation({
         rewardType: "barnes_points",
         amount: BARNES_POINTS_PER_STEP,
         source: "typing",
-        note: `Reached ${BARNES_XP_STEP * (barnesStepsBefore + 1 + i)} Barnes XP`,
+        note: `Reached ${BARNES_XP_STEP * (barnesStepsBefore + 1 + i)} B&N XP`,
         createdAt: now,
         redeemedAt: undefined,
       });

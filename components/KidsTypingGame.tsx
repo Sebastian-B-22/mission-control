@@ -93,6 +93,25 @@ export default function KidsTypingGame({ userId }: Props) {
   const balances = useQuery(api.rewardEvents.getBalances, { userId });
   const addSession = useMutation(api.typing.addSession);
 
+  const popConfetti = async () => {
+    // Lightweight client-side confetti burst.
+    const mod = await import("canvas-confetti");
+    const confetti = mod.default;
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      startVelocity: 35,
+      origin: { y: 0.6 },
+    });
+    confetti({
+      particleCount: 40,
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      origin: { y: 0.55 },
+    });
+  };
+
   const done = typed.length === prompt.length;
 
   const { correctChars, accuracy } = useMemo(() => {
@@ -127,7 +146,7 @@ export default function KidsTypingGame({ userId }: Props) {
       setFinishedAt(finished);
 
       try {
-        await addSession({
+        const res = await addSession({
           userId,
           child,
           rewardChoice,
@@ -135,6 +154,15 @@ export default function KidsTypingGame({ userId }: Props) {
           wpm,
           accuracy,
         });
+
+        const granted =
+          (res?.rewardsGranted?.bonus_bot_minutes ?? 0) +
+          (res?.rewardsGranted?.barnes_points ?? 0) +
+          (res?.rewardsGranted?.roblox_points ?? 0);
+
+        if (granted > 0) {
+          await popConfetti();
+        }
       } catch (e) {
         console.error(e);
       }
@@ -224,7 +252,7 @@ export default function KidsTypingGame({ userId }: Props) {
                 variant={rewardChoice === "barnes" ? "default" : "outline"}
                 onClick={() => setRewardChoice("barnes")}
               >
-                Barnes
+                B&N
               </Button>
               <Button
                 size="sm"
@@ -235,7 +263,7 @@ export default function KidsTypingGame({ userId }: Props) {
               </Button>
             </div>
             <div className="text-[11px] text-muted-foreground">
-              Bot: +5 min / 250 XP · Barnes: +10 pts / 500 XP · Roblox: +25 pts / 500 XP
+              Bot: +5 min / 250 XP · B&N: +10 pts / 500 XP · Roblox: +25 pts / 500 XP
             </div>
           </div>
         </div>
@@ -333,10 +361,10 @@ export default function KidsTypingGame({ userId }: Props) {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-1">
           <div>
-            <span className="font-semibold text-foreground">Roma</span>: {balances?.roma?.bonus_bot_minutes ?? 0} bot minutes, {balances?.roma?.barnes_points ?? 0} Barnes points, {balances?.roma?.roblox_points ?? 0} Roblox points
+            <span className="font-semibold text-foreground">Roma</span>: {balances?.roma?.bonus_bot_minutes ?? 0} bot minutes, {balances?.roma?.barnes_points ?? 0} B&N points, {balances?.roma?.roblox_points ?? 0} Roblox points
           </div>
           <div>
-            <span className="font-semibold text-foreground">Anthony</span>: {balances?.anthony?.bonus_bot_minutes ?? 0} bot minutes, {balances?.anthony?.barnes_points ?? 0} Barnes points, {balances?.anthony?.roblox_points ?? 0} Roblox points
+            <span className="font-semibold text-foreground">Anthony</span>: {balances?.anthony?.bonus_bot_minutes ?? 0} bot minutes, {balances?.anthony?.barnes_points ?? 0} B&N points, {balances?.anthony?.roblox_points ?? 0} Roblox points
           </div>
           <div className="pt-2">
             <a className="underline" href="/kids/rewards">Open rewards panel</a>
