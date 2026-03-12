@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
+import { useGatewayStatus } from "@/hooks/useGatewayStatus";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +43,28 @@ function formatTime(ts: number) {
   });
 }
 
+type Severity = "critical" | "warn" | "info" | "other";
+
+function classifyLine(line: string): Severity {
+  const s = line.toLowerCase();
+  if (/(^|\b)(critical|sev0|sev1|high)\b/.test(s)) return "critical";
+  if (/(^|\b)(warn|warning|medium)\b/.test(s)) return "warn";
+  if (/(^|\b)(info|ok|pass|passed|low)\b/.test(s)) return "info";
+  return "other";
+}
+
+function groupBySeverity(output: string) {
+  const lines = output.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  const grouped: Record<Severity, string[]> = {
+    critical: [],
+    warn: [],
+    info: [],
+    other: [],
+  };
+  for (const line of lines) grouped[classifyLine(line)].push(line);
+  return grouped;
+}
+
 type HuddleMsg = Doc<"agentHuddle"> & {
   channel?: string;
   mentions?: string[];
@@ -55,6 +78,14 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [sendOk, setSendOk] = useState<string | null>(null);
+
+  // Gateway-dependent ops
+  const gw = useGatewayStatus({ pollMs: 10_000 });
+  const [doctorRunning, setDoctorRunning] = useState(false);
+  const [securityRunning, setSecurityRunning] = useState(false);
+  const [doctorOut, setDoctorOut] = useState<string | null>(null);
+  const [securityOut, setSecurityOut] = useState<string | null>(null);
+  const [healthErr, setHealthErr] = useState<string | null>(null);
 
   // Pending / Next Up
   const createPendingItem = useMutation(api.pendingItems.create);
@@ -189,6 +220,41 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
     }
   }
 
+  async function runDoctor() {
+    setHealthErr(null);
+    setDoctorOut(null);
+    setDoctorRunning(true);
+    try {
+      const res = await fetch("/api/gateway/doctor", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Doctor failed");
+      setDoctorOut(String(data?.output || ""));
+    } catch (e) {
+      setHealthErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDoctorRunning(false);
+    }
+  }
+
+  async function runSecurityAudit() {
+    setHealthErr(null);
+    setSecurityOut(null);
+    setSecurityRunning(true);
+    try {
+      const res = await fetch("/api/gateway/security-audit", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Security audit failed");
+      setSecurityOut(String(data?.output || ""));
+    } catch (e) {
+      setHealthErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSecurityRunning(false);
+    }
+  }
+
+  const doctorGrouped = doctorOut ? groupBySeverity(doctorOut) : null;
+  const securityGrouped = securityOut ? groupBySeverity(securityOut) : null;
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -207,6 +273,69 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
           Paperclip ↗
         </a>
       </div>
+
+      {/* Health (Gateway) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Health</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Run host checks via the OpenClaw gateway. (No autofix yet.)
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {!gw.connected ? (
+            <div className="border border-zinc-800 rounded-lg p-3 text-xs text-zinc-300">
+              <div className="font-medium text-zinc-200">Gateway disconnected</div>
+              <div className="mt-1 text-muted-foreground">
+                Panels that require the operator host are disabled. Set <code className="text-zinc-200">OPENCLAW_GATEWAY_URL</code> and ensure the gateway is reachable.
+              </div>
+              {gw.error ? <div className="mt-2 text-[11px] text-red-400">{gw.error}</div> : null}
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={runDoctor} disabled={!gw.connected || doctorRunning}>
+              {doctorRunning ? "Running Doctor…" : "Run OpenClaw Doctor"}
+            </Button>
+            <Button size="sm" variant="secondary" onClick={runSecurityAudit} disabled={!gw.connected || securityRunning}>
+              {securityRunning ? "Running Security Audit…" : "Run Security Audit (deep)"}
+            </Button>
+          </div>
+
+          {healthErr ? <p className="text-xs text-red-400">{healthErr}</p> : null}
+
+          {/* Results */}
+          {doctorGrouped ? (
+            <div className="space-y-2">
+              <div className="text-xs font-medium">Doctor results</div>
+              <div className="flex flex-wrap gap-2 text-[11px]">
+                <Badge variant="destructive">Critical {doctorGrouped.critical.length}</Badge>
+                <Badge variant="secondary">Warn {doctorGrouped.warn.length}</Badge>
+                <Badge variant="outline">Info {doctorGrouped.info.length}</Badge>
+              </div>
+              <details className="border border-zinc-800 rounded-lg p-3">
+                <summary className="cursor-pointer text-xs text-zinc-300">Raw output</summary>
+                <pre className="mt-2 text-[11px] whitespace-pre-wrap text-zinc-200">{doctorOut}</pre>
+              </details>
+            </div>
+          ) : null}
+
+          {securityGrouped ? (
+            <div className="space-y-2">
+              <div className="text-xs font-medium">Security audit results</div>
+              <div className="flex flex-wrap gap-2 text-[11px]">
+                <Badge variant="destructive">Critical {securityGrouped.critical.length}</Badge>
+                <Badge variant="secondary">Warn {securityGrouped.warn.length}</Badge>
+                <Badge variant="outline">Info {securityGrouped.info.length}</Badge>
+              </div>
+              <details className="border border-zinc-800 rounded-lg p-3">
+                <summary className="cursor-pointer text-xs text-zinc-300">Raw output</summary>
+                <pre className="mt-2 text-[11px] whitespace-pre-wrap text-zinc-200">{securityOut}</pre>
+              </details>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Overnight Inbox */}

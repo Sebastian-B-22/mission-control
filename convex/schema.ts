@@ -933,6 +933,19 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_created", ["createdAt"]),
 
+  // ─── Approvals Inbox (MVP) ─────────────────────────────────────────────
+  // Placeholder queue for things that need explicit human approval.
+  approvalsQueue: defineTable({
+    title: v.string(),
+    details: v.optional(v.string()),
+    status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
+    requestedBy: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status", "updatedAt"])
+    .index("by_created", ["createdAt"]),
+
   // ─── Homeschool Platform Progress ───────────────────────────────────────
   // Aggregated progress data from Math Academy, Rosetta Stone, etc.
   homeschoolProgress: defineTable({

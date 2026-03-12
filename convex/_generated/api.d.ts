@@ -12,6 +12,7 @@ import type * as activitiesAdmin from "../activitiesAdmin.js";
 import type * as admin from "../admin.js";
 import type * as agentHuddle from "../agentHuddle.js";
 import type * as agentTrigger from "../agentTrigger.js";
+import type * as approvalsQueue from "../approvalsQueue.js";
 import type * as books from "../books.js";
 import type * as calendarEvents from "../calendarEvents.js";
 import type * as camp from "../camp.js";
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   agentHuddle: typeof agentHuddle;
   agentTrigger: typeof agentTrigger;
+  approvalsQueue: typeof approvalsQueue;
   books: typeof books;
   calendarEvents: typeof calendarEvents;
   camp: typeof camp;

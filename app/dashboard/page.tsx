@@ -68,6 +68,7 @@ import { FinanceView } from "@/components/views/FinanceView";
 import { WeeklyView } from "@/components/WeeklyView";
 import { AgentSquad } from "@/components/AgentSquad";
 import { AgentHQ } from "@/components/AgentHQ";
+import { DashboardTopBar } from "@/components/DashboardTopBar";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -660,6 +661,7 @@ export default function DashboardPage() {
 
       <div className="lg:pl-64 min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
+          <DashboardTopBar />
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
               Mission Control
