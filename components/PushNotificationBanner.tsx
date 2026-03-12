@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Id } from "@/convex/_generated/dataModel";
 import { Bell, BellOff, X } from "lucide-react";
@@ -12,15 +12,17 @@ interface PushNotificationBannerProps {
 export function PushNotificationBanner({ userId }: PushNotificationBannerProps) {
   const { isSupported, permission, isSubscribed, isLoading, enable, disable } =
     usePushNotifications(userId);
-  const [dismissed, setDismissed] = useState(false);
 
-  // Check localStorage for dismissed state
-  useEffect(() => {
-    const wasDismissed = localStorage.getItem("push-banner-dismissed");
-    if (wasDismissed === "true") {
-      setDismissed(true);
+  // Avoid showing the banner for a split-second on every load by reading
+  // localStorage synchronously (this is a client component).
+  const [dismissed, setDismissed] = useState<boolean>(() => {
+    try {
+      if (typeof window === "undefined") return false;
+      return window.localStorage.getItem("push-banner-dismissed") === "true";
+    } catch {
+      return false;
     }
-  }, []);
+  });
 
   // Don't show if not supported, already subscribed, denied, or dismissed
   if (!isSupported || isSubscribed || permission === "denied" || dismissed) {

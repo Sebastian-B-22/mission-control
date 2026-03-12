@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
@@ -16,16 +16,28 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    // "black-translucent" tends to look best in iOS standalone and avoids odd
+    // top chrome/title rendering on some devices.
+    statusBarStyle: "black-translucent",
     title: "Mission Control",
   },
   other: {
-    // Extra redundancy for iOS PWA title display.
+    // Redundancy for iOS/Android install/standalone behavior.
     "apple-mobile-web-app-title": "Mission Control",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "mobile-web-app-capable": "yes",
   },
   icons: {
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
