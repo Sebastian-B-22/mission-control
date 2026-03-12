@@ -34,6 +34,7 @@ import type * as games from "../games.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
 import type * as health from "../health.js";
+import type * as healthRuns from "../healthRuns.js";
 import type * as homeschool from "../homeschool.js";
 import type * as homeschoolActivities from "../homeschoolActivities.js";
 import type * as homeschoolProgress from "../homeschoolProgress.js";
@@ -93,6 +94,7 @@ declare const fullApi: ApiFromModules<{
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
   health: typeof health;
+  healthRuns: typeof healthRuns;
   homeschool: typeof homeschool;
   homeschoolActivities: typeof homeschoolActivities;
   homeschoolProgress: typeof homeschoolProgress;

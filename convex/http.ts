@@ -1677,4 +1677,82 @@ http.route({
   }),
 });
 
+// ─── Host Health Runs Ingest ─────────────────────────────────────────────
+// POST /health/runs/ingest
+// Body (JSON):
+//   clerkId  (required)
+//   kind     (required) "doctor" | "security_audit"
+//   status   (required) "ok" | "warn" | "critical"
+//   counts   (optional) { critical, warn, info }
+//   rawText  (required)
+//   createdAt (optional) ms timestamp
+// Auth: X-Agent-Key header
+http.route({
+  path: "/health/runs/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/health/runs/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const clerkId = String(body.clerkId || "").trim();
+    if (!clerkId) return errorResponse("Missing required field: clerkId");
+
+    const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId });
+    if (!user) return errorResponse("User not found for clerkId: " + clerkId, 404);
+
+    const kind = String(body.kind || "").trim();
+    if (!kind) return errorResponse("Missing required field: kind");
+    if (!["doctor", "security_audit"].includes(kind)) {
+      return errorResponse("Invalid kind. Must be: doctor | security_audit");
+    }
+
+    const status = String(body.status || "").trim();
+    if (!status) return errorResponse("Missing required field: status");
+    if (!["ok", "warn", "critical"].includes(status)) {
+      return errorResponse("Invalid status. Must be: ok | warn | critical");
+    }
+
+    const rawText = String(body.rawText || "");
+    if (!rawText.trim()) return errorResponse("Missing required field: rawText");
+
+    const createdAt = body.createdAt !== undefined ? Number(body.createdAt) : undefined;
+
+    let counts:
+      | { critical: number; warn: number; info: number }
+      | undefined;
+    if (body.counts && typeof body.counts === "object") {
+      const c = body.counts as Record<string, unknown>;
+      const critical = Number(c.critical);
+      const warn = Number(c.warn);
+      const info = Number(c.info);
+      if ([critical, warn, info].every((n) => Number.isFinite(n))) {
+        counts = { critical, warn, info };
+      }
+    }
+
+    const id = await ctx.runMutation(api.healthRuns.ingestHealthRun, {
+      userId: user._id,
+      kind: kind as "doctor" | "security_audit",
+      status: status as "ok" | "warn" | "critical",
+      counts,
+      rawText,
+      createdAt: createdAt && Number.isFinite(createdAt) ? createdAt : undefined,
+    });
+
+    return jsonResponse({ ok: true, id }, 201);
+  }),
+});
+
 export default http;

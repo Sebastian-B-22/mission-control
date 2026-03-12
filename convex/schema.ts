@@ -1046,6 +1046,26 @@ export default defineSchema({
     .index("by_user_created", ["userId", "createdAt"])
     .index("by_created", ["createdAt"]),
 
+  // ─── Host Health Runs (push-based) ─────────────────────────────────────
+  // Stores pushed results from `openclaw doctor` + `openclaw security audit`.
+  // These are viewable even when the gateway is disconnected.
+  healthRuns: defineTable({
+    userId: v.id("users"),
+    kind: v.union(v.literal("doctor"), v.literal("security_audit")),
+    status: v.union(v.literal("ok"), v.literal("warn"), v.literal("critical")),
+    counts: v.optional(
+      v.object({
+        critical: v.number(),
+        warn: v.number(),
+        info: v.number(),
+      })
+    ),
+    rawText: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user_createdAt", ["userId", "createdAt"])
+    .index("by_user_kind_createdAt", ["userId", "kind", "createdAt"]),
+
   // ─── Memory Snapshots (read-only UI) ───────────────────────────────────
   memorySnapshots: defineTable({
     userId: v.id("users"),

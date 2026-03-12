@@ -87,6 +87,12 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
   const [securityOut, setSecurityOut] = useState<string | null>(null);
   const [healthErr, setHealthErr] = useState<string | null>(null);
 
+  // Pushed health runs (works even without gateway)
+  const recentHealthRuns = useQuery(api.healthRuns.listRecentHealthRuns, {
+    userId,
+    limit: 20,
+  });
+
   // Pending / Next Up
   const createPendingItem = useMutation(api.pendingItems.create);
   const setPendingItemStatus = useMutation(api.pendingItems.setStatus);
@@ -255,6 +261,22 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
   const doctorGrouped = doctorOut ? groupBySeverity(doctorOut) : null;
   const securityGrouped = securityOut ? groupBySeverity(securityOut) : null;
 
+  const latestDoctorRun = useMemo(() => {
+    const runs = recentHealthRuns ?? [];
+    return runs.find((r) => r.kind === "doctor") ?? null;
+  }, [recentHealthRuns]);
+
+  const latestSecurityRun = useMemo(() => {
+    const runs = recentHealthRuns ?? [];
+    return runs.find((r) => r.kind === "security_audit") ?? null;
+  }, [recentHealthRuns]);
+
+  function statusBadgeVariant(status: string): "destructive" | "secondary" | "outline" {
+    if (status === "critical") return "destructive";
+    if (status === "warn") return "secondary";
+    return "outline";
+  }
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -283,6 +305,58 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* Latest pushed results (works even if gateway is disconnected) */}
+          <div className="border border-zinc-800 rounded-lg p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs font-medium text-zinc-200">Latest pushed checks</div>
+              <div className="text-[11px] text-muted-foreground">Persisted in Convex</div>
+            </div>
+
+            {!recentHealthRuns ? (
+              <div className="mt-2 text-xs text-muted-foreground">Loading…</div>
+            ) : recentHealthRuns.length === 0 ? (
+              <div className="mt-2 text-xs text-muted-foreground">
+                No pushed health runs yet. (These come from the Mac mini scripts.)
+              </div>
+            ) : (
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[{ label: "Doctor", run: latestDoctorRun }, { label: "Security audit", run: latestSecurityRun }].map(({ label, run }) => (
+                  <div key={label} className="border border-zinc-800 rounded-lg p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="text-xs font-medium">{label}</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {run ? formatTime(run.createdAt) : "No data"}
+                        </div>
+                      </div>
+                      {run ? (
+                        <Badge variant={statusBadgeVariant(run.status)} className="text-[10px]">
+                          {run.status}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px]">missing</Badge>
+                      )}
+                    </div>
+
+                    {run ? (
+                      <>
+                        <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                          <Badge variant="destructive">Critical {run.counts?.critical ?? groupBySeverity(run.rawText).critical.length}</Badge>
+                          <Badge variant="secondary">Warn {run.counts?.warn ?? groupBySeverity(run.rawText).warn.length}</Badge>
+                          <Badge variant="outline">Info {run.counts?.info ?? groupBySeverity(run.rawText).info.length}</Badge>
+                        </div>
+                        <details className="mt-2 border border-zinc-800 rounded-lg p-2">
+                          <summary className="cursor-pointer text-xs text-zinc-300">Raw output</summary>
+                          <pre className="mt-2 text-[11px] whitespace-pre-wrap text-zinc-200">{run.rawText}</pre>
+                        </details>
+                      </>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {!gw.connected ? (
             <div className="border border-zinc-800 rounded-lg p-3 text-xs text-zinc-300">
               <div className="font-medium text-zinc-200">Gateway disconnected</div>
