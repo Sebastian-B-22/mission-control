@@ -115,18 +115,20 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
     limit: 80,
   });
 
-  // Overnight Inbox (since 9pm)
-  function since9pmMs() {
+  // Overnight Inbox (since 7am)
+  // Rationale: overnight agent jobs tend to run early morning; Corinne should wake up and see them.
+  function since7amMs() {
     const now = new Date();
-    const ninePm = new Date(now);
-    ninePm.setHours(21, 0, 0, 0);
-    if (now.getTime() < ninePm.getTime()) {
-      ninePm.setDate(ninePm.getDate() - 1);
+    const sevenAm = new Date(now);
+    sevenAm.setHours(7, 0, 0, 0);
+    // If it's before 7am, show items since yesterday 7am.
+    if (now.getTime() < sevenAm.getTime()) {
+      sevenAm.setDate(sevenAm.getDate() - 1);
     }
-    return ninePm.getTime();
+    return sevenAm.getTime();
   }
 
-  const overnightSince = since9pmMs();
+  const overnightSince = since7amMs();
 
   const overnightItems = useQuery(api.overnightInbox.listNewSince, {
     sinceMs: overnightSince,
@@ -415,7 +417,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
         {/* Overnight Inbox */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="text-base">Overnight Inbox (since 9pm)</CardTitle>
+            <CardTitle className="text-base">Overnight Inbox (since 7am)</CardTitle>
             <p className="text-xs text-muted-foreground">
               New items pushed in by the Mac mini poller for quick morning triage.
             </p>
