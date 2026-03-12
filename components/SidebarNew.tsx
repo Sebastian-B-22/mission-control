@@ -121,6 +121,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       view: "finance",
     },
     {
+      name: "AI Costs",
+      icon: DollarSign,
+      view: "cost-tracker",
+    },
+    {
       name: "Personal RPM",
       icon: Home,
       view: "personal-overview",
@@ -191,6 +196,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Email Drafts", view: "email-drafts" },
         { name: "Engagement", view: "engagement-habits" },
         { name: "Memory Search", view: "memory" },
+        { name: "Memory Panel", view: "memory-panel" },
       ]
     },
     {

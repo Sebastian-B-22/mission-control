@@ -1562,4 +1562,119 @@ http.route({
   }),
 });
 
+// ─── Cost Events Ingest (agent/manual) ───────────────────────────────────
+// POST /cost-events/ingest
+// Body (JSON):
+//   clerkId      (required)
+//   agent        (required)
+//   model        (required)
+//   inputTokens  (optional)
+//   outputTokens (optional)
+//   costUsd      (required)
+//   createdAt    (optional) ms timestamp
+// Auth: X-Agent-Key header
+http.route({
+  path: "/cost-events/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/cost-events/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const clerkId = String(body.clerkId || "").trim();
+    if (!clerkId) return errorResponse("Missing required field: clerkId");
+
+    const agent = String(body.agent || "").trim();
+    const model = String(body.model || "").trim();
+    const costUsd = Number(body.costUsd);
+    if (!agent) return errorResponse("Missing required field: agent");
+    if (!model) return errorResponse("Missing required field: model");
+    if (!Number.isFinite(costUsd)) return errorResponse("Missing/invalid field: costUsd");
+
+    const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId });
+    if (!user) return errorResponse("User not found for clerkId: " + clerkId, 404);
+
+    const createdAt = body.createdAt !== undefined ? Number(body.createdAt) : undefined;
+
+    const id = await ctx.runMutation(api.costTracker.ingest, {
+      userId: user._id,
+      agent,
+      model,
+      inputTokens: body.inputTokens !== undefined ? Number(body.inputTokens) : undefined,
+      outputTokens: body.outputTokens !== undefined ? Number(body.outputTokens) : undefined,
+      costUsd,
+      createdAt: createdAt && Number.isFinite(createdAt) ? createdAt : undefined,
+    });
+
+    return jsonResponse({ ok: true, id }, 201);
+  }),
+});
+
+// ─── Memory Snapshots Ingest (Vercel-safe) ───────────────────────────────
+// POST /memory/snapshots/ingest
+// Body (JSON):
+//   clerkId (required)
+//   source  (optional)
+//   files   (required) [{ path, content, updatedAt? }]
+// Auth: X-Agent-Key header
+http.route({
+  path: "/memory/snapshots/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/memory/snapshots/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const clerkId = String(body.clerkId || "").trim();
+    if (!clerkId) return errorResponse("Missing required field: clerkId");
+
+    const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId });
+    if (!user) return errorResponse("User not found for clerkId: " + clerkId, 404);
+
+    const files = body.files as Array<{ path: string; content: string; updatedAt?: number }>;
+    if (!Array.isArray(files) || files.length === 0) {
+      return errorResponse("Missing required field: files (non-empty array)");
+    }
+
+    const source = body.source ? String(body.source) : undefined;
+
+    let upserted = 0;
+    for (const f of files) {
+      if (!f || typeof f.path !== "string" || typeof f.content !== "string") continue;
+      await ctx.runMutation(api.memorySnapshots.upsert, {
+        userId: user._id,
+        path: f.path,
+        content: f.content,
+        updatedAt: f.updatedAt,
+        source,
+      });
+      upserted++;
+    }
+
+    return jsonResponse({ ok: true, upserted }, 201);
+  }),
+});
+
 export default http;

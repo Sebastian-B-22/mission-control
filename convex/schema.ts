@@ -1017,4 +1017,44 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_endpoint", ["endpoint"]),
+
+  // ─── Onboarding Wizard ─────────────────────────────────────────────────
+  onboardingState: defineTable({
+    userId: v.id("users"),
+    dismissed: v.boolean(),
+    steps: v.object({
+      projectsBasics: v.boolean(),
+      pendingNextUp: v.boolean(),
+      overnightInbox: v.boolean(),
+      gatewayConnectivity: v.boolean(),
+      runHealthChecks: v.boolean(),
+    }),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // ─── Cost Tracker (MVP) ────────────────────────────────────────────────
+  costEvents: defineTable({
+    userId: v.id("users"),
+    agent: v.string(),
+    model: v.string(),
+    inputTokens: v.optional(v.number()),
+    outputTokens: v.optional(v.number()),
+    costUsd: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user_created", ["userId", "createdAt"])
+    .index("by_created", ["createdAt"]),
+
+  // ─── Memory Snapshots (read-only UI) ───────────────────────────────────
+  memorySnapshots: defineTable({
+    userId: v.id("users"),
+    path: v.string(),
+    content: v.string(),
+    updatedAt: v.number(),
+    createdAt: v.number(),
+    source: v.optional(v.string()), // e.g. "mac-mini-sync"
+  })
+    .index("by_user_path", ["userId", "path"])
+    .index("by_user_updated", ["userId", "updatedAt"]),
 });

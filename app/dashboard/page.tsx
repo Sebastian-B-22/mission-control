@@ -69,6 +69,10 @@ import { WeeklyView } from "@/components/WeeklyView";
 import { AgentSquad } from "@/components/AgentSquad";
 import { AgentHQ } from "@/components/AgentHQ";
 import { DashboardTopBar } from "@/components/DashboardTopBar";
+import { OnboardingWizardDialog } from "@/components/OnboardingWizardDialog";
+import { CostTrackerCard } from "@/components/CostTrackerCard";
+import { CostTrackerView } from "@/components/views/CostTrackerView";
+import { MemoryPanelView } from "@/components/views/MemoryPanelView";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -120,6 +124,14 @@ export default function DashboardPage() {
   );
 
   const updateCategory = useMutation(api.rpm.updateCategory);
+
+  // Onboarding
+  const onboarding = useQuery(
+    api.onboarding.getOrCreate,
+    convexUser ? { userId: convexUser._id } : "skip"
+  );
+  const resetOnboarding = useMutation(api.onboarding.reset);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   // Get today's date in PST (with auto-update at midnight PST)
   const getPSTDate = () => {
@@ -191,6 +203,22 @@ export default function DashboardPage() {
 
   const editingCategory = categories?.find((c: any) => c._id === editingCategoryId);
 
+  // Auto-prompt onboarding for first-time (or not dismissed) users
+  useEffect(() => {
+    if (!convexUser) return;
+    if (!onboarding) return;
+    if (onboarding.dismissed) return;
+
+    const steps = (onboarding as any).steps as Record<string, boolean> | undefined;
+    const completed = steps ? Object.values(steps).filter(Boolean).length : 0;
+    const total = steps ? Object.values(steps).length : 0;
+    const allDone = total > 0 && completed === total;
+
+    if (!allDone) {
+      setOnboardingOpen(true);
+    }
+  }, [convexUser, onboarding]);
+
   if (!convexUser) {
     return (
       <div className="container mx-auto py-8 px-4">
@@ -240,6 +268,7 @@ export default function DashboardPage() {
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               <HealthWidget userId={convexUser._id} />
               <HabitTracker userId={convexUser._id} date={today} />
+              <CostTrackerCard userId={convexUser._id} onOpen={() => setCurrentView("cost-tracker")} />
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               <FiveToThrive userId={convexUser._id} date={today} />
@@ -531,6 +560,9 @@ export default function DashboardPage() {
       case "memory":
         return <MemoryView />;
 
+      case "memory-panel":
+        return <MemoryPanelView userId={convexUser._id} />;
+
       case "engagement-habits":
         return (
           <div className="space-y-6">
@@ -567,6 +599,9 @@ export default function DashboardPage() {
 
       case "finance":
         return <FinanceView />;
+
+      case "cost-tracker":
+        return <CostTrackerView userId={convexUser._id} />;
 
       case "health":
         return <HealthDashboard userId={convexUser._id} />;
@@ -661,7 +696,14 @@ export default function DashboardPage() {
 
       <div className="lg:pl-64 min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
-          <DashboardTopBar />
+          <DashboardTopBar
+            userId={convexUser._id}
+            onOpenOnboarding={() => setOnboardingOpen(true)}
+            onResetOnboarding={async () => {
+              await resetOnboarding({ userId: convexUser._id });
+              setOnboardingOpen(true);
+            }}
+          />
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
               Mission Control
@@ -676,6 +718,16 @@ export default function DashboardPage() {
 
           {/* Push notification prompt */}
           <PushNotificationBanner userId={convexUser._id} />
+
+          <OnboardingWizardDialog
+            userId={convexUser._id}
+            open={onboardingOpen}
+            onOpenChange={setOnboardingOpen}
+            onNavigate={(view) => {
+              setCurrentView(view);
+              setOnboardingOpen(false);
+            }}
+          />
 
       {/* Edit Category Dialog */}
       <Dialog open={!!editingCategoryId} onOpenChange={() => setEditingCategoryId(null)}>
