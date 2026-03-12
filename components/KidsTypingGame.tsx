@@ -81,6 +81,7 @@ function formatPct(x: number) {
 
 export default function KidsTypingGame({ userId }: Props) {
   const [child, setChild] = useState<ChildProfile>("roma");
+  const [rewardChoice, setRewardChoice] = useState<"bot" | "barnes">("bot");
   const [prompt, setPrompt] = useState<string>(() => generatePrompt());
   const [typed, setTyped] = useState("");
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -129,6 +130,7 @@ export default function KidsTypingGame({ userId }: Props) {
         await addSession({
           userId,
           child,
+          rewardChoice,
           prompt,
           wpm,
           accuracy,
@@ -187,7 +189,7 @@ export default function KidsTypingGame({ userId }: Props) {
   return (
     <div className="mx-auto max-w-4xl space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant={child === "roma" ? "default" : "outline"}
             onClick={() => {
@@ -206,6 +208,24 @@ export default function KidsTypingGame({ userId }: Props) {
           >
             Anthony
           </Button>
+
+          <div className="ml-2 flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Reward this session:</span>
+            <Button
+              size="sm"
+              variant={rewardChoice === "bot" ? "default" : "outline"}
+              onClick={() => setRewardChoice("bot")}
+            >
+              +5 bot min
+            </Button>
+            <Button
+              size="sm"
+              variant={rewardChoice === "barnes" ? "default" : "outline"}
+              onClick={() => setRewardChoice("barnes")}
+            >
+              +Barnes points
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">

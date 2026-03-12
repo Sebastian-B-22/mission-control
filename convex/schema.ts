@@ -1086,8 +1086,14 @@ export default defineSchema({
     totalSessions: v.number(),
     bestWpm: v.optional(v.number()),
     bestAccuracy: v.optional(v.number()),
-    lastRewardXpBot: v.number(), // highest XP milestone rewarded for bonus_bot_minutes
-    lastRewardXpBarnes: v.number(), // highest XP milestone rewarded for barnes_points
+
+    // Reward banks so the child chooses which reward track each session contributes to.
+    botXpTotal: v.number(),
+    barnesXpTotal: v.number(),
+
+    lastRewardXpBot: v.number(), // highest botXpTotal milestone rewarded for bonus_bot_minutes
+    lastRewardXpBarnes: v.number(), // highest barnesXpTotal milestone rewarded for barnes_points
+
     updatedAt: v.number(),
   }).index("by_user_child", ["userId", "child"]),
 
