@@ -379,8 +379,14 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
 
       // Online (but we still want a record below)
       if (has("math academy")) candidates.push({ category: "math", activity: "Math Academy" });
+      if (has("wonder math")) candidates.push({ category: "math", activity: "Wonder Math" });
       if (has("membean")) candidates.push({ category: "writing", activity: "Membean" });
       if (has("rosetta")) candidates.push({ category: "writing", activity: "Rosetta Stone" });
+      // Synthesis: distinguish between Synthesis Math vs general Synthesis Teams
+      if (has("synthesis math")) candidates.push({ category: "math", activity: "Synthesis Math", notes: notes });
+      if (has("synthesis teams") || (has("synthesis") && !has("synthesis math"))) {
+        candidates.push({ category: "life-skills", activity: "Synthesis Teams", notes: notes });
+      }
 
       // History
       if (has("tuttle twins")) candidates.push({ category: "history", activity: "Tuttle Twins" });
@@ -427,6 +433,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       // PE
       if (has("boxing")) candidates.push({ category: "pe", activity: "Boxing" });
       if (has("jiu")) candidates.push({ category: "pe", activity: "Jiu-jitsu" });
+      if (has("rock climbing") || has("climbing")) candidates.push({ category: "pe", activity: "Rock Climbing", notes: notes });
       if (has("horse")) candidates.push({ category: "pe", activity: "Other PE", notes: notes });
       if (has("ninja")) candidates.push({ category: "pe", activity: "Ninja Academy" });
 
@@ -435,11 +442,17 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
         candidates.push({ category: "writing", activity: "Writing with Skill", notes: notes });
       }
       
-      // Reading / literature (v1)
+      // Reading / literature
       if (has("read aloud") || has("read-aloud")) candidates.push({ category: "literature", activity: "Read Aloud", notes: notes });
-      if (has("wings of fire") || has("redwall") || has("they read")) {
+
+      // Generic "reading" catch-all (plus a few series-specific hints)
+      if (has("reading") || has("wings of fire") || has("redwall") || has("they read")) {
         candidates.push({ category: "literature", activity: "Reading", notes: notes });
       }
+
+      // Creative / projects
+      if (has("stop motion") || has("stop-motion")) candidates.push({ category: "art", activity: "Stop Motion", notes: notes });
+      if (has("bot time") || has("bot-time") || has("robot")) candidates.push({ category: "science", activity: "Robotics / Bot Time", notes: notes });
 
       // Deduplicate candidates
       const uniq = new Map<string, { category: string; activity: string; notes?: string }>();
