@@ -7,7 +7,11 @@ import ClientErrorTrap from "@/components/ClientErrorTrap";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mission Control - Life OS Dashboard",
+  applicationName: "Mission Control",
+  title: {
+    default: "Mission Control",
+    template: "%s | Mission Control",
+  },
   description: "Your daily accountability and RPM planning system",
   manifest: "/manifest.json",
   appleWebApp: {
@@ -15,10 +19,12 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Mission Control",
   },
+  other: {
+    // Extra redundancy for iOS PWA title display.
+    "apple-mobile-web-app-title": "Mission Control",
+  },
   icons: {
-    apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
-    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 

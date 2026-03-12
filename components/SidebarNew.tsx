@@ -94,6 +94,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Read Aloud List", view: "homeschool-readaloud" },
         { name: "Book Library", view: "homeschool-library" },
         { name: "Game Library", view: "homeschool-games" },
+        { name: "Typing Game", href: "/kids/typing" },
         { name: "Resource Library", view: "homeschool-resources" },
         { name: "Field Trips", view: "homeschool-fieldtrips" },
         { name: "Travel", view: "homeschool-trips" },
@@ -294,7 +295,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                       <button
                         key={child.view}
                         onClick={() => {
-                          onViewChange(child.view);
+                          if (child.href) {
+                            window.location.href = child.href;
+                          } else {
+                            onViewChange(child.view);
+                          }
                           setIsOpen(false);
                         }}
                         className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${
