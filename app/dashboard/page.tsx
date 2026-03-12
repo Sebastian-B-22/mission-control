@@ -731,8 +731,20 @@ export default function DashboardPage() {
           {/* Render current view content */}
           {renderContent()}
 
-          {/* Push notification prompt */}
-          <PushNotificationBanner userId={convexUser._id} />
+          {/* Push notification prompt (only show in Ops/Sebastian views) */}
+          {(() => {
+            const sebastianViews = new Set([
+              "sebastian",
+              "agent-ideas",
+              "content-pipeline",
+              "email-drafts",
+              "engagement-habits",
+              "memory",
+              "memory-panel",
+            ]);
+            const show = currentView.startsWith("agent-") || sebastianViews.has(currentView);
+            return show ? <PushNotificationBanner userId={convexUser._id} /> : null;
+          })()}
 
           <OnboardingWizardDialog
             userId={convexUser._id}

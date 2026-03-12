@@ -18,7 +18,7 @@ export function PushNotificationBanner({ userId }: PushNotificationBannerProps) 
   const [dismissed, setDismissed] = useState<boolean>(() => {
     try {
       if (typeof window === "undefined") return false;
-      return window.localStorage.getItem("push-banner-dismissed") === "true";
+      return window.localStorage.getItem(`push-banner-dismissed:v1:${userId}`) === "true";
     } catch {
       return false;
     }
@@ -31,7 +31,7 @@ export function PushNotificationBanner({ userId }: PushNotificationBannerProps) 
 
   const handleDismiss = () => {
     setDismissed(true);
-    localStorage.setItem("push-banner-dismissed", "true");
+    localStorage.setItem(`push-banner-dismissed:v1:${userId}`, "true");
   };
 
   return (
