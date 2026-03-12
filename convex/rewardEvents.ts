@@ -3,7 +3,7 @@ import { mutation, query, type QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 
 type Child = "roma" | "anthony";
-type RewardType = "bonus_bot_minutes" | "barnes_points";
+type RewardType = "bonus_bot_minutes" | "barnes_points" | "roblox_points";
 
 type Balances = Record<Child, Record<RewardType, number>>;
 
@@ -17,8 +17,8 @@ async function getUserIdByClerkId(ctx: QueryCtx, clerkId: string): Promise<Id<"u
 
 function emptyBalances(): Balances {
   return {
-    roma: { bonus_bot_minutes: 0, barnes_points: 0 },
-    anthony: { bonus_bot_minutes: 0, barnes_points: 0 },
+    roma: { bonus_bot_minutes: 0, barnes_points: 0, roblox_points: 0 },
+    anthony: { bonus_bot_minutes: 0, barnes_points: 0, roblox_points: 0 },
   };
 }
 

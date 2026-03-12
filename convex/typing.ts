@@ -7,6 +7,11 @@ const BOT_MINUTES_PER_STEP = 5;
 const BARNES_XP_STEP = 500;
 const BARNES_POINTS_PER_STEP = 10;
 
+// Placeholder conversion until confirmed:
+// +25 roblox_points per 500 XP (easy to tweak)
+const ROBLOX_XP_STEP = 500;
+const ROBLOX_POINTS_PER_STEP = 25;
+
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
@@ -40,8 +45,10 @@ async function getOrCreateProfile(
     bestAccuracy: undefined,
     botXpTotal: 0,
     barnesXpTotal: 0,
+    robloxXpTotal: 0,
     lastRewardXpBot: 0,
     lastRewardXpBarnes: 0,
+    lastRewardXpRoblox: 0,
     updatedAt: now,
   });
 
@@ -84,7 +91,7 @@ export const addSession = mutation({
   args: {
     userId: v.id("users"),
     child: v.union(v.literal("roma"), v.literal("anthony")),
-    rewardChoice: v.union(v.literal("bot"), v.literal("barnes")),
+    rewardChoice: v.union(v.literal("bot"), v.literal("barnes"), v.literal("roblox")),
     prompt: v.string(),
     wpm: v.number(),
     accuracy: v.number(), // 0..1
@@ -116,22 +123,29 @@ export const addSession = mutation({
     // Rewards: each session contributes XP to ONE reward bank (chosen by the child).
     const botXpTotalBefore = profile.botXpTotal ?? 0;
     const barnesXpTotalBefore = profile.barnesXpTotal ?? 0;
+    const robloxXpTotalBefore = profile.robloxXpTotal ?? 0;
 
     const botXpTotalAfter =
       args.rewardChoice === "bot" ? botXpTotalBefore + xpEarned : botXpTotalBefore;
     const barnesXpTotalAfter =
       args.rewardChoice === "barnes" ? barnesXpTotalBefore + xpEarned : barnesXpTotalBefore;
+    const robloxXpTotalAfter =
+      args.rewardChoice === "roblox" ? robloxXpTotalBefore + xpEarned : robloxXpTotalBefore;
 
     const lastBot = profile.lastRewardXpBot ?? 0;
     const lastBarnes = profile.lastRewardXpBarnes ?? 0;
+    const lastRoblox = profile.lastRewardXpRoblox ?? 0;
 
     const botStepsBefore = Math.floor(lastBot / BOT_XP_STEP);
     const botStepsAfter = Math.floor(botXpTotalAfter / BOT_XP_STEP);
     const barnesStepsBefore = Math.floor(lastBarnes / BARNES_XP_STEP);
     const barnesStepsAfter = Math.floor(barnesXpTotalAfter / BARNES_XP_STEP);
+    const robloxStepsBefore = Math.floor(lastRoblox / ROBLOX_XP_STEP);
+    const robloxStepsAfter = Math.floor(robloxXpTotalAfter / ROBLOX_XP_STEP);
 
     const botNewSteps = args.rewardChoice === "bot" ? Math.max(0, botStepsAfter - botStepsBefore) : 0;
     const barnesNewSteps = args.rewardChoice === "barnes" ? Math.max(0, barnesStepsAfter - barnesStepsBefore) : 0;
+    const robloxNewSteps = args.rewardChoice === "roblox" ? Math.max(0, robloxStepsAfter - robloxStepsBefore) : 0;
 
     for (let i = 0; i < botNewSteps; i++) {
       await ctx.db.insert("rewardEvents", {
@@ -159,6 +173,19 @@ export const addSession = mutation({
       });
     }
 
+    for (let i = 0; i < robloxNewSteps; i++) {
+      await ctx.db.insert("rewardEvents", {
+        userId: args.userId,
+        child: args.child,
+        rewardType: "roblox_points",
+        amount: ROBLOX_POINTS_PER_STEP,
+        source: "typing",
+        note: `Reached ${ROBLOX_XP_STEP * (robloxStepsBefore + 1 + i)} Roblox XP`,
+        createdAt: now,
+        redeemedAt: undefined,
+      });
+    }
+
     await ctx.db.patch(profile._id, {
       totalXp: newTotalXp,
       totalSessions: newTotalSessions,
@@ -167,8 +194,10 @@ export const addSession = mutation({
 
       botXpTotal: botXpTotalAfter,
       barnesXpTotal: barnesXpTotalAfter,
+      robloxXpTotal: robloxXpTotalAfter,
       lastRewardXpBot: botStepsAfter * BOT_XP_STEP,
       lastRewardXpBarnes: barnesStepsAfter * BARNES_XP_STEP,
+      lastRewardXpRoblox: robloxStepsAfter * ROBLOX_XP_STEP,
 
       updatedAt: now,
     });
@@ -180,6 +209,7 @@ export const addSession = mutation({
       rewardsGranted: {
         bonus_bot_minutes: botNewSteps * BOT_MINUTES_PER_STEP,
         barnes_points: barnesNewSteps * BARNES_POINTS_PER_STEP,
+        roblox_points: robloxNewSteps * ROBLOX_POINTS_PER_STEP,
       },
     };
   },

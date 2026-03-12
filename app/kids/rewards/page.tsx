@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
 type Child = "roma" | "anthony";
 
@@ -75,6 +76,23 @@ export default function KidsRewardsPage() {
       </div>
 
       <div className="mx-auto max-w-4xl space-y-4">
+        <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950/40">
+          <div className="relative h-[140px] w-full">
+            <Image
+              src="/kids/rewards-banner.svg"
+              alt="Rewards Vault"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          <CardContent className="pt-4">
+            <div className="text-sm text-muted-foreground">
+              Rates: Bot +5 min / 250 XP · Barnes +10 pts / 500 XP · Roblox +25 pts / 500 XP
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-xl">Reward balances - {child}</CardTitle>
@@ -82,6 +100,7 @@ export default function KidsRewardsPage() {
           <CardContent className="text-sm text-muted-foreground space-y-1">
             <div>Bonus bot minutes: {totals?.bonus_bot_minutes ?? 0}</div>
             <div>Barnes points: {totals?.barnes_points ?? 0}</div>
+            <div>Roblox points: {totals?.roblox_points ?? 0}</div>
           </CardContent>
         </Card>
 

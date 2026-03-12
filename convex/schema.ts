@@ -1090,9 +1090,11 @@ export default defineSchema({
     // Reward banks so the child chooses which reward track each session contributes to.
     botXpTotal: v.number(),
     barnesXpTotal: v.number(),
+    robloxXpTotal: v.number(),
 
     lastRewardXpBot: v.number(), // highest botXpTotal milestone rewarded for bonus_bot_minutes
     lastRewardXpBarnes: v.number(), // highest barnesXpTotal milestone rewarded for barnes_points
+    lastRewardXpRoblox: v.number(), // highest robloxXpTotal milestone rewarded for roblox_points
 
     updatedAt: v.number(),
   }).index("by_user_child", ["userId", "child"]),
@@ -1114,7 +1116,8 @@ export default defineSchema({
     child: v.union(v.literal("roma"), v.literal("anthony")),
     rewardType: v.union(
       v.literal("bonus_bot_minutes"),
-      v.literal("barnes_points")
+      v.literal("barnes_points"),
+      v.literal("roblox_points")
     ),
     amount: v.number(),
     source: v.optional(v.string()), // e.g. "typing"

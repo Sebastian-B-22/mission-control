@@ -81,7 +81,7 @@ function formatPct(x: number) {
 
 export default function KidsTypingGame({ userId }: Props) {
   const [child, setChild] = useState<ChildProfile>("roma");
-  const [rewardChoice, setRewardChoice] = useState<"bot" | "barnes">("bot");
+  const [rewardChoice, setRewardChoice] = useState<"bot" | "barnes" | "roblox">("bot");
   const [prompt, setPrompt] = useState<string>(() => generatePrompt());
   const [typed, setTyped] = useState("");
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -209,22 +209,34 @@ export default function KidsTypingGame({ userId }: Props) {
             Anthony
           </Button>
 
-          <div className="ml-2 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Reward this session:</span>
-            <Button
-              size="sm"
-              variant={rewardChoice === "bot" ? "default" : "outline"}
-              onClick={() => setRewardChoice("bot")}
-            >
-              +5 bot min
-            </Button>
-            <Button
-              size="sm"
-              variant={rewardChoice === "barnes" ? "default" : "outline"}
-              onClick={() => setRewardChoice("barnes")}
-            >
-              +Barnes points
-            </Button>
+          <div className="ml-2 flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Reward this session:</span>
+              <Button
+                size="sm"
+                variant={rewardChoice === "bot" ? "default" : "outline"}
+                onClick={() => setRewardChoice("bot")}
+              >
+                Bot
+              </Button>
+              <Button
+                size="sm"
+                variant={rewardChoice === "barnes" ? "default" : "outline"}
+                onClick={() => setRewardChoice("barnes")}
+              >
+                Barnes
+              </Button>
+              <Button
+                size="sm"
+                variant={rewardChoice === "roblox" ? "default" : "outline"}
+                onClick={() => setRewardChoice("roblox")}
+              >
+                Roblox
+              </Button>
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Bot: +5 min / 250 XP · Barnes: +10 pts / 500 XP · Roblox: +25 pts / 500 XP
+            </div>
           </div>
         </div>
 
@@ -321,10 +333,10 @@ export default function KidsTypingGame({ userId }: Props) {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-1">
           <div>
-            <span className="font-semibold text-foreground">Roma</span>: {balances?.roma?.bonus_bot_minutes ?? 0} bot minutes, {balances?.roma?.barnes_points ?? 0} Barnes points
+            <span className="font-semibold text-foreground">Roma</span>: {balances?.roma?.bonus_bot_minutes ?? 0} bot minutes, {balances?.roma?.barnes_points ?? 0} Barnes points, {balances?.roma?.roblox_points ?? 0} Roblox points
           </div>
           <div>
-            <span className="font-semibold text-foreground">Anthony</span>: {balances?.anthony?.bonus_bot_minutes ?? 0} bot minutes, {balances?.anthony?.barnes_points ?? 0} Barnes points
+            <span className="font-semibold text-foreground">Anthony</span>: {balances?.anthony?.bonus_bot_minutes ?? 0} bot minutes, {balances?.anthony?.barnes_points ?? 0} Barnes points, {balances?.anthony?.roblox_points ?? 0} Roblox points
           </div>
           <div className="pt-2">
             <a className="underline" href="/kids/rewards">Open rewards panel</a>
