@@ -28,10 +28,12 @@ export const list = query({
   args: {
     status: v.optional(EMAIL_DRAFT_STATUS),
     tag: v.optional(v.string()),
+    includeDeleted: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     let items = await ctx.db.query("emailDrafts").collect();
 
+    if (!args.includeDeleted) items = items.filter((d) => d.deletedAt == null);
     if (args.status) items = items.filter((d) => d.status === args.status);
     if (args.tag) items = items.filter((d) => (d.tags ?? []).includes(args.tag!));
 
@@ -173,6 +175,39 @@ export const setSuggestionStatus = mutation({
     }
 
     await ctx.db.patch(args.draftId, updates);
+
+    return { success: true };
+  },
+});
+
+export const softDelete = mutation({
+  args: { id: v.id("emailDrafts"), deletedBy: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.get(args.id);
+    if (!existing) throw new Error("Email draft not found");
+
+    await ctx.db.patch(args.id, {
+      deletedAt: Date.now(),
+      deletedBy: args.deletedBy ?? "unknown",
+      updatedAt: Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
+export const restore = mutation({
+  args: { id: v.id("emailDrafts"), restoredBy: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.get(args.id);
+    if (!existing) throw new Error("Email draft not found");
+
+    await ctx.db.patch(args.id, {
+      deletedAt: undefined,
+      deletedBy: undefined,
+      updatedAt: Date.now(),
+      lastEditedBy: args.restoredBy ?? existing.lastEditedBy,
+    });
 
     return { success: true };
   },

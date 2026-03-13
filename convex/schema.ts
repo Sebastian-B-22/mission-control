@@ -389,6 +389,10 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
     lastEditedBy: v.string(),
+
+    // Soft delete
+    deletedAt: v.optional(v.number()),
+    deletedBy: v.optional(v.string()),
   })
     .index("by_status", ["status"])
     .index("by_updated", ["updatedAt"]),
@@ -453,26 +457,64 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_code", ["code"]),
 
+  // ─── Account Credit System ────────────────────────────────────────────
+  creditTransactions: defineTable({
+    familyEmail: v.string(),
+    amount: v.number(),           // Amount in cents (positive = credit added, negative = credit used)
+    type: v.union(
+      v.literal("refund_credit"),      // Credit issued from refund
+      v.literal("promotional_credit"), // Promotional credit
+      v.literal("applied_to_purchase") // Credit used at checkout
+    ),
+    description: v.string(),
+    registrationId: v.optional(v.string()),  // Link to registration if applicable
+    processedBy: v.optional(v.string()),      // Who issued the credit
+    createdAt: v.number(),
+  })
+    .index("by_email", ["familyEmail"])
+    .index("by_type", ["type"]),
+
   // ─── Family CRM ───────────────────────────────────────────────────────
   families: defineTable({
+    // Primary contact (backwards compatible)
     parentFirstName: v.string(),
     parentLastName: v.string(),
-    email: v.string(),
+    email: v.string(),         // Primary email (key)
     phone: v.string(),
+    // Enhanced fields
+    parentNames: v.optional(v.array(v.string())),  // ["Leah McMullen", "Paul McMullen"]
+    phones: v.optional(v.array(v.string())),
+    address: v.optional(v.string()),
+    // Links to external systems
+    stripeCustomerId: v.optional(v.string()),
+    kitSubscriberId: v.optional(v.string()),
+    // Credit balance (in cents)
+    creditBalance: v.optional(v.number()),
+    // Notes & tags
+    notes: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    // Communication tracking
     lastQuoMessage: v.optional(v.string()),
     lastQuoDate: v.optional(v.number()),
+    // Timestamps
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_email", ["email"])
-    .index("by_phone", ["phone"]),
+    .index("by_phone", ["phone"])
+    .searchIndex("search_families", {
+      searchField: "email",
+      filterFields: ["tags"],
+    }),
 
   children: defineTable({
     familyId: v.id("families"),
     firstName: v.string(),
     lastName: v.string(),
-    birthYear: v.optional(v.number()),
+    dob: v.optional(v.string()),          // YYYY-MM-DD
+    birthYear: v.optional(v.number()),    // Legacy support
     gender: v.optional(v.string()),
+    notes: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_family", ["familyId"]),
 

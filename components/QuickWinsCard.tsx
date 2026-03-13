@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRightLeft, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 interface QuickWinsCardProps {
   userId: Id<"users">;
@@ -101,9 +102,11 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
                     {item.task}
                   </span>
                   {item.categoryId && categoryNameById.get(item.categoryId) && (
-                    <p className="text-xs text-muted-foreground">
+                    <span
+                      className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(item.categoryId)).badge}`}
+                    >
                       {String(categoryNameById.get(item.categoryId) ?? "")}
-                    </p>
+                    </span>
                   )}
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => deleteQuickWin({ id: item._id })}>

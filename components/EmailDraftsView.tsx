@@ -40,6 +40,7 @@ export function EmailDraftsView() {
   const createDraft = useMutation(api.emailDrafts.create);
   const updateDraft = useMutation(api.emailDrafts.update);
   const markApproved = useMutation(api.emailDrafts.markApproved);
+  const softDelete = useMutation(api.emailDrafts.softDelete);
   const addSuggestion = useMutation(api.emailDrafts.addSuggestion);
   const setSuggestionStatus = useMutation(api.emailDrafts.setSuggestionStatus);
 
@@ -101,6 +102,14 @@ export function EmailDraftsView() {
   const handleApprove = async () => {
     if (!selectedId) return;
     await markApproved({ id: selectedId, lastEditedBy: "corinne" });
+  };
+
+  const handleDelete = async () => {
+    if (!selectedId) return;
+    const ok = window.confirm("Delete this draft? You can restore it later (soft delete).");
+    if (!ok) return;
+    await softDelete({ id: selectedId, deletedBy: "corinne" });
+    setSelectedId(null);
   };
 
   const handleAddSuggestion = async () => {
@@ -235,6 +244,7 @@ export function EmailDraftsView() {
                     </Button>
                     <Button variant="outline" onClick={handleCopy}>Copy</Button>
                     <Button variant="outline" onClick={handleSave}>Save</Button>
+                    <Button variant="destructive" onClick={handleDelete}>Delete</Button>
                     <Button onClick={handleApprove} disabled={selected.status === "approved" || selected.status === "sent"}>
                       Mark Approved
                     </Button>

@@ -682,7 +682,8 @@ async function tagConvertKit(email: string, firstName: string, weekNumbers: stri
 
 // CORS preflight for all camp routes
 ["/camp/availability", "/camp/validate-promo", "/camp/register", "/camp/stripe-webhook",
- "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/promo-codes"].forEach((path) => {
+ "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/promo-codes",
+ "/api/family/credit", "/api/family/credit/add", "/api/family/credit/apply"].forEach((path) => {
   http.route({
     path, method: "OPTIONS",
     handler: httpAction(async () => new Response(null, { status: 204, headers: campCors() })),
@@ -894,6 +895,101 @@ http.route({
       return campJson(result);
     } catch (e) {
       return campError(e instanceof Error ? e.message : "Failed", 404);
+    }
+  }),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Account Credit System
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /api/family/credit?email=parent@email.com
+http.route({
+  path: "/api/family/credit", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email");
+    if (!email) return campError("email query param required");
+    
+    const result = await ctx.runQuery(api.families.getCreditBalance, { email });
+    return campJson(result);
+  }),
+});
+
+// POST /api/family/credit/add
+// Body: { familyEmail, amount, type, description, registrationId?, processedBy? }
+// Used for issuing refunds as credit
+http.route({
+  path: "/api/family/credit/add", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    
+    let body: Record<string, unknown>;
+    try { body = await req.json(); } catch { return campError("Invalid JSON"); }
+    
+    const { familyEmail, amount, type, description, registrationId, processedBy } = body as {
+      familyEmail: string;
+      amount: number;
+      type: "refund_credit" | "promotional_credit";
+      description: string;
+      registrationId?: string;
+      processedBy?: string;
+    };
+    
+    if (!familyEmail || !amount || !type || !description) {
+      return campError("familyEmail, amount, type, and description required");
+    }
+    
+    if (!["refund_credit", "promotional_credit"].includes(type)) {
+      return campError("Invalid type. Must be refund_credit or promotional_credit");
+    }
+    
+    try {
+      const result = await ctx.runMutation(api.families.addCredit, {
+        familyEmail,
+        amount,
+        type,
+        description,
+        registrationId,
+        processedBy,
+      });
+      return campJson(result, 201);
+    } catch (e) {
+      return campError(e instanceof Error ? e.message : "Failed", 400);
+    }
+  }),
+});
+
+// POST /api/family/credit/apply
+// Body: { familyEmail, amount, description, registrationId? }
+// Used during checkout to apply credit to purchase
+http.route({
+  path: "/api/family/credit/apply", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    let body: Record<string, unknown>;
+    try { body = await req.json(); } catch { return campError("Invalid JSON"); }
+    
+    const { familyEmail, amount, description, registrationId } = body as {
+      familyEmail: string;
+      amount: number;
+      description: string;
+      registrationId?: string;
+    };
+    
+    if (!familyEmail || !amount || !description) {
+      return campError("familyEmail, amount, and description required");
+    }
+    
+    try {
+      const result = await ctx.runMutation(api.families.applyCredit, {
+        familyEmail,
+        amount,
+        description,
+        registrationId,
+      });
+      return campJson(result);
+    } catch (e) {
+      return campError(e instanceof Error ? e.message : "Failed", 400);
     }
   }),
 });

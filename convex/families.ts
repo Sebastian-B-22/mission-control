@@ -3,6 +3,14 @@ import { v } from "convex/values";
 
 // ─── Queries ──────────────────────────────────────────────────────────────
 
+// Simple list query for Family CRM page
+export const list = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("families").order("desc").collect();
+  },
+});
+
 export const getFamilies = query({
   args: {},
   handler: async (ctx) => {
@@ -207,5 +215,143 @@ export const updateFamilyQuo = mutation({
       lastQuoDate,
       updatedAt: Date.now(),
     });
+  },
+});
+
+// ─── Credit System ────────────────────────────────────────────────────────
+
+export const getCreditBalance = query({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const family = await ctx.db
+      .query("families")
+      .withIndex("by_email", (q) => q.eq("email", email.toLowerCase().trim()))
+      .first();
+    
+    return { balance: family?.creditBalance ?? 0 };
+  },
+});
+
+export const getCreditHistory = query({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const transactions = await ctx.db
+      .query("creditTransactions")
+      .withIndex("by_email", (q) => q.eq("familyEmail", email.toLowerCase().trim()))
+      .order("desc")
+      .collect();
+    
+    return transactions;
+  },
+});
+
+export const addCredit = mutation({
+  args: {
+    familyEmail: v.string(),
+    amount: v.number(),
+    type: v.union(v.literal("refund_credit"), v.literal("promotional_credit")),
+    description: v.string(),
+    registrationId: v.optional(v.string()),
+    processedBy: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const email = args.familyEmail.toLowerCase().trim();
+    
+    // Find or create family record
+    let family = await ctx.db
+      .query("families")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
+    
+    const now = Date.now();
+    
+    if (!family) {
+      // Create basic family record if it doesn't exist
+      const familyId = await ctx.db.insert("families", {
+        parentFirstName: "",
+        parentLastName: "",
+        email,
+        phone: "",
+        creditBalance: args.amount,
+        createdAt: now,
+        updatedAt: now,
+      });
+      family = await ctx.db.get(familyId);
+    } else {
+      // Update existing family's credit balance
+      const newBalance = (family.creditBalance ?? 0) + args.amount;
+      await ctx.db.patch(family._id, {
+        creditBalance: newBalance,
+        updatedAt: now,
+      });
+    }
+    
+    // Record the transaction
+    await ctx.db.insert("creditTransactions", {
+      familyEmail: email,
+      amount: args.amount,
+      type: args.type,
+      description: args.description,
+      registrationId: args.registrationId,
+      processedBy: args.processedBy,
+      createdAt: now,
+    });
+    
+    return {
+      success: true,
+      newBalance: (family?.creditBalance ?? 0) + args.amount,
+    };
+  },
+});
+
+export const applyCredit = mutation({
+  args: {
+    familyEmail: v.string(),
+    amount: v.number(),
+    description: v.string(),
+    registrationId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const email = args.familyEmail.toLowerCase().trim();
+    
+    const family = await ctx.db
+      .query("families")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
+    
+    if (!family) {
+      throw new Error("Family not found");
+    }
+    
+    const currentBalance = family.creditBalance ?? 0;
+    
+    if (currentBalance < args.amount) {
+      throw new Error(`Insufficient credit balance. Available: ${currentBalance}, Requested: ${args.amount}`);
+    }
+    
+    const newBalance = currentBalance - args.amount;
+    const now = Date.now();
+    
+    // Update family's credit balance
+    await ctx.db.patch(family._id, {
+      creditBalance: newBalance,
+      updatedAt: now,
+    });
+    
+    // Record the transaction (negative amount = credit used)
+    await ctx.db.insert("creditTransactions", {
+      familyEmail: email,
+      amount: -args.amount,
+      type: "applied_to_purchase",
+      description: args.description,
+      registrationId: args.registrationId,
+      createdAt: now,
+    });
+    
+    return {
+      success: true,
+      amountApplied: args.amount,
+      remainingBalance: newBalance,
+    };
   },
 });

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 interface FiveToThriveProps {
   userId: Id<"users">;
@@ -184,9 +185,11 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
                     {task.text}
                   </span>
                   {task.categoryId && categoryNameById.get(task.categoryId) && (
-                    <p className="text-xs text-muted-foreground">
+                    <span
+                      className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(task.categoryId)).badge}`}
+                    >
                       {String(categoryNameById.get(task.categoryId) ?? "")}
-                    </p>
+                    </span>
                   )}
                 </div>
                 <Button

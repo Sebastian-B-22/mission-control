@@ -144,6 +144,61 @@ export const markPaid = internalMutation({
 
     await ctx.db.patch(reg._id, { status: "paid", paidAt: Date.now() });
 
+    // ═══ Auto-populate Family CRM ═══
+    const email = reg.parent.email.toLowerCase().trim();
+    const now = Date.now();
+    
+    // Check if family exists
+    let family = await ctx.db
+      .query("families")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
+    
+    if (!family) {
+      // Create new family record
+      const familyId = await ctx.db.insert("families", {
+        parentFirstName: reg.parent.firstName,
+        parentLastName: reg.parent.lastName,
+        email,
+        phone: reg.parent.phone,
+        createdAt: now,
+        updatedAt: now,
+      });
+      family = await ctx.db.get(familyId);
+    }
+    
+    // Auto-create children records
+    if (family) {
+      for (const child of reg.children) {
+        if (!child.firstName || !child.lastName) continue;
+        
+        // Check if child already exists
+        const existingChild = await ctx.db
+          .query("children")
+          .withIndex("by_family", (q) => q.eq("familyId", family._id))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("firstName"), child.firstName),
+              q.eq(q.field("lastName"), child.lastName)
+            )
+          )
+          .first();
+        
+        if (!existingChild) {
+          // Create child record
+          const birthYear = child.age ? new Date().getFullYear() - child.age : undefined;
+          await ctx.db.insert("children", {
+            familyId: family._id,
+            firstName: child.firstName,
+            lastName: child.lastName,
+            birthYear,
+            gender: child.gender,
+            createdAt: now,
+          });
+        }
+      }
+    }
+
     // Update promo usage
     if (reg.promoCode) {
       const promo = await ctx.db

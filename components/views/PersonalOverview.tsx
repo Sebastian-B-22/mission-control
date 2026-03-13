@@ -4,30 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 interface PersonalOverviewProps {
   categories: Array<{ _id: Id<"rpmCategories">; name: string; role?: string; purpose?: string; monthlyFocus: string[] }>;
   onEditCategory: (id: Id<"rpmCategories">) => void;
   onViewCategory: (id: Id<"rpmCategories">) => void;
 }
-
-// Color palette for Personal RPM categories (Corinne's order)
-// 1. Raising Resilient Humans → Purple
-// 2. Financial Independence & Freedom → Green
-// 3. Home Haven & Sanctuary → Teal
-// 4. Bangin' Ass Body → Red
-// 5. Extraordinary Friendships → Blue
-// 6. Phenomenal Relationship → Orange
-const categoryColors: Record<string, string> = {
-  "Raising Resilient Humans": "border-l-4 border-l-purple-500",
-  "Financial Independence & Freedom": "border-l-4 border-l-green-500",
-  "Home Haven & Sanctuary": "border-l-4 border-l-teal-500",
-  "Bangin' Ass Body": "border-l-4 border-l-red-500",
-  "Extraordinary Friendships": "border-l-4 border-l-blue-500",
-  "Phenomenal Relationship": "border-l-4 border-l-orange-500",
-};
-
-const defaultColor = "border-l-4 border-l-gray-500";
 
 export function PersonalOverview({ categories, onEditCategory, onViewCategory }: PersonalOverviewProps) {
   return (
@@ -41,7 +24,7 @@ export function PersonalOverview({ categories, onEditCategory, onViewCategory }:
         {categories.map((category) => (
           <Card 
             key={category._id} 
-            className={`hover:shadow-lg transition-shadow cursor-pointer group ${categoryColors[category.name] || defaultColor}`}
+            className={`hover:shadow-lg transition-shadow cursor-pointer group ${getCategoryColor(category.name).border}`}
             onClick={() => onViewCategory(category._id)}
           >
             <CardHeader>
