@@ -23,9 +23,27 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
     .filter((job: any) => {
       if (showAllCron) return true;
       const name = job.name.toLowerCase();
-      // Hide noisy infra jobs by default
-      const noisy = ["huddle", "trigger poll", "activity alert", "security", "backup", "monitor", "check"].some(s => name.includes(s));
+      // Hide noisy infra jobs by default - be aggressive
+      const noisy = [
+        "huddle", "trigger poll", "activity alert", "security", "backup", 
+        "monitor", "check", "heartbeat", "night", "nightly", "auto-poster",
+        "work review", "health data"
+      ].some(s => name.includes(s));
       return !noisy;
+    })
+    // Also filter out jobs that run before 7am (night jobs)
+    .filter((job: any) => {
+      if (showAllCron) return true;
+      if (!job.schedule.startsWith("cron ")) return true;
+      const parts = job.schedule.replace("cron ", "").split(" ");
+      if (parts.length < 2) return true;
+      const hours = parts[1];
+      // If all hours are before 7am, hide it
+      if (/^\d+$/.test(hours)) {
+        const h = parseInt(hours, 10);
+        if (h < 7) return false;
+      }
+      return true;
     })
     .flatMap((job: any) => {
       // Format: "cron MIN HOUR DAY MONTH WEEKDAY ..." (may include tz suffix)
