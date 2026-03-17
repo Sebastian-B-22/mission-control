@@ -9,6 +9,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/auth/whoop(.*)",
   "/api/health/steps(.*)",
   "/api/registrations/update(.*)",
+  "/api/cron/update(.*)",
 ]);
 
 
