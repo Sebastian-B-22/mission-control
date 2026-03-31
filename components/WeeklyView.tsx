@@ -78,8 +78,12 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
       map.set(day.toDateString(), []);
     }
     for (const e of events) {
-      const d = new Date(e.startMs);
-      const key = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toDateString();
+      // Convert to local timezone for day matching
+      const localDate = new Date(e.startMs);
+      // Use toLocaleDateString to get the local day, then create a date from that
+      const [month, dayNum, year] = localDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" }).split("/");
+      const localDay = new Date(parseInt(year), parseInt(month) - 1, parseInt(dayNum));
+      const key = localDay.toDateString();
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(e);
     }
