@@ -16,7 +16,7 @@ interface HealthWidgetProps {
 function getScoreColor(score: number): string {
   if (score === 100) return "#f59e0b"; // gold/amber for perfect
   if (score >= 85) return "#ec4899"; // bright pink for 85+
-  if (score >= 70) return "#a855f7"; // purple for 70-84
+  if (score >= 70) return "#22c55e"; // green for 70-84
   if (score >= 50) return "#3b82f6"; // blue for 50-70
   return "#71717a"; // zinc-500 for <50
 }
@@ -112,7 +112,7 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
     if (score === 0) return 'ring-zinc-600';
     if (score === 100) return 'ring-yellow-500';
     if (score >= 85) return 'ring-pink-500';
-    if (score >= 70) return 'ring-blue-400';
+    if (score >= 70) return 'ring-green-500';
     if (score >= 50) return 'ring-blue-500';
     return 'ring-zinc-500';
   };
