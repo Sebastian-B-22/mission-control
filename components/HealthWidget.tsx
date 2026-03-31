@@ -203,39 +203,69 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
 
         {/* Three Metric Pills */}
         <div className="flex items-center justify-center gap-3">
-          {/* Sleep Pill */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-full border border-zinc-700">
-            <Moon className="h-4 w-4 text-blue-400" />
-            <span className="text-sm text-zinc-100 font-medium">
-              {monthStats.todaySleep ? formatSleep(monthStats.todaySleep) : '0h'}
-              <span className="text-zinc-500 ml-1">
-                /{healthGoals?.sleepGoalHours ?? 7}h
-              </span>
-            </span>
-          </div>
+          {/* Sleep Pill - gold when goal met */}
+          {(() => {
+            const sleepGoal = healthGoals?.sleepGoalHours ?? 7;
+            const isComplete = (monthStats.todaySleep ?? 0) >= sleepGoal;
+            return (
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
+                isComplete 
+                  ? 'bg-gradient-to-r from-yellow-600/30 to-amber-500/30 border-yellow-500/50' 
+                  : 'bg-zinc-800 border-zinc-700'
+              }`}>
+                <Moon className={`h-4 w-4 ${isComplete ? 'text-yellow-400' : 'text-blue-400'}`} />
+                <span className="text-sm text-zinc-100 font-medium">
+                  {monthStats.todaySleep ? formatSleep(monthStats.todaySleep) : '0h'}
+                  <span className={isComplete ? 'text-yellow-400/70 ml-1' : 'text-zinc-500 ml-1'}>
+                    /{sleepGoal}h
+                  </span>
+                </span>
+              </div>
+            );
+          })()}
 
-          {/* Steps Pill */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-full border border-zinc-700">
-            <Footprints className="h-4 w-4 text-purple-400" />
-            <span className="text-sm text-zinc-100 font-medium">
-              {monthStats.todaySteps ? Math.round(monthStats.todaySteps / 1000) : 0}
-              <span className="text-zinc-500 ml-0.5">K</span>
-              <span className="text-zinc-500 ml-1">
-                /{Math.round((healthGoals?.stepsGoal ?? 3500) / 1000)}K
-              </span>
-            </span>
-          </div>
+          {/* Steps Pill - gold when goal met */}
+          {(() => {
+            const stepsGoal = healthGoals?.stepsGoal ?? 3500;
+            const isComplete = (monthStats.todaySteps ?? 0) >= stepsGoal;
+            return (
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
+                isComplete 
+                  ? 'bg-gradient-to-r from-yellow-600/30 to-amber-500/30 border-yellow-500/50' 
+                  : 'bg-zinc-800 border-zinc-700'
+              }`}>
+                <Footprints className={`h-4 w-4 ${isComplete ? 'text-yellow-400' : 'text-purple-400'}`} />
+                <span className="text-sm text-zinc-100 font-medium">
+                  {monthStats.todaySteps ? Math.round(monthStats.todaySteps / 1000) : 0}
+                  <span className={isComplete ? 'text-yellow-400/70 ml-0.5' : 'text-zinc-500 ml-0.5'}>K</span>
+                  <span className={isComplete ? 'text-yellow-400/70 ml-1' : 'text-zinc-500 ml-1'}>
+                    /{Math.round(stepsGoal / 1000)}K
+                  </span>
+                </span>
+              </div>
+            );
+          })()}
 
-          {/* Calories Pill */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-full border border-zinc-700">
-            <Flame className="h-4 w-4 text-orange-400" />
-            <span className="text-sm text-zinc-100 font-medium">
-              {monthStats.todayCalories ?? 0}
-              <span className="text-zinc-500 ml-1">
-                /{healthGoals?.caloriesGoal ?? 350}
-              </span>
-            </span>
-          </div>
+          {/* Calories Pill - gold when goal met */}
+          {(() => {
+            const caloriesGoal = healthGoals?.caloriesGoal ?? 350;
+            const isComplete = (monthStats.todayCalories ?? 0) >= caloriesGoal;
+            return (
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
+                isComplete 
+                  ? 'bg-gradient-to-r from-yellow-600/30 to-amber-500/30 border-yellow-500/50' 
+                  : 'bg-zinc-800 border-zinc-700'
+              }`}>
+                <Flame className={`h-4 w-4 ${isComplete ? 'text-yellow-400' : 'text-orange-400'}`} />
+                <span className="text-sm text-zinc-100 font-medium">
+                  {monthStats.todayCalories ?? 0}
+                  <span className={isComplete ? 'text-yellow-400/70 ml-1' : 'text-zinc-500 ml-1'}>
+                    /{caloriesGoal}
+                  </span>
+                </span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Streak indicator */}
