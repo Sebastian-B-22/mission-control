@@ -97,13 +97,13 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
                   checked={item.completed}
                   onCheckedChange={() => toggleQuickWin({ id: item._id, completed: !item.completed })}
                 />
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-1">
                   <span className={`text-sm ${item.completed ? "line-through text-muted-foreground" : ""}`}>
                     {item.task}
                   </span>
                   {item.categoryId && categoryNameById.get(item.categoryId) && (
                     <span
-                      className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(item.categoryId)).badge}`}
+                      className={`self-start px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(item.categoryId)).badge}`}
                     >
                       {String(categoryNameById.get(item.categoryId) ?? "")}
                     </span>

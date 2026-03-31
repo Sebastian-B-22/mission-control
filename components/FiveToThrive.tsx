@@ -178,7 +178,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
                   checked={task.completed}
                   onCheckedChange={() => handleToggleTask(index)}
                 />
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-1">
                   <span
                     className={task.completed ? "line-through text-muted-foreground" : ""}
                   >
@@ -186,7 +186,7 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
                   </span>
                   {task.categoryId && categoryNameById.get(task.categoryId) && (
                     <span
-                      className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(task.categoryId)).badge}`}
+                      className={`self-start px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(task.categoryId)).badge}`}
                     >
                       {String(categoryNameById.get(task.categoryId) ?? "")}
                     </span>

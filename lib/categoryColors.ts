@@ -2,68 +2,68 @@
 // Used across PersonalOverview, ProfessionalOverview, FiveToThrive, QuickWins, etc.
 
 export const CATEGORY_COLORS: Record<string, { border: string; badge: string; bg: string }> = {
-  // Personal RPM (cool/calm palette)
+  // Personal RPM (distinct colors for dark mode)
   "Raising Resilient Humans": {
     border: "border-l-4 border-l-purple-500",
-    badge: "bg-purple-100 text-purple-800 border-purple-300",
-    bg: "bg-purple-50",
+    badge: "bg-purple-900/30 text-purple-300 border-purple-500/50",
+    bg: "bg-purple-950",
   },
   "Financial Independence & Freedom": {
     border: "border-l-4 border-l-emerald-500",
-    badge: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    bg: "bg-emerald-50",
+    badge: "bg-emerald-900/30 text-emerald-300 border-emerald-500/50",
+    bg: "bg-emerald-950",
   },
   "Home Haven & Sanctuary": {
     border: "border-l-4 border-l-teal-500",
-    badge: "bg-teal-100 text-teal-800 border-teal-300",
-    bg: "bg-teal-50",
+    badge: "bg-teal-900/30 text-teal-300 border-teal-500/50",
+    bg: "bg-teal-950",
   },
   "Bangin' Ass Body": {
     border: "border-l-4 border-l-red-500",
-    badge: "bg-red-100 text-red-800 border-red-300",
-    bg: "bg-red-50",
+    badge: "bg-red-900/30 text-red-300 border-red-500/50",
+    bg: "bg-red-950",
   },
   "Extraordinary Friendships": {
     border: "border-l-4 border-l-sky-500",
-    badge: "bg-sky-100 text-sky-800 border-sky-300",
-    bg: "bg-sky-50",
+    badge: "bg-sky-900/30 text-sky-300 border-sky-500/50",
+    bg: "bg-sky-950",
   },
   "Phenomenal Relationship": {
     border: "border-l-4 border-l-pink-500",
-    badge: "bg-pink-100 text-pink-800 border-pink-300",
-    bg: "bg-pink-50",
+    badge: "bg-pink-900/30 text-pink-300 border-pink-500/50",
+    bg: "bg-pink-950",
   },
 
-  // Professional RPM (warm/bold palette)
+  // Professional RPM (distinct colors - no two similar)
   "Bad Ass Business Owner": {
-    border: "border-l-4 border-l-yellow-500",
-    badge: "bg-yellow-100 text-yellow-800 border-yellow-400",
-    bg: "bg-yellow-50",
+    border: "border-l-4 border-l-rose-500",
+    badge: "bg-rose-900/30 text-rose-300 border-rose-500/50",
+    bg: "bg-rose-950",
   },
   "HTA Empire Builder": {
-    border: "border-l-4 border-l-lime-500",
-    badge: "bg-lime-100 text-lime-800 border-lime-400",
-    bg: "bg-lime-50",
+    border: "border-l-4 border-l-violet-500",
+    badge: "bg-violet-900/30 text-violet-300 border-violet-500/50",
+    bg: "bg-violet-950",
   },
   "Staff Empowerment & Kickass Workplace": {
-    border: "border-l-4 border-l-slate-300",
-    badge: "bg-white text-slate-700 border-slate-300",
-    bg: "bg-slate-50",
+    border: "border-l-4 border-l-cyan-500",
+    badge: "bg-cyan-900/30 text-cyan-300 border-cyan-500/50",
+    bg: "bg-cyan-950",
   },
   "Marketing & Networking Genius": {
-    border: "border-l-4 border-l-orange-500",
-    badge: "bg-orange-100 text-orange-800 border-orange-400",
-    bg: "bg-orange-50",
+    border: "border-l-4 border-l-amber-500",
+    badge: "bg-amber-900/30 text-amber-300 border-amber-500/50",
+    bg: "bg-amber-950",
   },
   "Operational Systems Guru": {
-    border: "border-l-4 border-l-amber-700",
-    badge: "bg-amber-100 text-amber-900 border-amber-400",
-    bg: "bg-amber-50",
+    border: "border-l-4 border-l-blue-500",
+    badge: "bg-blue-900/30 text-blue-300 border-blue-500/50",
+    bg: "bg-blue-950",
   },
   "Program Innovation & Excellence": {
-    border: "border-l-4 border-l-gray-400",
-    badge: "bg-gray-100 text-gray-700 border-gray-400",
-    bg: "bg-gray-50",
+    border: "border-l-4 border-l-fuchsia-500",
+    badge: "bg-fuchsia-900/30 text-fuchsia-300 border-fuchsia-500/50",
+    bg: "bg-fuchsia-950",
   },
 };
 
