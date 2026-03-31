@@ -114,6 +114,7 @@ export const createRegistration = mutation({
       firstName: v.string(),
       lastName: v.string(),
       age: v.optional(v.number()),
+      birthDate: v.optional(v.string()),  // YYYY-MM-DD format
       gender: v.optional(v.string()),
       allergies: v.optional(v.string()),
       sessions: v.any(),
@@ -130,6 +131,34 @@ export const createRegistration = mutation({
       status: "pending",
       createdAt: Date.now(),
     });
+  },
+});
+
+export const markFreeRegistration = mutation({
+  args: { 
+    registrationId: v.string(),
+    promoCode: v.optional(v.string())
+  },
+  handler: async (ctx, { registrationId, promoCode }) => {
+    // Find by stripePaymentIntentId (which was stored during registration)
+    const reg = await ctx.db
+      .query("campRegistrations")
+      .withIndex("by_stripe_pi", (q) => q.eq("stripePaymentIntentId", registrationId))
+      .first();
+    
+    if (!reg) {
+      console.log("[markFreeRegistration] No registration found for:", registrationId);
+      return null;
+    }
+    
+    await ctx.db.patch(reg._id, { 
+      status: "paid", 
+      paidAt: Date.now(),
+      paymentMethod: "free_promo",
+      appliedPromoCode: promoCode
+    });
+    
+    return { success: true };
   },
 });
 

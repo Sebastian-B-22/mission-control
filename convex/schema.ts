@@ -410,6 +410,7 @@ export default defineSchema({
       firstName: v.string(),
       lastName: v.string(),
       age: v.optional(v.number()),
+      birthDate: v.optional(v.string()),  // YYYY-MM-DD format
       gender: v.optional(v.string()),
       allergies: v.optional(v.string()),
       sessions: v.any(),
@@ -429,6 +430,8 @@ export default defineSchema({
     status: v.string(),
     createdAt: v.number(),
     paidAt: v.optional(v.number()),
+    paymentMethod: v.optional(v.string()),
+    appliedPromoCode: v.optional(v.string()),
   })
     .index("by_status", ["status"])
     .index("by_email", ["parent.email"])

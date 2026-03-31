@@ -179,27 +179,17 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
             <Heart className="h-5 w-5 text-purple-400" />
             Health Score
           </div>
-          {isWhoopConnected ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSync}
-              disabled={syncing}
-              className="text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
-            >
-              <Zap className="h-3 w-3 mr-1" />
-              {syncing ? "Syncing..." : "Sync"}
-            </Button>
-          ) : (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleConnect} 
-              className="text-xs bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
-            >
-              Connect Whoop
-            </Button>
-          )}
+          {/* Whoop syncs automatically via Open Wearables - no manual connection needed */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSync}
+            disabled={syncing}
+            className="text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+          >
+            <Zap className="h-3 w-3 mr-1" />
+            {syncing ? "Syncing..." : "Sync"}
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>

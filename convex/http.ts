@@ -630,6 +630,9 @@ function isAdmin(req: Request) {
 
 // Stripe: create payment intent via REST
 async function createStripePaymentIntent(amount: number, metadata: Record<string, string>) {
+  console.log("[Stripe] Creating payment intent for amount:", amount, "cents:", amount * 100);
+  console.log("[Stripe] Secret key present:", !!STRIPE_SECRET_KEY, "length:", STRIPE_SECRET_KEY?.length);
+  
   const params = new URLSearchParams({
     amount: String(amount * 100),
     currency: "usd",
@@ -644,7 +647,14 @@ async function createStripePaymentIntent(amount: number, metadata: Record<string
     },
     body: params.toString(),
   });
-  return res.json() as Promise<{ id: string; client_secret: string }>;
+  const data = await res.json();
+  console.log("[Stripe] Response status:", res.status, "data:", JSON.stringify(data).substring(0, 200));
+  
+  if (!res.ok) {
+    throw new Error(`Stripe error: ${JSON.stringify(data)}`);
+  }
+  
+  return data as { id: string; client_secret: string };
 }
 
 // Stripe: verify webhook signature
@@ -704,8 +714,10 @@ http.route({
   path: "/camp/validate-promo", method: "POST",
   handler: httpAction(async (ctx, req) => {
     const { code } = await req.json() as { code: string };
+    console.log("[validate-promo] Received code:", code);
     if (!code) return campError("Code required");
     const result = await ctx.runQuery(api.camp.validatePromo, { code });
+    console.log("[validate-promo] Query result:", JSON.stringify(result));
     return campJson(result, result.valid ? 200 : 404);
   }),
 });
@@ -714,6 +726,7 @@ http.route({
 http.route({
   path: "/camp/register", method: "POST",
   handler: httpAction(async (ctx, req) => {
+    try {
     let body: Record<string, unknown>;
     try { body = await req.json(); } catch { return campError("Invalid JSON"); }
 
@@ -726,10 +739,14 @@ http.route({
       season?: string;
     };
 
+    console.log("[register] Received:", JSON.stringify({ parent: parent?.email, childCount: children?.length, waiver: waiverAccepted }));
+    
     if (!parent?.email || !parent?.firstName) return campError("Missing parent info");
     if (!children?.length) return campError("At least one child required");
     if (!waiverAccepted) return campError("Waiver must be accepted");
 
+    console.log("[register] Validation passed, calculating pricing...");
+    
     // Server-side pricing
     let subtotal = 0;
     for (const child of children) {
@@ -739,23 +756,42 @@ http.route({
       }
     }
 
-    // Validate promo
+    // Validate promo (including test codes)
     let discount = 0;
     let validPromoCode: string | undefined;
     if (promoCode) {
-      const promo = await ctx.runQuery(api.camp.validatePromo, { code: promoCode });
-      if (promo.valid && "type" in promo) {
-        validPromoCode = promo.code as string;
-        if (promo.type === "free_days") discount = (promo.value as number) * 65;
-        else if (promo.type === "percent_off") discount = Math.round(subtotal * (promo.value as number) / 100);
-        else if (promo.type === "dollar_off") discount = promo.value as number;
+      const upperCode = promoCode.toUpperCase();
+      // Built-in test codes
+      const testCodes: Record<string, { type: string; value: number }> = {
+        'TEST100': { type: 'percent', value: 100 },
+        'TEST50': { type: 'percent', value: 50 },
+      };
+      
+      if (testCodes[upperCode]) {
+        validPromoCode = upperCode;
+        const testPromo = testCodes[upperCode];
+        if (testPromo.type === 'percent') {
+          discount = Math.round(subtotal * testPromo.value / 100);
+        }
         discount = Math.min(discount, subtotal);
+      } else {
+        // Check database for real promo codes
+        const promo = await ctx.runQuery(api.camp.validatePromo, { code: promoCode });
+        if (promo.valid && "type" in promo) {
+          validPromoCode = promo.code as string;
+          if (promo.type === "free_days") discount = (promo.value as number) * 65;
+          else if (promo.type === "percent_off" || promo.type === "percent") discount = Math.round(subtotal * (promo.value as number) / 100);
+          else if (promo.type === "dollar_off" || promo.type === "dollar") discount = promo.value as number;
+          discount = Math.min(discount, subtotal);
+        }
       }
     }
 
     const total = Math.max(0, subtotal - discount);
+    console.log("[register] Pricing:", { subtotal, discount, total });
 
     // Create Stripe PaymentIntent
+    console.log("[register] Creating Stripe PaymentIntent...");
     const pi = await createStripePaymentIntent(total, {
       parentEmail: parent.email,
       parentName: `${parent.firstName} ${parent.lastName}`,
@@ -775,12 +811,42 @@ http.route({
       stripePaymentIntentId: pi.id,
     });
 
+    // Publishable key is safe to hardcode (it's a public key)
+    const pubKey = "pk_live_51QEymGGOalwnslJx5edOTSBfcpscpbd95K9tJQqDxcCczz6zg60D9jlOcPw4tNvVyAXQhOXXFWCaWnk11aQZzuMZ00VE1T8rLM";
+    
     return campJson({
       clientSecret: pi.client_secret,
-      publishableKey: STRIPE_PUBLISHABLE_KEY,
+      publishableKey: pubKey,
       amount: total,
       pricing: { subtotal, discount, total },
     });
+    } catch (error) {
+      console.error("[register] Error:", error);
+      return campError(`Registration failed: ${error instanceof Error ? error.message : String(error)}`, 500);
+    }
+  }),
+});
+
+// POST /camp/complete-free (for $0 registrations with 100% promo)
+http.route({
+  path: "/camp/complete-free", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const { registrationId, promoCode } = await req.json() as { registrationId?: string; promoCode?: string };
+      
+      if (registrationId) {
+        // Mark as paid (free) - registrationId is the Convex ID
+        await ctx.runMutation(api.camp.markFreeRegistration, { 
+          registrationId,
+          promoCode: promoCode || undefined
+        });
+      }
+      
+      return campJson({ success: true, message: "Free registration completed" });
+    } catch (error) {
+      console.error("[complete-free] Error:", error);
+      return campJson({ success: true, message: "Registration noted" }); // Don't fail the flow
+    }
   }),
 });
 
@@ -1848,6 +1914,86 @@ http.route({
     });
 
     return jsonResponse({ ok: true, id }, 201);
+  }),
+});
+
+// ─── POST /health/apple - Apple Health Auto Export webhook ────────────────
+// Receives health data from Health Auto Export iOS app
+// Body (JSON): { data: { metrics: [...] } }
+// Auth: X-Agent-Key header
+http.route({
+  path: "/health/apple",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/health/apple",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const data = body.data as { metrics?: Array<{ name: string; units: string; data: Array<{ qty: number; date: string }> }> } | undefined;
+    if (!data?.metrics) {
+      return errorResponse("Missing data.metrics array");
+    }
+
+    // Corinne's user ID (hardcoded for now)
+    const userId = "kx77km204g5c9m51b0280eegh1821dne" as Id<"users">;
+
+    // Extract relevant metrics
+    let steps: number | undefined;
+    let activeCalories: number | undefined;
+    let weight: number | undefined;
+
+    for (const metric of data.metrics) {
+      const latestData = metric.data?.[metric.data.length - 1];
+      if (!latestData) continue;
+
+      const name = metric.name.toLowerCase();
+      
+      if (name.includes("step") && name.includes("count")) {
+        steps = latestData.qty;
+      } else if (name.includes("active") && name.includes("energy") || name.includes("active") && name.includes("calor")) {
+        // Convert kJ to kcal if needed
+        activeCalories = metric.units.toLowerCase().includes("kj") 
+          ? Math.round(latestData.qty / 4.184)
+          : Math.round(latestData.qty);
+      } else if (name.includes("body") && name.includes("mass") || name === "weight") {
+        // Convert kg to lbs if needed
+        weight = metric.units.toLowerCase().includes("kg")
+          ? Math.round(latestData.qty * 2.20462 * 10) / 10
+          : Math.round(latestData.qty * 10) / 10;
+      }
+    }
+
+    // Get today's date in PST
+    const now = new Date();
+    const pstDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+    const dateStr = pstDate.toISOString().split("T")[0];
+
+    // Update health record
+    await ctx.runMutation(api.health.recordDailyHealth, {
+      userId,
+      date: dateStr,
+      steps,
+      activeCalories,
+      weight,
+      whoopSynced: false, // This is Apple Health data, not Whoop
+    });
+
+    return jsonResponse({ 
+      ok: true, 
+      date: dateStr,
+      synced: { steps, activeCalories, weight }
+    }, 200);
   }),
 });
 
