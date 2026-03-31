@@ -442,6 +442,27 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
         candidates.push({ category: "writing", activity: "Writing with Skill", notes: notes });
       }
       
+      // Language Arts - Shakespeare, grammar, vocabulary, etc.
+      if (has("shakespeare")) {
+        const detail = has("game") ? "Shakespeare Game" : "Shakespeare";
+        candidates.push({ category: "writing", activity: detail, notes: notes });
+      }
+      if (has("grammar") || has("grammar island")) {
+        candidates.push({ category: "writing", activity: "Grammar", notes: notes });
+      }
+      if (has("vocabulary") || has("vocab")) {
+        candidates.push({ category: "writing", activity: "Vocabulary", notes: notes });
+      }
+      if (has("spelling") || has("spelling bee")) {
+        candidates.push({ category: "writing", activity: "Spelling", notes: notes });
+      }
+      if (has("poetry") || has("poem")) {
+        candidates.push({ category: "writing", activity: "Poetry", notes: notes });
+      }
+      if (has("journal") || has("journaling")) {
+        candidates.push({ category: "writing", activity: "Journaling", notes: notes });
+      }
+      
       // Reading / literature
       if (has("read aloud") || has("read-aloud")) candidates.push({ category: "literature", activity: "Read Aloud", notes: notes });
 
@@ -453,6 +474,37 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       // Creative / projects
       if (has("stop motion") || has("stop-motion")) candidates.push({ category: "art", activity: "Stop Motion", notes: notes });
       if (has("bot time") || has("bot-time") || has("robot")) candidates.push({ category: "science", activity: "Robotics / Bot Time", notes: notes });
+      
+      // Art
+      if (has("drawing") || has("sketch")) candidates.push({ category: "art", activity: "Drawing", notes: notes });
+      if (has("painting") || has("watercolor")) candidates.push({ category: "art", activity: "Painting", notes: notes });
+      if (has("craft") || has("crafts")) candidates.push({ category: "art", activity: "Crafts", notes: notes });
+      if (has("3d print") || has("3d-print") || has("3d printing")) candidates.push({ category: "art", activity: "3D Printing", notes: notes });
+      
+      // Music
+      if (has("music") || has("piano") || has("guitar") || has("singing") || has("ukulele")) {
+        candidates.push({ category: "music", activity: "Music", notes: notes });
+      }
+      
+      // Geography / Social Studies
+      if (has("geography") || has("map") || has("countries") || has("states")) {
+        candidates.push({ category: "history", activity: "Geography", notes: notes });
+      }
+      
+      // Foreign Language (beyond Rosetta)
+      if (has("spanish") || has("french") || has("italian") || has("german") || has("language lesson")) {
+        candidates.push({ category: "writing", activity: "Foreign Language", notes: notes });
+      }
+      
+      // Field trips / hands-on
+      if (has("field trip") || has("museum") || has("nature walk") || has("hike")) {
+        candidates.push({ category: "life-skills", activity: "Field Trip / Outdoor Learning", notes: notes });
+      }
+      
+      // Games / Educational play  
+      if (has("board game") || has("card game") || has("educational game") || has("trivia")) {
+        candidates.push({ category: "life-skills", activity: "Educational Games", notes: notes });
+      }
 
       // Deduplicate candidates
       const uniq = new Map<string, { category: string; activity: string; notes?: string }>();
