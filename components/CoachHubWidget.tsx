@@ -71,18 +71,32 @@ export default function CoachHubWidget() {
   const fetchSummary = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch(COACH_HUB_API, {
-        headers: { "X-Agent-Key": API_KEY }
+        method: "GET",
+        headers: { 
+          "X-Agent-Key": API_KEY,
+          "Accept": "application/json"
+        },
+        mode: "cors"
       });
       
-      if (!response.ok) throw new Error("Failed to fetch");
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Coach Hub API error:", response.status, text);
+        throw new Error(`API error: ${response.status}`);
+      }
       
       const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
       setSummary(data);
       setError(null);
-    } catch (err) {
-      setError("Unable to load Coach Hub data");
-      console.error(err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unable to load Coach Hub data";
+      setError(message);
+      console.error("Coach Hub fetch error:", err);
     } finally {
       setLoading(false);
     }

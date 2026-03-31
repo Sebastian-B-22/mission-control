@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CalendarDays, List, LayoutGrid, Plus, Trash2 } from "lucide-react";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 function startOfWeekMonday(date: Date): Date {
   const d = new Date(date);
@@ -202,9 +203,9 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                         {g.text}
                       </span>
                       {g.categoryId ? (
-                        <Badge variant="secondary" className="text-[11px]">
+                        <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full border ${getCategoryColor(rpmCategories.find((c) => c._id === g.categoryId)?.name).badge}`}>
                           {rpmCategories.find((c) => c._id === g.categoryId)?.name || "RPM"}
-                        </Badge>
+                        </span>
                       ) : null}
                     </div>
                   </label>
