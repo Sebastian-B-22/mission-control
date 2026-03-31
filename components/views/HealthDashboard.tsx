@@ -131,6 +131,16 @@ function MiniScoreRing({ score, size = 40 }: { score: number; size?: number }) {
   return <ScoreRing score={score} size={size} showLabel={false} />;
 }
 
+// Get ring color class based on score (matching the score ring colors)
+function getRingColorClass(score: number): string {
+  if (score === 0) return 'ring-zinc-600';
+  if (score === 100) return 'ring-yellow-500';
+  if (score >= 85) return 'ring-pink-500';
+  if (score >= 70) return 'ring-blue-400';
+  if (score >= 50) return 'ring-blue-500';
+  return 'ring-zinc-500';
+}
+
 // Calendar day cell with mini rings
 function CalendarDay({
   date,
@@ -151,7 +161,7 @@ function CalendarDay({
     <button
       onClick={onClick}
       className={`aspect-square w-full rounded-lg flex flex-col items-center justify-center transition-all hover:bg-zinc-800 ${
-        isToday ? "ring-2 ring-pink-500" : ""
+        isToday ? `ring-2 ${getRingColorClass(score)}` : ""
       }`}
     >
       <div className="text-xs text-zinc-400 mb-1">{day}</div>
@@ -196,7 +206,7 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
         return (
           <div key={date} className="flex flex-col items-center gap-0.5">
             <span className="text-[10px] text-zinc-500">{dayLabel}</span>
-            <div className={`${isToday ? 'ring-2 ring-pink-500 rounded-full' : ''}`}>
+            <div className={`${isToday ? `ring-2 ${getRingColorClass(score)} rounded-full` : ''}`}>
               <MiniScoreRing score={score} size={32} />
             </div>
           </div>

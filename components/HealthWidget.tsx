@@ -107,6 +107,16 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
     }
   }
 
+  // Get ring color class based on score (matching the score ring colors)
+  const getRingColorClass = (score: number): string => {
+    if (score === 0) return 'ring-zinc-600';
+    if (score === 100) return 'ring-yellow-500';
+    if (score >= 85) return 'ring-pink-500';
+    if (score >= 70) return 'ring-blue-400';
+    if (score >= 50) return 'ring-blue-500';
+    return 'ring-zinc-500';
+  };
+
   return (
     <div className="flex items-center justify-between mb-4 px-1">
       {weekDates.map((date, i) => {
@@ -117,7 +127,7 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
         return (
           <div key={date} className="flex flex-col items-center gap-0.5">
             <span className="text-[10px] text-zinc-500">{dayLabel}</span>
-            <div className={`${isToday ? 'ring-2 ring-pink-500 rounded-full' : ''}`}>
+            <div className={`${isToday ? `ring-2 ${getRingColorClass(score)} rounded-full` : ''}`}>
               <ScoreRing score={score} size={32} showLabel={false} />
             </div>
           </div>
