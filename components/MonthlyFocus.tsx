@@ -24,17 +24,19 @@ const focusAreas = [
   { emoji: "🍎", text: "Nutrition Science + Smoothie experiments for Anthony", topics: ["Nutrition"] },
   { emoji: "📚", text: "Finish Tuttle Twins Vol 2 + Liberty Kids series", topics: ["History"] },
   { emoji: "🇮🇹", text: "Italian 10-15 min daily (kids requested!)", topics: ["Language"] },
-  { emoji: "💰", text: "Compound Interest daily (Day 35→65)", topics: ["Financial Literacy"] },
+  { emoji: "💰", text: "Compound Interest daily (Day 55→85)", topics: ["Financial Literacy"] },
   { emoji: "🏠", text: "Raising Healthy Families 1x/week", topics: ["Life Skills"] },
   { emoji: "🔬", text: "Blood and Guts experiments", topics: ["Science", "Health"] },
-  { emoji: "🏇", text: "Horseback riding weekly", topics: ["P.E."] },
+  { emoji: "🏇", text: "Horseback riding", topics: ["P.E."] },
+  { emoji: "🤹", text: "Juggling practice", topics: ["P.E."] },
 ];
 
 const upNext = [
-  { emoji: "🤠", text: "Texas history prep (April trip)", topics: ["History"] },
   { emoji: "📃", text: "Origami restart", topics: ["Art"] },
   { emoji: "🏛️", text: "Nixon Museum field trip", topics: ["Civics", "History"] },
   { emoji: "🪂", text: "iFly field trip", topics: ["P.E.", "Science"] },
+  { emoji: "🚀", text: "California Science Center field trip", topics: ["Science"] },
+  { emoji: "🦕", text: "Natural History Museum field trip", topics: ["Science", "History"] },
 ];
 
 export function MonthlyFocus() {

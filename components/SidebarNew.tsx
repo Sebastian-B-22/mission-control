@@ -263,7 +263,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                       }
                     }}
                     className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                      currentView === item.view || currentView.startsWith(item.view.split('-')[0])
+                      currentView === item.view || (item.section && currentView.startsWith(item.section))
                         ? "bg-zinc-800 text-amber-400 font-medium"
                         : "text-zinc-300 hover:bg-zinc-800"
                     }`}
