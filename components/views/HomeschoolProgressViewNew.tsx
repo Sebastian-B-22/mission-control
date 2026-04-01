@@ -22,6 +22,7 @@ import {
   Globe,
   Brain,
 } from "lucide-react";
+import HomeschoolMonthlyPDF from "@/components/HomeschoolMonthlyPDF";
 
 interface HomeschoolProgressViewNewProps {
   userId: Id<"users">;
@@ -207,8 +208,9 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
           <p className="text-muted-foreground">Track daily learning activities</p>
         </div>
         
-        {/* Date Navigator */}
+        {/* Date Navigator + Monthly PDF */}
         <div className="flex items-center gap-2">
+          <HomeschoolMonthlyPDF userId={userId} />
           <Button variant="outline" size="icon" onClick={() => navigateDate(-1)}>
             <ChevronLeft className="h-4 w-4" />
           </Button>

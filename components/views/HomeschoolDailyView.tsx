@@ -45,6 +45,11 @@ function formatTime12h(time24: string): string {
   return `${hour12}:${minute} ${ampm}`;
 }
 
+// TODO: Make this dynamic - pull from Monthly objectives/goals in Convex
+// Currently static mapping, should query hsObjectives and hsResources
+// to rotate suggestions based on current month's focus areas
+// See: convex/homeschool.ts for objective queries
+
 // Specific resources for each subject/topic - what to actually DO
 const subjectToResources: Record<string, { resource: string; activity: string; noExpand?: boolean }> = {
   // Core subjects
@@ -801,7 +806,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
           <p className="text-sm text-muted-foreground">A & R Academy</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <HomeschoolMonthlyPDF userId={userId} />
+          {/* Note: Monthly PDF export has moved to Progress tab */}
           <Button 
             variant="outline" 
             size="sm" 

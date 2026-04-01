@@ -87,7 +87,6 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "homeschool",
       children: [
-        { name: "Planning", view: "homeschool-planning" },
         { name: "Progress", view: "homeschool-progress" },
         { name: "Daily", view: "homeschool-daily" },
         { name: "Weekly", view: "homeschool-schedule" },
