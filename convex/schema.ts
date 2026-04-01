@@ -1252,4 +1252,19 @@ export default defineSchema({
     order: v.number(),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  homeRemodelBudgetItems: defineTable({
+    userId: v.id("users"),
+    roomId: v.id("homeRemodelRooms"),
+    name: v.string(),
+    estimatedCost: v.optional(v.number()),
+    actualCost: v.optional(v.number()),
+    purchased: v.boolean(),
+    link: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_room", ["roomId"])
+    .index("by_user", ["userId"]),
 });

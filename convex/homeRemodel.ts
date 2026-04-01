@@ -420,3 +420,70 @@ export const updateIdeaImage = mutation({
     await ctx.db.patch(args.ideaId, { imageUrl: url || undefined });
   },
 });
+
+// ===== BUDGET ITEMS =====
+
+export const getBudgetItems = query({
+  args: { roomId: v.id("homeRemodelRooms") },
+  handler: async (ctx, args) => {
+    const items = await ctx.db
+      .query("homeRemodelBudgetItems")
+      .withIndex("by_room", (q) => q.eq("roomId", args.roomId))
+      .collect();
+    return items.sort((a, b) => a.order - b.order);
+  },
+});
+
+export const createBudgetItem = mutation({
+  args: {
+    userId: v.id("users"),
+    roomId: v.id("homeRemodelRooms"),
+    name: v.string(),
+    estimatedCost: v.optional(v.number()),
+    link: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("homeRemodelBudgetItems")
+      .withIndex("by_room", (q) => q.eq("roomId", args.roomId))
+      .collect();
+    const maxOrder = existing.reduce((m, i) => Math.max(m, i.order), -1);
+    
+    return await ctx.db.insert("homeRemodelBudgetItems", {
+      userId: args.userId,
+      roomId: args.roomId,
+      name: args.name,
+      estimatedCost: args.estimatedCost,
+      link: args.link,
+      purchased: false,
+      order: maxOrder + 1,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+export const updateBudgetItem = mutation({
+  args: {
+    itemId: v.id("homeRemodelBudgetItems"),
+    name: v.optional(v.string()),
+    estimatedCost: v.optional(v.number()),
+    actualCost: v.optional(v.number()),
+    purchased: v.optional(v.boolean()),
+    link: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { itemId, ...updates } = args;
+    const filtered = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(itemId, filtered);
+  },
+});
+
+export const deleteBudgetItem = mutation({
+  args: { itemId: v.id("homeRemodelBudgetItems") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.itemId);
+  },
+});

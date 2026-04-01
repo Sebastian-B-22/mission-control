@@ -33,6 +33,7 @@ import {
   Target,
   DollarSign,
   ChevronRight,
+  ChevronDown,
   Trash2,
   Sparkles,
   Calendar,
@@ -43,6 +44,8 @@ import {
   Image,
   AlertCircle,
   Hammer,
+  ShoppingCart,
+  ExternalLink,
 } from "lucide-react";
 
 // Status colors for room cards (background) - explicit colors for dark mode
@@ -84,6 +87,172 @@ const PRIORITY_COLORS: Record<string, string> = {
   "medium": "bg-yellow-100 text-yellow-800 border-yellow-200",
   "low": "bg-gray-100 text-gray-800 border-gray-200",
 };
+
+// Budget Breakdown Component
+function BudgetBreakdown({ 
+  userId, 
+  roomId, 
+  roomBudgetEstimate,
+  roomBudgetActual,
+  onUpdateRoom 
+}: { 
+  userId: Id<"users">;
+  roomId: Id<"homeRemodelRooms">;
+  roomBudgetEstimate?: number;
+  roomBudgetActual?: number;
+  onUpdateRoom: (est: number, act: number) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [newItemName, setNewItemName] = useState("");
+  const [newItemCost, setNewItemCost] = useState("");
+  const [newItemLink, setNewItemLink] = useState("");
+
+  const budgetItems = useQuery(api.homeRemodel.getBudgetItems, { roomId }) || [];
+  const createBudgetItem = useMutation(api.homeRemodel.createBudgetItem);
+  const updateBudgetItem = useMutation(api.homeRemodel.updateBudgetItem);
+  const deleteBudgetItem = useMutation(api.homeRemodel.deleteBudgetItem);
+
+  const totalEstimated = budgetItems.reduce((s, i) => s + (i.estimatedCost || 0), 0);
+  const totalActual = budgetItems.reduce((s, i) => s + (i.actualCost || 0), 0);
+
+  return (
+    <Card className="bg-emerald-50 border-emerald-300">
+      <CardHeader className="pb-2">
+        <button 
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center justify-between w-full text-left"
+        >
+          <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
+            <DollarSign className="h-4 w-4 text-emerald-600" />
+            Budget
+          </CardTitle>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-emerald-700">
+              ${totalEstimated.toLocaleString()} est / ${totalActual.toLocaleString()} spent
+            </span>
+            {expanded ? (
+              <ChevronDown className="h-4 w-4 text-emerald-600" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-emerald-600" />
+            )}
+          </div>
+        </button>
+      </CardHeader>
+      {expanded && (
+        <CardContent className="space-y-2">
+          {/* Budget Items */}
+          {budgetItems.length === 0 ? (
+            <p className="text-sm text-emerald-700">No items yet - add furniture, fixtures, materials...</p>
+          ) : (
+            budgetItems.map((item) => (
+              <div
+                key={item._id}
+                className="flex items-center gap-2 p-2 rounded bg-white border border-emerald-200"
+              >
+                <input
+                  type="checkbox"
+                  checked={item.purchased}
+                  onChange={(e) => updateBudgetItem({ itemId: item._id, purchased: e.target.checked })}
+                  className="h-4 w-4 accent-emerald-600"
+                />
+                <span className={`flex-1 text-sm text-slate-900 ${item.purchased ? 'line-through opacity-60' : ''}`}>
+                  {item.name}
+                </span>
+                {item.link && (
+                  <a href={item.link} target="_blank" className="text-emerald-600 hover:text-emerald-800">
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+                <Input
+                  type="number"
+                  placeholder="Est $"
+                  value={item.estimatedCost || ""}
+                  onChange={(e) => updateBudgetItem({ itemId: item._id, estimatedCost: Number(e.target.value) || 0 })}
+                  className="w-20 h-7 text-xs bg-white text-slate-900"
+                />
+                <Input
+                  type="number"
+                  placeholder="Actual $"
+                  value={item.actualCost || ""}
+                  onChange={(e) => updateBudgetItem({ itemId: item._id, actualCost: Number(e.target.value) || 0 })}
+                  className="w-20 h-7 text-xs bg-white text-slate-900"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => deleteBudgetItem({ itemId: item._id })}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            ))
+          )}
+
+          {/* Add Item Form */}
+          {showAddItem ? (
+            <div className="flex gap-2 p-2 bg-white rounded border border-emerald-200">
+              <Input
+                placeholder="Item name (e.g., King bed)"
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
+                className="flex-1 text-sm text-slate-900"
+                autoFocus
+              />
+              <Input
+                type="number"
+                placeholder="Est $"
+                value={newItemCost}
+                onChange={(e) => setNewItemCost(e.target.value)}
+                className="w-20 text-sm text-slate-900"
+              />
+              <Input
+                placeholder="Link (optional)"
+                value={newItemLink}
+                onChange={(e) => setNewItemLink(e.target.value)}
+                className="w-32 text-sm text-slate-900"
+              />
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (newItemName.trim()) {
+                    createBudgetItem({
+                      userId,
+                      roomId,
+                      name: newItemName.trim(),
+                      estimatedCost: Number(newItemCost) || undefined,
+                      link: newItemLink || undefined,
+                    });
+                    setNewItemName("");
+                    setNewItemCost("");
+                    setNewItemLink("");
+                    setShowAddItem(false);
+                  }
+                }}
+              >
+                Add
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowAddItem(false)}>
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowAddItem(true)}
+              className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Add Item
+            </Button>
+          )}
+        </CardContent>
+      )}
+    </Card>
+  );
+}
 
 export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const [selectedRoom, setSelectedRoom] = useState<Id<"homeRemodelRooms"> | null>(null);
@@ -422,10 +591,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
               {selectedRoomData ? (
                 <>
                   {/* Room Header */}
-                  <Card className={ROOM_STATUS_BG[selectedRoomData.status]}>
+                  <Card className="bg-slate-100 border-slate-400">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle>{selectedRoomData.name}</CardTitle>
+                        <CardTitle className="text-slate-900">{selectedRoomData.name}</CardTitle>
                         <Select
                           value={selectedRoomData.status}
                           onValueChange={(v) => updateRoom({ roomId: selectedRoomData._id, status: v })}
@@ -445,56 +614,47 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     <CardContent className="space-y-3">
                       <div className="grid md:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-xs font-medium text-muted-foreground">Vision</label>
+                          <label className="text-xs font-medium text-slate-700">Vision</label>
                           <Textarea
                             placeholder="What do you want this room to become?"
                             value={selectedRoomData.vision || ""}
                             onChange={(e) => updateRoom({ roomId: selectedRoomData._id, vision: e.target.value })}
-                            className="mt-1 bg-white/50"
+                            className="mt-1 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                             rows={3}
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-muted-foreground">Current State</label>
+                          <label className="text-xs font-medium text-slate-700">Current State</label>
                           <Textarea
                             placeholder="What's it like now?"
                             value={selectedRoomData.currentState || ""}
                             onChange={(e) => updateRoom({ roomId: selectedRoomData._id, currentState: e.target.value })}
-                            className="mt-1 bg-white/50"
+                            className="mt-1 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                             rows={3}
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground">Budget Estimate ($)</label>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            value={selectedRoomData.budgetEstimate || ""}
-                            onChange={(e) => updateRoom({ roomId: selectedRoomData._id, budgetEstimate: Number(e.target.value) || 0 })}
-                            className="mt-1 bg-white/50"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground">Actual Spent ($)</label>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            value={selectedRoomData.budgetActual || ""}
-                            onChange={(e) => updateRoom({ roomId: selectedRoomData._id, budgetActual: Number(e.target.value) || 0 })}
-                            className="mt-1 bg-white/50"
                           />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
+                  {/* Budget Breakdown */}
+                  <BudgetBreakdown 
+                    userId={userId}
+                    roomId={selectedRoom!}
+                    roomBudgetEstimate={selectedRoomData.budgetEstimate}
+                    roomBudgetActual={selectedRoomData.budgetActual}
+                    onUpdateRoom={(est, act) => updateRoom({ 
+                      roomId: selectedRoomData._id, 
+                      budgetEstimate: est,
+                      budgetActual: act 
+                    })}
+                  />
+
                   {/* Tasks */}
-                  <Card className="bg-zinc-50 border-zinc-300">
+                  <Card className="bg-slate-100 border-slate-400">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base text-zinc-900">Tasks ({tasks.length})</CardTitle>
+                        <CardTitle className="text-base text-slate-900">Tasks ({tasks.length})</CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddTask(true)}>
                           <Plus className="h-3 w-3 mr-1" />
                           Add
@@ -503,7 +663,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {tasks.length === 0 ? (
-                        <p className="text-sm text-zinc-500">No tasks yet</p>
+                        <p className="text-sm text-slate-600">No tasks yet</p>
                       ) : (
                         tasks.map((task) => (
                           <div
