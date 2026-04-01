@@ -30,8 +30,6 @@ import {
   Target,
   Trophy,
   Calendar,
-  RefreshCw,
-  Unplug,
   Droplet,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -221,19 +219,16 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
 
 export function HealthDashboard({ userId }: HealthDashboardProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [syncing, setSyncing] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [stepsInput, setStepsInput] = useState("");
 
   const monthStats = useQuery(api.health.getMonthStats, { userId });
-  const isWhoopConnected = useQuery(api.health.isWhoopConnected, { userId });
   const healthGoals = useQuery(api.health.getHealthGoals, { userId });
 
   const yearMonth = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}`;
   const monthHealth = useQuery(api.health.getMonthHealth, { userId, yearMonth });
 
   const updateSteps = useMutation(api.health.updateSteps);
-  const disconnectWhoop = useMutation(api.health.disconnectWhoop);
 
   // Create health lookup by date
   const healthByDate: Record<string, { healthScore: number; isPerfectDay: boolean }> = {};
@@ -262,30 +257,6 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
     }
 
     return days;
-  };
-
-  const handleSync = async () => {
-    setSyncing(true);
-    try {
-      await fetch("/api/auth/whoop/sync", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, days: 7 }),
-      });
-    } catch (e) {
-      console.error("Sync error:", e);
-    }
-    setSyncing(false);
-  };
-
-  const handleConnect = () => {
-    window.location.href = `/api/auth/whoop?userId=${userId}`;
-  };
-
-  const handleDisconnect = async () => {
-    if (confirm("Are you sure you want to disconnect Whoop?")) {
-      await disconnectWhoop({ userId });
-    }
   };
 
   const handleSaveSteps = async () => {
@@ -345,39 +316,6 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
               BioMap
             </TabsTrigger>
           </TabsList>
-          {/* Only show Whoop controls on Daily tab */}
-          {activeTab === "daily" && (
-            <div className="flex items-center gap-2">
-              {isWhoopConnected ? (
-                <>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleSync} 
-                    disabled={syncing}
-                    className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
-                  >
-                    <RefreshCw className={`h-4 w-4 mr-1 ${syncing ? "animate-spin" : ""}`} />
-                    {syncing ? "Syncing..." : "Sync Whoop"}
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleDisconnect}
-                    className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
-                  >
-                    <Unplug className="h-4 w-4 mr-1" />
-                    Disconnect
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={handleConnect} className="bg-purple-600 hover:bg-purple-700">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Connect Whoop
-                </Button>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Daily Health Tab */}
