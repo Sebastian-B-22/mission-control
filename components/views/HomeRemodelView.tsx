@@ -491,10 +491,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   </Card>
 
                   {/* Tasks */}
-                  <Card>
+                  <Card className="bg-zinc-50 border-zinc-300">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base">Tasks ({tasks.length})</CardTitle>
+                        <CardTitle className="text-base text-zinc-900">Tasks ({tasks.length})</CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddTask(true)}>
                           <Plus className="h-3 w-3 mr-1" />
                           Add
@@ -503,7 +503,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {tasks.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No tasks yet</p>
+                        <p className="text-sm text-zinc-500">No tasks yet</p>
                       ) : (
                         tasks.map((task) => (
                           <div
@@ -607,11 +607,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   </Card>
 
                   {/* Ideas */}
-                  <Card>
+                  <Card className="bg-yellow-50 border-yellow-300">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <Lightbulb className="h-4 w-4 text-yellow-500" />
+                        <CardTitle className="text-base flex items-center gap-2 text-yellow-900">
+                          <Lightbulb className="h-4 w-4 text-yellow-600" />
                           Ideas & Inspiration
                         </CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddIdea(true)}>
@@ -622,7 +622,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {roomIdeas.filter(i => !i.promoted).length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No ideas yet - brainstorm away!</p>
+                        <p className="text-sm text-yellow-700">No ideas yet - brainstorm away!</p>
                       ) : (
                         roomIdeas.filter(i => !i.promoted).map((idea) => (
                           <div
