@@ -139,7 +139,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
       // ========== COVER PAGE ==========
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.text(`Homeschool Progress Report`, 105, 35, { align: "center" });
+      doc.text(`Homeschool Recap Report`, 105, 35, { align: "center" });
       
       doc.setFontSize(16);
       doc.setFont("helvetica", "normal");
@@ -160,7 +160,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(88, 28, 135); // Purple
-      doc.text("📈 Compounding Learning", 105, 98, { align: "center" });
+      doc.text("Compounding Learning", 105, 98, { align: "center" });
       
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
@@ -230,7 +230,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
         doc.addPage();
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("📷 Learning Moments", 14, 20);
+        doc.text("Learning Moments", 14, 20);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(100);
@@ -246,7 +246,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
           doc.setFillColor(248, 250, 252);
           doc.roundedRect(14, photoY, 180, 25, 2, 2, "F");
           doc.setFontSize(9);
-          doc.text(`📸 ${dateStr}`, 20, photoY + 10);
+          doc.text(`* ${dateStr}`, 20, photoY + 10);
           doc.setTextColor(100);
           doc.setFontSize(8);
           doc.text(photo.url.slice(0, 70) + "...", 20, photoY + 18);
@@ -289,7 +289,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
         doc.roundedRect(14, 40, 90, 30, 2, 2, "F");
         doc.setFontSize(9);
         doc.setTextColor(88, 28, 135);
-        doc.text(`📈 ${studentMetrics.consistencyRate}% consistency`, 20, 52);
+        doc.text(`${studentMetrics.consistencyRate}% consistency`, 20, 52);
         doc.text(`${studentMetrics.maxStreak}-day best streak`, 20, 62);
         doc.setTextColor(0);
         
@@ -365,9 +365,9 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
             for (const note of studentPlatformNotes.slice(0, 3)) {
               if (noteY > 270) break;
               
-              const sourceLabel = note.source === "math-academy" ? "📊 Math Academy" :
-                note.source === "wonder-math" ? "📐 Wonder Math" :
-                note.source === "synthesis-teams" ? "🎮 Synthesis" : note.source;
+              const sourceLabel = note.source === "math-academy" ? "Math Academy" :
+                note.source === "wonder-math" ? "Wonder Math" :
+                note.source === "synthesis-teams" ? "Synthesis" : note.source;
               
               doc.setFillColor(note.sentiment === "positive" ? 240 : note.sentiment === "needs-attention" ? 254 : 248, 
                              note.sentiment === "positive" ? 253 : note.sentiment === "needs-attention" ? 243 : 250,
@@ -394,7 +394,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
         doc.addPage();
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("📧 Learning Platform Feedback", 14, 20);
+        doc.text("Learning Platform Feedback", 14, 20);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(100);
@@ -413,9 +413,9 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
         for (const [source, notes] of Object.entries(bySource)) {
           if (sourceY > 250) break;
           
-          const sourceLabel = source === "math-academy" ? "📊 Math Academy" :
-            source === "wonder-math" ? "📐 Wonder Math" :
-            source === "synthesis-teams" ? "🎮 Synthesis Teams" : source;
+          const sourceLabel = source === "math-academy" ? "Math Academy" :
+            source === "wonder-math" ? "Wonder Math" :
+            source === "synthesis-teams" ? "Synthesis Teams" : source;
           
           doc.setFontSize(11);
           doc.setFont("helvetica", "bold");
@@ -441,7 +441,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
             // Sentiment indicator
             if (note.sentiment === "positive") {
               doc.setTextColor(34, 197, 94);
-              doc.text("✓", 180, sourceY + 6);
+              doc.text("OK", 178, sourceY + 6);
             } else if (note.sentiment === "needs-attention") {
               doc.setTextColor(234, 88, 12);
               doc.text("!", 180, sourceY + 6);
@@ -465,7 +465,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
         doc.addPage();
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("📝 Daily Recap Notes", 14, 20);
+        doc.text("Daily Recap Notes", 14, 20);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(100);
