@@ -135,7 +135,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
             </p>
           </div>
         </div>
-        <Badge variant="outline" className="text-lg px-4 py-2">
+        <Badge variant="outline" className="text-lg px-4 py-2 bg-red-500 text-white border-red-600">
           <Calendar className="h-4 w-4 mr-2" />
           {daysUntilMove} days until move
         </Badge>
