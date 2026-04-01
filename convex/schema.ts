@@ -176,6 +176,23 @@ export default defineSchema({
     .index("by_user_week", ["userId", "weekOf"])
     .index("by_student_week", ["student", "weekOf"]),
 
+  // Agent observations + platform recap emails (Math Academy, Synthesis, etc.)
+  homeschoolAgentNotes: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD
+    source: v.string(), // "james" | "compass" | "math-academy" | "synthesis" | "parent"
+    student: v.optional(v.string()), // "anthony" | "roma" | "both" | undefined for general
+    subject: v.optional(v.string()), // "math" | "science" | etc.
+    content: v.string(), // The actual note/recap
+    highlights: v.optional(v.array(v.string())), // Key takeaways
+    sentiment: v.optional(v.string()), // "positive" | "neutral" | "needs-attention"
+    rawEmail: v.optional(v.string()), // Original email content if from email
+    createdAt: v.number(),
+  })
+    .index("by_user_date", ["userId", "date"])
+    .index("by_source", ["source", "date"])
+    .index("by_student", ["student", "date"]),
+
   dailyCheckIns: defineTable({
     userId: v.id("users"),
     date: v.string(), // YYYY-MM-DD format

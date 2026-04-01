@@ -37,6 +37,7 @@ import type * as health from "../health.js";
 import type * as healthRuns from "../healthRuns.js";
 import type * as homeschool from "../homeschool.js";
 import type * as homeschoolActivities from "../homeschoolActivities.js";
+import type * as homeschoolAgentNotes from "../homeschoolAgentNotes.js";
 import type * as homeschoolProgress from "../homeschoolProgress.js";
 import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
@@ -99,6 +100,7 @@ declare const fullApi: ApiFromModules<{
   healthRuns: typeof healthRuns;
   homeschool: typeof homeschool;
   homeschoolActivities: typeof homeschoolActivities;
+  homeschoolAgentNotes: typeof homeschoolAgentNotes;
   homeschoolProgress: typeof homeschoolProgress;
   http: typeof http;
   jotformSync: typeof jotformSync;
