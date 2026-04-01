@@ -708,9 +708,13 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
   const historyResources = useQuery(api.homeschool.getResources, { category: "history", limit: 30 });
   const lifeSkillsResources = useQuery(api.homeschool.getResources, { category: "life-skills", limit: 30 });
   
+  // Fetch current month's focus for dynamic Learning Block suggestions
+  const currentMonthFocus = useQuery(api.homeschool.getCurrentMonthFocus);
+  
   // Parse notes field and return specific suggestions for each topic mentioned
-  const getBlockSuggestions = (activity: string, notes?: string): Array<{ topic: string; resource: string; activity: string }> => {
-    const suggestions: Array<{ topic: string; resource: string; activity: string }> = [];
+  // Now prioritizes current month's objectives over static mapping
+  const getBlockSuggestions = (activity: string, notes?: string): Array<{ topic: string; resource: string; activity: string; isMonthlyFocus?: boolean }> => {
+    const suggestions: Array<{ topic: string; resource: string; activity: string; isMonthlyFocus?: boolean }> = [];
     const lowerActivity = activity.toLowerCase();
     
     // Skip suggestions for certain blocks entirely
@@ -729,7 +733,29 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       return regex.test(` ${text} `);
     };
     
-    // Check each subject we have resources for
+    // PRIORITY 1: Check current month's focus objectives first
+    if (currentMonthFocus && (lowerActivity.includes("learning block") || lowerActivity.includes("learning"))) {
+      // Add this month's theme and objectives as priority suggestions
+      if (currentMonthFocus.theme) {
+        suggestions.push({
+          topic: `📌 ${currentMonthFocus.month} Focus`,
+          resource: currentMonthFocus.theme,
+          activity: currentMonthFocus.objectives?.[0] || "See monthly objectives",
+          isMonthlyFocus: true,
+        });
+      }
+      // Add key resources from this month
+      currentMonthFocus.keyResources?.slice(0, 2).forEach((resource: string) => {
+        suggestions.push({
+          topic: "This Month",
+          resource: resource,
+          activity: "",
+          isMonthlyFocus: true,
+        });
+      });
+    }
+    
+    // PRIORITY 2: Check static subject mapping (fallback)
     for (const [keyword, suggestion] of Object.entries(subjectToResources)) {
       if (hasWord(content, keyword)) {
         // Skip if noExpand is set and no meaningful content
@@ -1003,16 +1029,20 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
                     </p>
                     <div className="space-y-2">
                       {allSuggestions.map((s, i) => (
-                        <div key={i} className="bg-zinc-800 rounded p-2">
-                          <div className="text-xs font-medium text-amber-400 mb-1">{s.topic}</div>
+                        <div key={i} className={`rounded p-2 ${s.isMonthlyFocus ? 'bg-purple-900/30 border border-purple-700/50' : 'bg-zinc-800'}`}>
+                          <div className={`text-xs font-medium mb-1 ${s.isMonthlyFocus ? 'text-purple-300' : 'text-amber-400'}`}>
+                            {s.topic}
+                          </div>
                           <div className="flex items-center gap-2 text-xs text-zinc-300">
-                            <BookOpen className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            <BookOpen className={`w-3 h-3 flex-shrink-0 ${s.isMonthlyFocus ? 'text-purple-400' : 'text-green-500'}`} />
                             <span>{s.resource}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1">
-                            <Lightbulb className="w-3 h-3 text-blue-400 flex-shrink-0" />
-                            <span>{s.activity}</span>
-                          </div>
+                          {s.activity && (
+                            <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1">
+                              <Lightbulb className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                              <span>{s.activity}</span>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

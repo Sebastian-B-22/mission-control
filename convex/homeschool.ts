@@ -53,6 +53,25 @@ export const getMonthlyFocus = query({
   },
 });
 
+// Get current month's focus for Learning Block suggestions
+export const getCurrentMonthFocus = query({
+  args: {},
+  handler: async (ctx) => {
+    const now = new Date();
+    const monthFormats = [
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`, // "2026-04"
+      now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), // "April 2026"
+    ];
+    
+    const allFocus = await ctx.db.query("hsMonthlyFocus").collect();
+    const current = allFocus.find(f => 
+      monthFormats.some(fmt => f.month.includes(fmt) || fmt.includes(f.month))
+    );
+    
+    return current || null;
+  },
+});
+
 export const createMonthlyFocus = mutation({
   args: {
     quarterId: v.id("hsQuarters"),
