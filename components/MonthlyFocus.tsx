@@ -29,12 +29,12 @@ const focusAreas = [
   { emoji: "🔬", text: "Blood and Guts experiments", topics: ["Science", "Health"] },
   { emoji: "🏇", text: "Horseback riding", topics: ["P.E."] },
   { emoji: "🤹", text: "Juggling practice", topics: ["P.E."] },
+  { emoji: "🏛️", text: "Nixon Museum field trip", topics: ["Civics", "History"] },
+  { emoji: "🪂", text: "iFly field trip", topics: ["P.E.", "Science"] },
 ];
 
 const upNext = [
   { emoji: "📃", text: "Origami restart", topics: ["Art"] },
-  { emoji: "🏛️", text: "Nixon Museum field trip", topics: ["Civics", "History"] },
-  { emoji: "🪂", text: "iFly field trip", topics: ["P.E.", "Science"] },
   { emoji: "🚀", text: "California Science Center field trip", topics: ["Science"] },
   { emoji: "🦕", text: "Natural History Museum field trip", topics: ["Science", "History"] },
 ];
