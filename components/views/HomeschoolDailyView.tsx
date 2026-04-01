@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import HomeschoolMonthlyPDF from "@/components/HomeschoolMonthlyPDF";
 
 interface HomeschoolDailyViewProps {
   userId: Id<"users">;
@@ -794,12 +795,13 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
   return (
     <div className="space-y-4">
       {/* Header - compact */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-2xl font-bold">Homeschool Daily Schedule</h1>
           <p className="text-sm text-muted-foreground">A & R Academy</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <HomeschoolMonthlyPDF userId={userId} />
           <Button 
             variant="outline" 
             size="sm" 

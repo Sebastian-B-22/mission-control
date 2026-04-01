@@ -1044,6 +1044,7 @@ export default defineSchema({
     weekOf: v.string(), // YYYY-MM-DD (Monday)
     text: v.string(),
     categoryId: v.optional(v.id("rpmCategories")),
+    scheduledDay: v.optional(v.number()), // 0=Mon, 1=Tue, ... 6=Sun; undefined = unscheduled
     done: v.boolean(),
     order: v.number(),
     createdAt: v.number(),

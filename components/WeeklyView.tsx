@@ -58,6 +58,9 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
   const addGoal = useMutation(api.weeklyGoals.add);
   const toggleDone = useMutation(api.weeklyGoals.toggleDone);
   const removeGoal = useMutation(api.weeklyGoals.remove);
+  const setScheduledDay = useMutation(api.weeklyGoals.setScheduledDay);
+
+  const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   const rpmCategories = useQuery(api.rpm.getCategoriesByUser, { userId }) || [];
 
@@ -213,14 +216,36 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                       ) : null}
                     </div>
                   </label>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={async () => removeGoal({ goalId: g._id })}
-                    title="Delete"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Select 
+                      value={g.scheduledDay !== undefined ? String(g.scheduledDay) : "none"}
+                      onValueChange={async (v) => {
+                        await setScheduledDay({ 
+                          goalId: g._id, 
+                          scheduledDay: v === "none" ? null : parseInt(v) 
+                        });
+                      }}
+                    >
+                      <SelectTrigger className="w-[80px] h-7 text-xs">
+                        <SelectValue placeholder="Day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Any</SelectItem>
+                        {DAY_NAMES.map((d, i) => (
+                          <SelectItem key={i} value={String(i)}>{d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={async () => removeGoal({ goalId: g._id })}
+                      title="Delete"
+                      className="h-7 w-7"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))
             )}
@@ -231,8 +256,10 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
       {/* Calendar */}
       {mode === "agenda" ? (
         <div className="grid gap-4 md:grid-cols-2">
-          {days.map((day) => {
+          {days.map((day, dayIndex) => {
             const list = eventsByDay.get(day.toDateString()) || [];
+            const dayGoals = goals.filter(g => g.scheduledDay === dayIndex);
+            const hasContent = list.length > 0 || dayGoals.length > 0;
             return (
               <Card key={day.toISOString()}>
                 <CardHeader className="pb-2">
@@ -241,9 +268,33 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {list.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No events</p>
-                  ) : (
+                  {/* Scheduled goals for this day */}
+                  {dayGoals.length > 0 && (
+                    <div className="space-y-1 mb-2">
+                      {dayGoals.map((g) => (
+                        <div key={g._id} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={g.done}
+                            onChange={async (e) => {
+                              await toggleDone({ goalId: g._id, done: e.target.checked });
+                            }}
+                            className="h-3 w-3"
+                          />
+                          <span className={g.done ? "line-through text-muted-foreground" : ""}>
+                            {g.text}
+                          </span>
+                          {g.categoryId ? (
+                            <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-full border ${getCategoryColor(rpmCategories.find((c) => c._id === g.categoryId)?.name).badge}`}>
+                              {rpmCategories.find((c) => c._id === g.categoryId)?.name}
+                            </span>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* Calendar events */}
+                  {list.length > 0 ? (
                     list.map((e) => (
                       <div key={e._id} className="rounded border p-2 text-sm">
                         <div className="flex items-center justify-between gap-2">
@@ -260,7 +311,9 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                         </div>
                       </div>
                     ))
-                  )}
+                  ) : !dayGoals.length ? (
+                    <p className="text-xs text-muted-foreground">No events</p>
+                  ) : null}
                 </CardContent>
               </Card>
             );

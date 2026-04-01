@@ -19,6 +19,7 @@ export const add = mutation({
     weekOf: v.string(),
     text: v.string(),
     categoryId: v.optional(v.id("rpmCategories")),
+    scheduledDay: v.optional(v.number()), // 0=Mon, 1=Tue, ... 6=Sun
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -34,10 +35,24 @@ export const add = mutation({
       weekOf: args.weekOf,
       text: args.text,
       categoryId: args.categoryId,
+      scheduledDay: args.scheduledDay,
       done: false,
       order: maxOrder + 1,
       createdAt: now,
       updatedAt: now,
+    });
+  },
+});
+
+export const setScheduledDay = mutation({
+  args: { 
+    goalId: v.id("weeklyGoals"), 
+    scheduledDay: v.union(v.number(), v.null()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.goalId, { 
+      scheduledDay: args.scheduledDay ?? undefined, 
+      updatedAt: Date.now() 
     });
   },
 });
