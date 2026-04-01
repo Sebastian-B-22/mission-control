@@ -1267,4 +1267,22 @@ export default defineSchema({
   })
     .index("by_room", ["roomId"])
     .index("by_user", ["userId"]),
+
+  // ─── BioMap / Blood Work Tracking ────────────────────────────────────────
+  biomarkerResults: defineTable({
+    userId: v.id("users"),
+    testDate: v.string(), // YYYY-MM-DD
+    labName: v.optional(v.string()), // Quest, LabCorp, etc.
+    biomarkers: v.array(v.object({
+      name: v.string(),
+      value: v.number(),
+      unit: v.string(),
+      category: v.string(), // lipids, metabolic, thyroid, vitamins, inflammation, etc.
+    })),
+    notes: v.optional(v.string()),
+    pdfStorageId: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_date", ["userId", "testDate"]),
 });
