@@ -27,6 +27,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   financial: "Financial Literacy",
 };
 
+// Grade level context for each child
+const STUDENT_INFO: Record<string, { name: string; age: number; grade: string }> = {
+  anthony: { name: "Anthony Medaglia", age: 12, grade: "7th Grade" },
+  roma: { name: "Roma Medaglia", age: 11, grade: "6th Grade" },
+};
+
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
@@ -56,73 +62,153 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
     try {
       const doc = new jsPDF();
       const monthName = MONTHS[selectedMonth];
+      const completed = activities.filter(a => a.completed);
       
-      // Title
-      doc.setFontSize(20);
+      // ========== COVER PAGE ==========
+      doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.text(`Homeschool Progress Report`, 105, 20, { align: "center" });
+      doc.text(`Homeschool Progress Report`, 105, 40, { align: "center" });
       
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont("helvetica", "normal");
-      doc.text(`${monthName} ${selectedYear}`, 105, 30, { align: "center" });
+      doc.text(`${monthName} ${selectedYear}`, 105, 55, { align: "center" });
       
+      // Family name
+      doc.setFontSize(12);
+      doc.text(`A & R Academy`, 105, 70, { align: "center" });
       doc.setFontSize(10);
-      doc.text(`Anthony & Roma Briers`, 105, 38, { align: "center" });
+      doc.setTextColor(100);
+      doc.text(`Anthony (12, 7th Grade) • Roma (11, 6th Grade)`, 105, 80, { align: "center" });
+      doc.setTextColor(0);
       
-      // Summary stats
-      const totalActivities = activities.filter(a => a.completed).length;
-      const uniqueDays = new Set(activities.filter(a => a.completed).map(a => a.date)).size;
-      const totalMinutes = activities.reduce((sum, a) => sum + (a.durationMinutes || 0), 0);
+      // Monthly highlights box
+      const totalActivities = completed.length;
+      const uniqueDays = new Set(completed.map(a => a.date)).size;
+      const totalMinutes = completed.reduce((sum, a) => sum + (a.durationMinutes || 0), 0);
+      const uniqueSubjects = new Set(completed.map(a => a.category)).size;
+      
+      doc.setFillColor(245, 247, 250);
+      doc.roundedRect(30, 95, 150, 50, 3, 3, "F");
       
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text("Monthly Summary", 14, 50);
+      doc.text("Monthly Overview", 105, 108, { align: "center" });
       
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.text(`• Total Activities Completed: ${totalActivities}`, 14, 58);
-      doc.text(`• Active Learning Days: ${uniqueDays}`, 14, 65);
-      doc.text(`• Total Time Logged: ${Math.round(totalMinutes / 60)} hours ${totalMinutes % 60} minutes`, 14, 72);
-
-      // Group by category
-      const byCategory: Record<string, typeof activities> = {};
-      for (const a of activities.filter(a => a.completed)) {
+      const stats = [
+        `${totalActivities} Activities Completed`,
+        `${uniqueDays} Active Learning Days`,
+        `${uniqueSubjects} Subject Areas Covered`,
+        `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m Total Learning Time`,
+      ];
+      stats.forEach((stat, i) => {
+        doc.text(`• ${stat}`, 45, 118 + (i * 7));
+      });
+      
+      // Group activities by category for narrative
+      const byCategory: Record<string, typeof completed> = {};
+      for (const a of completed) {
         if (!byCategory[a.category]) byCategory[a.category] = [];
         byCategory[a.category].push(a);
       }
-
-      let yPos = 85;
-
-      // Category breakdown table
-      const categoryRows = Object.entries(byCategory)
+      
+      // Generate narrative summary
+      const topCategories = Object.entries(byCategory)
         .sort(([,a], [,b]) => b.length - a.length)
-        .map(([cat, acts]) => [
-          CATEGORY_LABELS[cat] || cat,
-          acts.length.toString(),
-          `${acts.reduce((s, a) => s + (a.durationMinutes || 0), 0)} min`,
-        ]);
-
-      if (categoryRows.length > 0) {
-        autoTable(doc, {
-          startY: yPos,
-          head: [["Subject Area", "Activities", "Time"]],
-          body: categoryRows,
-          theme: "striped",
-          headStyles: { fillColor: [59, 130, 246] },
-          margin: { left: 14, right: 14 },
+        .slice(0, 4)
+        .map(([cat]) => CATEGORY_LABELS[cat] || cat);
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "italic");
+      const narrative = `This month's learning focused on ${topCategories.slice(0, -1).join(", ")}${topCategories.length > 1 ? " and " + topCategories[topCategories.length - 1] : topCategories[0]}.`;
+      doc.text(narrative, 105, 160, { align: "center", maxWidth: 160 });
+      
+      // ========== PER-STUDENT PAGES ==========
+      for (const studentKey of ["anthony", "roma"]) {
+        doc.addPage();
+        const info = STUDENT_INFO[studentKey];
+        const studentActivities = completed.filter(a => a.student === studentKey || a.student === "both");
+        
+        // Student header
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text(info.name, 14, 25);
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100);
+        doc.text(`Age ${info.age} • ${info.grade} • ${monthName} ${selectedYear}`, 14, 33);
+        doc.setTextColor(0);
+        
+        // Student stats
+        const studentDays = new Set(studentActivities.map(a => a.date)).size;
+        const studentMinutes = studentActivities.reduce((sum, a) => sum + (a.durationMinutes || 0), 0);
+        
+        doc.setFillColor(245, 247, 250);
+        doc.roundedRect(14, 40, 85, 25, 2, 2, "F");
+        doc.setFontSize(9);
+        doc.text(`${studentActivities.length} activities • ${studentDays} days • ${Math.floor(studentMinutes / 60)}h ${studentMinutes % 60}m`, 20, 52);
+        
+        // Subject breakdown for this student
+        const studentByCategory: Record<string, number> = {};
+        for (const a of studentActivities) {
+          studentByCategory[a.category] = (studentByCategory[a.category] || 0) + 1;
+        }
+        
+        const subjectRows = Object.entries(studentByCategory)
+          .sort(([,a], [,b]) => b - a)
+          .map(([cat, count]) => [CATEGORY_LABELS[cat] || cat, count.toString()]);
+        
+        if (subjectRows.length > 0) {
+          autoTable(doc, {
+            startY: 75,
+            head: [["Subject", "Activities"]],
+            body: subjectRows,
+            theme: "striped",
+            headStyles: { fillColor: [79, 70, 229], fontSize: 9 }, // Indigo for individual
+            bodyStyles: { fontSize: 8 },
+            tableWidth: 80,
+            margin: { left: 14 },
+          });
+        }
+        
+        // Unique activities list for this student
+        const uniqueActivities = [...new Set(studentActivities.map(a => a.activity))].slice(0, 15);
+        const actY = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 15 : 120;
+        
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("Activities This Month", 14, actY);
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        uniqueActivities.forEach((act, i) => {
+          if (actY + 8 + (i * 5) < 280) {
+            doc.text(`• ${act}`, 14, actY + 8 + (i * 5));
+          }
         });
-        yPos = (doc as any).lastAutoTable.finalY + 15;
+        if (uniqueActivities.length < [...new Set(studentActivities.map(a => a.activity))].length) {
+          doc.setTextColor(100);
+          doc.text(`...and ${[...new Set(studentActivities.map(a => a.activity))].length - 15} more`, 14, actY + 8 + (15 * 5));
+          doc.setTextColor(0);
+        }
       }
-
-      // Detailed activity log by date
-      doc.setFontSize(11);
+      
+      // ========== DETAILED LOG PAGE ==========
+      doc.addPage();
+      doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
-      doc.text("Daily Activity Log", 14, yPos);
-      yPos += 8;
-
+      doc.text("Detailed Activity Log", 14, 20);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100);
+      doc.text(`${monthName} ${selectedYear} • All Activities`, 14, 28);
+      doc.setTextColor(0);
+      
       // Group by date
-      const byDate: Record<string, typeof activities> = {};
-      for (const a of activities.filter(a => a.completed)) {
+      const byDate: Record<string, typeof completed> = {};
+      for (const a of completed) {
         if (!byDate[a.date]) byDate[a.date] = [];
         byDate[a.date].push(a);
       }
@@ -142,42 +228,46 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
             a.student === "both" ? "Both" : a.student.charAt(0).toUpperCase() + a.student.slice(1),
             CATEGORY_LABELS[a.category] || a.category,
             a.activity,
-            a.notes ? a.notes.slice(0, 50) + (a.notes.length > 50 ? "..." : "") : "",
+            a.notes ? a.notes.slice(0, 40) + (a.notes.length > 40 ? "..." : "") : "",
           ]);
         }
       }
 
       if (dateRows.length > 0) {
         autoTable(doc, {
-          startY: yPos,
+          startY: 35,
           head: [["Date", "Student", "Subject", "Activity", "Notes"]],
           body: dateRows,
           theme: "grid",
           headStyles: { fillColor: [59, 130, 246], fontSize: 8 },
           bodyStyles: { fontSize: 7 },
           columnStyles: {
-            0: { cellWidth: 25 },
-            1: { cellWidth: 18 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 40 },
+            0: { cellWidth: 22 },
+            1: { cellWidth: 16 },
+            2: { cellWidth: 28 },
+            3: { cellWidth: 38 },
             4: { cellWidth: "auto" },
           },
           margin: { left: 14, right: 14 },
         });
+      } else {
+        doc.text("No activities recorded this month.", 14, 50);
       }
 
-      // Footer
+      // ========== FOOTER ON ALL PAGES ==========
       const pageCount = doc.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setFont("helvetica", "italic");
+        doc.setTextColor(120);
         doc.text(
-          `Generated ${new Date().toLocaleDateString()} • Aspire Homeschool • Page ${i} of ${pageCount}`,
+          `Generated ${new Date().toLocaleDateString()} • A & R Academy Homeschool • Page ${i} of ${pageCount}`,
           105,
           doc.internal.pageSize.height - 10,
           { align: "center" }
         );
+        doc.setTextColor(0);
       }
 
       // Download
