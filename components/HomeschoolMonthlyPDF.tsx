@@ -16,6 +16,7 @@ interface Props {
 
 const CATEGORY_LABELS: Record<string, string> = {
   math: "Mathematics",
+  academics: "Academics",
   writing: "Language Arts / Writing",
   literature: "Literature / Reading",
   history: "History / Social Studies",
