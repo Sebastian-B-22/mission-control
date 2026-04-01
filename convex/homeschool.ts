@@ -649,7 +649,7 @@ export const getPlanningBlocks = query({
       // Get blocks for specific kid OR "both"
       const kidBlocks = await ctx.db
         .query("hsPlanningBlocks")
-        .withIndex("by_date_kid", (q) => q.eq("date", args.date).eq("kid", args.kid))
+        .withIndex("by_date_kid", (q) => q.eq("date", args.date).eq("kid", args.kid!))
         .collect();
       const bothBlocks = await ctx.db
         .query("hsPlanningBlocks")
