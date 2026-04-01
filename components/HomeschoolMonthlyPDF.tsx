@@ -406,7 +406,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
         const bySource: Record<string, typeof platformNotes> = {};
         for (const note of (platformNotes || [])) {
           if (!bySource[note.source]) bySource[note.source] = [];
-          bySource[note.source].push(note);
+          bySource[note.source]!.push(note);
         }
         
         let sourceY = 40;
@@ -423,7 +423,7 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
           doc.text(sourceLabel, 14, sourceY);
           sourceY += 8;
           
-          for (const note of notes.slice(0, 4)) {
+          for (const note of (notes || []).slice(0, 4)) {
             if (sourceY > 265) break;
             
             const dateStr = new Date(note.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
