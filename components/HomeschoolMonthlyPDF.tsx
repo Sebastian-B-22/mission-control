@@ -110,6 +110,13 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
     startDate,
     endDate,
   });
+  
+  // Get platform notes (Math Academy, Wonder Math, Synthesis, etc.)
+  const platformNotes = useQuery(api.homeschoolAgentNotes.getNotesForRange, {
+    userId,
+    startDate,
+    endDate,
+  });
 
   const generatePDF = async () => {
     if (!activities) return;
@@ -339,6 +346,117 @@ export default function HomeschoolMonthlyPDF({ userId }: Props) {
           doc.setTextColor(100);
           doc.text(`...and ${totalUnique - 12} more`, 14, actY + 8 + (12 * 5));
           doc.setTextColor(0);
+        }
+        
+        // Platform feedback for this student
+        const studentPlatformNotes = (platformNotes || []).filter(
+          (n) => n.student === studentKey || n.student === "both"
+        );
+        
+        if (studentPlatformNotes.length > 0) {
+          const platformY = actY + 8 + (Math.min(uniqueActivities.length, 12) * 5) + 15;
+          
+          if (platformY < 240) {
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.text("Platform Feedback", 14, platformY);
+            
+            let noteY = platformY + 8;
+            for (const note of studentPlatformNotes.slice(0, 3)) {
+              if (noteY > 270) break;
+              
+              const sourceLabel = note.source === "math-academy" ? "📊 Math Academy" :
+                note.source === "wonder-math" ? "📐 Wonder Math" :
+                note.source === "synthesis-teams" ? "🎮 Synthesis" : note.source;
+              
+              doc.setFillColor(note.sentiment === "positive" ? 240 : note.sentiment === "needs-attention" ? 254 : 248, 
+                             note.sentiment === "positive" ? 253 : note.sentiment === "needs-attention" ? 243 : 250,
+                             note.sentiment === "positive" ? 244 : note.sentiment === "needs-attention" ? 235 : 252);
+              doc.roundedRect(14, noteY, 180, 20, 2, 2, "F");
+              
+              doc.setFontSize(8);
+              doc.setFont("helvetica", "bold");
+              doc.text(`${sourceLabel} • ${new Date(note.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}`, 18, noteY + 7);
+              
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(7);
+              const contentText = note.highlights?.slice(0, 2).join(" • ") || note.content.slice(0, 80);
+              doc.text(contentText, 18, noteY + 14);
+              
+              noteY += 24;
+            }
+          }
+        }
+      }
+      
+      // ========== PLATFORM FEEDBACK SUMMARY PAGE ==========
+      if ((platformNotes || []).length > 0) {
+        doc.addPage();
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text("📧 Learning Platform Feedback", 14, 20);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100);
+        doc.text(`Teacher updates & platform reports from ${monthName}`, 14, 28);
+        doc.setTextColor(0);
+        
+        // Group by source
+        const bySource: Record<string, typeof platformNotes> = {};
+        for (const note of (platformNotes || [])) {
+          if (!bySource[note.source]) bySource[note.source] = [];
+          bySource[note.source].push(note);
+        }
+        
+        let sourceY = 40;
+        
+        for (const [source, notes] of Object.entries(bySource)) {
+          if (sourceY > 250) break;
+          
+          const sourceLabel = source === "math-academy" ? "📊 Math Academy" :
+            source === "wonder-math" ? "📐 Wonder Math" :
+            source === "synthesis-teams" ? "🎮 Synthesis Teams" : source;
+          
+          doc.setFontSize(11);
+          doc.setFont("helvetica", "bold");
+          doc.text(sourceLabel, 14, sourceY);
+          sourceY += 8;
+          
+          for (const note of notes.slice(0, 4)) {
+            if (sourceY > 265) break;
+            
+            const dateStr = new Date(note.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+            const studentName = note.student === "anthony" ? "Anthony" : note.student === "roma" ? "Roma" : "Both";
+            
+            // Color based on sentiment
+            const bgColor = note.sentiment === "positive" ? [240, 253, 244] : 
+                           note.sentiment === "needs-attention" ? [254, 243, 235] : [248, 250, 252];
+            doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+            doc.roundedRect(14, sourceY, 180, 18, 2, 2, "F");
+            
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            doc.text(`${dateStr} • ${studentName}`, 18, sourceY + 6);
+            
+            // Sentiment indicator
+            if (note.sentiment === "positive") {
+              doc.setTextColor(34, 197, 94);
+              doc.text("✓", 180, sourceY + 6);
+            } else if (note.sentiment === "needs-attention") {
+              doc.setTextColor(234, 88, 12);
+              doc.text("!", 180, sourceY + 6);
+            }
+            doc.setTextColor(0);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            const highlights = note.highlights?.slice(0, 2).join(" • ") || note.content.slice(0, 100);
+            doc.text(highlights.slice(0, 90), 18, sourceY + 13);
+            
+            sourceY += 22;
+          }
+          
+          sourceY += 8;
         }
       }
       
