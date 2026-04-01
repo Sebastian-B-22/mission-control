@@ -592,3 +592,112 @@ export const getForgottenResources = query({
     return all.filter((r) => !r.lastUsed || r.lastUsed < cutoff);
   },
 });
+
+// ==========================================
+// PLANNING BLOCKS
+// ==========================================
+
+export const getPlanningBlocks = query({
+  args: {
+    date: v.string(),
+    kid: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const all = await ctx.db
+      .query("hsPlanningBlocks")
+      .withIndex("by_date", (q) => q.eq("date", args.date))
+      .collect();
+
+    if (args.kid && args.kid !== "Both") {
+      return all.filter((b) => !b.kid || b.kid === args.kid);
+    }
+
+    return all;
+  },
+});
+
+export const createPlanningBlock = mutation({
+  args: {
+    date: v.string(),
+    kid: v.optional(v.string()),
+    topic: v.string(),
+    subject: v.string(),
+    methods: v.array(v.string()),
+    duration: v.optional(v.number()),
+    materials: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("hsPlanningBlocks", {
+      ...args,
+      createdAt: new Date().toISOString(),
+    });
+  },
+});
+
+export const updatePlanningBlock = mutation({
+  args: {
+    id: v.id("hsPlanningBlocks"),
+    topic: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    methods: v.optional(v.array(v.string())),
+    duration: v.optional(v.number()),
+    materials: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+    return id;
+  },
+});
+
+export const deletePlanningBlock = mutation({
+  args: { id: v.id("hsPlanningBlocks") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});
+
+export const convertPlanningBlockToSchedule = mutation({
+  args: {
+    blockId: v.id("hsPlanningBlocks"),
+    startTime: v.string(),
+    endTime: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const block = await ctx.db.get(args.blockId);
+    if (!block) return null;
+
+    // Get or create daily schedule for this date
+    let schedule = await ctx.db
+      .query("hsDailySchedule")
+      .withIndex("by_date", (q) => q.eq("date", block.date))
+      .first();
+
+    const scheduleBlock = {
+      id: `block-${Date.now()}`,
+      startTime: args.startTime,
+      endTime: args.endTime,
+      subject: block.subject,
+      activity: block.topic,
+      notes: block.notes,
+      completed: false,
+    };
+
+    if (schedule) {
+      const updatedBlocks = [...schedule.blocks, scheduleBlock];
+      await ctx.db.patch(schedule._id, { blocks: updatedBlocks });
+      return schedule._id;
+    } else {
+      const dateObj = new Date(block.date);
+      const dayOfWeek = dateObj.getDay();
+
+      return await ctx.db.insert("hsDailySchedule", {
+        date: block.date,
+        dayOfWeek,
+        blocks: [scheduleBlock],
+      });
+    }
+  },
+});}
