@@ -328,10 +328,12 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
     return `${h}h${m > 0 ? `${m}m` : ''}`;
   };
 
+  const [activeTab, setActiveTab] = useState("daily");
+
   return (
     <div className="space-y-6">
       {/* Header with Tabs */}
-      <Tabs defaultValue="daily" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex items-center justify-between mb-4">
           <TabsList className="bg-zinc-800">
             <TabsTrigger value="daily" className="data-[state=active]:bg-purple-600">
@@ -343,36 +345,39 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
               BioMap
             </TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-2">
-            {isWhoopConnected ? (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleSync} 
-                  disabled={syncing}
-                  className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
-                >
-                  <RefreshCw className={`h-4 w-4 mr-1 ${syncing ? "animate-spin" : ""}`} />
-                  {syncing ? "Syncing..." : "Sync Whoop"}
+          {/* Only show Whoop controls on Daily tab */}
+          {activeTab === "daily" && (
+            <div className="flex items-center gap-2">
+              {isWhoopConnected ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleSync} 
+                    disabled={syncing}
+                    className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-1 ${syncing ? "animate-spin" : ""}`} />
+                    {syncing ? "Syncing..." : "Sync Whoop"}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleDisconnect}
+                    className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+                  >
+                    <Unplug className="h-4 w-4 mr-1" />
+                    Disconnect
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={handleConnect} className="bg-purple-600 hover:bg-purple-700">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Connect Whoop
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleDisconnect}
-                  className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
-                >
-                  <Unplug className="h-4 w-4 mr-1" />
-                  Disconnect
-                </Button>
-              </>
-            ) : (
-              <Button onClick={handleConnect} className="bg-purple-600 hover:bg-purple-700">
-                <Zap className="h-4 w-4 mr-2" />
-                Connect Whoop
-              </Button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Daily Health Tab */}
