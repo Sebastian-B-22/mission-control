@@ -24,6 +24,7 @@ import {
   Handshake,
   Users,
   DollarSign,
+  Hammer,
 } from "lucide-react";
 import { SoccerBall } from "@/components/icons/SoccerBall";
 
@@ -120,6 +121,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Finance",
       icon: DollarSign,
       view: "finance",
+    },
+    {
+      name: "Home Remodel",
+      icon: Hammer,
+      view: "home-remodel",
     },
     {
       name: "Personal RPM",

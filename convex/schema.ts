@@ -1191,4 +1191,65 @@ export default defineSchema({
     .index("by_user_child_createdAt", ["userId", "child", "createdAt"])
     .index("by_user_child_redeemedAt", ["userId", "child", "redeemedAt"])
     .index("by_user_createdAt", ["userId", "createdAt"]),
+
+  // ─── Home Remodel Tracking ───────────────────────────────────────────────
+  homeRemodelRooms: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    order: v.number(),
+    currentState: v.optional(v.string()),
+    vision: v.optional(v.string()),
+    inspirationLinks: v.optional(v.array(v.string())),
+    budgetEstimate: v.optional(v.number()),
+    budgetActual: v.optional(v.number()),
+    priority: v.optional(v.string()),
+    status: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  homeRemodelTasks: defineTable({
+    userId: v.id("users"),
+    roomId: v.id("homeRemodelRooms"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    status: v.string(),
+    assignee: v.optional(v.string()),
+    dueDate: v.optional(v.string()),
+    priority: v.optional(v.string()),
+    estimatedCost: v.optional(v.number()),
+    actualCost: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_room", ["roomId"])
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
+
+  homeRemodelIdeas: defineTable({
+    userId: v.id("users"),
+    roomId: v.optional(v.id("homeRemodelRooms")),
+    content: v.string(),
+    category: v.optional(v.string()),
+    priority: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    sourceUrl: v.optional(v.string()),
+    promoted: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_room", ["roomId"])
+    .index("by_user", ["userId"]),
+
+  homeRemodelMilestones: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    targetDate: v.string(),
+    description: v.optional(v.string()),
+    completed: v.boolean(),
+    completedAt: v.optional(v.number()),
+    order: v.number(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

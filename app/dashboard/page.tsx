@@ -65,6 +65,7 @@ import {
   HomeschoolTripsView,
 } from "@/components/views/HomeschoolSubViews";
 import { FinanceView } from "@/components/views/FinanceView";
+import { HomeRemodelView } from "@/components/views/HomeRemodelView";
 import { WeeklyView } from "@/components/WeeklyView";
 import { AgentSquad } from "@/components/AgentSquad";
 import { AgentHQ } from "@/components/AgentHQ";
@@ -598,6 +599,9 @@ export default function DashboardPage() {
 
       case "finance":
         return <FinanceView />;
+
+      case "home-remodel":
+        return <HomeRemodelView userId={convexUser._id} />;
 
       case "cost-tracker":
         return <CostTrackerView userId={convexUser._id} />;
