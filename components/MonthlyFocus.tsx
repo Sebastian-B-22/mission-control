@@ -44,7 +44,7 @@ export function MonthlyFocus() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5 text-yellow-500" />
-            <CardTitle>March Focus</CardTitle>
+            <CardTitle>April Focus</CardTitle>
           </div>
           <CardDescription>Current learning themes & priorities</CardDescription>
         </CardHeader>
@@ -76,7 +76,7 @@ export function MonthlyFocus() {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <ArrowRight className="h-5 w-5 text-blue-500" />
-            <CardTitle className="text-base">Up Next (April)</CardTitle>
+            <CardTitle className="text-base">Up Next (May)</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
