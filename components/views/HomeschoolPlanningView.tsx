@@ -118,7 +118,7 @@ export function HomeschoolPlanningView({ userId }: HomeschoolPlanningViewProps) 
     await createBlock({
       date: selectedDateStr,
       kid: selectedKid,
-      title,
+      topic: title,
       subject,
       methods: selectedMethods,
       startTime,
@@ -269,7 +269,7 @@ export function HomeschoolPlanningView({ userId }: HomeschoolPlanningViewProps) 
                         <span className={textSecondary}>·</span>
                         <span className={textSecondary}>{block.duration} min</span>
                       </div>
-                      <h4 className={`font-semibold ${textPrimary}`}>{block.title}</h4>
+                      <h4 className={`font-semibold ${textPrimary}`}>{block.topic}</h4>
                       <p className={`text-sm ${textSecondary}`}>{block.subject}</p>
                       {block.methods && block.methods.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
