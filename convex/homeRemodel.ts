@@ -400,3 +400,23 @@ export const seedRooms = mutation({
     return { rooms: rooms.length, milestones: milestones.length };
   },
 });
+
+// ===== FILE UPLOAD =====
+
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const updateIdeaImage = mutation({
+  args: { 
+    ideaId: v.id("homeRemodelIdeas"),
+    storageId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const url = await ctx.storage.getUrl(args.storageId);
+    await ctx.db.patch(args.ideaId, { imageUrl: url || undefined });
+  },
+});

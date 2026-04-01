@@ -45,12 +45,12 @@ import {
   Hammer,
 } from "lucide-react";
 
-// Status colors for room cards (background)
+// Status colors for room cards (background) - explicit colors for dark mode
 const ROOM_STATUS_BG: Record<string, string> = {
-  "not-started": "bg-zinc-100 border-zinc-300",
-  "planning": "bg-blue-50 border-blue-300",
-  "in-progress": "bg-amber-50 border-amber-300",
-  "done": "bg-green-50 border-green-300",
+  "not-started": "bg-zinc-200 border-zinc-400 text-zinc-900",
+  "planning": "bg-blue-100 border-blue-400 text-blue-900",
+  "in-progress": "bg-amber-100 border-amber-400 text-amber-900",
+  "done": "bg-green-100 border-green-400 text-green-900",
 };
 
 const ROOM_STATUS_ACCENT: Record<string, string> = {
@@ -95,6 +95,8 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const [newTaskAssignee, setNewTaskAssignee] = useState<string>("");
   const [newIdeaContent, setNewIdeaContent] = useState("");
   const [newIdeaPriority, setNewIdeaPriority] = useState("nice-to-have");
+  const [newIdeaSourceUrl, setNewIdeaSourceUrl] = useState("");
+  const [uploadingIdea, setUploadingIdea] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("rooms");
   const [assigneeFilter, setAssigneeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -125,6 +127,25 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const deleteIdea = useMutation(api.homeRemodel.deleteIdea);
   const updateRoom = useMutation(api.homeRemodel.updateRoom);
   const toggleMilestone = useMutation(api.homeRemodel.toggleMilestone);
+  const generateUploadUrl = useMutation(api.homeRemodel.generateUploadUrl);
+  const updateIdeaImage = useMutation(api.homeRemodel.updateIdeaImage);
+
+  // Upload image for idea
+  const handleIdeaImageUpload = async (ideaId: string, file: File) => {
+    setUploadingIdea(ideaId);
+    try {
+      const uploadUrl = await generateUploadUrl({});
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { storageId } = await result.json();
+      await updateIdeaImage({ ideaId: ideaId as Id<"homeRemodelIdeas">, storageId });
+    } finally {
+      setUploadingIdea(null);
+    }
+  };
 
   const selectedRoomData = rooms.find((r) => r._id === selectedRoom);
 
@@ -606,37 +627,65 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                         roomIdeas.filter(i => !i.promoted).map((idea) => (
                           <div
                             key={idea._id}
-                            className="flex items-start gap-3 p-2 rounded border bg-yellow-50/50 border-yellow-200"
+                            className="flex flex-col gap-2 p-3 rounded border bg-yellow-100 border-yellow-300 text-yellow-900"
                           >
-                            <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5" />
-                            <div className="flex-1">
-                              <p className="text-sm">{idea.content}</p>
-                              {idea.sourceUrl && (
-                                <a href={idea.sourceUrl} target="_blank" className="text-xs text-blue-500 hover:underline">
-                                  View inspiration
+                            <div className="flex items-start gap-3">
+                              <Lightbulb className="h-4 w-4 text-yellow-600 mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-sm">{idea.content}</p>
+                                {idea.sourceUrl && (
+                                  <a href={idea.sourceUrl} target="_blank" className="text-xs text-blue-600 hover:underline">
+                                    View inspiration
+                                  </a>
+                                )}
+                              </div>
+                              <Badge className={`text-xs ${PRIORITY_COLORS[idea.priority || "nice-to-have"]}`}>
+                                {idea.priority || "nice-to-have"}
+                              </Badge>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => promoteIdea({ ideaId: idea._id, roomId: selectedRoom! })}
+                              >
+                                <ArrowRight className="h-3 w-3 mr-1" />
+                                To Task
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => deleteIdea({ ideaId: idea._id })}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                            {/* Image display and upload */}
+                            <div className="flex items-center gap-2 ml-7">
+                              {idea.imageUrl ? (
+                                <a href={idea.imageUrl} target="_blank" className="block">
+                                  <img 
+                                    src={idea.imageUrl} 
+                                    alt="Inspiration" 
+                                    className="h-20 w-auto rounded border border-yellow-300 hover:opacity-80 transition"
+                                  />
                                 </a>
+                              ) : (
+                                <label className="flex items-center gap-1 text-xs text-yellow-700 cursor-pointer hover:text-yellow-900">
+                                  <Image className="h-3 w-3" />
+                                  {uploadingIdea === idea._id ? "Uploading..." : "Add photo"}
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleIdeaImageUpload(idea._id, file);
+                                    }}
+                                  />
+                                </label>
                               )}
                             </div>
-                            <Badge className={`text-xs ${PRIORITY_COLORS[idea.priority || "nice-to-have"]}`}>
-                              {idea.priority || "nice-to-have"}
-                            </Badge>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => promoteIdea({ ideaId: idea._id, roomId: selectedRoom! })}
-                            >
-                              <ArrowRight className="h-3 w-3 mr-1" />
-                              To Task
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={() => deleteIdea({ ideaId: idea._id })}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
                           </div>
                         ))
                       )}
@@ -664,6 +713,8 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                             <Input 
                               placeholder="Link (Pinterest, etc.)" 
                               className="flex-1"
+                              value={newIdeaSourceUrl}
+                              onChange={(e) => setNewIdeaSourceUrl(e.target.value)}
                             />
                             <Button
                               size="sm"
@@ -674,8 +725,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                                     roomId: selectedRoom!,
                                     content: newIdeaContent.trim(),
                                     priority: newIdeaPriority,
+                                    sourceUrl: newIdeaSourceUrl || undefined,
                                   });
                                   setNewIdeaContent("");
+                                  setNewIdeaSourceUrl("");
                                   setShowAddIdea(false);
                                 }
                               }}
