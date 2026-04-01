@@ -53,11 +53,11 @@ const ROOM_STATUS_BG: Record<string, string> = {
   "done": "bg-green-100 border-green-400 text-green-900",
 };
 
-const ROOM_STATUS_ACCENT: Record<string, string> = {
-  "not-started": "bg-zinc-400",
-  "planning": "bg-blue-500",
-  "in-progress": "bg-amber-500",
-  "done": "bg-green-500",
+const ROOM_STATUS_BADGE: Record<string, string> = {
+  "not-started": "bg-zinc-600 text-white",
+  "planning": "bg-blue-600 text-white",
+  "in-progress": "bg-amber-500 text-white",
+  "done": "bg-green-600 text-white",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -393,7 +393,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium">{room.name}</span>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge className={`text-xs ${ROOM_STATUS_BADGE[room.status]}`}>
                         {STATUS_LABELS[room.status]}
                       </Badge>
                     </div>
@@ -430,7 +430,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                           value={selectedRoomData.status}
                           onValueChange={(v) => updateRoom({ roomId: selectedRoomData._id, status: v })}
                         >
-                          <SelectTrigger className="w-[140px]">
+                          <SelectTrigger className={`w-[140px] ${ROOM_STATUS_BADGE[selectedRoomData.status]}`}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
