@@ -890,6 +890,23 @@ export default defineSchema({
     .index("by_student", ["student"])
     .index("by_subject", ["subject"]),
 
+  // Planning blocks for homeschool lesson planning
+  hsPlanningBlocks: defineTable({
+    date: v.string(), // YYYY-MM-DD
+    kid: v.string(), // "anthony" | "roma" | "both"
+    topic: v.string(),
+    subject: v.string(),
+    methods: v.array(v.string()), // ["Lesson", "Practice", etc.]
+    startTime: v.optional(v.string()), // "09:00"
+    duration: v.optional(v.number()), // minutes
+    materials: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    completed: v.optional(v.boolean()),
+    createdAt: v.number(),
+  })
+    .index("by_date", ["date"])
+    .index("by_date_kid", ["date", "kid"]),
+
   // ─── Registration Counters ──────────────────────────────────────────────
   // Live registration counts updated by Scout's nightly Jotform sync
   registrationCounts: defineTable({

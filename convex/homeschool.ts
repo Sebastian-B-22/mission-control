@@ -635,3 +635,87 @@ export const getForgottenResources = query({
     return all.filter((r) => !r.lastUsed || r.lastUsed < cutoff);
   },
 });
+
+// ─── Planning Blocks ──────────────────────────────────────────────
+
+export const getPlanningBlocks = query({
+  args: {
+    date: v.string(),
+    kid: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let blocks;
+    if (args.kid && args.kid !== "both") {
+      // Get blocks for specific kid OR "both"
+      const kidBlocks = await ctx.db
+        .query("hsPlanningBlocks")
+        .withIndex("by_date_kid", (q) => q.eq("date", args.date).eq("kid", args.kid))
+        .collect();
+      const bothBlocks = await ctx.db
+        .query("hsPlanningBlocks")
+        .withIndex("by_date_kid", (q) => q.eq("date", args.date).eq("kid", "both"))
+        .collect();
+      blocks = [...kidBlocks, ...bothBlocks];
+    } else {
+      blocks = await ctx.db
+        .query("hsPlanningBlocks")
+        .withIndex("by_date", (q) => q.eq("date", args.date))
+        .collect();
+    }
+    // Sort by start time
+    return blocks.sort((a, b) => {
+      if (!a.startTime) return 1;
+      if (!b.startTime) return -1;
+      return a.startTime.localeCompare(b.startTime);
+    });
+  },
+});
+
+export const createPlanningBlock = mutation({
+  args: {
+    date: v.string(),
+    kid: v.string(),
+    topic: v.string(),
+    subject: v.string(),
+    methods: v.array(v.string()),
+    startTime: v.optional(v.string()),
+    duration: v.optional(v.number()),
+    materials: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("hsPlanningBlocks", {
+      ...args,
+      completed: false,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+export const updatePlanningBlock = mutation({
+  args: {
+    id: v.id("hsPlanningBlocks"),
+    topic: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    methods: v.optional(v.array(v.string())),
+    startTime: v.optional(v.string()),
+    duration: v.optional(v.number()),
+    materials: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    completed: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    const filtered = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(id, filtered);
+  },
+});
+
+export const deletePlanningBlock = mutation({
+  args: { id: v.id("hsPlanningBlocks") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});
