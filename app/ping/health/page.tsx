@@ -19,7 +19,10 @@ export default function HealthPing() {
 
   return (
     <div style={{ padding: 20, fontFamily: "monospace", background: "#111", color: "#fff", minHeight: "100vh" }}>
-      <h1>Health Debug</h1>
+      <h1>Health Debug v2</h1>
+      
+      <h2>0. Convex URL</h2>
+      <pre>{process.env.NEXT_PUBLIC_CONVEX_URL || "NOT SET"}</pre>
       
       <h2>1. Clerk</h2>
       <pre>
