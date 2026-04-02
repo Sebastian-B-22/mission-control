@@ -178,6 +178,48 @@ export const getUserById = query({
 
 // ─── Mutations ──────────────────────────────────────────────────────────────
 
+// Record daily health data with raw userId string (for syncing to users that exist but CLI can't see)
+export const recordDailyHealthRaw = mutation({
+  args: {
+    userIdStr: v.string(),
+    date: v.string(),
+    sleepHours: v.optional(v.number()),
+    steps: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { userIdStr, date, sleepHours, steps } = args;
+    const userId = userIdStr as any; // Cast to bypass validation
+    
+    const sleepScore = calculateSleepScore(sleepHours);
+    const stepsScore = calculateStepsScore(steps);
+    const healthScore = sleepScore + stepsScore;
+    const isPerfectDay = healthScore >= 66; // 2/3 metrics
+    
+    const existing = await ctx.db
+      .query("dailyHealth")
+      .filter((q) => q.and(
+        q.eq(q.field("userId"), userId),
+        q.eq(q.field("date"), date)
+      ))
+      .first();
+    
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        sleepHours, sleepScore, steps, stepsScore, healthScore, isPerfectDay,
+        manualEntry: true, updatedAt: Date.now(),
+      });
+      return existing._id;
+    } else {
+      return await ctx.db.insert("dailyHealth", {
+        userId, date, sleepHours, sleepScore, steps, stepsScore,
+        caloriesScore: 0, healthScore, isPerfectDay,
+        whoopSynced: false, manualEntry: true,
+        createdAt: Date.now(), updatedAt: Date.now(),
+      });
+    }
+  },
+});
+
 // Record daily health data (manual entry or Whoop sync)
 export const recordDailyHealth = mutation({
   args: {
