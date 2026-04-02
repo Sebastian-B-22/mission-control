@@ -1,5 +1,15 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
+
+// Delete a user by raw ID string (for cleaning up malformed records)
+export const deleteUserByRawId = mutation({
+  args: { rawId: v.string() },
+  handler: async (ctx, { rawId }) => {
+    // Use internal delete that bypasses type checking
+    await ctx.db.delete(rawId as any);
+    return { success: true, deleted: rawId };
+  },
+});
 
 // Admin function to manually initialize user data
 export const manuallyInitializeUser = mutation({
