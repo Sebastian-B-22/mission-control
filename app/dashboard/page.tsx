@@ -88,6 +88,10 @@ export default function DashboardPage() {
     api.users.getUserByClerkId,
     user?.id ? { clerkId: user.id } : "skip"
   );
+  
+  // Debug logging
+  console.log('[Dashboard] Clerk user.id:', user?.id);
+  console.log('[Dashboard] convexUser:', convexUser);
   const createUser = useMutation(api.users.createUser);
 
   // Check user setup

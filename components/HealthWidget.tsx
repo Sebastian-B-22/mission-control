@@ -143,6 +143,10 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
   const isWhoopConnected = useQuery(api.health.isWhoopConnected, { userId });
   const healthGoals = useQuery(api.health.getHealthGoals, { userId });
 
+  // Debug logging
+  console.log('[HealthWidget] userId:', userId);
+  console.log('[HealthWidget] monthStats:', monthStats);
+
   const handleSync = async () => {
     setSyncing(true);
     try {
