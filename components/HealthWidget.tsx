@@ -139,7 +139,9 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
         const health = healthByDate[date];
         const score = health?.healthScore ?? 0;
         const isToday = i === 6;
-        const dayLabel = ['T', 'F', 'S', 'S', 'M', 'T', 'W'][i];
+        // Get actual day abbreviation from the date
+        const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        const dayLabel = dayNames[new Date(date).getDay()];
         return (
           <div key={date} className="flex flex-col items-center gap-0.5">
             <span className="text-[10px] text-zinc-500">{dayLabel}</span>
