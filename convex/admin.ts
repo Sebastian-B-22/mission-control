@@ -1,6 +1,94 @@
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
 
+// Migrate sebastianTasks to new userId
+export const migrateSebastianTasks = mutation({
+  args: { 
+    oldUserId: v.string(),
+    newUserId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const tasks = await ctx.db.query("sebastianTasks").collect();
+    let updated = 0;
+    for (const task of tasks) {
+      if ((task as any).userId === args.oldUserId) {
+        await ctx.db.patch(task._id, { userId: args.newUserId as any });
+        updated++;
+      }
+    }
+    return { success: true, updated, message: `Migrated ${updated} sebastian tasks` };
+  },
+});
+
+// Dedupe books by title (keep oldest)
+export const dedupeBooks = mutation({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const books = await ctx.db.query("bookLibrary").collect();
+    const userBooks = books.filter((b: any) => b.userId === args.userId);
+    
+    // Group by title
+    const byTitle: Record<string, any[]> = {};
+    for (const book of userBooks) {
+      const title = (book as any).title;
+      if (!byTitle[title]) byTitle[title] = [];
+      byTitle[title].push(book);
+    }
+    
+    let deleted = 0;
+    for (const [title, copies] of Object.entries(byTitle)) {
+      if (copies.length > 1) {
+        // Sort by creationTime, keep oldest
+        copies.sort((a, b) => a._creationTime - b._creationTime);
+        for (let i = 1; i < copies.length; i++) {
+          await ctx.db.delete(copies[i]._id);
+          deleted++;
+        }
+      }
+    }
+    
+    return { success: true, deleted, message: `Removed ${deleted} duplicate books` };
+  },
+});
+
+// Migrate all data from old userId to new userId
+export const migrateUserData = mutation({
+  args: { 
+    oldUserId: v.string(),
+    newUserId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const oldId = args.oldUserId as any;
+    const newId = args.newUserId as any;
+    let totalUpdated = 0;
+    
+    // Tables with userId field
+    const tables = [
+      "weeklyGoals", "weeklySchedule", "calendarEvents", "healthMetrics",
+      "habits", "habitLogs", "checkins", "rpmCategories", "rpmTasks",
+      "teamMembers", "fieldTrips", "travelItems", "bookLibrary", "gameLibrary",
+      "resourceLibrary", "readAloudList", "homeschoolProjects", "rooms",
+      "rewardItems", "typingScores", "activities"
+    ];
+    
+    for (const tableName of tables) {
+      try {
+        const records = await ctx.db.query(tableName as any).collect();
+        for (const record of records) {
+          if ((record as any).userId === oldId) {
+            await ctx.db.patch(record._id, { userId: newId });
+            totalUpdated++;
+          }
+        }
+      } catch (e) {
+        // Table might not exist, skip
+      }
+    }
+    
+    return { success: true, totalUpdated, message: `Migrated ${totalUpdated} records to new user` };
+  },
+});
+
 // Delete a user by raw ID string (for cleaning up malformed records)
 export const deleteUserByRawId = mutation({
   args: { rawId: v.string() },

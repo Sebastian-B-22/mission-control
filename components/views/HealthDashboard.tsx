@@ -223,7 +223,10 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
         const health = healthByDate[date];
         const score = health?.healthScore ?? 0;
         const isToday = i === 6;
-        const dayLabel = dayNames[new Date(date).getDay()];
+        // Parse as local date to avoid timezone shift
+        const [year, month, day] = date.split('-').map(Number);
+        const localDate = new Date(year, month - 1, day);
+        const dayLabel = dayNames[localDate.getDay()];
         
         return (
           <div key={date} className="flex flex-col items-center gap-0.5">
