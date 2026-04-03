@@ -152,12 +152,18 @@ export async function POST(request: Request) {
         });
 
         // Record the health data
+        // For steps: use MAX of existing vs new (handles partial day exports)
+        // For sleep: use new value if provided (sleep is final once recorded)
+        // For calories: use MAX (same logic as steps)
+        const finalSteps = Math.max(data.steps ?? 0, existingHealth?.steps ?? 0);
+        const finalCalories = Math.max(data.activeCalories ?? 0, existingHealth?.activeCalories ?? 0);
+        
         await convex.mutation(api.health.recordDailyHealth, {
           userId: user._id,
           date,
           sleepHours: data.sleepHours ?? existingHealth?.sleepHours,
-          steps: data.steps ?? existingHealth?.steps,
-          activeCalories: data.activeCalories ?? existingHealth?.activeCalories,
+          steps: finalSteps || undefined,
+          activeCalories: finalCalories || undefined,
           weight: data.weight ?? existingHealth?.weight,
           whoopSynced: existingHealth?.whoopSynced || false,
         });
