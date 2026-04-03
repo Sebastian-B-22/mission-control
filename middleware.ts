@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   "/manifest.json",
   "/ping",
   "/api/auth/whoop(.*)",
+  "/api/health/apple(.*)",
   "/api/health/steps(.*)",
   "/api/registrations/update(.*)",
   "/api/cron/update(.*)",
