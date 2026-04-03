@@ -100,8 +100,8 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
   });
 
   // Get current month and previous month (for when week spans month boundary)
-  const currentYearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-  const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const prevYearMonth = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}`;
   
   // Check if any weekDates are from previous month
