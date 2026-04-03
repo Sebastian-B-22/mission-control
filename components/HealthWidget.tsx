@@ -90,11 +90,13 @@ function ScoreRing({ score, size = 120, showLabel = true }: { score: number; siz
 
 // Week preview rings
 function WeekPreview({ userId }: { userId: Id<"users"> }) {
-  const today = new Date();
+  // Use local date to avoid timezone issues
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  
   const weekDates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (6 - i));
-    return d.toISOString().split("T")[0];
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (6 - i));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   });
 
   // Get current month and previous month (for when week spans month boundary)
