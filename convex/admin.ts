@@ -1212,3 +1212,119 @@ export const importMovies = mutation({
     return results;
   },
 });
+
+// Copy health data from one user to another (bypasses schema validation)
+export const copyHealthData = mutation({
+  args: { 
+    fromUserIdStr: v.string(),
+    toUserIdStr: v.string()
+  },
+  handler: async (ctx, { fromUserIdStr, toUserIdStr }) => {
+    // Get all health records for the source user
+    const healthRecords = await ctx.db
+      .query("dailyHealth")
+      .filter((q) => q.eq(q.field("userId"), fromUserIdStr as any))
+      .collect();
+    
+    let copied = 0;
+    for (const record of healthRecords) {
+      // Check if record already exists for target user on this date
+      const existing = await ctx.db
+        .query("dailyHealth")
+        .filter((q) => 
+          q.and(
+            q.eq(q.field("userId"), toUserIdStr as any),
+            q.eq(q.field("date"), record.date)
+          )
+        )
+        .first();
+      
+      if (!existing) {
+        // Insert new record with target user
+        await ctx.db.insert("dailyHealth", {
+          ...record,
+          _id: undefined,
+          _creationTime: undefined,
+          userId: toUserIdStr as any,
+        } as any);
+        copied++;
+      }
+    }
+    
+    return { success: true, recordsCopied: copied, total: healthRecords.length };
+  },
+});
+
+// Update health records to new user ID
+export const migrateHealthRecords = mutation({
+  args: { 
+    oldUserId: v.string(),
+    newUserId: v.string()
+  },
+  handler: async (ctx, { oldUserId, newUserId }) => {
+    // Get all health records
+    const allRecords = await ctx.db.query("dailyHealth").collect();
+    
+    let migrated = 0;
+    for (const record of allRecords) {
+      if (String(record.userId) === oldUserId) {
+        await ctx.db.patch(record._id, { userId: newUserId as any });
+        migrated++;
+      }
+    }
+    
+    return { success: true, migrated };
+  },
+});
+
+// Debug health records
+export const debugHealthRecords = query({
+  args: {},
+  handler: async (ctx) => {
+    const records = await ctx.db.query("dailyHealth").take(5);
+    return records.map(r => ({
+      id: r._id,
+      date: r.date,
+      userId: r.userId,
+      userIdStr: String(r.userId),
+      userIdType: typeof r.userId,
+    }));
+  },
+});
+
+// Get all unique user IDs in dailyHealth
+export const getHealthUserIds = query({
+  args: {},
+  handler: async (ctx) => {
+    const records = await ctx.db.query("dailyHealth").collect();
+    const userIds = new Set<string>();
+    const dateCounts: Record<string, number> = {};
+    
+    for (const r of records) {
+      const uid = String(r.userId);
+      userIds.add(uid);
+      dateCounts[uid] = (dateCounts[uid] || 0) + 1;
+    }
+    
+    return { 
+      userIds: Array.from(userIds),
+      counts: dateCounts,
+      total: records.length
+    };
+  },
+});
+
+// Get date range of health records
+export const getHealthDateRange = query({
+  args: {},
+  handler: async (ctx) => {
+    const records = await ctx.db.query("dailyHealth").collect();
+    const dates = records.map(r => r.date).sort();
+    return { 
+      earliest: dates[0],
+      latest: dates[dates.length - 1],
+      count: dates.length,
+      recentDates: dates.slice(-7)
+    };
+  },
+});

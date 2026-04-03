@@ -97,12 +97,28 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
     return d.toISOString().split("T")[0];
   });
 
-  const yearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-  const monthHealth = useQuery(api.health.getMonthHealth, { userId, yearMonth });
+  // Get current month and previous month (for when week spans month boundary)
+  const currentYearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+  const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const prevYearMonth = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}`;
+  
+  // Check if any weekDates are from previous month
+  const needsPrevMonth = weekDates.some(d => d.startsWith(prevYearMonth.slice(0, 7)));
+  
+  const currentMonthHealth = useQuery(api.health.getMonthHealth, { userId, yearMonth: currentYearMonth });
+  const prevMonthHealth = useQuery(
+    api.health.getMonthHealth, 
+    needsPrevMonth ? { userId, yearMonth: prevYearMonth } : "skip"
+  );
 
   const healthByDate: Record<string, { healthScore: number }> = {};
-  if (monthHealth) {
-    for (const h of monthHealth) {
+  if (currentMonthHealth) {
+    for (const h of currentMonthHealth) {
+      healthByDate[h.date] = { healthScore: h.healthScore };
+    }
+  }
+  if (prevMonthHealth) {
+    for (const h of prevMonthHealth) {
       healthByDate[h.date] = { healthScore: h.healthScore };
     }
   }
