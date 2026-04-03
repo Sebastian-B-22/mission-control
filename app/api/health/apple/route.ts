@@ -79,11 +79,16 @@ export async function POST(request: Request) {
           const currentSteps = dataByDate[dateStr].steps || 0;
           dataByDate[dateStr].steps = currentSteps + (entry.qty || 0);
         } else if (metricName === "sleep_analysis" || metricName === "sleep") {
-          // Sleep data - totalSleep is in minutes
-          if (entry.totalSleep) {
-            dataByDate[dateStr].sleepHours = Math.round((entry.totalSleep / 60) * 10) / 10;
-          } else if (entry.asleep) {
-            dataByDate[dateStr].sleepHours = Math.round((entry.asleep / 60) * 10) / 10;
+          // Sleep data - check units (can be "hr" or "min")
+          const isHours = metric.units?.toLowerCase() === "hr";
+          let sleepValue = entry.totalSleep || entry.asleep || 0;
+          
+          if (isHours) {
+            // Already in hours
+            dataByDate[dateStr].sleepHours = Math.round(sleepValue * 10) / 10;
+          } else {
+            // Assume minutes, convert to hours
+            dataByDate[dateStr].sleepHours = Math.round((sleepValue / 60) * 10) / 10;
           }
         } else if (metricName === "active_energy" || metricName === "active_energy_burned") {
           const currentCals = dataByDate[dateStr].activeCalories || 0;
