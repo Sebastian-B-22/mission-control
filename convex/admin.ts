@@ -1,6 +1,80 @@
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
 
+// Delete sebastian tasks by ID
+export const deleteSebastianTask = mutation({
+  args: { taskId: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.taskId as any);
+    return { success: true, deleted: args.taskId };
+  },
+});
+
+// Update sebastian task
+export const updateSebastianTask = mutation({
+  args: { 
+    taskId: v.string(),
+    assignedTo: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const updates: any = {};
+    if (args.assignedTo) updates.assignedTo = args.assignedTo;
+    await ctx.db.patch(args.taskId as any, updates);
+    return { success: true, updated: args.taskId };
+  },
+});
+
+// Create new sebastian task
+export const createSebastianTask = mutation({
+  args: { 
+    userId: v.string(),
+    title: v.string(),
+    category: v.string(),
+    priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    status: v.union(v.literal("backlog"), v.literal("todo"), v.literal("in-progress"), v.literal("done")),
+    description: v.optional(v.string()),
+    assignedTo: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const id = await ctx.db.insert("sebastianTasks", {
+      userId: args.userId as any,
+      title: args.title,
+      category: args.category,
+      priority: args.priority,
+      status: args.status,
+      description: args.description,
+      assignedTo: args.assignedTo || "sebastian",
+      createdAt: Date.now(),
+    });
+    return { success: true, id };
+  },
+});
+
+// Clean up content pipeline - keep only N most recent items
+export const cleanupContentPipeline = mutation({
+  args: { keepCount: v.number() },
+  handler: async (ctx, args) => {
+    const items = await ctx.db.query("contentPipeline").collect();
+    
+    // Sort by createdAt descending (most recent first)
+    items.sort((a: any, b: any) => (b.createdAt || b._creationTime) - (a.createdAt || a._creationTime));
+    
+    // Keep the first N, delete the rest
+    const toDelete = items.slice(args.keepCount);
+    
+    for (const item of toDelete) {
+      await ctx.db.delete(item._id);
+    }
+    
+    return { 
+      success: true, 
+      kept: args.keepCount, 
+      deleted: toDelete.length,
+      message: `Kept ${args.keepCount} most recent items, deleted ${toDelete.length} old items`
+    };
+  },
+});
+
 // Migrate sebastianTasks to new userId
 export const migrateSebastianTasks = mutation({
   args: { 

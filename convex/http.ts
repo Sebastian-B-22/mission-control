@@ -678,16 +678,62 @@ async function verifyStripeWebhook(payload: string, sigHeader: string, secret: s
   } catch { return false; }
 }
 
-// ConvertKit tagging
+// ConvertKit tagging + automation trigger
 async function tagConvertKit(email: string, firstName: string, weekNumbers: string[]) {
   const tags = ["Summer Camp 2026", ...weekNumbers.map((n) => `Camp-Week-${n}`)];
   try {
+    // Tag subscriber
     await fetch("https://api.kit.com/v4/subscribers", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
       body: JSON.stringify({ email_address: email, first_name: firstName, tags }),
     });
-  } catch { /* non-fatal */ }
+    // Trigger confirmation email automation (ID: 1929360)
+    await fetch("https://api.kit.com/v4/automations/1929360/subscribers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
+      body: JSON.stringify({ email_address: email, first_name: firstName }),
+    });
+    console.log("[ConvertKit] Tagged and triggered automation for:", email);
+  } catch (e) {
+    console.error("[ConvertKit] Error:", e);
+  }
+}
+
+// OpenPhone SMS confirmation
+const OPENPHONE_API_KEY = "k4LxAv80VW7q5nEfzPb0aopWOzA4AbM2";
+const OPENPHONE_AGOURA_LINE = "PN2La7sbgD"; // +18052227212
+
+async function sendCampConfirmationSMS(phone: string, childNames: string[], weekNumbers: string[]) {
+  try {
+    // Normalize phone to E.164 format
+    let normalized = phone.replace(/[^0-9]/g, "");
+    if (normalized.length === 10) normalized = "1" + normalized;
+    if (!normalized.startsWith("+")) normalized = "+" + normalized;
+    
+    const names = childNames.join(" & ");
+    const weeks = weekNumbers.length === 1 
+      ? `Week ${weekNumbers[0]}` 
+      : `Weeks ${weekNumbers.join(", ")}`;
+    
+    const message = `🎉 ${names} ${childNames.length > 1 ? "are" : "is"} registered for Summer Camp ${weeks}! Check your email for all the details. Questions? Reply here! -Coach Corinne`;
+    
+    await fetch("https://api.openphone.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": OPENPHONE_API_KEY,
+      },
+      body: JSON.stringify({
+        from: OPENPHONE_AGOURA_LINE,
+        to: [normalized],
+        content: message,
+      }),
+    });
+    console.log("[OpenPhone] Sent SMS to:", normalized);
+  } catch (e) {
+    console.error("[OpenPhone] SMS Error:", e);
+  }
 }
 
 // CORS preflight for all camp routes
@@ -870,9 +916,11 @@ http.route({
       const reg = await ctx.runMutation(internal.camp.markPaid, { stripePaymentIntentId: pi.id });
 
       if (reg) {
-        // Tag in ConvertKit
+        // Collect week numbers and child names
         const weekNumbers: string[] = [];
+        const childNames: string[] = [];
         for (const child of reg.children) {
+          childNames.push(child.firstName);
           const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }>;
           for (const [wk, sess] of Object.entries(sessions)) {
             if (sess.type === "full" || (sess.selectedDays?.length ?? 0) > 0) {
@@ -880,7 +928,26 @@ http.route({
             }
           }
         }
-        await tagConvertKit(reg.parent.email, reg.parent.firstName, [...new Set(weekNumbers)]);
+        const uniqueWeeks = [...new Set(weekNumbers)];
+        
+        // 1. Tag in ConvertKit + trigger email automation
+        await tagConvertKit(reg.parent.email, reg.parent.firstName, uniqueWeeks);
+        
+        // 2. Send SMS confirmation via OpenPhone
+        await sendCampConfirmationSMS(reg.parent.phone, childNames, uniqueWeeks);
+        
+        // 3. Upsert family in CRM
+        try {
+          await ctx.runMutation(api.families.upsertFamily, {
+            parentFirstName: reg.parent.firstName,
+            parentLastName: reg.parent.lastName,
+            email: reg.parent.email,
+            phone: reg.parent.phone,
+          });
+          console.log("[CRM] Upserted family:", reg.parent.email);
+        } catch (e) {
+          console.error("[CRM] Family upsert error:", e);
+        }
       }
     }
 
