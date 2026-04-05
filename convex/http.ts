@@ -704,7 +704,18 @@ async function tagConvertKit(email: string, firstName: string, weekNumbers: stri
 const OPENPHONE_API_KEY = "k4LxAv80VW7q5nEfzPb0aopWOzA4AbM2";
 const OPENPHONE_AGOURA_LINE = "PN2La7sbgD"; // +18052227212
 
-async function sendCampConfirmationSMS(phone: string, childNames: string[], weekNumbers: string[]) {
+interface CampSession {
+  type: string;
+  selectedDays?: string[];
+}
+
+async function sendCampConfirmationSMS(
+  phone: string, 
+  childNames: string[], 
+  weekNumbers: string[],
+  pricing: { subtotal: number; discount: number; total: number },
+  childSessions: Array<{ firstName: string; sessions: Record<string, CampSession> }>
+) {
   try {
     // Normalize phone to E.164 format
     let normalized = phone.replace(/[^0-9]/g, "");
@@ -712,11 +723,46 @@ async function sendCampConfirmationSMS(phone: string, childNames: string[], week
     if (!normalized.startsWith("+")) normalized = "+" + normalized;
     
     const names = childNames.join(" & ");
-    const weeks = weekNumbers.length === 1 
-      ? `Week ${weekNumbers[0]}` 
-      : `Weeks ${weekNumbers.join(", ")}`;
     
-    const message = `🎉 ${names} ${childNames.length > 1 ? "are" : "is"} registered for Summer Camp ${weeks}! Check your email for all the details. Questions? Reply here! -Coach Corinne`;
+    // Build detailed session info per child
+    const weekDates: Record<string, string> = {
+      "1": "June 16-20",
+      "2": "June 23-27", 
+      "3": "July 14-18",
+      "4": "July 21-25",
+    };
+    
+    let sessionDetails = "";
+    for (const child of childSessions) {
+      const sessions = child.sessions || {};
+      const parts: string[] = [];
+      for (const [wk, sess] of Object.entries(sessions)) {
+        const weekNum = wk.replace("week", "");
+        const dates = weekDates[weekNum] || `Week ${weekNum}`;
+        if (sess.type === "full") {
+          parts.push(`${dates} (Full Week)`);
+        } else if (sess.selectedDays && sess.selectedDays.length > 0) {
+          const dayCount = sess.selectedDays.length;
+          parts.push(`${dates} (${dayCount} day${dayCount > 1 ? "s" : ""})`);
+        }
+      }
+      if (parts.length > 0) {
+        if (childSessions.length > 1) {
+          sessionDetails += `\n${child.firstName}: ${parts.join(", ")}`;
+        } else {
+          sessionDetails = parts.join(", ");
+        }
+      }
+    }
+    
+    // Build message
+    let message = `🎉 CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for Summer Camp!\n\n`;
+    message += `📅 ${sessionDetails}\n`;
+    message += `💰 Total: $${pricing.total}`;
+    if (pricing.discount > 0) {
+      message += ` (saved $${pricing.discount}!)`;
+    }
+    message += `\n\n📍 Brookside Elementary\n⏰ 8am-1pm daily\n\nQuestions? Reply here! -Coach Corinne`;
     
     await fetch("https://api.openphone.com/v1/messages", {
       method: "POST",
@@ -934,7 +980,17 @@ http.route({
         await tagConvertKit(reg.parent.email, reg.parent.firstName, uniqueWeeks);
         
         // 2. Send SMS confirmation via OpenPhone
-        await sendCampConfirmationSMS(reg.parent.phone, childNames, uniqueWeeks);
+        const childSessionData = reg.children.map((c: { firstName: string; sessions: Record<string, CampSession> }) => ({
+          firstName: c.firstName,
+          sessions: c.sessions,
+        }));
+        await sendCampConfirmationSMS(
+          reg.parent.phone, 
+          childNames, 
+          uniqueWeeks,
+          reg.pricing,
+          childSessionData
+        );
         
         // 3. Upsert family in CRM
         try {
