@@ -732,6 +732,13 @@ async function sendCampConfirmationSMS(
       "4": "July 21-25",
     };
     
+    // Day name mapping
+    const dayNames: Record<string, string> = {
+      "monday": "Mon", "tuesday": "Tue", "wednesday": "Wed", 
+      "thursday": "Thu", "friday": "Fri",
+      "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri"
+    };
+    
     let sessionDetails = "";
     for (const child of childSessions) {
       const sessions = child.sessions || {};
@@ -739,30 +746,32 @@ async function sendCampConfirmationSMS(
       for (const [wk, sess] of Object.entries(sessions)) {
         const weekNum = wk.replace("week", "");
         const dates = weekDates[weekNum] || `Week ${weekNum}`;
-        if (sess.type === "full") {
-          parts.push(`${dates} (Full Week)`);
-        } else if (sess.selectedDays && sess.selectedDays.length > 0) {
-          const dayCount = sess.selectedDays.length;
-          parts.push(`${dates} (${dayCount} day${dayCount > 1 ? "s" : ""})`);
+        if (sess.selectedDays && sess.selectedDays.length > 0) {
+          // Convert day names to short form
+          const days = sess.selectedDays.map(d => {
+            const lower = d.toLowerCase();
+            return dayNames[lower] || d;
+          }).join(", ");
+          parts.push(`${dates}: ${days}`);
         }
       }
       if (parts.length > 0) {
         if (childSessions.length > 1) {
-          sessionDetails += `\n${child.firstName}: ${parts.join(", ")}`;
+          sessionDetails += `\n${child.firstName}: ${parts.join("; ")}`;
         } else {
-          sessionDetails = parts.join(", ");
+          sessionDetails = parts.join("; ");
         }
       }
     }
     
-    // Build message
-    let message = `🎉 CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for Summer Camp!\n\n`;
-    message += `📅 ${sessionDetails}\n`;
-    message += `💰 Total: $${pricing.total}`;
-    if (pricing.discount > 0) {
-      message += ` (saved $${pricing.discount}!)`;
-    }
-    message += `\n\n📍 Brookside Elementary\n⏰ 8am-1pm daily\n\nQuestions? Reply here! -Coach Corinne`;
+    // Build message - no emojis
+    let message = `CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for AYSO Region 4 Summer Soccer Camp!\n\n`;
+    message += `Dates: ${sessionDetails}\n`;
+    message += `Total Paid: $${pricing.total}\n\n`;
+    message += `Location: Brookside Elementary (enter via Conifer St)\n`;
+    message += `Time: 8am-1pm daily\n\n`;
+    message += `Bring: Water, lunch, snack, sunscreen\n\n`;
+    message += `Questions? Just reply to this text!\n\n-Coach Corinne`;
     
     await fetch("https://api.openphone.com/v1/messages", {
       method: "POST",

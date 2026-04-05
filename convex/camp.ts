@@ -388,3 +388,75 @@ export const seedCampData = mutation({
     return { seeded: true };
   },
 });
+
+// ─── Admin Stats & Reports ────────────────────────────────────────────────
+
+export const getCampStats = query({  
+  args: {},
+  handler: async (ctx) => {
+    const regs = await ctx.db.query("campRegistrations")
+      .filter(q => q.eq(q.field("status"), "paid"))
+      .collect();
+
+    let totalRevenue = 0;
+    let totalKids = 0;
+    let totalAge = 0;
+    let ageCount = 0;
+    
+    const weeklyBreakdown: Record<string, Record<string, number>> = {
+      "Week 1 (Jun 16-20)": {},
+      "Week 2 (Jun 23-27)": {},
+      "Week 3 (Jul 14-18)": {},
+      "Week 4 (Jul 21-25)": {},
+    };
+
+    const weekMap: Record<string, string> = {
+      week1: "Week 1 (Jun 16-20)",
+      week2: "Week 2 (Jun 23-27)",
+      week3: "Week 3 (Jul 14-18)",
+      week4: "Week 4 (Jul 21-25)",
+    };
+
+    for (const reg of regs) {
+      totalRevenue += reg.pricing.total;
+      totalKids += reg.children.length;
+
+      for (const child of reg.children) {
+        // Calculate age
+        if (child.birthDate) {
+          const birth = new Date(child.birthDate);
+          const today = new Date();
+          let age = today.getFullYear() - birth.getFullYear();
+          const m = today.getMonth() - birth.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            age--;
+          }
+          totalAge += age;
+          ageCount++;
+        }
+
+        // Count days per week
+        const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }>;
+        for (const [wk, sess] of Object.entries(sessions || {})) {
+          const weekName = weekMap[wk];
+          if (!weekName) continue;
+          
+          if (!weeklyBreakdown[weekName]) weeklyBreakdown[weekName] = {};
+          
+          for (const day of sess.selectedDays || []) {
+            const dayLower = day.toLowerCase();
+            weeklyBreakdown[weekName][dayLower] = (weeklyBreakdown[weekName][dayLower] || 0) + 1;
+          }
+        }
+      }
+    }
+
+    return {
+      totalRegistrations: regs.length,
+      totalRevenue,
+      totalKids,
+      avgAge: ageCount > 0 ? totalAge / ageCount : 0,
+      weeklyBreakdown,
+    };
+  },
+});

@@ -74,6 +74,7 @@ import { OnboardingWizardDialog } from "@/components/OnboardingWizardDialog";
 import { CostTrackerCard } from "@/components/CostTrackerCard";
 import { CostTrackerView } from "@/components/views/CostTrackerView";
 import { MemoryPanelView } from "@/components/views/MemoryPanelView";
+import CampAdminView from "./camp-admin/page";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -638,6 +639,8 @@ export default function DashboardPage() {
         return <AspireSpringView userId={convexUser._id} />;
       case "aspire-camps":
         return <AspireCampsView userId={convexUser._id} />;
+      case "aspire-camp-admin":
+        return <CampAdminView />;
       case "aspire-pdp":
         return <AspirePDPView userId={convexUser._id} />;
       case "aspire-7v7":

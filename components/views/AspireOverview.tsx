@@ -105,6 +105,11 @@ export function AspireOverview({ userId }: AspireOverviewProps) {
         </TabsContent>
 
         <TabsContent value="camps" className="space-y-4">
+          <div className="mb-4">
+            <Button onClick={() => onNavigate('aspire-camp-admin')} variant="outline">
+              Camp Admin Dashboard
+            </Button>
+          </div>
           <div className="grid gap-6 md:grid-cols-2">
             <ProjectTaskList
               userId={userId}
