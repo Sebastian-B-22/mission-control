@@ -8,14 +8,15 @@ export const listRange = query({
     endMs: v.number(),
   },
   handler: async (ctx, args) => {
-    // Pull a little extra and filter in-memory (Convex has limited range queries)
+    // Pull this user's events and return any event that overlaps the requested range.
+    // Important: events can start before the week and still appear inside it.
     const events = await ctx.db
       .query("calendarEvents")
-      .withIndex("by_user_start", (q) => q.eq("userId", args.userId).gte("startMs", args.startMs))
+      .withIndex("by_user_start", (q) => q.eq("userId", args.userId))
       .collect();
 
     return events
-      .filter((e) => e.startMs < args.endMs)
+      .filter((e) => e.startMs < args.endMs && e.endMs > args.startMs)
       .sort((a, b) => a.startMs - b.startMs);
   },
 });
@@ -42,14 +43,14 @@ export const syncRange = mutation({
   handler: async (ctx, args) => {
     const now = Date.now();
 
-    // Delete existing events in range for this user
+    // Delete existing events that overlap this range for this user
     const existing = await ctx.db
       .query("calendarEvents")
-      .withIndex("by_user_start", (q) => q.eq("userId", args.userId).gte("startMs", args.startMs))
+      .withIndex("by_user_start", (q) => q.eq("userId", args.userId))
       .collect();
 
     for (const e of existing) {
-      if (e.startMs < args.endMs) {
+      if (e.startMs < args.endMs && e.endMs > args.startMs) {
         await ctx.db.delete(e._id);
       }
     }
