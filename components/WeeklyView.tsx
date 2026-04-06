@@ -75,35 +75,37 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
     });
   }, [monday]);
 
+  // Helper to get YYYY-MM-DD in PST timezone
+  const toPSTDateKey = (timestampMs: number): string => {
+    const pstDateStr = new Date(timestampMs).toLocaleDateString("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
+    const [m, d, y] = pstDateStr.split("/");
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  };
+
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
     
-    // Initialize map with all 7 days
+    // Initialize map with all 7 days using YYYY-MM-DD keys
     for (const day of days) {
-      map.set(day.toDateString(), []);
+      const key = toPSTDateKey(day.getTime());
+      map.set(key, []);
     }
     
     // Group events by day (PST timezone)
     for (const e of events) {
-      // Create date in PST and get its calendar day
-      const eventDate = new Date(e.startMs);
-      const pstDateStr = eventDate.toLocaleDateString("en-US", { 
-        timeZone: "America/Los_Angeles",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      });
-      
-      // Parse MM/DD/YYYY back to a Date object for the key
-      const [m, d, y] = pstDateStr.split("/");
-      const dayKey = new Date(parseInt(y), parseInt(m) - 1, parseInt(d)).toDateString();
+      const dayKey = toPSTDateKey(e.startMs);
       
       // Add to map (create array if key doesn't exist yet)
       const arr = map.get(dayKey);
       if (arr) {
         arr.push(e);
       } else {
-        console.warn("Event date not in week range:", dayKey, pstDateStr, e.title);
+        console.warn("Event date not in week range:", dayKey, e.title);
       }
     }
     
@@ -275,7 +277,8 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
       {mode === "agenda" ? (
         <div className="grid gap-4 md:grid-cols-2">
           {days.map((day, dayIndex) => {
-            const list = eventsByDay.get(day.toDateString()) || [];
+            const dayKey = toPSTDateKey(day.getTime());
+            const list = eventsByDay.get(dayKey) || [];
             const dayGoals = goals.filter(g => g.scheduledDay === dayIndex);
             const hasContent = list.length > 0 || dayGoals.length > 0;
             return (
@@ -351,7 +354,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                     <span className="text-muted-foreground"> {day.getDate()}</span>
                   </div>
                   <div className="space-y-2">
-                    {(eventsByDay.get(day.toDateString()) || []).map((e) => (
+                    {(eventsByDay.get(toPSTDateKey(day.getTime())) || []).map((e) => (
                       <div key={e._id} className="rounded border p-2 text-xs">
                         <div className="font-medium">{e.title}</div>
                         <div className="text-muted-foreground">
@@ -359,7 +362,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                         </div>
                       </div>
                     ))}
-                    {(eventsByDay.get(day.toDateString()) || []).length === 0 ? (
+                    {(eventsByDay.get(toPSTDateKey(day.getTime())) || []).length === 0 ? (
                       <div className="text-xs text-muted-foreground">No events</div>
                     ) : null}
                   </div>
