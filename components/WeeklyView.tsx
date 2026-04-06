@@ -77,23 +77,41 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
 
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
+    
+    // Initialize map with all 7 days
     for (const day of days) {
       map.set(day.toDateString(), []);
     }
+    
+    // Group events by day (PST timezone)
     for (const e of events) {
-      // Convert to local timezone for day matching
-      const localDate = new Date(e.startMs);
-      // Use toLocaleDateString to get the local day, then create a date from that
-      const [month, dayNum, year] = localDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" }).split("/");
-      const localDay = new Date(parseInt(year), parseInt(month) - 1, parseInt(dayNum));
-      const key = localDay.toDateString();
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(e);
+      // Create date in PST and get its calendar day
+      const eventDate = new Date(e.startMs);
+      const pstDateStr = eventDate.toLocaleDateString("en-US", { 
+        timeZone: "America/Los_Angeles",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      
+      // Parse MM/DD/YYYY back to a Date object for the key
+      const [m, d, y] = pstDateStr.split("/");
+      const dayKey = new Date(parseInt(y), parseInt(m) - 1, parseInt(d)).toDateString();
+      
+      // Add to map (create array if key doesn't exist yet)
+      const arr = map.get(dayKey);
+      if (arr) {
+        arr.push(e);
+      } else {
+        console.warn("Event date not in week range:", dayKey, pstDateStr, e.title);
+      }
     }
+    
+    // Sort events within each day
     for (const [k, list] of map) {
       list.sort((a, b) => a.startMs - b.startMs);
-      map.set(k, list);
     }
+    
     return map;
   }, [events, days]);
 

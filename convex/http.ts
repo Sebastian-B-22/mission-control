@@ -791,8 +791,186 @@ async function sendCampConfirmationSMS(
   }
 }
 
+// ─── Health Data Ingest (from Health Auto Export app) ─────────────────────────
+
+// CORS preflight for health endpoint
+http.route({
+  path: "/api/health/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, X-Health-Key",
+    },
+  })),
+});
+
+// POST /api/health/ingest - receive health data from Health Auto Export app
+http.route({
+  path: "/api/health/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    // Simple auth - check for health ingest key (header or URL param)
+    const url = new URL(req.url);
+    const authKey = req.headers.get("X-Health-Key") || url.searchParams.get("key");
+    const validKey = process.env.HEALTH_INGEST_KEY || "hk-corinne-health-2026";
+    
+    if (authKey !== validKey) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    
+    try {
+      const rawBody = await req.json();
+      console.log("[Health Ingest] Received payload, keys:", Object.keys(rawBody));
+      
+      // Health Auto Export format: { data: { metrics: [...] } }
+      // Each metric: { name: "step_count", units: "count", data: [{ qty: 1234, date: "..." }] }
+      let date: string;
+      let metrics: { steps?: number; activeCalories?: number; sleepHours?: number } = {};
+      
+      // Check if this is our simple format
+      if (rawBody.date && rawBody.metrics) {
+        date = rawBody.date;
+        metrics = rawBody.metrics;
+      } 
+      // Check if this is Health Auto Export format
+      else if (rawBody.data?.metrics) {
+        const metricsArray = rawBody.data.metrics;
+        console.log("[Health Ingest] Health Auto Export format, metrics count:", metricsArray?.length);
+        
+        // Use PST date
+        const now = new Date();
+        const pst = new Date(now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+        date = pst.toISOString().split("T")[0];
+        
+        if (Array.isArray(metricsArray)) {
+          for (const m of metricsArray) {
+            const metricName = m.name?.toLowerCase() || "";
+            
+            // Steps: sum all data points for the day
+            if (metricName.includes("step")) {
+              const dataPoints = m.data || [];
+              if (dataPoints.length > 0) {
+                // If summarized, use qty directly; else sum
+                const total = dataPoints.reduce((sum: number, d: { qty?: number }) => sum + (d.qty || 0), 0);
+                metrics.steps = total;
+                console.log("[Health Ingest] Steps:", total);
+              }
+            }
+            
+            // Active Energy / Calories
+            if (metricName.includes("active_energy") || metricName.includes("active energy")) {
+              const dataPoints = m.data || [];
+              if (dataPoints.length > 0) {
+                const total = dataPoints.reduce((sum: number, d: { qty?: number }) => sum + (d.qty || 0), 0);
+                metrics.activeCalories = Math.round(total);
+                console.log("[Health Ingest] Active Calories:", total);
+              }
+            }
+            
+            // Sleep Analysis
+            if (metricName.includes("sleep")) {
+              const dataPoints = m.data || [];
+              if (dataPoints.length > 0) {
+                // Sleep data might have totalSleep in minutes or asleep field
+                const lastSleep = dataPoints[dataPoints.length - 1];
+                let sleepMinutes = lastSleep.totalSleep || lastSleep.asleep || lastSleep.qty || 0;
+                // If it looks like hours already (< 24), don't convert
+                metrics.sleepHours = sleepMinutes > 24 ? sleepMinutes / 60 : sleepMinutes;
+                console.log("[Health Ingest] Sleep hours:", metrics.sleepHours);
+              }
+            }
+          }
+        }
+      } else {
+        console.log("[Health Ingest] Unknown format:", JSON.stringify(rawBody).slice(0, 200));
+        return new Response(JSON.stringify({ ok: true, note: "Unknown format, logged for debugging" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      if (!metrics.steps && !metrics.sleepHours && !metrics.activeCalories) {
+        console.log("[Health Ingest] No metrics extracted");
+        return new Response(JSON.stringify({ ok: true, note: "No relevant metrics found" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      // Calculate Don't Die score (reverse-engineered)
+      // Sleep: 7+ hours = 33 pts, scaled below
+      // Steps: 7000+ = 33 pts, scaled below  
+      // Active Calories: 300+ = 33 pts, scaled below
+      const sleepTarget = 7;
+      const stepsTarget = 7000;
+      const caloriesTarget = 300;
+      
+      const sleepScore = metrics.sleepHours 
+        ? Math.min(33, Math.round((metrics.sleepHours / sleepTarget) * 33))
+        : 0;
+      const stepsScore = metrics.steps
+        ? Math.min(33, Math.round((metrics.steps / stepsTarget) * 33))
+        : 0;
+      const caloriesScore = metrics.activeCalories
+        ? Math.min(34, Math.round((metrics.activeCalories / caloriesTarget) * 34))
+        : 0;
+      
+      const totalScore = sleepScore + stepsScore + caloriesScore;
+      
+      // Find Corinne's user by email
+      const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId: "user_39OvUeL8WpfRGbmQRP5UFiurhNe" });
+      if (!user) {
+        return new Response(JSON.stringify({ error: "User not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      const corinneUserId = user._id;
+      
+      await ctx.runMutation(api.health.upsertDailyHealth, {
+        userId: corinneUserId,
+        date,
+        steps: metrics.steps || 0,
+        sleepHours: metrics.sleepHours || 0,
+        activeCalories: metrics.activeCalories || 0,
+        sleepScore,
+        stepsScore,
+        caloriesScore,
+        healthScore: totalScore,
+        restingHeartRate: undefined,
+        hrv: undefined,
+        source: "health-auto-export",
+      });
+      
+      console.log(`[Health Ingest] Synced ${date}: score=${totalScore}, steps=${metrics.steps}, sleep=${metrics.sleepHours}h, cal=${metrics.activeCalories}`);
+      
+      return new Response(JSON.stringify({ 
+        success: true, 
+        date,
+        score: totalScore,
+        breakdown: { sleepScore, stepsScore, caloriesScore }
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (e) {
+      console.error("[Health Ingest] Error:", e);
+      return new Response(JSON.stringify({ error: "Failed to process health data", details: String(e) }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }),
+});
+
 // CORS preflight for all camp routes
-["/camp/availability", "/camp/validate-promo", "/camp/register", "/camp/stripe-webhook",
+["/camp/availability", "/camp/validate-promo", "/camp/register", "/camp/register-free", "/camp/stripe-webhook",
  "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/promo-codes",
  "/api/family/credit", "/api/family/credit/add", "/api/family/credit/apply"].forEach((path) => {
   http.route({
@@ -928,7 +1106,92 @@ http.route({
   }),
 });
 
-// POST /camp/complete-free (for $0 registrations with 100% promo)
+// POST /camp/register-free (for $0 registrations with 100% promo - no Stripe)
+http.route({
+  path: "/camp/register-free", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const body = await req.json() as {
+        season: string;
+        parent: { firstName: string; lastName: string; email: string; phone: string };
+        children: Array<{ firstName: string; lastName: string; birthDate?: string; gender?: string; allergies?: string; sessions: Record<string, unknown> }>;
+        emergencyContact: { name: string; phone: string };
+        waiverAccepted: boolean;
+        promoCode?: string;
+        pricing: { subtotal: number; discount: number; total: number };
+      };
+      
+      const { parent, children, emergencyContact, waiverAccepted, promoCode, pricing, season } = body;
+      
+      if (!parent?.email || !parent?.firstName) return campError("Missing parent info");
+      if (!children?.length) return campError("At least one child required");
+      if (!waiverAccepted) return campError("Waiver must be accepted");
+      if (pricing.total > 0) return campError("This endpoint is only for $0 registrations");
+      
+      // Create registration directly as paid (no Stripe needed)
+      const regId = await ctx.runMutation(api.camp.createRegistration, {
+        season: season || "summer-2026",
+        parent,
+        children,
+        emergencyContact,
+        waiverAccepted,
+        promoCode: promoCode || undefined,
+        pricing,
+        stripePaymentIntentId: `free_${Date.now()}`, // Fake PI ID for free registrations
+      });
+      
+      // Mark as paid immediately
+      await ctx.runMutation(api.camp.markFreeRegistration, {
+        registrationId: `free_${Date.now()}`,
+        promoCode: promoCode || undefined,
+      });
+      
+      // Get the registration to trigger confirmations
+      const reg = { parent, children, pricing };
+      
+      // Collect child names and weeks for SMS
+      const childNames: string[] = [];
+      const weekNumbers: string[] = [];
+      for (const child of children) {
+        childNames.push(child.firstName);
+        const sessions = child.sessions as Record<string, { type?: string; selectedDays?: string[] }>;
+        for (const [wk, sess] of Object.entries(sessions || {})) {
+          if (sess.selectedDays && sess.selectedDays.length > 0) {
+            weekNumbers.push(wk.replace("week", ""));
+          }
+        }
+      }
+      const uniqueWeeks = [...new Set(weekNumbers)];
+      
+      // Tag in ConvertKit + trigger email
+      await tagConvertKit(parent.email, parent.firstName, uniqueWeeks);
+      
+      // Send SMS confirmation
+      const childSessionData = children.map(c => ({ firstName: c.firstName, sessions: c.sessions as Record<string, CampSession> }));
+      await sendCampConfirmationSMS(parent.phone, childNames, uniqueWeeks, pricing, childSessionData);
+      
+      // Upsert family in CRM
+      try {
+        await ctx.runMutation(api.families.upsertFamily, {
+          parentFirstName: parent.firstName,
+          parentLastName: parent.lastName,
+          email: parent.email,
+          phone: parent.phone,
+        });
+      } catch (e) {
+        console.error("[CRM] Family upsert error:", e);
+      }
+      
+      console.log("[register-free] Completed free registration for:", parent.email);
+      return campJson({ success: true, registrationId: regId });
+    } catch (error) {
+      console.error("[register-free] Error:", error);
+      return campError("Registration failed: " + (error as Error).message);
+    }
+  }),
+});
+
+// POST /camp/complete-free (legacy - for $0 registrations with 100% promo)
 http.route({
   path: "/camp/complete-free", method: "POST",
   handler: httpAction(async (ctx, req) => {

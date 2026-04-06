@@ -430,3 +430,67 @@ export const disconnectWhoop = mutation({
     return { success: true };
   },
 });
+
+// Upsert daily health from Health Auto Export API
+export const upsertDailyHealth = mutation({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+    steps: v.number(),
+    sleepHours: v.number(),
+    activeCalories: v.number(),
+    sleepScore: v.number(),
+    stepsScore: v.number(),
+    caloriesScore: v.number(),
+    healthScore: v.number(),
+    restingHeartRate: v.optional(v.number()), // Not stored yet, for future
+    hrv: v.optional(v.number()), // Not stored yet, for future
+    source: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId, date, steps, sleepHours, activeCalories, sleepScore, stepsScore, caloriesScore, healthScore } = args;
+    
+    const isPerfectDay = healthScore >= 100;
+    const now = Date.now();
+    
+    // Check if record exists
+    const existing = await ctx.db
+      .query("dailyHealth")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", userId).eq("date", date))
+      .first();
+    
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        steps,
+        sleepHours,
+        activeCalories,
+        sleepScore,
+        stepsScore,
+        caloriesScore,
+        healthScore,
+        isPerfectDay,
+        manualEntry: false,
+        whoopSynced: false,
+        updatedAt: now,
+      });
+      return existing._id;
+    } else {
+      return await ctx.db.insert("dailyHealth", {
+        userId,
+        date,
+        steps,
+        sleepHours,
+        activeCalories,
+        sleepScore,
+        stepsScore,
+        caloriesScore,
+        healthScore,
+        isPerfectDay,
+        manualEntry: false,
+        whoopSynced: false,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+  },
+});
