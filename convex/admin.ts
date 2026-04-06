@@ -1490,3 +1490,56 @@ export const getHealthDateRange = query({
     };
   },
 });
+
+// Remove duplicate homeschool schedule blocks
+export const removeDuplicateScheduleBlocks = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Find first user
+    const allUsers = await ctx.db.query("users").collect();
+    const user = allUsers[0];
+    if (!user) throw new Error("No users found");
+
+    // Get all schedule blocks for this user
+    const allBlocks = await ctx.db
+      .query("weeklySchedule")
+      .withIndex("by_user_and_day", (q) => q.eq("userId", user._id))
+      .collect();
+
+    // Group by dayOfWeek + startTime + endTime + activity
+    type Block = typeof allBlocks[number];
+    const groups = new Map<string, Block[]>();
+    
+    for (const block of allBlocks) {
+      const key = `${block.dayOfWeek}|${block.startTime}|${block.endTime}|${block.activity}`;
+      if (!groups.has(key)) {
+        groups.set(key, []);
+      }
+      groups.get(key)!.push(block);
+    }
+
+    // Find and remove duplicates (keep newest)
+    let deletedCount = 0;
+    
+    for (const [key, blocks] of Array.from(groups.entries())) {
+      if (blocks.length > 1) {
+        // Sort by creation time (newest first)
+        const sorted = blocks.sort((a, b) => b.createdAt - a.createdAt);
+        const toDelete = sorted.slice(1);
+        
+        for (const dupe of toDelete) {
+          await ctx.db.delete(dupe._id);
+          deletedCount++;
+        }
+      }
+    }
+
+    return {
+      success: true,
+      totalBlocks: allBlocks.length,
+      uniqueActivities: groups.size,
+      duplicatesRemoved: deletedCount,
+      remainingBlocks: allBlocks.length - deletedCount
+    };
+  },
+});
