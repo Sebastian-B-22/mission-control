@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRightLeft, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getCategoryColor } from "@/lib/categoryColors";
+import { groupByCategory } from "@/lib/groupByCategory";
 
 interface QuickWinsCardProps {
   userId: Id<"users">;
@@ -39,6 +40,12 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
   const categoryNameById = useMemo(
     () => new Map(rpmCategories.map((category: any) => [category._id, category.name])),
     [rpmCategories]
+  );
+
+  // Group quick wins by category for display
+  const groupedQuickWins = useMemo(
+    () => groupByCategory(quickWins, rpmCategories),
+    [quickWins, rpmCategories]
   );
 
   const handleAdd = async () => {
@@ -87,31 +94,46 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
           </Select>
         </div>
 
-        <div className="space-y-2">
+        {/* Quick Wins - Grouped by Category */}
+        <div className="space-y-4">
           {quickWins.length === 0 ? (
             <p className="text-sm text-muted-foreground">No quick wins yet.</p>
           ) : (
-            quickWins.map((item: any) => (
-              <div key={item._id} className="flex items-center gap-2 p-2 border rounded-lg">
-                <Checkbox
-                  checked={item.completed}
-                  onCheckedChange={() => toggleQuickWin({ id: item._id, completed: !item.completed })}
-                />
-                <div className="flex-1 flex flex-col gap-1">
-                  <span className={`text-sm ${item.completed ? "line-through text-muted-foreground" : ""}`}>
-                    {item.task}
-                  </span>
-                  {item.categoryId && categoryNameById.get(item.categoryId) && (
+            groupedQuickWins.map((group) => (
+              <div key={group.categoryId ?? "uncategorized"} className="space-y-2">
+                {/* Category header - only show if there's a category */}
+                {group.categoryName && (
+                  <div className="flex items-center gap-2 pt-1">
                     <span
-                      className={`self-start px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(item.categoryId)).badge}`}
+                      className={`px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(group.categoryName).badge}`}
                     >
-                      {String(categoryNameById.get(item.categoryId) ?? "")}
+                      {group.categoryName}
                     </span>
-                  )}
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => deleteQuickWin({ id: item._id })}>
-                  ✕
-                </Button>
+                  </div>
+                )}
+                {!group.categoryName && groupedQuickWins.length > 1 && (
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="text-xs text-muted-foreground font-medium">Uncategorized</span>
+                  </div>
+                )}
+                {/* Items in this category */}
+                {group.items.map((item: any) => (
+                  <div
+                    key={item._id}
+                    className={`flex items-center gap-2 p-2 border rounded-lg ${group.categoryName ? getCategoryColor(group.categoryName).border : ""}`}
+                  >
+                    <Checkbox
+                      checked={item.completed}
+                      onCheckedChange={() => toggleQuickWin({ id: item._id, completed: !item.completed })}
+                    />
+                    <span className={`flex-1 text-sm ${item.completed ? "line-through text-muted-foreground" : ""}`}>
+                      {item.task}
+                    </span>
+                    <Button variant="ghost" size="sm" onClick={() => deleteQuickWin({ id: item._id })}>
+                      ✕
+                    </Button>
+                  </div>
+                ))}
               </div>
             ))
           )}

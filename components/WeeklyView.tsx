@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { CalendarDays, List, LayoutGrid, Plus, Trash2 } from "lucide-react";
 import { getCategoryColor } from "@/lib/categoryColors";
+import { groupByCategory } from "@/lib/groupByCategory";
 
 function startOfWeekMonday(date: Date): Date {
   const d = new Date(date);
@@ -120,6 +121,12 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
   const formatTime = (ms: number) =>
     new Date(ms).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 
+  // Group goals by category for display
+  const groupedGoals = useMemo(
+    () => groupByCategory(goals, rpmCategories),
+    [goals, rpmCategories]
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
@@ -208,64 +215,78 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
             </div>
           </div>
 
-          <div className="space-y-2">
+          {/* Goals - Grouped by Category */}
+          <div className="space-y-4">
             {goals.length === 0 ? (
               <p className="text-sm text-muted-foreground">No goals yet.</p>
             ) : (
-              goals.map((g) => (
-                <div
-                  key={g._id}
-                  className="flex items-center justify-between gap-3 rounded border p-2"
-                >
-                  <label className="flex items-center gap-3 text-sm flex-1 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={g.done}
-                      onChange={async (e) => {
-                        await toggleDone({ goalId: g._id, done: e.target.checked });
-                      }}
-                    />
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={g.done ? "line-through text-muted-foreground" : ""}>
-                        {g.text}
+              groupedGoals.map((group) => (
+                <div key={group.categoryId ?? "uncategorized"} className="space-y-2">
+                  {/* Category header - only show if there's a category */}
+                  {group.categoryName && (
+                    <div className="flex items-center gap-2 pt-1">
+                      <span
+                        className={`px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(group.categoryName).badge}`}
+                      >
+                        {group.categoryName}
                       </span>
-                      {g.categoryId ? (
-                        <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full border ${getCategoryColor(rpmCategories.find((c) => c._id === g.categoryId)?.name).badge}`}>
-                          {rpmCategories.find((c) => c._id === g.categoryId)?.name || "RPM"}
-                        </span>
-                      ) : null}
                     </div>
-                  </label>
-                  <div className="flex items-center gap-1">
-                    <Select 
-                      value={g.scheduledDay !== undefined ? String(g.scheduledDay) : "none"}
-                      onValueChange={async (v) => {
-                        await setScheduledDay({ 
-                          goalId: g._id, 
-                          scheduledDay: v === "none" ? null : parseInt(v) 
-                        });
-                      }}
+                  )}
+                  {!group.categoryName && groupedGoals.length > 1 && (
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-xs text-muted-foreground font-medium">Uncategorized</span>
+                    </div>
+                  )}
+                  {/* Goals in this category */}
+                  {group.items.map((g) => (
+                    <div
+                      key={g._id}
+                      className={`flex items-center justify-between gap-3 rounded border p-2 ${group.categoryName ? getCategoryColor(group.categoryName).border : ""}`}
                     >
-                      <SelectTrigger className="w-[80px] h-7 text-xs">
-                        <SelectValue placeholder="Day" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Any</SelectItem>
-                        {DAY_NAMES.map((d, i) => (
-                          <SelectItem key={i} value={String(i)}>{d}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={async () => removeGoal({ goalId: g._id })}
-                      title="Delete"
-                      className="h-7 w-7"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <label className="flex items-center gap-3 text-sm flex-1 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={g.done}
+                          onChange={async (e) => {
+                            await toggleDone({ goalId: g._id, done: e.target.checked });
+                          }}
+                        />
+                        <span className={g.done ? "line-through text-muted-foreground" : ""}>
+                          {g.text}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <Select 
+                          value={g.scheduledDay !== undefined ? String(g.scheduledDay) : "none"}
+                          onValueChange={async (v) => {
+                            await setScheduledDay({ 
+                              goalId: g._id, 
+                              scheduledDay: v === "none" ? null : parseInt(v) 
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="w-[80px] h-7 text-xs">
+                            <SelectValue placeholder="Day" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Any</SelectItem>
+                            {DAY_NAMES.map((d, i) => (
+                              <SelectItem key={i} value={String(i)}>{d}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={async () => removeGoal({ goalId: g._id })}
+                          title="Delete"
+                          className="h-7 w-7"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))
             )}

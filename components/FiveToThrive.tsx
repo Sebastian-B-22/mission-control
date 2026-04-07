@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getCategoryColor } from "@/lib/categoryColors";
+import { groupByCategory } from "@/lib/groupByCategory";
 
 interface FiveToThriveProps {
   userId: Id<"users">;
@@ -37,6 +38,16 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   const categoryNameById = useMemo(
     () => new Map(rpmCategories.map((category: any) => [category._id, category.name])),
     [rpmCategories]
+  );
+
+  // Group tasks by category for display
+  const tasksWithIndex = useMemo(
+    () => tasks.map((task: any, index: number) => ({ ...task, originalIndex: index })),
+    [tasks]
+  );
+  const groupedTasks = useMemo(
+    () => groupByCategory(tasksWithIndex, rpmCategories),
+    [tasksWithIndex, rpmCategories]
   );
 
   const handleAddTask = async () => {
@@ -159,47 +170,58 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
           </div>
         )}
 
-        {/* Task List */}
-        <div className="space-y-2">
+        {/* Task List - Grouped by Category */}
+        <div className="space-y-4">
           {tasks.length === 0 ? (
             <p className="text-sm text-muted-foreground italic text-center py-4">
               No tasks yet. Add your top 5 priorities for today!
             </p>
           ) : (
-            tasks.map((task: any, index: any) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
-              >
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-semibold">
-                  {index + 1}
-                </div>
-                <Checkbox
-                  checked={task.completed}
-                  onCheckedChange={() => handleToggleTask(index)}
-                />
-                <div className="flex-1 flex flex-col gap-1">
-                  <span
-                    className={task.completed ? "line-through text-muted-foreground" : ""}
-                  >
-                    {task.text}
-                  </span>
-                  {task.categoryId && categoryNameById.get(task.categoryId) && (
+            groupedTasks.map((group) => (
+              <div key={group.categoryId ?? "uncategorized"} className="space-y-2">
+                {/* Category header - only show if there's a category */}
+                {group.categoryName && (
+                  <div className="flex items-center gap-2 pt-2">
                     <span
-                      className={`self-start px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(categoryNameById.get(task.categoryId)).badge}`}
+                      className={`px-2 py-0.5 text-xs font-medium rounded-full border ${getCategoryColor(group.categoryName).badge}`}
                     >
-                      {String(categoryNameById.get(task.categoryId) ?? "")}
+                      {group.categoryName}
                     </span>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteTask(index)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                  </div>
+                )}
+                {!group.categoryName && groupedTasks.length > 1 && (
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-xs text-muted-foreground font-medium">Uncategorized</span>
+                  </div>
+                )}
+                {/* Tasks in this category */}
+                {group.items.map((task: any) => (
+                  <div
+                    key={task.originalIndex}
+                    className={`flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group ${group.categoryName ? getCategoryColor(group.categoryName).border : ""}`}
+                  >
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-semibold">
+                      {task.originalIndex + 1}
+                    </div>
+                    <Checkbox
+                      checked={task.completed}
+                      onCheckedChange={() => handleToggleTask(task.originalIndex)}
+                    />
+                    <span
+                      className={`flex-1 ${task.completed ? "line-through text-muted-foreground" : ""}`}
+                    >
+                      {task.text}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteTask(task.originalIndex)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             ))
           )}
