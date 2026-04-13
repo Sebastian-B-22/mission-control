@@ -27,7 +27,6 @@ import { HealthDashboard } from "@/components/views/HealthDashboard";
 import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import AgentHuddle from "@/components/AgentHuddle";
 import { ContentPipeline } from "@/components/ContentPipeline";
-import { MavenVerificationDashboard } from "@/components/MavenVerificationDashboard";
 import { EmailDraftsView } from "@/components/EmailDraftsView";
 import { MemoryView } from "@/components/MemoryView";
 import { EngagementHabits } from "@/components/EngagementHabits";
@@ -558,8 +557,30 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-            <MavenVerificationDashboard />
             <ContentPipeline />
+          </div>
+        );
+
+      case "agent-learnings":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <span>🧠</span> Training
+              </h2>
+              <p className="text-muted-foreground text-sm mt-1">
+                Review and lock in useful agent learnings without turning this into a junk drawer.
+              </p>
+            </div>
+            <Card className="bg-zinc-950 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-sm">Training queue</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-zinc-400">
+                <p>The full training review surface is not wired back in yet.</p>
+                <p>I restored this page so it is no longer a dead end, and I can build the actual review queue next if you want.</p>
+              </CardContent>
+            </Card>
           </div>
         );
 
