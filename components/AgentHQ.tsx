@@ -283,9 +283,9 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Agent HQ</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Quick broadcast + huddle pulse + pings for Corinne
+          <h1 className="text-2xl font-bold">Telegram Bridge</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Quick send, overnight triage, pending follow-up, and huddle pulse in one place.
           </p>
         </div>
         <a
@@ -299,16 +299,16 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
       </div>
 
       {/* Health (Gateway) */}
-      <Card>
+      <Card className="border-cyan-500/20 bg-cyan-500/[0.05] shadow-none">
         <CardHeader>
-          <CardTitle className="text-base">Health</CardTitle>
+          <CardTitle className="text-base text-white">Health</CardTitle>
           <p className="text-xs text-muted-foreground">
             Run host checks via the OpenClaw gateway. (No autofix yet.)
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
           {/* Latest pushed results (works even if gateway is disconnected) */}
-          <div className="border border-zinc-800 rounded-lg p-3">
+          <div className="rounded-lg border border-cyan-500/20 bg-black/20 p-3">
             <div className="flex items-center justify-between gap-2">
               <div className="text-xs font-medium text-zinc-200">Latest pushed checks</div>
               <div className="text-[11px] text-muted-foreground">Persisted in Convex</div>
@@ -360,7 +360,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
           </div>
 
           {!gw.connected ? (
-            <div className="border border-zinc-800 rounded-lg p-3 text-xs text-zinc-300">
+            <div className="rounded-lg border border-rose-500/20 bg-rose-500/[0.05] p-3 text-xs text-zinc-300">
               <div className="font-medium text-zinc-200">Gateway disconnected</div>
               <div className="mt-1 text-muted-foreground">
                 Panels that require the operator host are disabled. Set <code className="text-zinc-200">OPENCLAW_GATEWAY_URL</code> and ensure the gateway is reachable.
@@ -413,11 +413,11 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Overnight Inbox */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 border-blue-500/20 bg-blue-500/[0.05] shadow-none">
           <CardHeader>
-            <CardTitle className="text-base">Overnight Inbox (since 7am)</CardTitle>
+            <CardTitle className="text-base text-white">Overnight Inbox (since 7am)</CardTitle>
             <p className="text-xs text-muted-foreground">
               New items pushed in by the Mac mini poller for quick morning triage.
             </p>
@@ -430,7 +430,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
             ) : (
               <div className="space-y-2 max-h-[360px] overflow-auto pr-2">
                 {overnightItems.map((it) => (
-                  <div key={it._id} className="border border-zinc-800 rounded-lg p-3">
+                  <div key={it._id} className="rounded-lg border border-blue-500/15 bg-black/20 p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -500,9 +500,9 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
         </Card>
 
         {/* Pending / Next Up */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 border-amber-500/20 bg-amber-500/[0.05] shadow-none">
           <CardHeader>
-            <CardTitle className="text-base">Pending / Next Up</CardTitle>
+            <CardTitle className="text-base text-white">Pending / Next Up</CardTitle>
             <p className="text-xs text-muted-foreground">
               A lightweight list of open items to track what needs doing next.
             </p>
@@ -595,7 +595,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
                 <p className="text-xs text-muted-foreground">No pending items.</p>
               ) : (
                 pendingItems.map((item) => (
-                  <div key={item._id} className="border border-zinc-800 rounded-lg p-3">
+                  <div key={item._id} className="rounded-lg border border-amber-500/15 bg-black/20 p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -662,15 +662,16 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
         </Card>
 
         {/* Quick Send */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 border-violet-500/20 bg-violet-500/[0.05] shadow-none">
           <CardHeader>
-            <CardTitle className="text-base">Quick Send</CardTitle>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <CardTitle className="text-base text-white">Quick Send</CardTitle>
+            <div className="mt-2 flex flex-wrap gap-2">
               {TOPICS.map((t) => (
                 <Button
                   key={t.key}
-                  variant={topic === t.key ? "default" : "secondary"}
+                  variant="outline"
                   size="sm"
+                  className={topic === t.key ? "border-amber-500/30 bg-amber-500/15 text-amber-200" : "border-zinc-700 bg-zinc-900/80 text-zinc-300"}
                   onClick={() => setTopic(t.key)}
                 >
                   {t.label}
@@ -700,15 +701,15 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
         </Card>
 
         {/* What's happening */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 border-fuchsia-500/20 bg-fuchsia-500/[0.05] shadow-none">
           <CardHeader>
-            <CardTitle className="text-base">Whats happening</CardTitle>
+            <CardTitle className="text-base text-white">What&apos;s happening</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Tabs value={feedChannel} onValueChange={(v) => setFeedChannel(v as ChannelKey)}>
-              <TabsList className="flex flex-wrap h-auto">
+              <TabsList className="flex h-auto flex-wrap border border-zinc-800 bg-zinc-950/80 p-1">
                 {CHANNELS.map((c) => (
-                  <TabsTrigger key={c.key} value={c.key} className="text-xs">
+                  <TabsTrigger key={c.key} value={c.key} className="text-xs data-[state=active]:bg-fuchsia-500/15 data-[state=active]:text-fuchsia-200">
                     {c.label}
                   </TabsTrigger>
                 ))}
@@ -720,7 +721,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
                       <p className="text-xs text-muted-foreground">No recent messages.</p>
                     ) : (
                       feedItems.map((m) => (
-                        <div key={m._id} className="border border-zinc-800 rounded-lg p-3">
+                        <div key={m._id} className="rounded-lg border border-fuchsia-500/15 bg-black/20 p-3">
                           <div className="flex items-center justify-between gap-2">
                             <div className="text-xs text-zinc-300">
                               <span className="font-medium">{m.agent}</span>
@@ -743,9 +744,9 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
         </Card>
 
         {/* Pings */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 border-emerald-500/20 bg-emerald-500/[0.05] shadow-none">
           <CardHeader>
-            <CardTitle className="text-base">Pings for you</CardTitle>
+            <CardTitle className="text-base text-white">Pings for you</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-[560px] overflow-auto pr-2">
@@ -753,7 +754,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
                 <p className="text-xs text-muted-foreground">No @corinne mentions in recent huddle.</p>
               ) : (
                 pings.map((m) => (
-                  <div key={m._id} className="border border-zinc-800 rounded-lg p-3">
+                  <div key={m._id} className="rounded-lg border border-emerald-500/15 bg-black/20 p-3">
                     <div className="flex items-center justify-between gap-2">
                       <div className="text-xs text-zinc-300">
                         <span className="font-medium">{m.agent}</span>
