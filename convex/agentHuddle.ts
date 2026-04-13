@@ -136,6 +136,16 @@ function buildRoundPrompt(mission: MissionDoc, phase: MissionPhase) {
     ].join(" ");
   }
 
+  if (isOvernight) {
+    return [
+      `Sebastian synthesis needed for the ${channel.name} mission.`,
+      `Original brief: ${mission.brief}`,
+      "Review the brief plus the agent discussion and post the final synthesis in the huddle.",
+      "Format it with exact section labels: Workflow:, Revenue:, Retention:, Tomorrow:, and X Post: when relevant.",
+      "Keep each section concrete and actionable.",
+    ].join(" ");
+  }
+
   return [
     `Sebastian synthesis needed for the ${channel.name} mission.`,
     `Original brief: ${mission.brief}`,
