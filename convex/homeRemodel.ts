@@ -376,14 +376,15 @@ export const seedRooms = mutation({
       });
     }
     
-    // Add default milestones
+    // Add default milestones for the actual remodel sequence
     const milestones = [
-      { title: "Initial walkthrough & assessment", targetDate: "2026-04-15" },
-      { title: "Finalize room plans", targetDate: "2026-06-01" },
-      { title: "Contractor quotes received", targetDate: "2026-07-01" },
-      { title: "Major work begins", targetDate: "2026-09-01" },
-      { title: "Final walkthrough before move", targetDate: "2026-12-15" },
-      { title: "Move-in day!", targetDate: "2027-01-15" },
+      { title: "Walk house + confirm blank-canvas priorities", targetDate: "2026-04-15" },
+      { title: "Set furniture deadlines + clear-out plan", targetDate: "2026-04-25" },
+      { title: "Choose bathroom order + room priorities", targetDate: "2026-05-05" },
+      { title: "Measure bathrooms + choose kitchen refresh approach", targetDate: "2026-05-20" },
+      { title: "Get roof, window, and bathroom quotes", targetDate: "2026-06-15" },
+      { title: "Decide funding plan + book must-do work", targetDate: "2026-07-01" },
+      { title: "Final walkthrough + move into house", targetDate: "2027-01-15" },
     ];
     
     for (let i = 0; i < milestones.length; i++) {
