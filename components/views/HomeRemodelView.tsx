@@ -187,10 +187,57 @@ const SOURCING_STARTERS: StarterTask[] = [
   { title: "Save kitchen inspiration links and paint options", roomHint: "Kitchen" },
 ];
 
+const MOVE_IN_OBJECTIVE_BLUEPRINT = [
+  {
+    title: "Clear the blank canvas",
+    description: "Walk the house, set furniture deadlines, and clear what blocks decisions.",
+    milestoneStart: 0,
+    milestoneEnd: 1,
+    cardClass: "border-sky-500/25 bg-sky-500/[0.05]",
+    titleClass: "text-sky-100",
+    textClass: "text-sky-200/80",
+    buttonClass: "border-sky-500/15 hover:bg-sky-500/10",
+  },
+  {
+    title: "Lock the plan",
+    description: "Finalize room priorities, measurements, and which upgrades happen first.",
+    milestoneStart: 1,
+    milestoneEnd: 2,
+    cardClass: "border-amber-500/25 bg-amber-500/[0.05]",
+    titleClass: "text-amber-100",
+    textClass: "text-amber-200/80",
+    buttonClass: "border-amber-500/15 hover:bg-amber-500/10",
+  },
+  {
+    title: "Price and execute",
+    description: "Get quotes, choose vendors, and start the biggest work with confidence.",
+    milestoneStart: 2,
+    milestoneEnd: 4,
+    cardClass: "border-emerald-500/25 bg-emerald-500/[0.05]",
+    titleClass: "text-emerald-100",
+    textClass: "text-emerald-200/80",
+    buttonClass: "border-emerald-500/15 hover:bg-emerald-500/10",
+  },
+  {
+    title: "Final prep + move",
+    description: "Wrap punch-list items, do the final walkthrough, and land the move cleanly.",
+    milestoneStart: 4,
+    milestoneEnd: 6,
+    cardClass: "border-violet-500/25 bg-violet-500/[0.05]",
+    titleClass: "text-violet-100",
+    textClass: "text-violet-200/80",
+    buttonClass: "border-violet-500/15 hover:bg-violet-500/10",
+  },
+] as const;
+
 function includesAnyKeyword(value: string | undefined, keywords: string[]) {
   if (!value) return false;
   const normalized = value.toLowerCase();
   return keywords.some((keyword) => normalized.includes(keyword));
+}
+
+function formatShortDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 // Budget Breakdown Component
@@ -463,6 +510,20 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
     ? Math.ceil((new Date(nextMilestone.targetDate).getTime() - today.getTime()) / 86400000)
     : null;
 
+  const moveInObjectives = MOVE_IN_OBJECTIVE_BLUEPRINT.map((stage) => {
+    const objectiveMilestones = milestones.slice(stage.milestoneStart, stage.milestoneEnd);
+    const completedCount = objectiveMilestones.filter((milestone) => milestone.completed).length;
+    const targetDate = objectiveMilestones[objectiveMilestones.length - 1]?.targetDate;
+    return {
+      ...stage,
+      milestones: objectiveMilestones,
+      completedCount,
+      totalCount: objectiveMilestones.length,
+      targetDate,
+      isComplete: objectiveMilestones.length > 0 && completedCount === objectiveMilestones.length,
+    };
+  }).filter((stage) => stage.milestones.length > 0);
+
   // Filter tasks
   const filteredTasks = allTasks.filter(t => {
     if (assigneeFilter !== "all" && t.assignee !== assigneeFilter) return false;
@@ -544,157 +605,144 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <Hammer className="h-7 w-7 text-orange-500" />
+          <Hammer className="h-6 w-6 text-orange-500" />
           <div>
-            <h1 className="text-2xl font-bold">Home Remodel</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-xl font-bold">Home Remodel</h1>
+            <p className="text-xs text-muted-foreground">
               Joey's childhood home - January 2027 move
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {/* Quick Add Button */}
-          <Button variant="outline" onClick={() => setShowQuickAdd(true)}>
+          <Button variant="outline" size="sm" onClick={() => setShowQuickAdd(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Quick Add Task
           </Button>
           {/* Countdown */}
-          <Badge className="text-lg px-4 py-2 bg-red-500 text-white border-red-600">
-            <Calendar className="h-4 w-4 mr-2" />
+          <Badge className="px-3 py-1.5 bg-red-500 text-sm text-white border-red-600">
+            <Calendar className="h-3.5 w-3.5 mr-2" />
             {daysUntilMove} days until move
           </Badge>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-6">
-        <Card className="border-blue-500/25 bg-blue-500/[0.06] shadow-none">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-blue-100">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
-            <p className="text-xs text-blue-300">Rooms Done</p>
-          </CardContent>
-        </Card>
-        <Card className="border-green-500/25 bg-green-500/[0.06] shadow-none">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-green-100">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
-            <p className="text-xs text-green-300">Tasks Done</p>
-          </CardContent>
-        </Card>
-        <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-amber-100">{stats?.tasksByStatus.inProgress || 0}</div>
-            <p className="text-xs text-amber-300">In Progress</p>
-          </CardContent>
-        </Card>
-        <Card className="border-purple-500/25 bg-purple-500/[0.06] shadow-none">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-purple-100">{stats?.ideasTotal || 0}</div>
-            <p className="text-xs text-purple-300">Ideas</p>
-          </CardContent>
-        </Card>
-        <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-emerald-100">
-              ${totalEstimated.toLocaleString()}
+      {/* Compact Overview */}
+      <div className="grid gap-3 xl:grid-cols-3">
+        <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
+          <CardContent className="grid grid-cols-3 gap-3 px-4 py-3">
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Rooms</div>
+              <div className="mt-1 text-lg font-semibold text-white">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
+              <div className="text-xs text-zinc-400">completed</div>
             </div>
-            <p className="text-xs text-emerald-300">Est. Budget</p>
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Tasks</div>
+              <div className="mt-1 text-lg font-semibold text-white">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
+              <div className="text-xs text-zinc-400">done</div>
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Active</div>
+              <div className="mt-1 text-lg font-semibold text-white">{stats?.tasksByStatus.inProgress || 0}</div>
+              <div className="text-xs text-zinc-400">in progress</div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="border-rose-500/25 bg-rose-500/[0.06] shadow-none">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-rose-100">
-              ${totalSpent.toLocaleString()}
+
+        <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
+          <CardContent className="grid grid-cols-3 gap-3 px-4 py-3">
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Ideas</div>
+              <div className="mt-1 text-lg font-semibold text-white">{stats?.ideasTotal || 0}</div>
+              <div className="text-xs text-zinc-400">saved</div>
             </div>
-            <p className="text-xs text-rose-300">Spent</p>
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Budget</div>
+              <div className="mt-1 text-lg font-semibold text-emerald-200">${totalEstimated.toLocaleString()}</div>
+              <div className="text-xs text-zinc-400">estimated</div>
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Spent</div>
+              <div className="mt-1 text-lg font-semibold text-rose-200">${totalSpent.toLocaleString()}</div>
+              <div className="text-xs text-zinc-400">actual</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-orange-500/20 bg-orange-500/[0.05] shadow-none">
+          <CardContent className="px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[11px] uppercase tracking-wide text-orange-300/80">Next objective</div>
+                <div className="mt-1 text-sm font-semibold text-orange-100">
+                  {nextMilestone ? nextMilestone.title : "Move-in day"}
+                </div>
+                <div className="text-xs text-orange-200/70">
+                  {nextMilestone ? `${formatShortDate(nextMilestone.targetDate)}${daysToNextMilestone !== null ? ` • ${daysToNextMilestone} days` : ""}` : `Target ${formatShortDate("2027-01-15")}`}
+                </div>
+              </div>
+              <Badge className="border-orange-500/30 bg-black/30 px-3 py-1 text-orange-100">
+                {daysUntilMove} days left
+              </Badge>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Next Milestone Alert */}
-      {nextMilestone && daysToNextMilestone !== null && daysToNextMilestone <= 30 && (
-        <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
-          <CardContent className="flex items-center gap-3 py-3">
-            <AlertCircle className="h-5 w-5 text-amber-400" />
-            <span className="font-medium text-amber-100">
-              Next milestone in {daysToNextMilestone} days: {nextMilestone.title}
-            </span>
-            <span className="ml-auto text-sm text-amber-300">
-              {new Date(nextMilestone.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-            </span>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* This Week */}
-      {thisWeekTasks.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-500" />
-              This Week ({thisWeekTasks.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {thisWeekTasks.slice(0, 8).map((t) => {
-                const room = rooms.find(r => r._id === t.roomId);
-                return (
-                  <Badge 
-                    key={t._id} 
-                    variant="outline" 
-                    className={TASK_STATUS_COLORS[t.status]}
-                  >
-                    {room?.name}: {t.title}
-                  </Badge>
-                );
-              })}
-              {thisWeekTasks.length > 8 && (
-                <Badge variant="outline">+{thisWeekTasks.length - 8} more</Badge>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Milestones Timeline */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Timeline to Move-In
+      {/* Move-In Objectives */}
+      <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2 text-zinc-100">
+            <Target className="h-4 w-4 text-orange-400" />
+            Move-In Objectives
           </CardTitle>
+          <p className="text-sm text-zinc-400">
+            Think in phases, not just dates. Tap milestones as each objective gets locked in.
+          </p>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {milestones.map((m) => {
-              const isPast = new Date(m.targetDate) < today && !m.completed;
-              return (
-                <button
-                  key={m._id}
-                  onClick={() => toggleMilestone({ milestoneId: m._id, completed: !m.completed })}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
-                    m.completed
-                      ? "bg-green-950/40 border-green-700/40 text-green-100"
-                      : isPast
-                      ? "bg-red-950/40 border-red-700/40 text-red-100"
-                      : "bg-zinc-950 border-zinc-800 text-zinc-200 hover:bg-zinc-900"
-                  }`}
-                >
-                  {m.completed ? (
-                    <CheckCircle2 className="h-4 w-4" />
-                  ) : (
-                    <Clock className="h-4 w-4" />
-                  )}
-                  <span>{m.title}</span>
-                  <span className="text-xs opacity-70">
-                    {new Date(m.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+        <CardContent className="grid gap-3 xl:grid-cols-4">
+          {moveInObjectives.map((objective) => (
+            <div key={objective.title} className={`rounded-xl border p-4 ${objective.cardClass}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className={`text-sm font-semibold ${objective.titleClass}`}>{objective.title}</div>
+                  <p className={`mt-1 text-sm ${objective.textClass}`}>{objective.description}</p>
+                </div>
+                <Badge className={objective.isComplete ? "bg-green-600 text-white" : "bg-black/30 text-zinc-200 border border-white/10"}>
+                  {objective.completedCount}/{objective.totalCount}
+                </Badge>
+              </div>
+              {objective.targetDate ? (
+                <div className="mt-3 text-xs uppercase tracking-wide text-zinc-500">
+                  Target by {formatShortDate(objective.targetDate)}
+                </div>
+              ) : null}
+              <div className="mt-3 space-y-2">
+                {objective.milestones.map((milestone) => {
+                  const isPast = new Date(milestone.targetDate) < today && !milestone.completed;
+                  return (
+                    <button
+                      key={milestone._id}
+                      onClick={() => toggleMilestone({ milestoneId: milestone._id, completed: !milestone.completed })}
+                      className={`flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-all ${
+                        milestone.completed
+                          ? "border-green-700/40 bg-green-950/40 text-green-100"
+                          : isPast
+                          ? "border-red-700/40 bg-red-950/40 text-red-100"
+                          : `bg-black/20 text-zinc-200 ${objective.buttonClass}`
+                      }`}
+                    >
+                      {milestone.completed ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <Clock className="h-4 w-4 shrink-0" />}
+                      <span className="flex-1">{milestone.title}</span>
+                      <span className="text-xs opacity-70">{formatShortDate(milestone.targetDate)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </CardContent>
       </Card>
 
@@ -711,10 +759,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
         {/* PLAN TAB */}
         <TabsContent value="plan" className="mt-4 space-y-6">
           {isGettingStarted ? (
-            <Card className="border-orange-500/25 bg-orange-500/[0.06] shadow-none">
+            <Card className="border-amber-500/25 bg-amber-500/[0.08] shadow-none">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base text-orange-100">Start here this week</CardTitle>
-                <p className="text-sm text-orange-200/80">
+                <CardTitle className="text-base text-amber-100">Start here this week</CardTitle>
+                <p className="text-sm text-amber-200/80">
                   You&apos;ve got the structure. Now let&apos;s turn it into a working remodel plan with the first real moves.
                 </p>
               </CardHeader>
@@ -739,13 +787,13 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
             </Card>
           ) : null}
 
-          <Card className="border-orange-500/25 bg-orange-500/[0.06] shadow-none">
+          <Card className="border-sky-500/25 bg-sky-500/[0.05] shadow-none">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base text-orange-100">
-                <Home className="h-4 w-4 text-orange-400" />
+              <CardTitle className="flex items-center gap-2 text-base text-sky-100">
+                <Home className="h-4 w-4 text-sky-400" />
                 Remodel game plan
               </CardTitle>
-              <p className="text-sm text-orange-200/80">
+              <p className="text-sm text-sky-200/80">
                 The goal is a blank canvas first, then the highest-leverage renovations, then sourcing and polish.
               </p>
             </CardHeader>
