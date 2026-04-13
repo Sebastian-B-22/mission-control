@@ -341,6 +341,12 @@ export default function DashboardPage() {
             <AgentHuddle initialChannel="ideas" />
           </div>
         );
+      case "agent-huddle-overnight":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="overnight-strategy" />
+          </div>
+        );
       case "agent-huddle-joy-support":
         return (
           <div className="h-[calc(100vh-120px)]">
