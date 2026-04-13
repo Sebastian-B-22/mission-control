@@ -17,8 +17,8 @@ import { internal, api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
 // Re-export type so TypeScript can use it
-type ContentType = "x-post" | "email" | "blog" | "landing-page" | "other";
-type ContentStage = "idea" | "review" | "approved" | "published";
+type ContentType = "x-post" | "x-reply" | "email" | "blog" | "landing-page" | "other";
+type ContentStage = "idea" | "priority" | "later" | "needs-work" | "review" | "approved" | "published" | "dismissed";
 
 const http = httpRouter();
 
@@ -389,13 +389,13 @@ http.route({
     if (!content) return errorResponse("Missing required field: content");
 
     const type = body.type as string;
-    const validTypes: ContentType[] = ["x-post", "email", "blog", "landing-page", "other"];
+    const validTypes: ContentType[] = ["x-post", "x-reply", "email", "blog", "landing-page", "other"];
     if (!type || !validTypes.includes(type as ContentType)) {
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
 
     const stage = (body.stage as string) ?? "review";
-    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "priority", "later", "needs-work", "review", "approved", "published", "dismissed"];
     if (!validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -452,7 +452,7 @@ http.route({
     if (!contentId) return errorResponse("Missing required field: contentId");
 
     const stage = body.stage as string;
-    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "priority", "later", "needs-work", "review", "approved", "published", "dismissed"];
     if (!stage || !validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -496,12 +496,12 @@ http.route({
     const type = url.searchParams.get("type") || undefined;
     const createdBy = url.searchParams.get("createdBy") || undefined;
 
-    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "priority", "later", "needs-work", "review", "approved", "published", "dismissed"];
     if (stage && !validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
 
-    const validTypes: ContentType[] = ["x-post", "email", "blog", "landing-page", "other"];
+    const validTypes: ContentType[] = ["x-post", "x-reply", "email", "blog", "landing-page", "other"];
     if (type && !validTypes.includes(type as ContentType)) {
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
@@ -1641,6 +1641,7 @@ const HUDDLE_CHANNELS = {
   "hta-launch": { name: "HTA Launch", description: "Marketing, product, launch prep" },
   family: { name: "Family", description: "Kids' learning, projects" },
   ideas: { name: "Ideas", description: "Brainstorming, discussions" },
+  "overnight-strategy": { name: "Overnight Huddle", description: "Overnight strategy pass for goals, workflow, revenue, retention, and tomorrow's priorities" },
   "joy-support": { name: "Joy Support", description: "Joy asking Sebastian for help with Carolyn" },
 };
 
@@ -1671,8 +1672,8 @@ http.route({
   }),
 });
 
-// POST /huddle - Post a message
-// Body: { agent: string, message: string, channel: string, mentions?: string[], replyTo?: string }
+// POST /huddle - Post a message or start a mission
+// Body: { agent: string, message: string, channel: string, mentions?: string[], replyTo?: string, missionId?: string, startMission?: boolean }
 http.route({
   path: "/huddle", method: "POST",
   handler: httpAction(async (ctx, req) => {
@@ -1684,37 +1685,55 @@ http.route({
       channel?: string;
       mentions?: string[];
       replyTo?: string;
+      missionId?: string;
+      startMission?: boolean;
     };
     
     if (!body.agent || !body.message) {
       return jsonResponse({ error: "Missing required fields: agent, message" }, 400);
     }
     
-    // Validate agent name
-    const validAgents = ["sebastian", "scout", "maven", "compass", "james", "corinne"];
+    const validAgents = ["sebastian", "scout", "maven", "compass", "james", "corinne", "joy"];
     if (!validAgents.includes(body.agent.toLowerCase())) {
       return jsonResponse({ error: `Invalid agent. Must be one of: ${validAgents.join(", ")}` }, 400);
     }
     
-    // Default to main channel
     const channel = body.channel || "main";
     
-    // Validate channel
     if (!Object.keys(HUDDLE_CHANNELS).includes(channel)) {
       return jsonResponse({ 
         error: `Invalid channel. Must be one of: ${Object.keys(HUDDLE_CHANNELS).join(", ")}` 
       }, 400);
+    }
+
+    if (body.startMission) {
+      const result = await ctx.runMutation(api.agentHuddle.startMission, {
+        agent: body.agent.toLowerCase(),
+        message: body.message,
+        channel,
+        mentions: body.mentions,
+        participants: body.mentions,
+      });
+
+      return jsonResponse({
+        success: true,
+        channel,
+        missionId: result.missionId,
+        messageId: result.messageId,
+        status: result.status,
+      });
     }
     
     const messageId = await ctx.runMutation(internal.agentHuddle.postInternal, {
       agent: body.agent.toLowerCase(),
       message: body.message,
       channel,
+      missionId: body.missionId as Id<"agentHuddleMissions"> | undefined,
       mentions: body.mentions,
       replyTo: body.replyTo as Id<"agentHuddle"> | undefined,
     });
     
-    return jsonResponse({ success: true, messageId, channel });
+    return jsonResponse({ success: true, messageId, channel, missionId: body.missionId });
   }),
 });
 
@@ -1949,19 +1968,26 @@ http.route({
 });
 
 // POST /telegram/outbox/sent - Mark an outbox item as sent
-// Body: { id: string, telegramMessageId?: string }
+// Body: { id: string, telegramMessageId?: string, deliveredAccountId?: string, deliveredThreadId?: string }
 http.route({
   path: "/telegram/outbox/sent",
   method: "POST",
   handler: httpAction(async (ctx, req) => {
     if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
 
-    const body = (await req.json()) as { id?: string; telegramMessageId?: string };
+    const body = (await req.json()) as {
+      id?: string;
+      telegramMessageId?: string;
+      deliveredAccountId?: string;
+      deliveredThreadId?: string;
+    };
     if (!body.id) return jsonResponse({ error: "Missing id" }, 400);
 
     await ctx.runMutation(internal.telegramOutbox.markSentInternal, {
       id: body.id as Id<"telegramOutbox">,
       telegramMessageId: body.telegramMessageId,
+      deliveredAccountId: body.deliveredAccountId,
+      deliveredThreadId: body.deliveredThreadId,
     });
 
     return jsonResponse({ success: true });
@@ -2005,6 +2031,49 @@ http.route({
   path: "/telegram/outbox/failed",
   method: "OPTIONS",
   handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+// POST /telegram/inbox/ingest - Bridge a Telegram reply back into Agent Huddle
+// Body: { text: string, topic?: string, channel?: string, author?: string, agent?: string, telegramMessageId?: string, telegramThreadId?: string, replyToTelegramMessageId?: string }
+http.route({
+  path: "/telegram/inbox/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/telegram/inbox/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+
+    const body = (await req.json()) as {
+      text?: string;
+      topic?: string;
+      channel?: string;
+      author?: string;
+      agent?: string;
+      telegramMessageId?: string;
+      telegramThreadId?: string;
+      replyToTelegramMessageId?: string;
+    };
+
+    const text = String(body.text || "").trim();
+    if (!text) return jsonResponse({ error: "Missing required field: text" }, 400);
+
+    const messageId = await ctx.runMutation(internal.telegramOutbox.ingestTelegramReplyInternal, {
+      text,
+      topic: body.topic ? String(body.topic) : undefined,
+      channel: body.channel ? String(body.channel) : undefined,
+      author: body.author ? String(body.author) : undefined,
+      agent: body.agent ? String(body.agent) : undefined,
+      telegramMessageId: body.telegramMessageId ? String(body.telegramMessageId) : undefined,
+      telegramThreadId: body.telegramThreadId ? String(body.telegramThreadId) : undefined,
+      replyToTelegramMessageId: body.replyToTelegramMessageId ? String(body.replyToTelegramMessageId) : undefined,
+    });
+
+    return jsonResponse({ ok: true, messageId }, 201);
+  }),
 });
 
 // ─── POST /pending-items/create - Create a Pending / Next Up item ─────────

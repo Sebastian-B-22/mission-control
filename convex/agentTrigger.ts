@@ -1,52 +1,44 @@
 /**
  * Agent Trigger System
- * 
+ *
  * Handles routing huddle messages to the correct agents.
  * Works via polling since OpenClaw gateway is loopback-only.
- * 
- * Flow:
- * 1. Huddle message posted → createTrigger() adds to queue
- * 2. OpenClaw polls /huddle/triggers every 30s (via cron)
- * 3. OpenClaw wakes relevant agents with message context
- * 4. Agent processes, OpenClaw marks trigger complete
  */
 
 import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
 
 // ─── Channel → Agent Routing ────────────────────────────────────────────────
 
 export const CHANNEL_ROUTING: Record<string, string[]> = {
   "aspire-ops": ["scout", "sebastian"],
   "hta-launch": ["maven", "sebastian"],
-  "family": ["compass", "james", "sebastian"],
-  "main": ["scout", "maven", "compass", "james", "sebastian"],
-  "ideas": ["scout", "maven", "compass", "james", "sebastian"],
-  "joy-support": ["sebastian"],  // Joy asks, Sebastian answers
+  family: ["compass", "james", "sebastian"],
+  main: ["scout", "maven", "compass", "james", "sebastian"],
+  ideas: ["scout", "maven", "compass", "james", "sebastian"],
+  "overnight-strategy": ["scout", "maven", "sebastian"],
+  "joy-support": ["sebastian"],
 };
 
-// All known agents
 const ALL_AGENTS = ["sebastian", "scout", "maven", "compass", "james", "corinne", "joy"];
+const HUMAN_OR_EXTERNAL_INITIATORS = new Set(["corinne", "joy"]);
 
-// ─── Helper: Parse @mentions ────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────
 
 function parseMentions(message: string): string[] {
   const mentionRegex = /@(\w+)/g;
   const mentions: string[] = [];
-  let match;
-  
+  let match: RegExpExecArray | null;
+
   while ((match = mentionRegex.exec(message)) !== null) {
     const agent = match[1].toLowerCase();
     if (ALL_AGENTS.includes(agent)) {
       mentions.push(agent);
     }
   }
-  
-  return [...new Set(mentions)]; // Deduplicate
-}
 
-// ─── Helper: Get target agents ──────────────────────────────────────────────
+  return [...new Set(mentions)];
+}
 
 export function getTargetAgents(
   channel: string,
@@ -54,31 +46,33 @@ export function getTargetAgents(
   message: string,
   explicitMentions?: string[]
 ): string[] {
-  // Start with explicit mentions if provided
-  const targets = new Set<string>(explicitMentions || []);
-  
-  // Parse @mentions from message
-  const parsedMentions = parseMentions(message);
-  parsedMentions.forEach(m => targets.add(m));
-  
-  // If no specific mentions, use channel routing
-  if (targets.size === 0) {
-    const channelAgents = CHANNEL_ROUTING[channel] || CHANNEL_ROUTING["main"];
-    channelAgents.forEach(a => targets.add(a));
+  const normalizedFromAgent = fromAgent.toLowerCase();
+  const targets = new Set<string>((explicitMentions || []).map((mention) => mention.toLowerCase()));
+
+  parseMentions(message).forEach((mention) => targets.add(mention));
+
+  if (targets.size > 0) {
+    targets.delete(normalizedFromAgent);
+    return Array.from(targets);
   }
-  
-  // Remove the sender from targets (don't wake yourself)
-  targets.delete(fromAgent.toLowerCase());
-  
-  // Note: Keep "corinne" in targets - the poll script will send her
-  // a Telegram notification instead of trying to wake an agent
-  
+
+  if (HUMAN_OR_EXTERNAL_INITIATORS.has(normalizedFromAgent)) {
+    const channelAgents = CHANNEL_ROUTING[channel] || CHANNEL_ROUTING.main;
+    channelAgents.forEach((agent) => targets.add(agent));
+    targets.delete(normalizedFromAgent);
+    return Array.from(targets);
+  }
+
+  if (normalizedFromAgent !== "sebastian") {
+    targets.add("sebastian");
+  }
+
+  targets.delete(normalizedFromAgent);
   return Array.from(targets);
 }
 
 // ─── Mutations ──────────────────────────────────────────────────────────────
 
-// Create a trigger when a huddle message is posted
 export const createTrigger = internalMutation({
   args: {
     huddleMessageId: v.id("agentHuddle"),
@@ -86,6 +80,13 @@ export const createTrigger = internalMutation({
     fromAgent: v.string(),
     message: v.string(),
     mentions: v.optional(v.array(v.string())),
+    missionId: v.optional(v.id("agentHuddleMissions")),
+    missionPhase: v.optional(v.union(
+      v.literal("round1"),
+      v.literal("round2"),
+      v.literal("synthesis")
+    )),
+    reason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const targetAgents = getTargetAgents(
@@ -94,27 +95,66 @@ export const createTrigger = internalMutation({
       args.message,
       args.mentions
     );
-    
-    // Don't create trigger if no agents to wake
+
     if (targetAgents.length === 0) {
       return null;
     }
-    
+
     const triggerId = await ctx.db.insert("agentTriggers", {
       huddleMessageId: args.huddleMessageId,
       channel: args.channel,
       fromAgent: args.fromAgent,
       targetAgents,
       message: args.message,
+      missionId: args.missionId,
+      missionPhase: args.missionPhase,
+      reason: args.reason,
       status: "pending",
       createdAt: Date.now(),
     });
-    
+
     return triggerId;
   },
 });
 
-// Mark trigger as processing
+export const createDirectTrigger = internalMutation({
+  args: {
+    huddleMessageId: v.id("agentHuddle"),
+    channel: v.string(),
+    fromAgent: v.string(),
+    targetAgents: v.array(v.string()),
+    message: v.string(),
+    missionId: v.optional(v.id("agentHuddleMissions")),
+    missionPhase: v.optional(v.union(
+      v.literal("round1"),
+      v.literal("round2"),
+      v.literal("synthesis")
+    )),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const targetAgents = [...new Set(args.targetAgents.map((agent) => agent.toLowerCase()))]
+      .filter((agent) => agent !== args.fromAgent.toLowerCase());
+
+    if (targetAgents.length === 0) {
+      return null;
+    }
+
+    return await ctx.db.insert("agentTriggers", {
+      huddleMessageId: args.huddleMessageId,
+      channel: args.channel,
+      fromAgent: args.fromAgent,
+      targetAgents,
+      message: args.message,
+      missionId: args.missionId,
+      missionPhase: args.missionPhase,
+      reason: args.reason,
+      status: "pending",
+      createdAt: Date.now(),
+    });
+  },
+});
+
 export const markProcessing = internalMutation({
   args: {
     triggerId: v.id("agentTriggers"),
@@ -126,7 +166,6 @@ export const markProcessing = internalMutation({
   },
 });
 
-// Mark trigger as completed
 export const markCompleted = internalMutation({
   args: {
     triggerId: v.id("agentTriggers"),
@@ -139,7 +178,6 @@ export const markCompleted = internalMutation({
   },
 });
 
-// Mark trigger as failed
 export const markFailed = internalMutation({
   args: {
     triggerId: v.id("agentTriggers"),
@@ -156,63 +194,51 @@ export const markFailed = internalMutation({
 
 // ─── Queries ────────────────────────────────────────────────────────────────
 
-// Get pending triggers (for OpenClaw to poll)
 export const getPendingTriggers = internalQuery({
   args: {
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const limit = args.limit || 10;
-    
-    const triggers = await ctx.db
+
+    return await ctx.db
       .query("agentTriggers")
       .withIndex("by_status", (q) => q.eq("status", "pending"))
       .order("asc")
       .take(limit);
-    
-    return triggers;
   },
 });
 
-// Get recent triggers for debugging
 export const getRecentTriggers = query({
   args: {
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
-    
-    const triggers = await ctx.db
+
+    return await ctx.db
       .query("agentTriggers")
       .withIndex("by_created")
       .order("desc")
       .take(limit);
-    
-    return triggers;
   },
 });
 
-// Get trigger stats
 export const getTriggerStats = query({
   args: {},
   handler: async (ctx) => {
-    const allTriggers = await ctx.db
-      .query("agentTriggers")
-      .collect();
-    
-    const stats = {
+    const allTriggers = await ctx.db.query("agentTriggers").collect();
+
+    return {
       total: allTriggers.length,
-      pending: allTriggers.filter(t => t.status === "pending").length,
-      processing: allTriggers.filter(t => t.status === "processing").length,
-      completed: allTriggers.filter(t => t.status === "completed").length,
-      failed: allTriggers.filter(t => t.status === "failed").length,
+      pending: allTriggers.filter((trigger) => trigger.status === "pending").length,
+      processing: allTriggers.filter((trigger) => trigger.status === "processing").length,
+      completed: allTriggers.filter((trigger) => trigger.status === "completed").length,
+      failed: allTriggers.filter((trigger) => trigger.status === "failed").length,
     };
-    
-    return stats;
   },
 });
 
-// Cleanup old triggers (keep last 100)
 export const cleanup = mutation({
   args: {},
   handler: async (ctx) => {
@@ -221,16 +247,16 @@ export const cleanup = mutation({
       .withIndex("by_created")
       .order("asc")
       .collect();
-    
+
     if (triggers.length <= 100) {
       return { deleted: 0 };
     }
-    
+
     const toDelete = triggers.slice(0, triggers.length - 100);
     for (const trigger of toDelete) {
       await ctx.db.delete(trigger._id);
     }
-    
+
     return { deleted: toDelete.length };
   },
 });

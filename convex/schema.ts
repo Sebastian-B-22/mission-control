@@ -331,6 +331,10 @@ export default defineSchema({
     createdBy: v.string(),           // "sebastian" | "maven" | "scout"
     assignedTo: v.string(),          // "corinne" (who reviews)
     notes: v.optional(v.string()),   // Agent notes / Corinne feedback
+    parentContentId: v.optional(v.id("contentPipeline")),
+    rootContentId: v.optional(v.id("contentPipeline")),
+    outputGroupId: v.optional(v.string()),
+    outputRole: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
     publishedUrl: v.optional(v.string()),
@@ -342,7 +346,49 @@ export default defineSchema({
     .index("by_stage", ["stage"])
     .index("by_type", ["type"])
     .index("by_created_by", ["createdBy"])
-    .index("by_stage_type", ["stage", "type"]),
+    .index("by_stage_type", ["stage", "type"])
+    .index("by_parent_content", ["parentContentId", "updatedAt"])
+    .index("by_root_content", ["rootContentId", "updatedAt"]),
+
+  contentOutputGroups: defineTable({
+    title: v.string(),
+    summary: v.optional(v.string()),
+    sourceType: v.union(
+      v.literal("content"),
+      v.literal("idea"),
+      v.literal("task"),
+      v.literal("manual")
+    ),
+    sourceContentId: v.optional(v.id("contentPipeline")),
+    sourceIdeaId: v.optional(v.id("agentIdeas")),
+    sourceTaskId: v.optional(v.id("sebastianTasks")),
+    owner: v.optional(v.string()),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("in-progress"),
+      v.literal("complete"),
+      v.literal("archived")
+    ),
+    targetChannels: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status", "updatedAt"])
+    .index("by_source_content", ["sourceContentId", "updatedAt"])
+    .index("by_source_idea", ["sourceIdeaId", "updatedAt"])
+    .index("by_source_task", ["sourceTaskId", "updatedAt"]),
+
+  contentOutputItems: defineTable({
+    groupId: v.id("contentOutputGroups"),
+    contentId: v.id("contentPipeline"),
+    outputType: v.string(),
+    channel: v.optional(v.string()),
+    label: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_group", ["groupId", "order"])
+    .index("by_content", ["contentId"]),
 
   contentVerification: defineTable({
     contentId: v.id("contentPipeline"),
@@ -603,6 +649,65 @@ export default defineSchema({
     .index("by_content", ["contentId"])
     .index("by_type", ["feedbackType"])
     .index("by_created_at", ["createdAt"]),
+
+  // ─── Agent Training ─────────────────────────────────────────────────────
+  // Structured instruction hierarchy for agents and content generation.
+  agentTraining: defineTable({
+    category: v.union(
+      v.literal("voice"),
+      v.literal("business"),
+      v.literal("platform"),
+      v.literal("contentType"),
+      v.literal("section"),
+      v.literal("ideaType")
+    ),
+    key: v.string(),
+    title: v.string(),
+    content: v.string(),
+    active: v.boolean(),
+    updatedBy: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_category", ["category", "updatedAt"])
+    .index("by_key", ["key"]),
+
+  // ─── Agent Learnings ────────────────────────────────────────────────────
+  // Proposed/approved learnings that can shape future agent behavior.
+  agentLearnings: defineTable({
+    title: v.string(),
+    learning: v.string(),
+    scopeType: v.union(
+      v.literal("global"),
+      v.literal("business"),
+      v.literal("platform"),
+      v.literal("contentType"),
+      v.literal("agent"),
+      v.literal("section")
+    ),
+    scopeKey: v.optional(v.string()),
+    proposedBy: v.string(),
+    status: v.union(
+      v.literal("proposed"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("archived")
+    ),
+    sourceType: v.union(
+      v.literal("content_edit"),
+      v.literal("content_reject"),
+      v.literal("manual"),
+      v.literal("agent_observation")
+    ),
+    sourceContentId: v.optional(v.id("contentPipeline")),
+    confidence: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    approvedAt: v.optional(v.number()),
+  })
+    .index("by_status", ["status", "createdAt"])
+    .index("by_scope", ["scopeType", "createdAt"])
+    .index("by_source_content", ["sourceContentId"]),
 
   // ─── Engagement Habits ───────────────────────────────────────────────────
   // Tracks daily engagement activities (comments, posts, interactions)
@@ -915,6 +1020,34 @@ export default defineSchema({
     lastUpdated: v.number(),
   }).index("by_program", ["program"]),
 
+  // ─── Agent Ideas ──────────────────────────────────────────────────────
+  // Dedicated idea inbox so idea triage stops overloading contentPipeline.
+  agentIdeas: defineTable({
+    title: v.string(),
+    summary: v.string(),
+    sourceAgent: v.string(),
+    businessArea: v.optional(v.string()),
+    ideaType: v.optional(v.string()),
+    confidence: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+    effort: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+    recommendedAction: v.optional(v.string()),
+    status: v.union(
+      v.literal("new"),
+      v.literal("priority"),
+      v.literal("later"),
+      v.literal("needs-work"),
+      v.literal("converted"),
+      v.literal("dismissed")
+    ),
+    notes: v.optional(v.string()),
+    sourceContentId: v.optional(v.id("contentPipeline")),
+    convertedToTaskId: v.optional(v.id("sebastianTasks")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status", "updatedAt"])
+    .index("by_source_agent", ["sourceAgent", "updatedAt"]),
+
   // ─── Pending / Next Up ───────────────────────────────────────────────
   // Lightweight open items tracker
   pendingItems: defineTable({
@@ -956,20 +1089,74 @@ export default defineSchema({
     .index("by_created", ["createdAt"])
     .index("by_status", ["triageStatus", "createdAt"]),
 
+  // ─── Agent Huddle Missions ──────────────────────────────────────────────
+  // Explicit multi-round huddles with bounded phases and Sebastian synthesis.
+  agentHuddleMissions: defineTable({
+    channel: v.string(),
+    mode: v.union(v.literal("live"), v.literal("overnight")),
+    title: v.string(),
+    brief: v.string(),
+    createdBy: v.string(),
+    participants: v.array(v.string()),
+    status: v.union(
+      v.literal("round1"),
+      v.literal("round2"),
+      v.literal("synthesis"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    lastMessageAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    finalMessageId: v.optional(v.id("agentHuddle")),
+  })
+    .index("by_created", ["createdAt"])
+    .index("by_channel_updated", ["channel", "updatedAt"])
+    .index("by_status_updated", ["status", "updatedAt"]),
+
   // ─── Agent Huddle ──────────────────────────────────────────────────────
-  // Inter-agent communication - organized by channels
+  // Inter-agent communication - organized by channels and optional missions.
   agentHuddle: defineTable({
     agent: v.string(), // "sebastian", "scout", "maven", "compass", "james", "corinne"
     message: v.string(),
     channel: v.optional(v.string()), // "main", "aspire-ops", "hta-launch", "family", "ideas" - defaults to "main"
+    missionId: v.optional(v.id("agentHuddleMissions")),
+    round: v.optional(v.union(
+      v.literal("brief"),
+      v.literal("round1"),
+      v.literal("round2"),
+      v.literal("synthesis"),
+      v.literal("note")
+    )),
+    kind: v.optional(v.union(
+      v.literal("brief"),
+      v.literal("response"),
+      v.literal("synthesis"),
+      v.literal("note")
+    )),
     replyTo: v.optional(v.id("agentHuddle")), // Thread support
     mentions: v.optional(v.array(v.string())), // ["scout", "maven"] for @mentions
     topic: v.optional(v.string()), // Legacy field
+    source: v.optional(v.union(
+      v.literal("mission-control"),
+      v.literal("telegram"),
+      v.literal("agent"),
+      v.literal("manual")
+    )),
+    sourceMessageId: v.optional(v.string()),
+    sourceThreadId: v.optional(v.string()),
+    sourceAuthor: v.optional(v.string()),
+    deliveredToTopic: v.optional(v.string()),
+    deliveredAt: v.optional(v.number()),
+    telegramMessageId: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index("by_created", ["createdAt"])
     .index("by_agent", ["agent"])
-    .index("by_channel", ["channel", "createdAt"]),
+    .index("by_channel", ["channel", "createdAt"])
+    .index("by_mission_created", ["missionId", "createdAt"])
+    .index("by_source_and_message_id", ["source", "sourceMessageId"]),
 
   // ─── Agent Triggers ──────────────────────────────────────────────────────
   // Queue for waking up agents when huddle messages arrive
@@ -979,6 +1166,13 @@ export default defineSchema({
     fromAgent: v.string(), // Who posted the message
     targetAgents: v.array(v.string()), // Which agents should be woken
     message: v.string(), // The message content
+    missionId: v.optional(v.id("agentHuddleMissions")),
+    missionPhase: v.optional(v.union(
+      v.literal("round1"),
+      v.literal("round2"),
+      v.literal("synthesis")
+    )),
+    reason: v.optional(v.string()),
     status: v.union(
       v.literal("pending"),
       v.literal("processing"),
@@ -999,18 +1193,31 @@ export default defineSchema({
     text: v.string(),
     // "operations" | "marketing" | "family" | "ideas" | "general"
     topic: v.string(),
+    // Canonical MC/Huddle channel this message belongs to
+    channel: v.optional(v.string()),
+    // Agent identity for the canonical huddle record
+    agent: v.optional(v.string()),
+    // Optional linkage back to the source Huddle message
+    sourceHuddleMessageId: v.optional(v.id("agentHuddle")),
     // Optional OpenClaw telegram account routing (default/scout/maven/compass/james)
     accountId: v.optional(v.string()),
     requestedBy: v.optional(v.string()),
+    // Optional thread/reply hints for Telegram delivery
+    threadId: v.optional(v.string()),
+    replyToTelegramMessageId: v.optional(v.string()),
     status: v.union(v.literal("pending"), v.literal("sent"), v.literal("failed")),
     createdAt: v.number(),
     sentAt: v.optional(v.number()),
     failedAt: v.optional(v.number()),
     telegramMessageId: v.optional(v.string()),
+    deliveredAccountId: v.optional(v.string()),
+    deliveredThreadId: v.optional(v.string()),
     error: v.optional(v.string()),
   })
     .index("by_status", ["status"])
-    .index("by_created", ["createdAt"]),
+    .index("by_created", ["createdAt"])
+    .index("by_telegram_message_id", ["telegramMessageId"])
+    .index("by_source_huddle_message", ["sourceHuddleMessageId"]),
 
   // ─── Approvals Inbox (MVP) ─────────────────────────────────────────────
   // Placeholder queue for things that need explicit human approval.

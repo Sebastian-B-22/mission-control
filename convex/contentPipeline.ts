@@ -3,8 +3,8 @@
  *
  * Agents drop content drafts here. Corinne reviews and approves.
  *
- * Stages: idea → review → approved → published
- * Types:  x-post | email | blog | landing-page | other
+ * Stages: idea → priority | later | needs-work → review → approved → published
+ * Types:  x-post | x-reply | email | blog | landing-page | other
  */
 
 import { v } from "convex/values";
@@ -15,6 +15,7 @@ import { internal } from "./_generated/api";
 
 const CONTENT_TYPE = v.union(
   v.literal("x-post"),
+  v.literal("x-reply"),
   v.literal("email"),
   v.literal("blog"),
   v.literal("landing-page"),
