@@ -153,6 +153,40 @@ const SOURCE_KEYWORDS = [
   "material",
 ];
 
+type StarterTask = {
+  title: string;
+  roomHint?: string;
+};
+
+const BLANK_CANVAS_STARTERS: StarterTask[] = [
+  { title: "Set deadline for relatives to pick up claimed furniture" },
+  { title: "Plan dumpster day for inherited junk and overgrowth" },
+  { title: "Schedule family demo day to save on labor" },
+  { title: "Donate unwanted books to the library drop box" },
+];
+
+const PRIORITY_PROJECT_STARTERS: StarterTask[] = [
+  { title: "Measure bathroom vanity spaces", roomHint: "Bathroom" },
+  { title: "Get 3 quotes for window replacement" },
+  { title: "Get 3 quotes for roof replacement" },
+  { title: "Choose kitchen refresh plan: paint cabinets vs replace", roomHint: "Kitchen" },
+  { title: "Clear shed for future home gym" },
+];
+
+const DECISION_STARTERS: StarterTask[] = [
+  { title: "Decide which bathroom gets renovated first", roomHint: "Bathroom" },
+  { title: "Decide whether to sell a car to fund the bathroom remodel" },
+  { title: "Set ship-or-donate fallback for unclaimed furniture" },
+  { title: "Decide paint-vs-replace plan for kitchen cabinets", roomHint: "Kitchen" },
+];
+
+const SOURCING_STARTERS: StarterTask[] = [
+  { title: "Price bathroom vanities from Wayfair and Costco", roomHint: "Bathroom" },
+  { title: "Create quote tracker for windows and roof" },
+  { title: "Check Marketplace for furniture and hutches" },
+  { title: "Save kitchen inspiration links and paint options", roomHint: "Kitchen" },
+];
+
 function includesAnyKeyword(value: string | undefined, keywords: string[]) {
   if (!value) return false;
   const normalized = value.toLowerCase();
@@ -325,6 +359,35 @@ function BudgetBreakdown({
   );
 }
 
+function StarterTaskList({
+  items,
+  accentClass,
+  onPick,
+}: {
+  items: StarterTask[];
+  accentClass: string;
+  onPick: (title: string, roomHint?: string) => void;
+}) {
+  return (
+    <div className="rounded-lg border border-dashed border-white/10 bg-black/20 p-4">
+      <div className="mb-3 text-xs font-medium uppercase tracking-wide text-zinc-400">Suggested starters</div>
+      <div className="grid gap-2">
+        {items.map((item) => (
+          <button
+            key={item.title}
+            type="button"
+            onClick={() => onPick(item.title, item.roomHint)}
+            className={`flex items-start gap-2 rounded-lg border px-3 py-3 text-left text-sm text-zinc-100 transition-colors hover:bg-white/5 ${accentClass}`}
+          >
+            <Plus className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>{item.title}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const [selectedRoom, setSelectedRoom] = useState<Id<"homeRemodelRooms"> | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -440,6 +503,19 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const topBudgetRooms = [...rooms]
     .sort((a, b) => (b.budgetEstimate || 0) - (a.budgetEstimate || 0))
     .slice(0, 6);
+
+  const isGettingStarted = allTasks.length === 0 && openIdeas.length === 0 && totalEstimated === 0 && totalSpent === 0;
+
+  const openQuickAddFor = (title: string, roomHint?: string) => {
+    setNewTaskTitle(title);
+    if (roomHint) {
+      const matchedRoom = rooms.find((room) => room.name.toLowerCase().includes(roomHint.toLowerCase()));
+      setNewTaskRoom(matchedRoom?._id || "");
+    } else {
+      setNewTaskRoom("");
+    }
+    setShowQuickAdd(true);
+  };
 
   // Room progress (tasks done / total tasks)
   const getRoomProgress = (roomId: Id<"homeRemodelRooms">) => {
@@ -634,6 +710,35 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
 
         {/* PLAN TAB */}
         <TabsContent value="plan" className="mt-4 space-y-6">
+          {isGettingStarted ? (
+            <Card className="border-orange-500/25 bg-orange-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-orange-100">Start here this week</CardTitle>
+                <p className="text-sm text-orange-200/80">
+                  You&apos;ve got the structure. Now let&apos;s turn it into a working remodel plan with the first real moves.
+                </p>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <button type="button" onClick={() => openQuickAddFor("Set deadline for relatives to pick up claimed furniture")} className="rounded-xl border border-orange-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
+                  <div className="text-sm font-semibold text-orange-100">Furniture deadlines</div>
+                  <p className="mt-2 text-sm text-zinc-300">Start with inherited-item decisions so the house can become a blank canvas.</p>
+                </button>
+                <button type="button" onClick={() => openQuickAddFor("Plan dumpster day for inherited junk and overgrowth")} className="rounded-xl border border-sky-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
+                  <div className="text-sm font-semibold text-sky-100">Dumpster + demo day</div>
+                  <p className="mt-2 text-sm text-zinc-300">Create the first cleanup push before spending energy on finish details.</p>
+                </button>
+                <button type="button" onClick={() => openQuickAddFor("Measure bathroom vanity spaces", "Bathroom")} className="rounded-xl border border-emerald-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
+                  <div className="text-sm font-semibold text-emerald-100">Grab measurements</div>
+                  <p className="mt-2 text-sm text-zinc-300">Measure bathrooms first so sourcing vanities and comparing options gets concrete fast.</p>
+                </button>
+                <button type="button" onClick={() => setActiveTab("rooms")} className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
+                  <div className="text-sm font-semibold text-fuchsia-100">Review rooms</div>
+                  <p className="mt-2 text-sm text-zinc-300">Open Rooms and start filling in vision and current state room by room.</p>
+                </button>
+              </CardContent>
+            </Card>
+          ) : null}
+
           <Card className="border-orange-500/25 bg-orange-500/[0.06] shadow-none">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base text-orange-100">
@@ -682,9 +787,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </div>
                   );
                 }) : (
-                  <div className="rounded-lg border border-dashed border-sky-500/20 bg-black/20 p-4 text-sm text-zinc-300">
-                    Add declutter, donate, junk haul, furniture deadline, or demo-day tasks here first.
-                  </div>
+                  <StarterTaskList
+                    items={BLANK_CANVAS_STARTERS}
+                    accentClass="border-sky-500/15"
+                    onPick={openQuickAddFor}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -706,9 +813,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </div>
                   );
                 }) : (
-                  <div className="rounded-lg border border-dashed border-amber-500/20 bg-black/20 p-4 text-sm text-zinc-300">
-                    Add bathroom, kitchen, roof, window, yard, or shed priorities so they stay front and center.
-                  </div>
+                  <StarterTaskList
+                    items={PRIORITY_PROJECT_STARTERS}
+                    accentClass="border-amber-500/15"
+                    onPick={openQuickAddFor}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -746,9 +855,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     })}
                   </div>
                 ) : (
-                  <div className="rounded-lg border border-dashed border-violet-500/20 bg-black/20 p-4 text-sm text-zinc-300">
-                    Use this for quotes to compare, measurements to grab, budget calls, and any yes-no decisions blocking progress.
-                  </div>
+                  <StarterTaskList
+                    items={DECISION_STARTERS}
+                    accentClass="border-violet-500/15"
+                    onPick={openQuickAddFor}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -769,7 +880,13 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                           <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
                         </div>
                       );
-                    }) : <p className="text-sm text-zinc-300">No this-week tasks yet.</p>}
+                    }) : (
+                      <StarterTaskList
+                        items={SOURCING_STARTERS}
+                        accentClass="border-emerald-500/15"
+                        onPick={openQuickAddFor}
+                      />
+                    )}
                   </div>
                 </div>
                 <div>
@@ -792,7 +909,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                           ) : null}
                         </div>
                       );
-                    }) : <p className="text-sm text-zinc-300">Add links for vanity options, paint ideas, Marketplace finds, and vendor research.</p>}
+                    }) : <p className="text-sm text-zinc-300">Capture links from Wayfair, Costco, Marketplace, and contractor quotes here as you go.</p>}
                   </div>
                 </div>
               </CardContent>
