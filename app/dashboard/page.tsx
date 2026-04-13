@@ -69,7 +69,6 @@ import { HomeRemodelView } from "@/components/views/HomeRemodelView";
 import { WeeklyView } from "@/components/WeeklyView";
 import { AgentSquad } from "@/components/AgentSquad";
 import { AgentHQ } from "@/components/AgentHQ";
-import { DashboardTopBar } from "@/components/DashboardTopBar";
 import { OnboardingWizardDialog } from "@/components/OnboardingWizardDialog";
 import { CostTrackerCard } from "@/components/CostTrackerCard";
 import { CostTrackerView } from "@/components/views/CostTrackerView";
@@ -136,7 +135,6 @@ export default function DashboardPage() {
     api.onboarding.getOrCreate,
     convexUser ? { userId: convexUser._id } : "skip"
   );
-  const resetOnboarding = useMutation(api.onboarding.reset);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   // Get today's date in PST (with auto-update at midnight PST)
@@ -723,18 +721,7 @@ export default function DashboardPage() {
               "memory-panel",
             ]);
 
-            const showOpsTopBar = currentView.startsWith("agent-") || sebastianViews.has(currentView);
-
-            return showOpsTopBar ? (
-              <DashboardTopBar
-                userId={convexUser._id}
-                onOpenOnboarding={() => setOnboardingOpen(true)}
-                onResetOnboarding={async () => {
-                  await resetOnboarding({ userId: convexUser._id });
-                  setOnboardingOpen(true);
-                }}
-              />
-            ) : null;
+            return null;
           })()}
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
