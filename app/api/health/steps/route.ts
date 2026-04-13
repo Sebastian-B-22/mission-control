@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(request: Request) {
   try {
@@ -18,6 +17,7 @@ export async function POST(request: Request) {
 
     // Update or create today's health record with steps
     const targetDate = date || new Date().toISOString().split("T")[0];
+    const convex = getConvexHttpClient();
     
     await convex.mutation(api.health.updateSteps, {
       clerkId: userId,

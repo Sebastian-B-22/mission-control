@@ -1,9 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 import { NextResponse } from "next/server";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET() {
   const { userId: clerkId } = await auth();
@@ -11,6 +10,8 @@ export async function GET() {
   if (!clerkId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  const convex = getConvexHttpClient();
 
   // Step 1: Get user by Clerk ID
   const user = await convex.query(api.users.getUserByClerkId, { clerkId });

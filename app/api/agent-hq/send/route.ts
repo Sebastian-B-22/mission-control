@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 type Body = {
   text?: string;
@@ -20,6 +19,8 @@ export async function POST(req: NextRequest) {
     if (!text) {
       return NextResponse.json({ error: "Missing text" }, { status: 400 });
     }
+
+    const convex = getConvexHttpClient();
 
     const id = await convex.mutation(api.telegramOutbox.enqueue, {
       text,

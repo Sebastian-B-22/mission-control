@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 const WHOOP_API_BASE = "https://api.prod.whoop.com/developer/v2";
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 // Helper to refresh tokens if needed
 async function getValidTokens(userId: Id<"users">) {
+  const convex = getConvexHttpClient();
   const tokens = await convex.query(api.health.getWhoopTokens, { userId });
   
   if (!tokens) {
@@ -117,6 +117,7 @@ async function fetchCycleData(accessToken: string, startDate: string, endDate: s
 export async function POST(request: Request) {
   try {
     const { userId, date } = await request.json();
+    const convex = getConvexHttpClient();
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -187,6 +188,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const { userId, days = 7 } = await request.json();
+    const convex = getConvexHttpClient();
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });

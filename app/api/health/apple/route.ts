@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 // API key for Health Auto Export app
 const HEALTH_EXPORT_API_KEY = process.env.HEALTH_EXPORT_API_KEY || "hae-corinne-2026";
@@ -55,6 +54,8 @@ export async function POST(request: Request) {
     if (!payload.data?.metrics) {
       return NextResponse.json({ error: "No metrics data" }, { status: 400 });
     }
+
+    const convex = getConvexHttpClient();
 
     // Process metrics by date
     const dataByDate: Record<string, { steps?: number; sleepHours?: number; activeCalories?: number; weight?: number }> = {};

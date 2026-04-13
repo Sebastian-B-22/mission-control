@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 type Body = {
   userId: string;
@@ -39,6 +38,8 @@ export async function POST(req: NextRequest) {
     if (!Array.isArray(body.events)) {
       return NextResponse.json({ error: "Missing events[]" }, { status: 400 });
     }
+
+    const convex = getConvexHttpClient();
 
     const result = await convex.mutation(api.calendarEvents.syncRange, {
       userId: body.userId as any,
