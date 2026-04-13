@@ -88,6 +88,77 @@ const PRIORITY_COLORS: Record<string, string> = {
   "low": "bg-zinc-900 text-zinc-200 border-zinc-700",
 };
 
+const BLANK_CANVAS_KEYWORDS = [
+  "declutter",
+  "clutter",
+  "junk",
+  "dumpster",
+  "dump",
+  "demo",
+  "donate",
+  "marketplace",
+  "sell",
+  "pickup",
+  "claimed",
+  "furniture",
+  "books",
+  "clear",
+  "cleanup",
+  "shed",
+];
+
+const PRIORITY_PROJECT_KEYWORDS = [
+  "bathroom",
+  "bath",
+  "kitchen",
+  "window",
+  "roof",
+  "yard",
+  "shed",
+  "gym",
+  "paint",
+  "cabinet",
+  "vanity",
+];
+
+const DECISION_KEYWORDS = [
+  "decide",
+  "decision",
+  "measure",
+  "quote",
+  "budget",
+  "deadline",
+  "finance",
+  "car",
+  "window",
+  "roof",
+  "vanity",
+  "cabinet",
+  "bathroom",
+  "kitchen",
+];
+
+const SOURCE_KEYWORDS = [
+  "wayfair",
+  "costco",
+  "marketplace",
+  "quote",
+  "vendor",
+  "window",
+  "roof",
+  "vanity",
+  "cabinet",
+  "paint",
+  "fixture",
+  "material",
+];
+
+function includesAnyKeyword(value: string | undefined, keywords: string[]) {
+  if (!value) return false;
+  const normalized = value.toLowerCase();
+  return keywords.some((keyword) => normalized.includes(keyword));
+}
+
 // Budget Breakdown Component
 function BudgetBreakdown({ 
   userId, 
@@ -266,7 +337,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const [newIdeaPriority, setNewIdeaPriority] = useState("nice-to-have");
   const [newIdeaSourceUrl, setNewIdeaSourceUrl] = useState("");
   const [uploadingIdea, setUploadingIdea] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("rooms");
+  const [activeTab, setActiveTab] = useState("plan");
   const [assigneeFilter, setAssigneeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [beforeMoveOnly, setBeforeMoveOnly] = useState(false);
@@ -349,6 +420,26 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
     allTasks.reduce((s, t) => s + (t.estimatedCost || 0), 0);
   const totalSpent = rooms.reduce((s, r) => s + (r.budgetActual || 0), 0) +
     allTasks.reduce((s, t) => s + (t.actualCost || 0), 0);
+
+  const openTasks = allTasks.filter((t) => t.status !== "done");
+  const openIdeas = allIdeas.filter((i) => !i.promoted);
+  const blankCanvasTasks = openTasks.filter((t) => includesAnyKeyword(t.title, BLANK_CANVAS_KEYWORDS));
+  const priorityProjectTasks = openTasks.filter((t) => includesAnyKeyword(t.title, PRIORITY_PROJECT_KEYWORDS));
+  const decisionTasks = openTasks.filter((t) => includesAnyKeyword(t.title, DECISION_KEYWORDS));
+  const sourcingIdeas = openIdeas.filter((idea) =>
+    includesAnyKeyword(`${idea.content} ${idea.sourceUrl || ""}`, SOURCE_KEYWORDS)
+  );
+  const decisionIdeas = openIdeas.filter((idea) =>
+    includesAnyKeyword(`${idea.content} ${idea.sourceUrl || ""}`, DECISION_KEYWORDS)
+  );
+  const quoteTasks = openTasks.filter((t) => includesAnyKeyword(t.title, ["quote", "window", "roof", "vanity", "cabinet"]));
+  const quoteIdeas = openIdeas.filter((idea) =>
+    includesAnyKeyword(`${idea.content} ${idea.sourceUrl || ""}`, ["quote", "wayfair", "costco", "window", "roof", "vanity", "cabinet"])
+  );
+
+  const topBudgetRooms = [...rooms]
+    .sort((a, b) => (b.budgetEstimate || 0) - (a.budgetEstimate || 0))
+    .slice(0, 6);
 
   // Room progress (tasks done / total tasks)
   const getRoomProgress = (roomId: Id<"homeRemodelRooms">) => {
@@ -531,13 +622,183 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
         </CardContent>
       </Card>
 
-      {/* Tabs: Rooms / All Tasks / Ideas */}
+      {/* Tabs: Plan / Rooms / Tasks / Budget / Ideas */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="flex h-auto flex-wrap gap-1 border border-zinc-800 bg-zinc-950/80 p-1">
+          <TabsTrigger value="plan">Plan</TabsTrigger>
           <TabsTrigger value="rooms">Rooms</TabsTrigger>
           <TabsTrigger value="tasks">All Tasks ({allTasks.length})</TabsTrigger>
+          <TabsTrigger value="budget">Budget + Quotes</TabsTrigger>
           <TabsTrigger value="ideas">Ideas ({allIdeas.filter(i => !i.promoted).length})</TabsTrigger>
         </TabsList>
+
+        {/* PLAN TAB */}
+        <TabsContent value="plan" className="mt-4 space-y-6">
+          <Card className="border-orange-500/25 bg-orange-500/[0.06] shadow-none">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base text-orange-100">
+                <Home className="h-4 w-4 text-orange-400" />
+                Remodel game plan
+              </CardTitle>
+              <p className="text-sm text-orange-200/80">
+                The goal is a blank canvas first, then the highest-leverage renovations, then sourcing and polish.
+              </p>
+            </CardHeader>
+            <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-orange-500/20 bg-black/20 p-4">
+                <div className="text-sm font-semibold text-orange-100">1. Blank canvas first</div>
+                <p className="mt-2 text-sm text-zinc-300">Clear inherited items, junk, books, and anything blocking clean decision-making.</p>
+              </div>
+              <div className="rounded-xl border border-amber-500/20 bg-black/20 p-4">
+                <div className="text-sm font-semibold text-amber-100">2. Priority projects</div>
+                <p className="mt-2 text-sm text-zinc-300">Bathrooms, kitchen refresh, windows, roof, yard, and the shed-to-gym conversion.</p>
+              </div>
+              <div className="rounded-xl border border-emerald-500/20 bg-black/20 p-4">
+                <div className="text-sm font-semibold text-emerald-100">3. Source smart</div>
+                <p className="mt-2 text-sm text-zinc-300">Measure first, then compare Wayfair, Costco, Marketplace, and contractor quotes.</p>
+              </div>
+              <div className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-4">
+                <div className="text-sm font-semibold text-fuchsia-100">4. Family logistics</div>
+                <p className="mt-2 text-sm text-zinc-300">Use deadlines for claimed furniture and make pickup, shipping, sell, or donate decisions fast.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6 xl:grid-cols-2">
+            <Card className="border-sky-500/25 bg-sky-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-sky-100">Blank Canvas Before Move-In</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {blankCanvasTasks.length > 0 ? blankCanvasTasks.slice(0, 8).map((task) => {
+                  const room = rooms.find((r) => r._id === task.roomId);
+                  return (
+                    <div key={task._id} className="flex items-center gap-3 rounded-lg border border-sky-500/15 bg-black/20 p-3">
+                      <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200 min-w-[96px]">
+                        {room?.name || "General"}
+                      </Badge>
+                      <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
+                      <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                    </div>
+                  );
+                }) : (
+                  <div className="rounded-lg border border-dashed border-sky-500/20 bg-black/20 p-4 text-sm text-zinc-300">
+                    Add declutter, donate, junk haul, furniture deadline, or demo-day tasks here first.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-amber-100">Priority Projects</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {priorityProjectTasks.length > 0 ? priorityProjectTasks.slice(0, 8).map((task) => {
+                  const room = rooms.find((r) => r._id === task.roomId);
+                  return (
+                    <div key={task._id} className="flex items-center gap-3 rounded-lg border border-amber-500/15 bg-black/20 p-3">
+                      <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200 min-w-[96px]">
+                        {room?.name || "General"}
+                      </Badge>
+                      <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
+                      <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                    </div>
+                  );
+                }) : (
+                  <div className="rounded-lg border border-dashed border-amber-500/20 bg-black/20 p-4 text-sm text-zinc-300">
+                    Add bathroom, kitchen, roof, window, yard, or shed priorities so they stay front and center.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-violet-500/25 bg-violet-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-violet-100">Decisions Needed</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {[...decisionTasks.slice(0, 5), ...decisionIdeas.slice(0, 3)].length > 0 ? (
+                  <div className="space-y-2">
+                    {decisionTasks.slice(0, 5).map((task) => {
+                      const room = rooms.find((r) => r._id === task.roomId);
+                      return (
+                        <div key={task._id} className="rounded-lg border border-violet-500/15 bg-black/20 p-3">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room?.name || "General"}</Badge>
+                            <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-zinc-100">{task.title}</div>
+                        </div>
+                      );
+                    })}
+                    {decisionIdeas.slice(0, 3).map((idea) => {
+                      const room = rooms.find((r) => r._id === idea.roomId);
+                      return (
+                        <div key={idea._id} className="rounded-lg border border-violet-500/15 bg-black/20 p-3">
+                          <div className="flex items-center gap-2">
+                            {room ? <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room.name}</Badge> : null}
+                            <Badge className={PRIORITY_COLORS[idea.priority || "nice-to-have"]}>{idea.priority || "nice-to-have"}</Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-zinc-100">{idea.content}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-violet-500/20 bg-black/20 p-4 text-sm text-zinc-300">
+                    Use this for quotes to compare, measurements to grab, budget calls, and any yes-no decisions blocking progress.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-emerald-100">This Week + Sourcing</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wide text-emerald-300">This week</div>
+                  <div className="space-y-2">
+                    {thisWeekTasks.length > 0 ? thisWeekTasks.slice(0, 6).map((task) => {
+                      const room = rooms.find((r) => r._id === task.roomId);
+                      return (
+                        <div key={task._id} className="flex items-center gap-3 rounded-lg border border-emerald-500/15 bg-black/20 p-3">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200 min-w-[96px]">{room?.name || "General"}</Badge>
+                          <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
+                        </div>
+                      );
+                    }) : <p className="text-sm text-zinc-300">No this-week tasks yet.</p>}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wide text-emerald-300">Sourcing and quote leads</div>
+                  <div className="space-y-2">
+                    {sourcingIdeas.length > 0 ? sourcingIdeas.slice(0, 4).map((idea) => {
+                      const room = rooms.find((r) => r._id === idea.roomId);
+                      return (
+                        <div key={idea._id} className="rounded-lg border border-emerald-500/15 bg-black/20 p-3">
+                          <div className="flex items-center gap-2">
+                            {room ? <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room.name}</Badge> : null}
+                            <Badge className={PRIORITY_COLORS[idea.priority || "nice-to-have"]}>{idea.priority || "nice-to-have"}</Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-zinc-100">{idea.content}</div>
+                          {idea.sourceUrl ? (
+                            <a href={idea.sourceUrl} target="_blank" className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300 hover:text-emerald-200">
+                              <ExternalLink className="h-3 w-3" />
+                              Open source
+                            </a>
+                          ) : null}
+                        </div>
+                      );
+                    }) : <p className="text-sm text-zinc-300">Add links for vanity options, paint ideas, Marketplace finds, and vendor research.</p>}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* ROOMS TAB */}
         <TabsContent value="rooms" className="mt-4">
@@ -1009,6 +1270,96 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* BUDGET TAB */}
+        <TabsContent value="budget" className="mt-4">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base text-emerald-100">
+                  <DollarSign className="h-4 w-4 text-emerald-400" />
+                  Budget by room
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {topBudgetRooms.length > 0 ? topBudgetRooms.map((room) => (
+                  <div key={room._id} className="rounded-lg border border-emerald-500/15 bg-black/20 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-medium text-zinc-100">{room.name}</div>
+                        <div className="text-xs text-zinc-400">{STATUS_LABELS[room.status]}</div>
+                      </div>
+                      <div className="text-right text-sm text-zinc-200">
+                        <div>${(room.budgetEstimate || 0).toLocaleString()} est</div>
+                        <div className="text-xs text-zinc-400">${(room.budgetActual || 0).toLocaleString()} spent</div>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-zinc-300">No room budgets added yet.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="space-y-6">
+              <Card className="border-cyan-500/25 bg-cyan-500/[0.06] shadow-none">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base text-cyan-100">
+                    <FileText className="h-4 w-4 text-cyan-400" />
+                    Quotes to collect
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {quoteTasks.length > 0 ? quoteTasks.slice(0, 8).map((task) => {
+                    const room = rooms.find((r) => r._id === task.roomId);
+                    return (
+                      <div key={task._id} className="rounded-lg border border-cyan-500/15 bg-black/20 p-3 text-sm text-zinc-100">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room?.name || "General"}</Badge>
+                          <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                        </div>
+                        <div className="mt-2">{task.title}</div>
+                      </div>
+                    );
+                  }) : (
+                    <p className="text-sm text-zinc-300">Add quote tasks for windows, roof, bathrooms, and kitchen materials.</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="border-fuchsia-500/25 bg-fuchsia-500/[0.06] shadow-none">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base text-fuchsia-100">
+                    <ShoppingCart className="h-4 w-4 text-fuchsia-400" />
+                    Source links and product ideas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {quoteIdeas.length > 0 ? quoteIdeas.slice(0, 8).map((idea) => {
+                    const room = rooms.find((r) => r._id === idea.roomId);
+                    return (
+                      <div key={idea._id} className="rounded-lg border border-fuchsia-500/15 bg-black/20 p-3">
+                        <div className="flex items-center gap-2">
+                          {room ? <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room.name}</Badge> : null}
+                          <Badge className={PRIORITY_COLORS[idea.priority || "nice-to-have"]}>{idea.priority || "nice-to-have"}</Badge>
+                        </div>
+                        <div className="mt-2 text-sm text-zinc-100">{idea.content}</div>
+                        {idea.sourceUrl ? (
+                          <a href={idea.sourceUrl} target="_blank" className="mt-2 inline-flex items-center gap-1 text-xs text-fuchsia-300 hover:text-fuchsia-200">
+                            <ExternalLink className="h-3 w-3" />
+                            Open link
+                          </a>
+                        ) : null}
+                      </div>
+                    );
+                  }) : (
+                    <p className="text-sm text-zinc-300">Add Wayfair, Costco, Marketplace, and contractor links here as ideas.</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
 
         {/* IDEAS TAB */}
