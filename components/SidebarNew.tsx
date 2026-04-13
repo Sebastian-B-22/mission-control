@@ -14,13 +14,9 @@ import {
   Home,
   Briefcase,
   BookOpen,
-  Bot,
-  Brain,
-  Layers,
   Heart,
   ChevronRight,
   ChevronDown,
-  TrendingUp,
   Handshake,
   Users,
   DollarSign,
@@ -63,6 +59,34 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
   };
 
   const isExpanded = (section: string) => expandedSections.includes(section);
+
+  const agentOpsViews = new Set([
+    "sebastian",
+    "agent-ideas",
+    "content-pipeline",
+    "email-drafts",
+    "agent-learnings",
+    "engagement-habits",
+    "agent-hq",
+    "cost-tracker",
+    "agent-huddle-main",
+    "agent-huddle-aspire-ops",
+    "agent-huddle-hta-launch",
+    "agent-huddle-family",
+    "agent-huddle-ideas",
+    "agent-huddle-overnight",
+    "agent-huddle-joy-support",
+    "memory",
+    "memory-panel",
+  ]);
+
+  const isItemActive = (item: any) => {
+    if (item.activeViews) {
+      return item.activeViews.includes(currentView);
+    }
+
+    return currentView === item.view || (item.section && currentView.startsWith(item.section));
+  };
 
   const navigation = [
     {
@@ -186,37 +210,32 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       ]
     },
     {
-      name: "Sebastian",
-      icon: Bot,
-      view: "sebastian",
-      expandable: true,
-      section: "sebastian",
-      children: [
-        { name: "Projects & Backlog", view: "sebastian" },
-        { name: "Agent Ideas", view: "agent-ideas" },
-        { name: "Content Pipeline", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
-        { name: "Email Drafts", view: "email-drafts" },
-        { name: "Engagement", view: "engagement-habits" },
-        { name: "Memory Search", view: "memory" },
-        { name: "Memory Panel", view: "memory-panel" },
-      ]
-    },
-    {
       name: "Agent Ops",
       icon: Users,
       view: "agent-huddle-main",
       expandable: true,
       section: "agents",
+      activeViews: Array.from(agentOpsViews),
       children: [
-        { name: "Agent HQ", view: "agent-hq" },
+        { type: "label", name: "Work" },
+        { name: "Queue", view: "sebastian" },
+        { name: "Ideas", view: "agent-ideas" },
+        { name: "Content", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
+        { name: "Emails & Texts", view: "email-drafts" },
+        { name: "Training", view: "agent-learnings" },
+        { name: "Engagement", view: "engagement-habits" },
+        { type: "label", name: "Admin" },
+        { name: "Telegram Bridge", view: "agent-hq" },
         { name: "AI Costs", view: "cost-tracker" },
-        { name: "Main Huddle", view: "agent-huddle-main" },
-        { name: "Aspire Ops", view: "agent-huddle-aspire-ops" },
-        { name: "HTA Launch", view: "agent-huddle-hta-launch" },
+        { name: "General", view: "agent-huddle-main" },
+        { name: "Operations", view: "agent-huddle-aspire-ops" },
+        { name: "Marketing", view: "agent-huddle-hta-launch" },
         { name: "Family", view: "agent-huddle-family" },
         { name: "Ideas", view: "agent-huddle-ideas" },
         { name: "Overnight", view: "agent-huddle-overnight" },
         { name: "Joy Support", view: "agent-huddle-joy-support" },
+        { name: "Memory Search", view: "memory" },
+        { name: "Memory Panel", view: "memory-panel" },
       ]
     },
   ];
@@ -264,7 +283,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                       }
                     }}
                     className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                      currentView === item.view || (item.section && currentView.startsWith(item.section))
+                      isItemActive(item)
                         ? "bg-zinc-800 text-amber-400 font-medium"
                         : "text-zinc-300 hover:bg-zinc-800"
                     }`}
@@ -299,32 +318,41 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 {item.expandable && item.section && isExpanded(item.section) && item.children && item.children.length > 0 && (
                   <div className="ml-4 mt-1 space-y-1 border-l-2 border-zinc-800 pl-2">
                     {item.children.map((child: any) => (
-                      <button
-                        key={child.view}
-                        onClick={() => {
-                          if (child.href) {
-                            window.location.href = child.href;
-                          } else {
-                            onViewChange(child.view);
-                          }
-                          setIsOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${
-                          currentView === child.view
-                            ? "bg-zinc-800 text-amber-400 font-medium"
-                            : "text-zinc-400 hover:bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <ChevronRight className="h-3 w-3" />
-                          <span>{child.name}</span>
+                      child.type === "label" ? (
+                        <div
+                          key={`label-${child.name}`}
+                          className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500"
+                        >
+                          {child.name}
                         </div>
-                        {(child as any).badge !== undefined && (
-                          <span className="bg-zinc-800 text-zinc-300 text-xs px-1.5 py-0.5 rounded">
-                            {(child as any).badge}
-                          </span>
-                        )}
-                      </button>
+                      ) : (
+                        <button
+                          key={child.view}
+                          onClick={() => {
+                            if (child.href) {
+                              window.location.href = child.href;
+                            } else {
+                              onViewChange(child.view);
+                            }
+                            setIsOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${
+                            currentView === child.view
+                              ? "bg-zinc-800 text-amber-400 font-medium"
+                              : "text-zinc-400 hover:bg-zinc-800"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className="h-3 w-3" />
+                            <span>{child.name}</span>
+                          </div>
+                          {(child as any).badge ? (
+                            <span className="bg-zinc-800 text-zinc-300 text-xs px-1.5 py-0.5 rounded">
+                              {(child as any).badge}
+                            </span>
+                          ) : null}
+                        </button>
+                      )
                     ))}
                   </div>
                 )}
