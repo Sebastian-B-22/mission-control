@@ -378,13 +378,13 @@ export const seedRooms = mutation({
     
     // Add default milestones for the actual remodel sequence
     const milestones = [
-      { title: "Walk house + confirm blank-canvas priorities", targetDate: "2026-04-15" },
+      { title: "Walk house + confirm declutter priorities", targetDate: "2026-04-15" },
       { title: "Set furniture deadlines + clear-out plan", targetDate: "2026-04-25" },
       { title: "Choose bathroom order + room priorities", targetDate: "2026-05-05" },
       { title: "Measure bathrooms + choose kitchen refresh approach", targetDate: "2026-05-20" },
       { title: "Get roof, window, and bathroom quotes", targetDate: "2026-06-15" },
       { title: "Decide funding plan + book must-do work", targetDate: "2026-07-01" },
-      { title: "Final walkthrough + move into house", targetDate: "2027-01-15" },
+      { title: "Pack current house + final walkthrough + move", targetDate: "2027-01-15" },
     ];
     
     for (let i = 0; i < milestones.length; i++) {

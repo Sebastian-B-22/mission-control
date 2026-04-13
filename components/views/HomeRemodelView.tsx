@@ -189,8 +189,8 @@ const SOURCING_STARTERS: StarterTask[] = [
 
 const MOVE_IN_OBJECTIVE_BLUEPRINT = [
   {
-    title: "Clear inherited stuff",
-    description: "Confirm the blank-canvas plan, then set pickup, donate, and junk deadlines.",
+    title: "Declutter",
+    description: "Clear inherited furniture, books, junk, and overgrowth so the house becomes a true blank canvas.",
     milestoneStart: 0,
     milestoneEnd: 2,
     cardClass: "border-sky-500/25 bg-sky-500/[0.05]",
@@ -199,8 +199,8 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
     buttonClass: "border-sky-500/15 hover:bg-sky-500/10",
   },
   {
-    title: "Lock renovation priorities",
-    description: "Decide bathroom order, room priorities, and the kitchen refresh approach.",
+    title: "Lock the big decisions",
+    description: "Choose bathroom order, room priorities, and the kitchen refresh path so the project has a real backbone.",
     milestoneStart: 2,
     milestoneEnd: 4,
     cardClass: "border-amber-500/25 bg-amber-500/[0.05]",
@@ -210,7 +210,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
   },
   {
     title: "Source, quote, fund",
-    description: "Measure, compare options, get quotes, and make the funding calls for must-do work.",
+    description: "Measure, compare options, get roof/window/bath quotes, and decide how to fund the must-do work.",
     milestoneStart: 4,
     milestoneEnd: 6,
     cardClass: "border-emerald-500/25 bg-emerald-500/[0.05]",
@@ -219,8 +219,8 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
     buttonClass: "border-emerald-500/15 hover:bg-emerald-500/10",
   },
   {
-    title: "Final prep + move",
-    description: "Land the house in a move-ready state and make the January move cleanly.",
+    title: "Pack + move",
+    description: "Finish the house, pack the current house, and make the January move feel clean instead of chaotic.",
     milestoneStart: 6,
     milestoneEnd: 7,
     cardClass: "border-violet-500/25 bg-violet-500/[0.05]",
