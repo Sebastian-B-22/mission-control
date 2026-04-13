@@ -416,15 +416,15 @@ function StarterTaskList({
   onPick: (title: string, roomHint?: string) => void;
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-white/10 bg-black/20 p-4">
-      <div className="mb-3 text-xs font-medium uppercase tracking-wide text-zinc-400">Suggested starters</div>
+    <div className="rounded-lg border border-dashed border-white/10 bg-black/20 p-3">
+      <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-zinc-400">Suggested starters</div>
       <div className="grid gap-2">
         {items.map((item) => (
           <button
             key={item.title}
             type="button"
             onClick={() => onPick(item.title, item.roomHint)}
-            className={`flex items-start gap-2 rounded-lg border px-3 py-3 text-left text-sm text-zinc-100 transition-colors hover:bg-white/5 ${accentClass}`}
+            className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-left text-sm text-zinc-100 transition-colors hover:bg-white/5 ${accentClass}`}
           >
             <Plus className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>{item.title}</span>
@@ -603,7 +603,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
@@ -630,103 +630,80 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
       </div>
 
       {/* Compact Overview */}
-      <div className="grid gap-3 xl:grid-cols-3">
-        <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
-          <CardContent className="grid grid-cols-3 gap-3 px-4 py-3">
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Rooms</div>
-              <div className="mt-1 text-lg font-semibold text-white">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
-              <div className="text-xs text-zinc-400">completed</div>
+      <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
+        <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500">Rooms</div>
+            <div className="mt-0.5 text-base font-semibold text-white">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
+          </div>
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500">Tasks</div>
+            <div className="mt-0.5 text-base font-semibold text-white">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
+          </div>
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500">Active</div>
+            <div className="mt-0.5 text-base font-semibold text-white">{stats?.tasksByStatus.inProgress || 0}</div>
+          </div>
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500">Ideas</div>
+            <div className="mt-0.5 text-base font-semibold text-white">{stats?.ideasTotal || 0}</div>
+          </div>
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500">Budget</div>
+            <div className="mt-0.5 text-base font-semibold text-emerald-200">${totalEstimated.toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500">Spent</div>
+            <div className="mt-0.5 text-base font-semibold text-rose-200">${totalSpent.toLocaleString()}</div>
+          </div>
+          <div className="h-8 w-px bg-zinc-800 hidden md:block" />
+          <div className="min-w-[200px] flex-1">
+            <div className="text-[11px] uppercase tracking-wide text-orange-300/80">Next objective</div>
+            <div className="mt-0.5 text-sm font-semibold text-orange-100">
+              {nextMilestone ? nextMilestone.title : "Move-in day"}
             </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Tasks</div>
-              <div className="mt-1 text-lg font-semibold text-white">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
-              <div className="text-xs text-zinc-400">done</div>
+            <div className="text-xs text-zinc-400">
+              {nextMilestone ? `${formatShortDate(nextMilestone.targetDate)}${daysToNextMilestone !== null ? ` • ${daysToNextMilestone} days` : ""}` : `Target ${formatShortDate("2027-01-15")}`}
             </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Active</div>
-              <div className="mt-1 text-lg font-semibold text-white">{stats?.tasksByStatus.inProgress || 0}</div>
-              <div className="text-xs text-zinc-400">in progress</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
-          <CardContent className="grid grid-cols-3 gap-3 px-4 py-3">
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Ideas</div>
-              <div className="mt-1 text-lg font-semibold text-white">{stats?.ideasTotal || 0}</div>
-              <div className="text-xs text-zinc-400">saved</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Budget</div>
-              <div className="mt-1 text-lg font-semibold text-emerald-200">${totalEstimated.toLocaleString()}</div>
-              <div className="text-xs text-zinc-400">estimated</div>
-            </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500">Spent</div>
-              <div className="mt-1 text-lg font-semibold text-rose-200">${totalSpent.toLocaleString()}</div>
-              <div className="text-xs text-zinc-400">actual</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-500/20 bg-orange-500/[0.05] shadow-none">
-          <CardContent className="px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[11px] uppercase tracking-wide text-orange-300/80">Next objective</div>
-                <div className="mt-1 text-sm font-semibold text-orange-100">
-                  {nextMilestone ? nextMilestone.title : "Move-in day"}
-                </div>
-                <div className="text-xs text-orange-200/70">
-                  {nextMilestone ? `${formatShortDate(nextMilestone.targetDate)}${daysToNextMilestone !== null ? ` • ${daysToNextMilestone} days` : ""}` : `Target ${formatShortDate("2027-01-15")}`}
-                </div>
-              </div>
-              <Badge className="border-orange-500/30 bg-black/30 px-3 py-1 text-orange-100">
-                {daysUntilMove} days left
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Move-In Objectives */}
       <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2 text-zinc-100">
             <Target className="h-4 w-4 text-orange-400" />
             Move-In Objectives
           </CardTitle>
-          <p className="text-sm text-zinc-400">
-            Think in phases, not just dates. Tap milestones as each objective gets locked in.
+          <p className="text-xs text-zinc-400">
+            Four phases to move from clean-out to move-in.
           </p>
         </CardHeader>
-        <CardContent className="grid gap-3 xl:grid-cols-4">
+        <CardContent className="grid gap-3 md:grid-cols-2">
           {moveInObjectives.map((objective) => (
-            <div key={objective.title} className={`rounded-xl border p-4 ${objective.cardClass}`}>
+            <div key={objective.title} className={`rounded-xl border p-3 ${objective.cardClass}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className={`text-sm font-semibold ${objective.titleClass}`}>{objective.title}</div>
-                  <p className={`mt-1 text-sm ${objective.textClass}`}>{objective.description}</p>
+                  {objective.targetDate ? (
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-zinc-500">
+                      Target by {formatShortDate(objective.targetDate)}
+                    </div>
+                  ) : null}
                 </div>
                 <Badge className={objective.isComplete ? "bg-green-600 text-white" : "bg-black/30 text-zinc-200 border border-white/10"}>
                   {objective.completedCount}/{objective.totalCount}
                 </Badge>
               </div>
-              {objective.targetDate ? (
-                <div className="mt-3 text-xs uppercase tracking-wide text-zinc-500">
-                  Target by {formatShortDate(objective.targetDate)}
-                </div>
-              ) : null}
-              <div className="mt-3 space-y-2">
+              <div className="mt-2 space-y-1.5">
                 {objective.milestones.map((milestone) => {
                   const isPast = new Date(milestone.targetDate) < today && !milestone.completed;
                   return (
                     <button
                       key={milestone._id}
                       onClick={() => toggleMilestone({ milestoneId: milestone._id, completed: !milestone.completed })}
-                      className={`flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-all ${
+                      className={`flex w-full items-center gap-2 rounded-lg border px-3 py-1.5 text-left text-sm transition-all ${
                         milestone.completed
                           ? "border-green-700/40 bg-green-950/40 text-green-100"
                           : isPast
@@ -734,8 +711,8 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                           : `bg-black/20 text-zinc-200 ${objective.buttonClass}`
                       }`}
                     >
-                      {milestone.completed ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <Clock className="h-4 w-4 shrink-0" />}
-                      <span className="flex-1">{milestone.title}</span>
+                      {milestone.completed ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <Clock className="h-3.5 w-3.5 shrink-0" />}
+                      <span className="flex-1 truncate">{milestone.title}</span>
                       <span className="text-xs opacity-70">{formatShortDate(milestone.targetDate)}</span>
                     </button>
                   );
@@ -757,67 +734,69 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
         </TabsList>
 
         {/* PLAN TAB */}
-        <TabsContent value="plan" className="mt-4 space-y-6">
-          {isGettingStarted ? (
-            <Card className="border-amber-500/25 bg-amber-500/[0.08] shadow-none">
+        <TabsContent value="plan" className="mt-4 space-y-4">
+          <div className={`grid gap-4 ${isGettingStarted ? "md:grid-cols-2" : ""}`}>
+            {isGettingStarted ? (
+              <Card className="border-amber-500/25 bg-amber-500/[0.08] shadow-none">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base text-amber-100">Start here this week</CardTitle>
+                  <p className="text-sm text-amber-200/80">
+                    You&apos;ve got the structure. Now let&apos;s turn it into a working remodel plan with the first real moves.
+                  </p>
+                </CardHeader>
+                <CardContent className="grid gap-2 sm:grid-cols-2">
+                  <button type="button" onClick={() => openQuickAddFor("Set deadline for relatives to pick up claimed furniture")} className="rounded-xl border border-orange-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-orange-100">Furniture deadlines</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Start with inherited-item decisions so the house can become a blank canvas.</p>
+                  </button>
+                  <button type="button" onClick={() => openQuickAddFor("Plan dumpster day for inherited junk and overgrowth")} className="rounded-xl border border-sky-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-sky-100">Dumpster + demo day</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Create the first cleanup push before spending energy on finish details.</p>
+                  </button>
+                  <button type="button" onClick={() => openQuickAddFor("Measure bathroom vanity spaces", "Bathroom")} className="rounded-xl border border-emerald-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-emerald-100">Grab measurements</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Measure bathrooms first so sourcing vanities gets concrete fast.</p>
+                  </button>
+                  <button type="button" onClick={() => setActiveTab("rooms")} className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-fuchsia-100">Review rooms</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Open Rooms and fill in vision and current state room by room.</p>
+                  </button>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            <Card className="border-sky-500/25 bg-sky-500/[0.05] shadow-none">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base text-amber-100">Start here this week</CardTitle>
-                <p className="text-sm text-amber-200/80">
-                  You&apos;ve got the structure. Now let&apos;s turn it into a working remodel plan with the first real moves.
+                <CardTitle className="flex items-center gap-2 text-base text-sky-100">
+                  <Home className="h-4 w-4 text-sky-400" />
+                  Remodel game plan
+                </CardTitle>
+                <p className="text-sm text-sky-200/80">
+                  Blank canvas first, then priority renovations, then sourcing and polish.
                 </p>
               </CardHeader>
-              <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <button type="button" onClick={() => openQuickAddFor("Set deadline for relatives to pick up claimed furniture")} className="rounded-xl border border-orange-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
-                  <div className="text-sm font-semibold text-orange-100">Furniture deadlines</div>
-                  <p className="mt-2 text-sm text-zinc-300">Start with inherited-item decisions so the house can become a blank canvas.</p>
-                </button>
-                <button type="button" onClick={() => openQuickAddFor("Plan dumpster day for inherited junk and overgrowth")} className="rounded-xl border border-sky-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
-                  <div className="text-sm font-semibold text-sky-100">Dumpster + demo day</div>
-                  <p className="mt-2 text-sm text-zinc-300">Create the first cleanup push before spending energy on finish details.</p>
-                </button>
-                <button type="button" onClick={() => openQuickAddFor("Measure bathroom vanity spaces", "Bathroom")} className="rounded-xl border border-emerald-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
-                  <div className="text-sm font-semibold text-emerald-100">Grab measurements</div>
-                  <p className="mt-2 text-sm text-zinc-300">Measure bathrooms first so sourcing vanities and comparing options gets concrete fast.</p>
-                </button>
-                <button type="button" onClick={() => setActiveTab("rooms")} className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-4 text-left transition hover:bg-white/5">
-                  <div className="text-sm font-semibold text-fuchsia-100">Review rooms</div>
-                  <p className="mt-2 text-sm text-zinc-300">Open Rooms and start filling in vision and current state room by room.</p>
-                </button>
+              <CardContent className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-xl border border-orange-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-orange-100">1. Blank canvas first</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Clear inherited items, junk, books, and blockers.</p>
+                </div>
+                <div className="rounded-xl border border-amber-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-amber-100">2. Priority projects</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Bathrooms, kitchen, windows, roof, yard, shed-to-gym.</p>
+                </div>
+                <div className="rounded-xl border border-emerald-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-emerald-100">3. Source smart</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Measure first, then compare vendors and quotes.</p>
+                </div>
+                <div className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-fuchsia-100">4. Family logistics</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Use deadlines to force pickup, ship, sell, or donate decisions.</p>
+                </div>
               </CardContent>
             </Card>
-          ) : null}
+          </div>
 
-          <Card className="border-sky-500/25 bg-sky-500/[0.05] shadow-none">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base text-sky-100">
-                <Home className="h-4 w-4 text-sky-400" />
-                Remodel game plan
-              </CardTitle>
-              <p className="text-sm text-sky-200/80">
-                The goal is a blank canvas first, then the highest-leverage renovations, then sourcing and polish.
-              </p>
-            </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-xl border border-orange-500/20 bg-black/20 p-4">
-                <div className="text-sm font-semibold text-orange-100">1. Blank canvas first</div>
-                <p className="mt-2 text-sm text-zinc-300">Clear inherited items, junk, books, and anything blocking clean decision-making.</p>
-              </div>
-              <div className="rounded-xl border border-amber-500/20 bg-black/20 p-4">
-                <div className="text-sm font-semibold text-amber-100">2. Priority projects</div>
-                <p className="mt-2 text-sm text-zinc-300">Bathrooms, kitchen refresh, windows, roof, yard, and the shed-to-gym conversion.</p>
-              </div>
-              <div className="rounded-xl border border-emerald-500/20 bg-black/20 p-4">
-                <div className="text-sm font-semibold text-emerald-100">3. Source smart</div>
-                <p className="mt-2 text-sm text-zinc-300">Measure first, then compare Wayfair, Costco, Marketplace, and contractor quotes.</p>
-              </div>
-              <div className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-4">
-                <div className="text-sm font-semibold text-fuchsia-100">4. Family logistics</div>
-                <p className="mt-2 text-sm text-zinc-300">Use deadlines for claimed furniture and make pickup, shipping, sell, or donate decisions fast.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card className="border-sky-500/25 bg-sky-500/[0.06] shadow-none">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base text-sky-100">Blank Canvas Before Move-In</CardTitle>
