@@ -50,10 +50,10 @@ import {
 
 // Status colors for room cards (background) - explicit colors for dark mode
 const ROOM_STATUS_BG: Record<string, string> = {
-  "not-started": "bg-zinc-200 border-zinc-400 text-zinc-900",
-  "planning": "bg-blue-100 border-blue-400 text-blue-900",
-  "in-progress": "bg-amber-100 border-amber-400 text-amber-900",
-  "done": "bg-green-100 border-green-400 text-green-900",
+  "not-started": "bg-zinc-950 border-zinc-800 text-zinc-100",
+  "planning": "bg-blue-950/50 border-blue-700/40 text-blue-100",
+  "in-progress": "bg-amber-950/40 border-amber-700/40 text-amber-100",
+  "done": "bg-green-950/40 border-green-700/40 text-green-100",
 };
 
 const ROOM_STATUS_BADGE: Record<string, string> = {
@@ -73,19 +73,19 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const TASK_STATUS_COLORS: Record<string, string> = {
-  "idea": "bg-purple-100 text-purple-700 border-purple-200",
-  "planned": "bg-blue-100 text-blue-700 border-blue-200",
-  "in-progress": "bg-amber-100 text-amber-700 border-amber-200",
-  "done": "bg-green-100 text-green-700 border-green-200",
+  "idea": "bg-purple-950/40 text-purple-100 border-purple-700/40",
+  "planned": "bg-blue-950/40 text-blue-100 border-blue-700/40",
+  "in-progress": "bg-amber-950/40 text-amber-100 border-amber-700/40",
+  "done": "bg-green-950/40 text-green-100 border-green-700/40",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  "must-have": "bg-red-100 text-red-800 border-red-200",
-  "nice-to-have": "bg-yellow-100 text-yellow-800 border-yellow-200",
-  "dream": "bg-purple-100 text-purple-800 border-purple-200",
-  "high": "bg-red-100 text-red-800 border-red-200",
-  "medium": "bg-yellow-100 text-yellow-800 border-yellow-200",
-  "low": "bg-gray-100 text-gray-800 border-gray-200",
+  "must-have": "bg-red-950/40 text-red-100 border-red-700/40",
+  "nice-to-have": "bg-yellow-950/40 text-yellow-100 border-yellow-700/40",
+  "dream": "bg-purple-950/40 text-purple-100 border-purple-700/40",
+  "high": "bg-red-950/40 text-red-100 border-red-700/40",
+  "medium": "bg-yellow-950/40 text-yellow-100 border-yellow-700/40",
+  "low": "bg-zinc-900 text-zinc-200 border-zinc-700",
 };
 
 // Budget Breakdown Component
@@ -117,24 +117,24 @@ function BudgetBreakdown({
   const totalActual = budgetItems.reduce((s, i) => s + (i.actualCost || 0), 0);
 
   return (
-    <Card className="bg-emerald-50 border-emerald-300">
+    <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
       <CardHeader className="pb-2">
         <button 
           onClick={() => setExpanded(!expanded)}
           className="flex items-center justify-between w-full text-left"
         >
-          <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
-            <DollarSign className="h-4 w-4 text-emerald-600" />
+          <CardTitle className="text-base flex items-center gap-2 text-emerald-100">
+            <DollarSign className="h-4 w-4 text-emerald-400" />
             Budget
           </CardTitle>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-emerald-700">
+            <span className="text-sm text-emerald-200">
               ${totalEstimated.toLocaleString()} est / ${totalActual.toLocaleString()} spent
             </span>
             {expanded ? (
-              <ChevronDown className="h-4 w-4 text-emerald-600" />
+              <ChevronDown className="h-4 w-4 text-emerald-400" />
             ) : (
-              <ChevronRight className="h-4 w-4 text-emerald-600" />
+              <ChevronRight className="h-4 w-4 text-emerald-400" />
             )}
           </div>
         </button>
@@ -143,12 +143,12 @@ function BudgetBreakdown({
         <CardContent className="space-y-2">
           {/* Budget Items */}
           {budgetItems.length === 0 ? (
-            <p className="text-sm text-emerald-700">No items yet - add furniture, fixtures, materials...</p>
+            <p className="text-sm text-emerald-200">No items yet - add furniture, fixtures, materials...</p>
           ) : (
             budgetItems.map((item) => (
               <div
                 key={item._id}
-                className="flex items-center gap-2 p-2 rounded bg-white border border-emerald-200"
+                className="flex items-center gap-2 rounded border border-emerald-700/30 bg-zinc-950/80 p-2"
               >
                 <input
                   type="checkbox"
@@ -156,11 +156,11 @@ function BudgetBreakdown({
                   onChange={(e) => updateBudgetItem({ itemId: item._id, purchased: e.target.checked })}
                   className="h-4 w-4 accent-emerald-600"
                 />
-                <span className={`flex-1 text-sm text-slate-900 ${item.purchased ? 'line-through opacity-60' : ''}`}>
+                <span className={`flex-1 text-sm text-zinc-100 ${item.purchased ? 'line-through opacity-60' : ''}`}>
                   {item.name}
                 </span>
                 {item.link && (
-                  <a href={item.link} target="_blank" className="text-emerald-600 hover:text-emerald-800">
+                  <a href={item.link} target="_blank" className="text-emerald-400 hover:text-emerald-300">
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
@@ -169,14 +169,14 @@ function BudgetBreakdown({
                   placeholder="Est $"
                   value={item.estimatedCost || ""}
                   onChange={(e) => updateBudgetItem({ itemId: item._id, estimatedCost: Number(e.target.value) || 0 })}
-                  className="w-20 h-7 text-xs bg-white text-slate-900"
+                  className="h-7 w-20 border-emerald-700/30 bg-zinc-900 text-xs text-zinc-100"
                 />
                 <Input
                   type="number"
                   placeholder="Actual $"
                   value={item.actualCost || ""}
                   onChange={(e) => updateBudgetItem({ itemId: item._id, actualCost: Number(e.target.value) || 0 })}
-                  className="w-20 h-7 text-xs bg-white text-slate-900"
+                  className="h-7 w-20 border-emerald-700/30 bg-zinc-900 text-xs text-zinc-100"
                 />
                 <Button
                   variant="ghost"
@@ -192,12 +192,12 @@ function BudgetBreakdown({
 
           {/* Add Item Form */}
           {showAddItem ? (
-            <div className="flex gap-2 p-2 bg-white rounded border border-emerald-200">
+            <div className="flex gap-2 rounded border border-emerald-700/30 bg-zinc-950/80 p-2">
               <Input
                 placeholder="Item name (e.g., King bed)"
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
-                className="flex-1 text-sm text-slate-900"
+                className="flex-1 border-emerald-700/30 bg-zinc-900 text-sm text-zinc-100"
                 autoFocus
               />
               <Input
@@ -205,13 +205,13 @@ function BudgetBreakdown({
                 placeholder="Est $"
                 value={newItemCost}
                 onChange={(e) => setNewItemCost(e.target.value)}
-                className="w-20 text-sm text-slate-900"
+                className="w-20 border-emerald-700/30 bg-zinc-900 text-sm text-zinc-100"
               />
               <Input
                 placeholder="Link (optional)"
                 value={newItemLink}
                 onChange={(e) => setNewItemLink(e.target.value)}
-                className="w-32 text-sm text-slate-900"
+                className="w-32 border-emerald-700/30 bg-zinc-900 text-sm text-zinc-100"
               />
               <Button
                 size="sm"
@@ -242,7 +242,7 @@ function BudgetBreakdown({
               variant="outline" 
               size="sm" 
               onClick={() => setShowAddItem(true)}
-              className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+              className="w-full border-emerald-700/40 text-emerald-300 hover:bg-emerald-500/10"
             >
               <Plus className="h-3 w-3 mr-1" />
               Add Item
@@ -402,58 +402,58 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-6">
+        <Card className="border-blue-500/25 bg-blue-500/[0.06] shadow-none">
           <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-blue-700">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
-            <p className="text-xs text-blue-600">Rooms Done</p>
+            <div className="text-2xl font-bold text-blue-100">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
+            <p className="text-xs text-blue-300">Rooms Done</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+        <Card className="border-green-500/25 bg-green-500/[0.06] shadow-none">
           <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-green-700">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
-            <p className="text-xs text-green-600">Tasks Done</p>
+            <div className="text-2xl font-bold text-green-100">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
+            <p className="text-xs text-green-300">Tasks Done</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+        <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
           <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-amber-700">{stats?.tasksByStatus.inProgress || 0}</div>
-            <p className="text-xs text-amber-600">In Progress</p>
+            <div className="text-2xl font-bold text-amber-100">{stats?.tasksByStatus.inProgress || 0}</div>
+            <p className="text-xs text-amber-300">In Progress</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+        <Card className="border-purple-500/25 bg-purple-500/[0.06] shadow-none">
           <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-purple-700">{stats?.ideasTotal || 0}</div>
-            <p className="text-xs text-purple-600">Ideas</p>
+            <div className="text-2xl font-bold text-purple-100">{stats?.ideasTotal || 0}</div>
+            <p className="text-xs text-purple-300">Ideas</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+        <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
           <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-emerald-700">
+            <div className="text-2xl font-bold text-emerald-100">
               ${totalEstimated.toLocaleString()}
             </div>
-            <p className="text-xs text-emerald-600">Est. Budget</p>
+            <p className="text-xs text-emerald-300">Est. Budget</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200">
+        <Card className="border-rose-500/25 bg-rose-500/[0.06] shadow-none">
           <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-rose-700">
+            <div className="text-2xl font-bold text-rose-100">
               ${totalSpent.toLocaleString()}
             </div>
-            <p className="text-xs text-rose-600">Spent</p>
+            <p className="text-xs text-rose-300">Spent</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Next Milestone Alert */}
       {nextMilestone && daysToNextMilestone !== null && daysToNextMilestone <= 30 && (
-        <Card className="bg-amber-50 border-amber-300">
-          <CardContent className="py-3 flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
-            <span className="font-medium text-amber-800">
+        <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
+          <CardContent className="flex items-center gap-3 py-3">
+            <AlertCircle className="h-5 w-5 text-amber-400" />
+            <span className="font-medium text-amber-100">
               Next milestone in {daysToNextMilestone} days: {nextMilestone.title}
             </span>
-            <span className="text-sm text-amber-600 ml-auto">
+            <span className="ml-auto text-sm text-amber-300">
               {new Date(nextMilestone.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
             </span>
           </CardContent>
@@ -507,12 +507,12 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                 <button
                   key={m._id}
                   onClick={() => toggleMilestone({ milestoneId: m._id, completed: !m.completed })}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all ${
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
                     m.completed
-                      ? "bg-green-100 border-green-300 text-green-800"
+                      ? "bg-green-950/40 border-green-700/40 text-green-100"
                       : isPast
-                      ? "bg-red-100 border-red-300 text-red-700"
-                      : "bg-zinc-100 border-zinc-300 text-zinc-700 hover:bg-zinc-200"
+                      ? "bg-red-950/40 border-red-700/40 text-red-100"
+                      : "bg-zinc-950 border-zinc-800 text-zinc-200 hover:bg-zinc-900"
                   }`}
                 >
                   {m.completed ? (
@@ -591,10 +591,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
               {selectedRoomData ? (
                 <>
                   {/* Room Header */}
-                  <Card className="bg-slate-100 border-slate-400">
+                  <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-slate-900">{selectedRoomData.name}</CardTitle>
+                        <CardTitle className="text-white">{selectedRoomData.name}</CardTitle>
                         <Select
                           value={selectedRoomData.status}
                           onValueChange={(v) => updateRoom({ roomId: selectedRoomData._id, status: v })}
@@ -612,24 +612,24 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="grid md:grid-cols-2 gap-3">
+                      <div className="grid gap-3 md:grid-cols-2">
                         <div>
-                          <label className="text-xs font-medium text-slate-700">Vision</label>
+                          <label className="text-xs font-medium text-zinc-300">Vision</label>
                           <Textarea
                             placeholder="What do you want this room to become?"
                             value={selectedRoomData.vision || ""}
                             onChange={(e) => updateRoom({ roomId: selectedRoomData._id, vision: e.target.value })}
-                            className="mt-1 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
+                            className="mt-1 border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
                             rows={3}
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-slate-700">Current State</label>
+                          <label className="text-xs font-medium text-zinc-300">Current State</label>
                           <Textarea
                             placeholder="What's it like now?"
                             value={selectedRoomData.currentState || ""}
                             onChange={(e) => updateRoom({ roomId: selectedRoomData._id, currentState: e.target.value })}
-                            className="mt-1 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
+                            className="mt-1 border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
                             rows={3}
                           />
                         </div>
@@ -651,10 +651,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   />
 
                   {/* Tasks */}
-                  <Card className="bg-slate-100 border-slate-400">
+                  <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base text-slate-900">Tasks ({tasks.length})</CardTitle>
+                        <CardTitle className="text-base text-white">Tasks ({tasks.length})</CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddTask(true)}>
                           <Plus className="h-3 w-3 mr-1" />
                           Add
@@ -663,18 +663,18 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {tasks.length === 0 ? (
-                        <p className="text-sm text-slate-600">No tasks yet</p>
+                        <p className="text-sm text-zinc-400">No tasks yet</p>
                       ) : (
                         tasks.map((task) => (
                           <div
                             key={task._id}
-                            className={`flex items-center gap-3 p-2 rounded border ${TASK_STATUS_COLORS[task.status]}`}
+                            className={`flex items-center gap-3 rounded border p-2 ${TASK_STATUS_COLORS[task.status]}`}
                           >
                             <Select
                               value={task.status}
                               onValueChange={(v) => updateTask({ taskId: task._id, status: v })}
                             >
-                              <SelectTrigger className="w-[110px] h-7 text-xs bg-white/50">
+                              <SelectTrigger className="h-7 w-[110px] border-white/10 bg-black/20 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -688,13 +688,13 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                               {task.title}
                             </span>
                             {task.assignee && (
-                              <Badge variant="outline" className="text-xs bg-white/50">
+                              <Badge variant="outline" className="border-white/10 bg-black/20 text-xs text-zinc-200">
                                 <User className="h-3 w-3 mr-1" />
                                 {task.assignee}
                               </Badge>
                             )}
                             {task.estimatedCost && (
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-xs text-zinc-300">
                                 ${task.estimatedCost}
                               </span>
                             )}
@@ -711,7 +711,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       )}
 
                       {showAddTask && (
-                        <div className="flex gap-2 mt-2 p-2 bg-zinc-50 rounded">
+                        <div className="mt-2 flex gap-2 rounded border border-zinc-800 bg-zinc-900 p-2">
                           <Input
                             placeholder="New task..."
                             value={newTaskTitle}
@@ -767,11 +767,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   </Card>
 
                   {/* Ideas */}
-                  <Card className="bg-yellow-50 border-yellow-300">
+                  <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base flex items-center gap-2 text-yellow-900">
-                          <Lightbulb className="h-4 w-4 text-yellow-600" />
+                        <CardTitle className="text-base flex items-center gap-2 text-amber-100">
+                          <Lightbulb className="h-4 w-4 text-amber-400" />
                           Ideas & Inspiration
                         </CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddIdea(true)}>
@@ -782,19 +782,19 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {roomIdeas.filter(i => !i.promoted).length === 0 ? (
-                        <p className="text-sm text-yellow-700">No ideas yet - brainstorm away!</p>
+                        <p className="text-sm text-amber-200">No ideas yet - brainstorm away!</p>
                       ) : (
                         roomIdeas.filter(i => !i.promoted).map((idea) => (
                           <div
                             key={idea._id}
-                            className="flex flex-col gap-2 p-3 rounded border bg-yellow-100 border-yellow-300 text-yellow-900"
+                            className="flex flex-col gap-2 rounded border border-amber-700/30 bg-zinc-950/80 p-3 text-amber-50"
                           >
                             <div className="flex items-start gap-3">
-                              <Lightbulb className="h-4 w-4 text-yellow-600 mt-0.5" />
+                              <Lightbulb className="mt-0.5 h-4 w-4 text-amber-400" />
                               <div className="flex-1">
                                 <p className="text-sm">{idea.content}</p>
                                 {idea.sourceUrl && (
-                                  <a href={idea.sourceUrl} target="_blank" className="text-xs text-blue-600 hover:underline">
+                                  <a href={idea.sourceUrl} target="_blank" className="text-xs text-blue-300 hover:underline">
                                     View inspiration
                                   </a>
                                 )}
@@ -821,17 +821,17 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                               </Button>
                             </div>
                             {/* Image display and upload */}
-                            <div className="flex items-center gap-2 ml-7">
+                            <div className="ml-7 flex items-center gap-2">
                               {idea.imageUrl ? (
                                 <a href={idea.imageUrl} target="_blank" className="block">
                                   <img 
                                     src={idea.imageUrl} 
                                     alt="Inspiration" 
-                                    className="h-20 w-auto rounded border border-yellow-300 hover:opacity-80 transition"
+                                    className="h-20 w-auto rounded border border-amber-700/30 transition hover:opacity-80"
                                   />
                                 </a>
                               ) : (
-                                <label className="flex items-center gap-1 text-xs text-yellow-700 cursor-pointer hover:text-yellow-900">
+                                <label className="flex cursor-pointer items-center gap-1 text-xs text-amber-300 hover:text-amber-100">
                                   <Image className="h-3 w-3" />
                                   {uploadingIdea === idea._id ? "Uploading..." : "Add photo"}
                                   <input
@@ -851,7 +851,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       )}
 
                       {showAddIdea && (
-                        <div className="flex flex-col gap-2 mt-2 p-3 border rounded bg-white">
+                        <div className="mt-2 flex flex-col gap-2 rounded border border-zinc-800 bg-zinc-900 p-3">
                           <Textarea
                             placeholder="Describe your idea..."
                             value={newIdeaContent}
@@ -966,16 +966,16 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     return (
                       <div
                         key={task._id}
-                        className={`flex items-center gap-3 p-2 rounded border ${TASK_STATUS_COLORS[task.status]}`}
+                        className={`flex items-center gap-3 rounded border p-2 ${TASK_STATUS_COLORS[task.status]}`}
                       >
-                        <Badge variant="outline" className="bg-white/50 min-w-[100px]">
+                        <Badge variant="outline" className="min-w-[100px] border-white/10 bg-black/20 text-zinc-200">
                           {room?.name}
                         </Badge>
                         <Select
                           value={task.status}
                           onValueChange={(v) => updateTask({ taskId: task._id, status: v })}
                         >
-                          <SelectTrigger className="w-[110px] h-7 text-xs bg-white/50">
+                          <SelectTrigger className="h-7 w-[110px] border-white/10 bg-black/20 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -989,7 +989,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                           {task.title}
                         </span>
                         {task.assignee && (
-                          <Badge variant="outline" className="text-xs bg-white/50">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-xs text-zinc-200">
                             <User className="h-3 w-3 mr-1" />
                             {task.assignee}
                           </Badge>
@@ -1030,11 +1030,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     return (
                       <div
                         key={idea._id}
-                        className="flex items-start gap-3 p-2 rounded border bg-yellow-50/50 border-yellow-200"
+                        className="flex items-start gap-3 rounded border border-amber-700/30 bg-zinc-950/80 p-2"
                       >
-                        <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5" />
+                        <Lightbulb className="mt-0.5 h-4 w-4 text-amber-400" />
                         {room && (
-                          <Badge variant="outline" className="bg-white/50">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">
                             {room.name}
                           </Badge>
                         )}

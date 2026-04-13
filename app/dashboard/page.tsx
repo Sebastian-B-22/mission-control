@@ -28,6 +28,7 @@ import { SebastianWorkspace } from "@/components/SebastianWorkspace";
 import AgentHuddle from "@/components/AgentHuddle";
 import { ContentPipeline } from "@/components/ContentPipeline";
 import { EmailDraftsView } from "@/components/EmailDraftsView";
+import { AgentLearningsReview } from "@/components/AgentLearningsReview";
 import { MemoryView } from "@/components/MemoryView";
 import { EngagementHabits } from "@/components/EngagementHabits";
 import { SidebarNew } from "@/components/SidebarNew";
@@ -572,15 +573,7 @@ export default function DashboardPage() {
                 Review and lock in useful agent learnings without turning this into a junk drawer.
               </p>
             </div>
-            <Card className="bg-zinc-950 border-zinc-800">
-              <CardHeader>
-                <CardTitle className="text-sm">Training queue</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-zinc-400">
-                <p>The full training review surface is not wired back in yet.</p>
-                <p>I restored this page so it is no longer a dead end, and I can build the actual review queue next if you want.</p>
-              </CardContent>
-            </Card>
+            <AgentLearningsReview />
           </div>
         );
 

@@ -69,7 +69,7 @@ function QueueLane({
   itemClass: string;
 }) {
   return (
-    <Card className={`w-[320px] shrink-0 border shadow-none ${cardClass}`}>
+    <Card className={`w-full min-w-0 border shadow-none ${cardClass}`}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg text-white">
           {icon}
@@ -242,68 +242,66 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
         <p className="mt-1 text-sm text-zinc-400">{today}. Work left to right: act now, triage inbox, clear review, then close loops.</p>
       </div>
 
-      <div className="overflow-x-auto pb-2">
-        <div className="flex min-w-max gap-4 pr-4">
-          <QueueLane
-            title={`Action now (${actionNow.length})`}
-            subtitle="Active tasks, urgent project work, and Sebastian-owned pending items."
-            icon={<TrendingUp className="h-5 w-5 text-amber-400" />}
-            items={actionNow}
-            emptyMessage="Nothing urgent is queued right now."
-            cardClass="border-amber-500/30 bg-amber-500/[0.06]"
-            itemClass="border-amber-500/15 bg-black/20"
-          />
+      <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+        <QueueLane
+          title={`Action now (${actionNow.length})`}
+          subtitle="Active tasks, urgent project work, and Sebastian-owned pending items."
+          icon={<TrendingUp className="h-5 w-5 text-amber-400" />}
+          items={actionNow}
+          emptyMessage="Nothing urgent is queued right now."
+          cardClass="border-amber-500/30 bg-amber-500/[0.06]"
+          itemClass="border-amber-500/15 bg-black/20"
+        />
 
-          <QueueLane
-            title={`Inbox + pending (${inboxAndPending.length})`}
-            subtitle="Fresh overnight messages and follow-ups that still need triage or reply."
-            icon={<Clock className="h-5 w-5 text-blue-400" />}
-            items={inboxAndPending}
-            emptyMessage="Inbox is clear for now."
-            cardClass="border-blue-500/30 bg-blue-500/[0.06]"
-            itemClass="border-blue-500/15 bg-black/20"
-          />
+        <QueueLane
+          title={`Inbox + pending (${inboxAndPending.length})`}
+          subtitle="Fresh overnight messages and follow-ups that still need triage or reply."
+          icon={<Clock className="h-5 w-5 text-blue-400" />}
+          items={inboxAndPending}
+          emptyMessage="Inbox is clear for now."
+          cardClass="border-blue-500/30 bg-blue-500/[0.06]"
+          itemClass="border-blue-500/15 bg-black/20"
+        />
 
-          <QueueLane
-            title={`Needs review (${reviewQueue.length})`}
-            subtitle="Draft outputs and ideas that need a decision before they rot."
-            icon={<Brain className="h-5 w-5 text-violet-400" />}
-            items={reviewQueue}
-            emptyMessage="No review pile at the moment."
-            cardClass="border-violet-500/30 bg-violet-500/[0.06]"
-            itemClass="border-violet-500/15 bg-black/20"
-          />
+        <QueueLane
+          title={`Needs review (${reviewQueue.length})`}
+          subtitle="Draft outputs and ideas that need a decision before they rot."
+          icon={<Brain className="h-5 w-5 text-violet-400" />}
+          items={reviewQueue}
+          emptyMessage="No review pile at the moment."
+          cardClass="border-violet-500/30 bg-violet-500/[0.06]"
+          itemClass="border-violet-500/15 bg-black/20"
+        />
 
-          <QueueLane
-            title={`Waiting on Corinne (${corinneQueue.length})`}
-            subtitle="Tasks and follow-ups that need Corinne input or a decision."
-            icon={<User className="h-5 w-5 text-pink-400" />}
-            items={corinneQueue}
-            emptyMessage="Nothing is waiting on Corinne right now."
-            cardClass="border-pink-500/30 bg-pink-500/[0.06]"
-            itemClass="border-pink-500/15 bg-black/20"
-          />
+        <QueueLane
+          title={`Waiting on Corinne (${corinneQueue.length})`}
+          subtitle="Tasks and follow-ups that need Corinne input or a decision."
+          icon={<User className="h-5 w-5 text-pink-400" />}
+          items={corinneQueue}
+          emptyMessage="Nothing is waiting on Corinne right now."
+          cardClass="border-pink-500/30 bg-pink-500/[0.06]"
+          itemClass="border-pink-500/15 bg-black/20"
+        />
 
-          <QueueLane
-            title={`Agent handoffs (${agentQueue.length})`}
-            subtitle="Work assigned to Sebastian or the agent squad that is still open."
-            icon={<Bot className="h-5 w-5 text-cyan-400" />}
-            items={agentQueue}
-            emptyMessage="No agent follow-up is queued."
-            cardClass="border-cyan-500/30 bg-cyan-500/[0.06]"
-            itemClass="border-cyan-500/15 bg-black/20"
-          />
+        <QueueLane
+          title={`Agent handoffs (${agentQueue.length})`}
+          subtitle="Work assigned to Sebastian or the agent squad that is still open."
+          icon={<Bot className="h-5 w-5 text-cyan-400" />}
+          items={agentQueue}
+          emptyMessage="No agent follow-up is queued."
+          cardClass="border-cyan-500/30 bg-cyan-500/[0.06]"
+          itemClass="border-cyan-500/15 bg-black/20"
+        />
 
-          <QueueLane
-            title={`Done today (${doneTodayItems.length})`}
-            subtitle="Quick proof the queue is actually moving."
-            icon={<CheckCircle2 className="h-5 w-5 text-green-400" />}
-            items={doneTodayItems}
-            emptyMessage="Nothing completed yet today."
-            cardClass="border-green-500/30 bg-green-500/[0.06]"
-            itemClass="border-green-500/15 bg-black/20"
-          />
-        </div>
+        <QueueLane
+          title={`Done today (${doneTodayItems.length})`}
+          subtitle="Quick proof the queue is actually moving."
+          icon={<CheckCircle2 className="h-5 w-5 text-green-400" />}
+          items={doneTodayItems}
+          emptyMessage="Nothing completed yet today."
+          cardClass="border-green-500/30 bg-green-500/[0.06]"
+          itemClass="border-green-500/15 bg-black/20"
+        />
       </div>
     </div>
   );

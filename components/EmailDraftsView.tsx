@@ -58,6 +58,13 @@ export function EmailDraftsView({ showHeader = true }: { showHeader?: boolean })
 
   const [suggestionText, setSuggestionText] = useState("");
 
+  const statusCounts: Record<DraftStatus, number> = {
+    draft: drafts.filter((d) => d.status === "draft").length,
+    review: drafts.filter((d) => d.status === "review").length,
+    approved: drafts.filter((d) => d.status === "approved").length,
+    sent: drafts.filter((d) => d.status === "sent").length,
+  };
+
   const loadDraftIntoEditor = (draft: EmailDraftDoc) => {
     setSelectedId(draft._id);
     setTitle(draft.title ?? "");
@@ -156,15 +163,38 @@ export function EmailDraftsView({ showHeader = true }: { showHeader?: boolean })
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-2xl font-bold">
-              <span>✉️</span> Email Drafts
+              <span>✉️</span> Emails & Texts
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Draft, review, approve, and copy emails without losing the thread.
+              Shape email and text drafts into send-ready messages without losing the thread.
             </p>
           </div>
           <Button onClick={handleCreate}>+ New Draft</Button>
         </div>
       )}
+
+      <div className="grid gap-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">Drafts</div>
+          <div className="mt-1 text-lg font-semibold text-white">{statusCounts.draft}</div>
+          <div className="text-xs text-zinc-500">Still being shaped</div>
+        </div>
+        <div className="rounded-xl border border-orange-500/25 bg-orange-500/[0.06] px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">In review</div>
+          <div className="mt-1 text-lg font-semibold text-white">{statusCounts.review}</div>
+          <div className="text-xs text-zinc-500">Waiting for a final pass</div>
+        </div>
+        <div className="rounded-xl border border-green-500/25 bg-green-500/[0.06] px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">Approved</div>
+          <div className="mt-1 text-lg font-semibold text-white">{statusCounts.approved}</div>
+          <div className="text-xs text-zinc-500">Ready to send</div>
+        </div>
+        <div className="rounded-xl border border-blue-500/25 bg-blue-500/[0.06] px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">Sent</div>
+          <div className="mt-1 text-lg font-semibold text-white">{statusCounts.sent}</div>
+          <div className="text-xs text-zinc-500">Already delivered or finished</div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* List */}
