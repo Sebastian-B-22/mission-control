@@ -13,6 +13,7 @@ import type * as admin from "../admin.js";
 import type * as agentHuddle from "../agentHuddle.js";
 import type * as agentIdeas from "../agentIdeas.js";
 import type * as agentLearnings from "../agentLearnings.js";
+import type * as agentTraining from "../agentTraining.js";
 import type * as agentTrigger from "../agentTrigger.js";
 import type * as approvalsQueue from "../approvalsQueue.js";
 import type * as biomarkers from "../biomarkers.js";
@@ -22,6 +23,7 @@ import type * as camp from "../camp.js";
 import type * as checkIns from "../checkIns.js";
 import type * as cleanupDuplicates from "../cleanupDuplicates.js";
 import type * as contacts from "../contacts.js";
+import type * as contentOutputGroups from "../contentOutputGroups.js";
 import type * as contentPipeline from "../contentPipeline.js";
 import type * as contentVerification from "../contentVerification.js";
 import type * as costTracker from "../costTracker.js";
@@ -33,6 +35,7 @@ import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
 import type * as familyMeeting from "../familyMeeting.js";
 import type * as fieldTrips from "../fieldTrips.js";
+import type * as fixUserResolutionAndDedupe from "../fixUserResolutionAndDedupe.js";
 import type * as games from "../games.js";
 import type * as habitTemplates from "../habitTemplates.js";
 import type * as habits from "../habits.js";
@@ -67,6 +70,7 @@ import type * as updateRPMGoals from "../updateRPMGoals.js";
 import type * as users from "../users.js";
 import type * as weeklyGoals from "../weeklyGoals.js";
 import type * as weeklySchedule from "../weeklySchedule.js";
+import type * as workouts from "../workouts.js";
 
 import type {
   ApiFromModules,
@@ -80,6 +84,7 @@ declare const fullApi: ApiFromModules<{
   agentHuddle: typeof agentHuddle;
   agentIdeas: typeof agentIdeas;
   agentLearnings: typeof agentLearnings;
+  agentTraining: typeof agentTraining;
   agentTrigger: typeof agentTrigger;
   approvalsQueue: typeof approvalsQueue;
   biomarkers: typeof biomarkers;
@@ -89,6 +94,7 @@ declare const fullApi: ApiFromModules<{
   checkIns: typeof checkIns;
   cleanupDuplicates: typeof cleanupDuplicates;
   contacts: typeof contacts;
+  contentOutputGroups: typeof contentOutputGroups;
   contentPipeline: typeof contentPipeline;
   contentVerification: typeof contentVerification;
   costTracker: typeof costTracker;
@@ -100,6 +106,7 @@ declare const fullApi: ApiFromModules<{
   families: typeof families;
   familyMeeting: typeof familyMeeting;
   fieldTrips: typeof fieldTrips;
+  fixUserResolutionAndDedupe: typeof fixUserResolutionAndDedupe;
   games: typeof games;
   habitTemplates: typeof habitTemplates;
   habits: typeof habits;
@@ -134,6 +141,7 @@ declare const fullApi: ApiFromModules<{
   users: typeof users;
   weeklyGoals: typeof weeklyGoals;
   weeklySchedule: typeof weeklySchedule;
+  workouts: typeof workouts;
 }>;
 
 /**

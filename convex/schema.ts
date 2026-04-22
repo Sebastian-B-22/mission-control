@@ -98,6 +98,17 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user_and_date", ["userId", "date"]),
 
+  dailyCanvasNotes: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    kind: v.string(), // e.g. "time-blocks"
+    data: v.string(), // JSON-serialized strokes
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_date_kind", ["userId", "date", "kind"])
+    .index("by_user_and_date", ["userId", "date"]),
+
   fieldTrips: defineTable({
     userId: v.id("users"),
     name: v.string(),
@@ -502,10 +513,15 @@ export default defineSchema({
 
   campAvailability: defineTable({
     weekId: v.string(),
+    weekLabel: v.optional(v.string()),
     label: v.string(),
     shortLabel: v.string(),
     startDate: v.string(),
     endDate: v.string(),
+    regionKey: v.optional(v.string()),
+    regionLabel: v.optional(v.string()),
+    locationLabel: v.optional(v.string()),
+    sequence: v.optional(v.number()),
     weeklySlots: v.number(),
     weeklyUsed: v.number(),
     dailySlots: v.number(),
@@ -522,6 +538,51 @@ export default defineSchema({
     maxUses: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_code", ["code"]),
+
+  campAttendance: defineTable({
+    key: v.string(),
+    date: v.string(),
+    regionKey: v.string(),
+    weekId: v.optional(v.string()),
+    registrationId: v.optional(v.id("campRegistrations")),
+    childIndex: v.optional(v.number()),
+    childName: v.string(),
+    age: v.optional(v.number()),
+    emergencyPhone: v.string(),
+    parentPhone: v.optional(v.string()),
+    isWalkIn: v.boolean(),
+    checkInAt: v.optional(v.number()),
+    checkOutAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_key", ["key"])
+    .index("by_date_region", ["date", "regionKey"]),
+
+  campTrialDayRegistrations: defineTable({
+    programId: v.string(),
+    eventDate: v.string(),
+    region: v.string(),
+    session: v.string(),
+    childFirstName: v.string(),
+    childLastName: v.string(),
+    dateOfBirth: v.string(),
+    age: v.optional(v.number()),
+    gender: v.string(),
+    parentFirstName: v.string(),
+    parentLastName: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    emergencyContactName: v.string(),
+    emergencyContactPhone: v.string(),
+    medicalNotes: v.optional(v.string()),
+    waiverAccepted: v.boolean(),
+    status: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_session", ["session"])
+    .index("by_status", ["status"]),
 
   // ─── Account Credit System ────────────────────────────────────────────
   creditTransactions: defineTable({
@@ -881,6 +942,76 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  workoutPrograms: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    startsOn: v.optional(v.string()), // YYYY-MM-DD
+    active: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  workoutProgramDays: defineTable({
+    userId: v.id("users"),
+    programId: v.id("workoutPrograms"),
+    name: v.string(),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_program_order", ["programId", "order"])
+    .index("by_user", ["userId"]),
+
+  workoutProgramExercises: defineTable({
+    userId: v.id("users"),
+    programId: v.id("workoutPrograms"),
+    programDayId: v.id("workoutProgramDays"),
+    name: v.string(),
+    setCount: v.number(),
+    repTarget: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_day_order", ["programDayId", "order"])
+    .index("by_program", ["programId"])
+    .index("by_user", ["userId"]),
+
+  workoutLogs: defineTable({
+    userId: v.id("users"),
+    programId: v.id("workoutPrograms"),
+    programDayId: v.id("workoutProgramDays"),
+    workoutDate: v.string(), // YYYY-MM-DD
+    workoutDayName: v.string(),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_date", ["userId", "workoutDate"])
+    .index("by_day_date", ["programDayId", "workoutDate"])
+    .index("by_user_day_date", ["userId", "programDayId", "workoutDate"]),
+
+  workoutExerciseLogs: defineTable({
+    userId: v.id("users"),
+    workoutLogId: v.id("workoutLogs"),
+    programDayId: v.id("workoutProgramDays"),
+    exerciseTemplateId: v.id("workoutProgramExercises"),
+    exerciseName: v.string(),
+    order: v.number(),
+    notes: v.optional(v.string()),
+    sets: v.array(v.object({
+      reps: v.string(),
+      weight: v.string(),
+    })),
+    workoutDate: v.string(), // YYYY-MM-DD
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_log_order", ["workoutLogId", "order"])
+    .index("by_user_date", ["userId", "workoutDate"])
+    .index("by_user_exercise_date", ["userId", "exerciseTemplateId", "workoutDate"]),
 
   // ─── Homeschool Management System ───────────────────────────────────────
   // Quarterly planning with trip tie-ins
@@ -1434,7 +1565,7 @@ export default defineSchema({
 
   homeRemodelTasks: defineTable({
     userId: v.id("users"),
-    roomId: v.id("homeRemodelRooms"),
+    roomId: v.optional(v.id("homeRemodelRooms")),
     title: v.string(),
     description: v.optional(v.string()),
     status: v.string(),
@@ -1469,6 +1600,7 @@ export default defineSchema({
   homeRemodelMilestones: defineTable({
     userId: v.id("users"),
     title: v.string(),
+    stage: v.optional(v.string()),
     targetDate: v.string(),
     description: v.optional(v.string()),
     completed: v.boolean(),
