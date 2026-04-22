@@ -105,7 +105,7 @@ export const getAllTasks = query({
 export const createTask = mutation({
   args: {
     userId: v.id("users"),
-    roomId: v.id("homeRemodelRooms"),
+    roomId: v.optional(v.id("homeRemodelRooms")),
     title: v.string(),
     description: v.optional(v.string()),
     assignee: v.optional(v.string()),
@@ -114,10 +114,15 @@ export const createTask = mutation({
     estimatedCost: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("homeRemodelTasks")
-      .withIndex("by_room", (q) => q.eq("roomId", args.roomId))
-      .collect();
+    const existing = args.roomId
+      ? await ctx.db
+          .query("homeRemodelTasks")
+          .withIndex("by_room", (q) => q.eq("roomId", args.roomId!))
+          .collect()
+      : (await ctx.db
+          .query("homeRemodelTasks")
+          .withIndex("by_user", (q) => q.eq("userId", args.userId))
+          .collect()).filter((task) => !task.roomId);
     const maxOrder = existing.reduce((m, t) => Math.max(m, t.order), -1);
     
     return await ctx.db.insert("homeRemodelTasks", {
@@ -208,15 +213,20 @@ export const createIdea = mutation({
 });
 
 export const promoteIdeaToTask = mutation({
-  args: { ideaId: v.id("homeRemodelIdeas"), roomId: v.id("homeRemodelRooms") },
+  args: { ideaId: v.id("homeRemodelIdeas"), roomId: v.optional(v.id("homeRemodelRooms")) },
   handler: async (ctx, args) => {
     const idea = await ctx.db.get(args.ideaId);
     if (!idea) return null;
     
-    const existing = await ctx.db
-      .query("homeRemodelTasks")
-      .withIndex("by_room", (q) => q.eq("roomId", args.roomId))
-      .collect();
+    const existing = args.roomId
+      ? await ctx.db
+          .query("homeRemodelTasks")
+          .withIndex("by_room", (q) => q.eq("roomId", args.roomId!))
+          .collect()
+      : (await ctx.db
+          .query("homeRemodelTasks")
+          .withIndex("by_user", (q) => q.eq("userId", idea.userId))
+          .collect()).filter((task) => !task.roomId);
     const maxOrder = existing.reduce((m, t) => Math.max(m, t.order), -1);
     
     const taskId = await ctx.db.insert("homeRemodelTasks", {
@@ -259,6 +269,7 @@ export const createMilestone = mutation({
   args: {
     userId: v.id("users"),
     title: v.string(),
+    stage: v.optional(v.string()),
     targetDate: v.string(),
     description: v.optional(v.string()),
   },
@@ -271,12 +282,30 @@ export const createMilestone = mutation({
     return await ctx.db.insert("homeRemodelMilestones", {
       userId: args.userId,
       title: args.title,
+      stage: args.stage,
       targetDate: args.targetDate,
       description: args.description,
       completed: false,
       order: existing.length,
       createdAt: Date.now(),
     });
+  },
+});
+
+export const updateMilestone = mutation({
+  args: {
+    milestoneId: v.id("homeRemodelMilestones"),
+    title: v.optional(v.string()),
+    stage: v.optional(v.string()),
+    targetDate: v.optional(v.string()),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { milestoneId, ...updates } = args;
+    const filtered = Object.fromEntries(
+      Object.entries(updates).filter(([_, value]) => value !== undefined)
+    );
+    await ctx.db.patch(milestoneId, filtered);
   },
 });
 

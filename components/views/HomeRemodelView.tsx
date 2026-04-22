@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,14 +46,15 @@ import {
   Hammer,
   ShoppingCart,
   ExternalLink,
+  Pencil,
 } from "lucide-react";
 
 // Status colors for room cards (background) - explicit colors for dark mode
 const ROOM_STATUS_BG: Record<string, string> = {
-  "not-started": "bg-zinc-200 border-zinc-400 text-zinc-900",
-  "planning": "bg-blue-100 border-blue-400 text-blue-900",
-  "in-progress": "bg-amber-100 border-amber-400 text-amber-900",
-  "done": "bg-green-100 border-green-400 text-green-900",
+  "not-started": "bg-zinc-950 border-zinc-800 text-zinc-100",
+  "planning": "bg-blue-950/50 border-blue-700/40 text-blue-100",
+  "in-progress": "bg-amber-950/40 border-amber-700/40 text-amber-100",
+  "done": "bg-green-950/40 border-green-700/40 text-green-100",
 };
 
 const ROOM_STATUS_BADGE: Record<string, string> = {
@@ -73,20 +74,194 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const TASK_STATUS_COLORS: Record<string, string> = {
-  "idea": "bg-purple-100 text-purple-700 border-purple-200",
-  "planned": "bg-blue-100 text-blue-700 border-blue-200",
-  "in-progress": "bg-amber-100 text-amber-700 border-amber-200",
-  "done": "bg-green-100 text-green-700 border-green-200",
+  "idea": "bg-purple-950/40 text-purple-100 border-purple-700/40",
+  "planned": "bg-blue-950/40 text-blue-100 border-blue-700/40",
+  "in-progress": "bg-amber-950/40 text-amber-100 border-amber-700/40",
+  "done": "bg-green-950/40 text-green-100 border-green-700/40",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  "must-have": "bg-red-100 text-red-800 border-red-200",
-  "nice-to-have": "bg-yellow-100 text-yellow-800 border-yellow-200",
-  "dream": "bg-purple-100 text-purple-800 border-purple-200",
-  "high": "bg-red-100 text-red-800 border-red-200",
-  "medium": "bg-yellow-100 text-yellow-800 border-yellow-200",
-  "low": "bg-gray-100 text-gray-800 border-gray-200",
+  "must-have": "bg-red-950/40 text-red-100 border-red-700/40",
+  "nice-to-have": "bg-yellow-950/40 text-yellow-100 border-yellow-700/40",
+  "dream": "bg-purple-950/40 text-purple-100 border-purple-700/40",
+  "high": "bg-red-950/40 text-red-100 border-red-700/40",
+  "medium": "bg-yellow-950/40 text-yellow-100 border-yellow-700/40",
+  "low": "bg-zinc-900 text-zinc-200 border-zinc-700",
 };
+
+const BLANK_CANVAS_KEYWORDS = [
+  "declutter",
+  "clutter",
+  "junk",
+  "dumpster",
+  "dump",
+  "demo",
+  "donate",
+  "marketplace",
+  "sell",
+  "pickup",
+  "claimed",
+  "furniture",
+  "books",
+  "clear",
+  "cleanup",
+  "shed",
+];
+
+const PRIORITY_PROJECT_KEYWORDS = [
+  "bathroom",
+  "bath",
+  "kitchen",
+  "window",
+  "roof",
+  "yard",
+  "shed",
+  "gym",
+  "paint",
+  "cabinet",
+  "vanity",
+];
+
+const DECISION_KEYWORDS = [
+  "decide",
+  "decision",
+  "measure",
+  "quote",
+  "budget",
+  "deadline",
+  "finance",
+  "car",
+  "window",
+  "roof",
+  "vanity",
+  "cabinet",
+  "bathroom",
+  "kitchen",
+];
+
+const SOURCE_KEYWORDS = [
+  "wayfair",
+  "costco",
+  "marketplace",
+  "quote",
+  "vendor",
+  "window",
+  "roof",
+  "vanity",
+  "cabinet",
+  "paint",
+  "fixture",
+  "material",
+];
+
+type StarterTask = {
+  title: string;
+  roomHint?: string;
+};
+
+const GENERAL_ROOM_VALUE = "__general__";
+
+function getRoomLabel(room?: { name: string } | null) {
+  return room?.name || "General";
+}
+
+const BLANK_CANVAS_STARTERS: StarterTask[] = [
+  { title: "Set deadline for relatives to pick up claimed furniture" },
+  { title: "Plan dumpster day for inherited junk and overgrowth" },
+  { title: "Schedule family demo day to save on labor" },
+  { title: "Donate unwanted books to the library drop box" },
+];
+
+const PRIORITY_PROJECT_STARTERS: StarterTask[] = [
+  { title: "Measure bathroom vanity spaces", roomHint: "Bathroom" },
+  { title: "Get 3 quotes for window replacement" },
+  { title: "Get 3 quotes for roof replacement" },
+  { title: "Choose kitchen refresh plan: paint cabinets vs replace", roomHint: "Kitchen" },
+  { title: "Clear shed for future home gym" },
+];
+
+const DECISION_STARTERS: StarterTask[] = [
+  { title: "Decide which bathroom gets renovated first", roomHint: "Bathroom" },
+  { title: "Decide whether to sell a car to fund the bathroom remodel" },
+  { title: "Set ship-or-donate fallback for unclaimed furniture" },
+  { title: "Decide paint-vs-replace plan for kitchen cabinets", roomHint: "Kitchen" },
+];
+
+const SOURCING_STARTERS: StarterTask[] = [
+  { title: "Price bathroom vanities from Wayfair and Costco", roomHint: "Bathroom" },
+  { title: "Create quote tracker for windows and roof" },
+  { title: "Check Marketplace for furniture and hutches" },
+  { title: "Save kitchen inspiration links and paint options", roomHint: "Kitchen" },
+];
+
+const MOVE_IN_OBJECTIVE_BLUEPRINT = [
+  {
+    id: "declutter",
+    title: "Declutter",
+    description: "Clear inherited furniture, books, junk, and overgrowth so the house becomes a true blank canvas.",
+    cardClass: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
+    titleClass: "text-cyan-100",
+    textClass: "text-cyan-200/80",
+    buttonClass: "border-cyan-400/15 hover:bg-cyan-500/10",
+  },
+  {
+    id: "decisions",
+    title: "Lock the big decisions",
+    description: "Choose bathroom order, room priorities, and the kitchen refresh path so the project has a real backbone.",
+    cardClass: "border-amber-400/30 bg-gradient-to-br from-amber-500/24 via-orange-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(251,191,36,0.08)]",
+    titleClass: "text-amber-100",
+    textClass: "text-amber-200/80",
+    buttonClass: "border-amber-400/15 hover:bg-amber-500/10",
+  },
+  {
+    id: "source",
+    title: "Source, quote, fund",
+    description: "Measure, compare options, get roof/window/bath quotes, and decide how to fund the must-do work.",
+    cardClass: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/24 via-teal-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
+    titleClass: "text-emerald-100",
+    textClass: "text-emerald-200/80",
+    buttonClass: "border-emerald-400/15 hover:bg-emerald-500/10",
+  },
+  {
+    id: "pack",
+    title: "Pack + move",
+    description: "Finish the house, pack the current house, and make the January move feel clean instead of chaotic.",
+    cardClass: "border-violet-400/30 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(167,139,250,0.08)]",
+    titleClass: "text-violet-100",
+    textClass: "text-violet-200/80",
+    buttonClass: "border-violet-400/15 hover:bg-violet-500/10",
+  },
+] as const;
+
+type MoveInStageId = (typeof MOVE_IN_OBJECTIVE_BLUEPRINT)[number]["id"];
+
+const MOVE_IN_STAGE_OPTIONS: Array<{ value: MoveInStageId; label: string }> = [
+  { value: "declutter", label: "Declutter" },
+  { value: "decisions", label: "Lock the big decisions" },
+  { value: "source", label: "Source, quote, fund" },
+  { value: "pack", label: "Pack + move" },
+];
+
+function inferMilestoneStage(milestone: { stage?: string; targetDate: string }): MoveInStageId {
+  if (milestone.stage && MOVE_IN_STAGE_OPTIONS.some((option) => option.value === milestone.stage)) {
+    return milestone.stage as MoveInStageId;
+  }
+
+  if (milestone.targetDate <= "2026-04-24") return "declutter";
+  if (milestone.targetDate <= "2026-05-31") return "decisions";
+  if (milestone.targetDate <= "2026-11-30") return "source";
+  return "pack";
+}
+
+function includesAnyKeyword(value: string | undefined, keywords: string[]) {
+  if (!value) return false;
+  const normalized = value.toLowerCase();
+  return keywords.some((keyword) => normalized.includes(keyword));
+}
+
+function formatShortDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
 
 // Budget Breakdown Component
 function BudgetBreakdown({ 
@@ -117,24 +292,24 @@ function BudgetBreakdown({
   const totalActual = budgetItems.reduce((s, i) => s + (i.actualCost || 0), 0);
 
   return (
-    <Card className="bg-emerald-50 border-emerald-300">
+    <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
       <CardHeader className="pb-2">
         <button 
           onClick={() => setExpanded(!expanded)}
           className="flex items-center justify-between w-full text-left"
         >
-          <CardTitle className="text-base flex items-center gap-2 text-emerald-900">
-            <DollarSign className="h-4 w-4 text-emerald-600" />
+          <CardTitle className="text-base flex items-center gap-2 text-emerald-100">
+            <DollarSign className="h-4 w-4 text-emerald-400" />
             Budget
           </CardTitle>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-emerald-700">
+            <span className="text-sm text-emerald-200">
               ${totalEstimated.toLocaleString()} est / ${totalActual.toLocaleString()} spent
             </span>
             {expanded ? (
-              <ChevronDown className="h-4 w-4 text-emerald-600" />
+              <ChevronDown className="h-4 w-4 text-emerald-400" />
             ) : (
-              <ChevronRight className="h-4 w-4 text-emerald-600" />
+              <ChevronRight className="h-4 w-4 text-emerald-400" />
             )}
           </div>
         </button>
@@ -143,12 +318,12 @@ function BudgetBreakdown({
         <CardContent className="space-y-2">
           {/* Budget Items */}
           {budgetItems.length === 0 ? (
-            <p className="text-sm text-emerald-700">No items yet - add furniture, fixtures, materials...</p>
+            <p className="text-sm text-emerald-200">No items yet - add furniture, fixtures, materials...</p>
           ) : (
             budgetItems.map((item) => (
               <div
                 key={item._id}
-                className="flex items-center gap-2 p-2 rounded bg-white border border-emerald-200"
+                className="flex items-center gap-2 rounded border border-emerald-700/30 bg-zinc-950/80 p-2"
               >
                 <input
                   type="checkbox"
@@ -156,11 +331,11 @@ function BudgetBreakdown({
                   onChange={(e) => updateBudgetItem({ itemId: item._id, purchased: e.target.checked })}
                   className="h-4 w-4 accent-emerald-600"
                 />
-                <span className={`flex-1 text-sm text-slate-900 ${item.purchased ? 'line-through opacity-60' : ''}`}>
+                <span className={`flex-1 text-sm text-zinc-100 ${item.purchased ? 'line-through opacity-60' : ''}`}>
                   {item.name}
                 </span>
                 {item.link && (
-                  <a href={item.link} target="_blank" className="text-emerald-600 hover:text-emerald-800">
+                  <a href={item.link} target="_blank" className="text-emerald-400 hover:text-emerald-300">
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
@@ -169,14 +344,14 @@ function BudgetBreakdown({
                   placeholder="Est $"
                   value={item.estimatedCost || ""}
                   onChange={(e) => updateBudgetItem({ itemId: item._id, estimatedCost: Number(e.target.value) || 0 })}
-                  className="w-20 h-7 text-xs bg-white text-slate-900"
+                  className="h-7 w-20 border-emerald-700/30 bg-zinc-900 text-xs text-zinc-100"
                 />
                 <Input
                   type="number"
                   placeholder="Actual $"
                   value={item.actualCost || ""}
                   onChange={(e) => updateBudgetItem({ itemId: item._id, actualCost: Number(e.target.value) || 0 })}
-                  className="w-20 h-7 text-xs bg-white text-slate-900"
+                  className="h-7 w-20 border-emerald-700/30 bg-zinc-900 text-xs text-zinc-100"
                 />
                 <Button
                   variant="ghost"
@@ -192,12 +367,12 @@ function BudgetBreakdown({
 
           {/* Add Item Form */}
           {showAddItem ? (
-            <div className="flex gap-2 p-2 bg-white rounded border border-emerald-200">
+            <div className="flex gap-2 rounded border border-emerald-700/30 bg-zinc-950/80 p-2">
               <Input
                 placeholder="Item name (e.g., King bed)"
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
-                className="flex-1 text-sm text-slate-900"
+                className="flex-1 border-emerald-700/30 bg-zinc-900 text-sm text-zinc-100"
                 autoFocus
               />
               <Input
@@ -205,13 +380,13 @@ function BudgetBreakdown({
                 placeholder="Est $"
                 value={newItemCost}
                 onChange={(e) => setNewItemCost(e.target.value)}
-                className="w-20 text-sm text-slate-900"
+                className="w-20 border-emerald-700/30 bg-zinc-900 text-sm text-zinc-100"
               />
               <Input
                 placeholder="Link (optional)"
                 value={newItemLink}
                 onChange={(e) => setNewItemLink(e.target.value)}
-                className="w-32 text-sm text-slate-900"
+                className="w-32 border-emerald-700/30 bg-zinc-900 text-sm text-zinc-100"
               />
               <Button
                 size="sm"
@@ -242,7 +417,7 @@ function BudgetBreakdown({
               variant="outline" 
               size="sm" 
               onClick={() => setShowAddItem(true)}
-              className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+              className="w-full border-emerald-700/40 text-emerald-300 hover:bg-emerald-500/10"
             >
               <Plus className="h-3 w-3 mr-1" />
               Add Item
@@ -254,19 +429,55 @@ function BudgetBreakdown({
   );
 }
 
+function StarterTaskList({
+  items,
+  accentClass,
+  onPick,
+}: {
+  items: StarterTask[];
+  accentClass: string;
+  onPick: (title: string, roomHint?: string) => void;
+}) {
+  return (
+    <div className="rounded-lg border border-dashed border-white/10 bg-black/20 p-3">
+      <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-zinc-400">Suggested starters</div>
+      <div className="mb-3 text-xs text-zinc-500">Tap one to use it as-is, or tweak the wording before saving.</div>
+      <div className="grid gap-2">
+        {items.map((item) => (
+          <button
+            key={item.title}
+            type="button"
+            onClick={() => onPick(item.title, item.roomHint)}
+            className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-left text-sm text-zinc-100 transition-colors hover:bg-white/5 ${accentClass}`}
+          >
+            <Plus className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>{item.title}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const [selectedRoom, setSelectedRoom] = useState<Id<"homeRemodelRooms"> | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddIdea, setShowAddIdea] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showMilestoneDialog, setShowMilestoneDialog] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskRoom, setNewTaskRoom] = useState<string>("");
+  const [newTaskRoom, setNewTaskRoom] = useState<string>(GENERAL_ROOM_VALUE);
   const [newTaskAssignee, setNewTaskAssignee] = useState<string>("");
   const [newIdeaContent, setNewIdeaContent] = useState("");
   const [newIdeaPriority, setNewIdeaPriority] = useState("nice-to-have");
   const [newIdeaSourceUrl, setNewIdeaSourceUrl] = useState("");
   const [uploadingIdea, setUploadingIdea] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("rooms");
+  const [editingMilestoneId, setEditingMilestoneId] = useState<Id<"homeRemodelMilestones"> | null>(null);
+  const [milestoneStage, setMilestoneStage] = useState<MoveInStageId>("declutter");
+  const [milestoneTitle, setMilestoneTitle] = useState("");
+  const [milestoneTargetDate, setMilestoneTargetDate] = useState("");
+  const [milestoneDescription, setMilestoneDescription] = useState("");
+  const [activeTab, setActiveTab] = useState("plan");
   const [assigneeFilter, setAssigneeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [beforeMoveOnly, setBeforeMoveOnly] = useState(false);
@@ -295,6 +506,8 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const promoteIdea = useMutation(api.homeRemodel.promoteIdeaToTask);
   const deleteIdea = useMutation(api.homeRemodel.deleteIdea);
   const updateRoom = useMutation(api.homeRemodel.updateRoom);
+  const createMilestone = useMutation(api.homeRemodel.createMilestone);
+  const updateMilestone = useMutation(api.homeRemodel.updateMilestone);
   const toggleMilestone = useMutation(api.homeRemodel.toggleMilestone);
   const generateUploadUrl = useMutation(api.homeRemodel.generateUploadUrl);
   const updateIdeaImage = useMutation(api.homeRemodel.updateIdeaImage);
@@ -316,6 +529,40 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
     }
   };
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const savedRoom = window.localStorage.getItem(`home-remodel:selected-room:${userId}`);
+    const savedTab = window.localStorage.getItem(`home-remodel:active-tab:${userId}`);
+
+    if (savedRoom) {
+      setSelectedRoom(savedRoom as Id<"homeRemodelRooms">);
+    }
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (selectedRoom) {
+      window.localStorage.setItem(`home-remodel:selected-room:${userId}`, selectedRoom);
+    } else {
+      window.localStorage.removeItem(`home-remodel:selected-room:${userId}`);
+    }
+  }, [selectedRoom, userId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(`home-remodel:active-tab:${userId}`, activeTab);
+  }, [activeTab, userId]);
+
+  useEffect(() => {
+    if (selectedRoom && rooms.length > 0 && !rooms.some((room) => room._id === selectedRoom)) {
+      setSelectedRoom(null);
+    }
+  }, [rooms, selectedRoom]);
+
   const selectedRoomData = rooms.find((r) => r._id === selectedRoom);
 
   // Calculate days until move
@@ -328,6 +575,22 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   const daysToNextMilestone = nextMilestone 
     ? Math.ceil((new Date(nextMilestone.targetDate).getTime() - today.getTime()) / 86400000)
     : null;
+
+  const moveInObjectives = MOVE_IN_OBJECTIVE_BLUEPRINT.map((stage) => {
+    const objectiveMilestones = milestones
+      .filter((milestone) => inferMilestoneStage(milestone) === stage.id)
+      .sort((a, b) => a.targetDate.localeCompare(b.targetDate));
+    const completedCount = objectiveMilestones.filter((milestone) => milestone.completed).length;
+    const targetDate = objectiveMilestones[objectiveMilestones.length - 1]?.targetDate;
+    return {
+      ...stage,
+      milestones: objectiveMilestones,
+      completedCount,
+      totalCount: objectiveMilestones.length,
+      targetDate,
+      isComplete: objectiveMilestones.length > 0 && completedCount === objectiveMilestones.length,
+    };
+  });
 
   // Filter tasks
   const filteredTasks = allTasks.filter(t => {
@@ -349,6 +612,109 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
     allTasks.reduce((s, t) => s + (t.estimatedCost || 0), 0);
   const totalSpent = rooms.reduce((s, r) => s + (r.budgetActual || 0), 0) +
     allTasks.reduce((s, t) => s + (t.actualCost || 0), 0);
+
+  const openTasks = allTasks.filter((t) => t.status !== "done");
+  const openIdeas = allIdeas.filter((i) => !i.promoted);
+  const blankCanvasTasks = openTasks.filter((t) => includesAnyKeyword(t.title, BLANK_CANVAS_KEYWORDS));
+  const priorityProjectTasks = openTasks.filter((t) => includesAnyKeyword(t.title, PRIORITY_PROJECT_KEYWORDS));
+  const decisionTasks = openTasks.filter((t) => includesAnyKeyword(t.title, DECISION_KEYWORDS));
+  const sourcingIdeas = openIdeas.filter((idea) =>
+    includesAnyKeyword(`${idea.content} ${idea.sourceUrl || ""}`, SOURCE_KEYWORDS)
+  );
+  const decisionIdeas = openIdeas.filter((idea) =>
+    includesAnyKeyword(`${idea.content} ${idea.sourceUrl || ""}`, DECISION_KEYWORDS)
+  );
+  const quoteTasks = openTasks.filter((t) => includesAnyKeyword(t.title, ["quote", "window", "roof", "vanity", "cabinet"]));
+  const quoteIdeas = openIdeas.filter((idea) =>
+    includesAnyKeyword(`${idea.content} ${idea.sourceUrl || ""}`, ["quote", "wayfair", "costco", "window", "roof", "vanity", "cabinet"])
+  );
+
+  const topBudgetRooms = [...rooms]
+    .sort((a, b) => (b.budgetEstimate || 0) - (a.budgetEstimate || 0))
+    .slice(0, 6);
+
+  const isGettingStarted = allTasks.length === 0 && openIdeas.length === 0 && totalEstimated === 0 && totalSpent === 0;
+
+  const metricCards = [
+    {
+      label: "Rooms",
+      value: `${stats?.roomsComplete || 0}/${stats?.roomsTotal || 0}`,
+      sub: "Rooms mapped for move-in",
+      tone: "border-cyan-400/35 bg-gradient-to-br from-cyan-500/28 via-sky-500/12 to-slate-950",
+      labelTone: "text-cyan-100/90",
+    },
+    {
+      label: "Tasks",
+      value: `${stats?.tasksByStatus.done || 0}/${stats?.tasksTotal || 0}`,
+      sub: "Completed vs total tasks",
+      tone: "border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950",
+      labelTone: "text-amber-100/90",
+    },
+    {
+      label: "Active",
+      value: stats?.tasksByStatus.inProgress || 0,
+      sub: "Currently in motion",
+      tone: "border-rose-400/35 bg-gradient-to-br from-rose-500/28 via-red-500/12 to-slate-950",
+      labelTone: "text-rose-100/90",
+    },
+    {
+      label: "Ideas",
+      value: stats?.ideasTotal || 0,
+      sub: "Still sitting in the queue",
+      tone: "border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/24 via-violet-500/12 to-slate-950",
+      labelTone: "text-fuchsia-100/90",
+    },
+    {
+      label: "Budget",
+      value: `$${totalEstimated.toLocaleString()}`,
+      sub: "Estimated across rooms + tasks",
+      tone: "border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-slate-950",
+      labelTone: "text-emerald-100/90",
+    },
+    {
+      label: "Spent",
+      value: `$${totalSpent.toLocaleString()}`,
+      sub: `${daysUntilMove} days until move`,
+      tone: "border-violet-400/35 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-slate-950",
+      labelTone: "text-violet-100/90",
+    },
+  ];
+
+  const openQuickAddFor = (title: string, roomHint?: string) => {
+    setNewTaskTitle(title);
+    if (roomHint) {
+      const matchedRoom = rooms.find((room) => room.name.toLowerCase().includes(roomHint.toLowerCase()));
+      setNewTaskRoom(matchedRoom?._id || GENERAL_ROOM_VALUE);
+    } else {
+      setNewTaskRoom(GENERAL_ROOM_VALUE);
+    }
+    setShowQuickAdd(true);
+  };
+
+  const resetMilestoneForm = () => {
+    setEditingMilestoneId(null);
+    setMilestoneStage("declutter");
+    setMilestoneTitle("");
+    setMilestoneTargetDate("");
+    setMilestoneDescription("");
+  };
+
+  const openMilestoneDialog = (stage?: MoveInStageId, milestone?: typeof milestones[number]) => {
+    if (milestone) {
+      setEditingMilestoneId(milestone._id);
+      setMilestoneStage(inferMilestoneStage(milestone));
+      setMilestoneTitle(milestone.title);
+      setMilestoneTargetDate(milestone.targetDate);
+      setMilestoneDescription(milestone.description || "");
+    } else {
+      setEditingMilestoneId(null);
+      setMilestoneStage(stage || "declutter");
+      setMilestoneTitle("");
+      setMilestoneTargetDate("");
+      setMilestoneDescription("");
+    }
+    setShowMilestoneDialog(true);
+  };
 
   // Room progress (tasks done / total tasks)
   const getRoomProgress = (roomId: Id<"homeRemodelRooms">) => {
@@ -375,169 +741,386 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <Hammer className="h-7 w-7 text-orange-500" />
+          <Hammer className="h-6 w-6 text-orange-500" />
           <div>
-            <h1 className="text-2xl font-bold">Home Remodel</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-xl font-bold">Home Remodel</h1>
+            <p className="text-xs text-muted-foreground">
               Joey's childhood home - January 2027 move
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {/* Quick Add Button */}
-          <Button variant="outline" onClick={() => setShowQuickAdd(true)}>
+          <Button variant="outline" size="sm" onClick={() => openQuickAddFor("")}>
             <Plus className="h-4 w-4 mr-2" />
             Quick Add Task
           </Button>
           {/* Countdown */}
-          <Badge className="text-lg px-4 py-2 bg-red-500 text-white border-red-600">
-            <Calendar className="h-4 w-4 mr-2" />
+          <Badge className="px-3 py-1.5 bg-red-500 text-sm text-white border-red-600">
+            <Calendar className="h-3.5 w-3.5 mr-2" />
             {daysUntilMove} days until move
           </Badge>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-blue-700">{stats?.roomsComplete || 0}/{stats?.roomsTotal || 0}</div>
-            <p className="text-xs text-blue-600">Rooms Done</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-green-700">{stats?.tasksByStatus.done || 0}/{stats?.tasksTotal || 0}</div>
-            <p className="text-xs text-green-600">Tasks Done</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-amber-700">{stats?.tasksByStatus.inProgress || 0}</div>
-            <p className="text-xs text-amber-600">In Progress</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-purple-700">{stats?.ideasTotal || 0}</div>
-            <p className="text-xs text-purple-600">Ideas</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-emerald-700">
-              ${totalEstimated.toLocaleString()}
-            </div>
-            <p className="text-xs text-emerald-600">Est. Budget</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200">
-          <CardContent className="pt-4 pb-3">
-            <div className="text-2xl font-bold text-rose-700">
-              ${totalSpent.toLocaleString()}
-            </div>
-            <p className="text-xs text-rose-600">Spent</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Next Milestone Alert */}
-      {nextMilestone && daysToNextMilestone !== null && daysToNextMilestone <= 30 && (
-        <Card className="bg-amber-50 border-amber-300">
-          <CardContent className="py-3 flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
-            <span className="font-medium text-amber-800">
-              Next milestone in {daysToNextMilestone} days: {nextMilestone.title}
-            </span>
-            <span className="text-sm text-amber-600 ml-auto">
-              {new Date(nextMilestone.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-            </span>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* This Week */}
-      {thisWeekTasks.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-500" />
-              This Week ({thisWeekTasks.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {thisWeekTasks.slice(0, 8).map((t) => {
-                const room = rooms.find(r => r._id === t.roomId);
-                return (
-                  <Badge 
-                    key={t._id} 
-                    variant="outline" 
-                    className={TASK_STATUS_COLORS[t.status]}
-                  >
-                    {room?.name}: {t.title}
-                  </Badge>
-                );
-              })}
-              {thisWeekTasks.length > 8 && (
-                <Badge variant="outline">+{thisWeekTasks.length - 8} more</Badge>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Milestones Timeline */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Timeline to Move-In
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {milestones.map((m) => {
-              const isPast = new Date(m.targetDate) < today && !m.completed;
-              return (
-                <button
-                  key={m._id}
-                  onClick={() => toggleMilestone({ milestoneId: m._id, completed: !m.completed })}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all ${
-                    m.completed
-                      ? "bg-green-100 border-green-300 text-green-800"
-                      : isPast
-                      ? "bg-red-100 border-red-300 text-red-700"
-                      : "bg-zinc-100 border-zinc-300 text-zinc-700 hover:bg-zinc-200"
-                  }`}
-                >
-                  {m.completed ? (
-                    <CheckCircle2 className="h-4 w-4" />
-                  ) : (
-                    <Clock className="h-4 w-4" />
-                  )}
-                  <span>{m.title}</span>
-                  <span className="text-xs opacity-70">
-                    {new Date(m.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                </button>
-              );
-            })}
+      <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(245,158,11,0.04)]">
+        <CardContent className="p-3.5 md:p-4">
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {metricCards.map((card) => (
+              <div key={card.label} className={`rounded-xl border p-3 ${card.tone}`}>
+                <div className={`text-[11px] uppercase tracking-[0.18em] ${card.labelTone}`}>{card.label}</div>
+                <div className="mt-1.5 text-2xl font-semibold text-white leading-none">{card.value}</div>
+                <div className="mt-1 text-xs text-zinc-300">{card.sub}</div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabs: Rooms / All Tasks / Ideas */}
+      <Card className="border-orange-400/30 bg-gradient-to-br from-orange-500/16 via-amber-500/10 to-zinc-950 shadow-[0_0_30px_rgba(251,146,60,0.05)]">
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <CardTitle className="text-base text-white">Next objective</CardTitle>
+              <CardDescription className="text-xs text-zinc-300">The next real move to keep January feeling possible.</CardDescription>
+            </div>
+            <Badge className="bg-black/30 text-orange-100 border border-orange-400/20 text-xs">
+              {daysToNextMilestone !== null ? `${daysToNextMilestone} days` : `${daysUntilMove} days left`}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="text-lg font-semibold text-white">
+            {nextMilestone ? nextMilestone.title : "Move-in day"}
+          </div>
+          <div className="mt-1.5 text-xs text-zinc-300">
+            {nextMilestone ? `${formatShortDate(nextMilestone.targetDate)}${daysToNextMilestone !== null ? ` • ${daysToNextMilestone} days` : ""}` : `Target ${formatShortDate("2027-01-15")}`}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Move-In Objectives */}
+      <Card className="border-zinc-800 bg-zinc-950/80 shadow-[0_0_30px_rgba(34,211,238,0.04)]">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2 text-white">
+                <Target className="h-4 w-4 text-orange-300" />
+                Move-In Objectives
+              </CardTitle>
+              <p className="text-xs text-zinc-300 mt-1">
+                Four phases to move from clean-out to move-in.
+              </p>
+            </div>
+            <Button size="sm" variant="outline" className="border-white/10 bg-black/20 text-zinc-100 hover:bg-white/5" onClick={() => openMilestoneDialog("declutter")}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Add milestone
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-2">
+          {moveInObjectives.map((objective) => (
+            <div key={objective.title} className={`rounded-2xl border p-3 ${objective.cardClass}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className={`text-sm font-semibold ${objective.titleClass}`}>{objective.title}</div>
+                  {objective.targetDate ? (
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-zinc-300/70">
+                      Target by {formatShortDate(objective.targetDate)}
+                    </div>
+                  ) : null}
+                </div>
+                <Badge className={objective.isComplete ? "bg-green-600 text-white" : "bg-black/30 text-zinc-100 border border-white/10"}>
+                  {objective.completedCount}/{objective.totalCount}
+                </Badge>
+              </div>
+              <div className="mt-2 flex justify-end">
+                <Button size="sm" variant="ghost" className="h-7 px-2 text-xs text-zinc-200 hover:bg-white/5" onClick={() => openMilestoneDialog(objective.id)}>
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add
+                </Button>
+              </div>
+              <div className="mt-2 space-y-1.5">
+                {objective.milestones.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-white/10 bg-black/20 px-3 py-3 text-sm text-zinc-300">
+                    No milestones yet for this phase.
+                  </div>
+                ) : objective.milestones.map((milestone) => {
+                  const isPast = new Date(milestone.targetDate) < today && !milestone.completed;
+                  return (
+                    <div
+                      key={milestone._id}
+                      className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-sm transition-all ${
+                        milestone.completed
+                          ? "border-green-700/40 bg-green-950/40 text-green-100"
+                          : isPast
+                          ? "border-red-700/40 bg-red-950/40 text-red-100"
+                          : `bg-black/28 text-zinc-100 ${objective.buttonClass}`
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleMilestone({ milestoneId: milestone._id, completed: !milestone.completed })}
+                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                      >
+                        {milestone.completed ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <Clock className="h-3.5 w-3.5 shrink-0" />}
+                        <span className="flex-1 truncate">{milestone.title}</span>
+                        <span className="text-xs opacity-70">{formatShortDate(milestone.targetDate)}</span>
+                      </button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0 text-zinc-200 hover:bg-white/10"
+                        onClick={() => openMilestoneDialog(objective.id, milestone)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Tabs: Plan / Rooms / Tasks / Budget / Ideas */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="flex h-auto flex-wrap gap-1 border border-zinc-800 bg-zinc-950/80 p-1">
+          <TabsTrigger value="plan">Plan</TabsTrigger>
           <TabsTrigger value="rooms">Rooms</TabsTrigger>
           <TabsTrigger value="tasks">All Tasks ({allTasks.length})</TabsTrigger>
+          <TabsTrigger value="budget">Budget + Quotes</TabsTrigger>
           <TabsTrigger value="ideas">Ideas ({allIdeas.filter(i => !i.promoted).length})</TabsTrigger>
         </TabsList>
+
+        {/* PLAN TAB */}
+        <TabsContent value="plan" className="mt-4 space-y-4">
+          <div className={`grid gap-4 ${isGettingStarted ? "md:grid-cols-2" : ""}`}>
+            {isGettingStarted ? (
+              <Card className="border-amber-400/30 bg-gradient-to-br from-amber-500/18 via-orange-500/10 to-zinc-950 shadow-[0_0_30px_rgba(245,158,11,0.05)]">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base text-amber-100">Start here this week</CardTitle>
+                  <p className="text-sm text-amber-200/80">
+                    You&apos;ve got the structure. Now let&apos;s turn it into a working remodel plan with the first real moves.
+                  </p>
+                </CardHeader>
+                <CardContent className="grid gap-2 sm:grid-cols-2">
+                  <button type="button" onClick={() => openQuickAddFor("Set deadline for relatives to pick up claimed furniture")} className="rounded-xl border border-orange-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-orange-100">Furniture deadlines</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Start with inherited-item decisions so the house can become a blank canvas.</p>
+                  </button>
+                  <button type="button" onClick={() => openQuickAddFor("Plan dumpster day for inherited junk and overgrowth")} className="rounded-xl border border-sky-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-sky-100">Dumpster + demo day</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Create the first cleanup push before spending energy on finish details.</p>
+                  </button>
+                  <button type="button" onClick={() => openQuickAddFor("Measure bathroom vanity spaces", "Bathroom")} className="rounded-xl border border-emerald-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-emerald-100">Grab measurements</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Measure bathrooms first so sourcing vanities gets concrete fast.</p>
+                  </button>
+                  <button type="button" onClick={() => setActiveTab("rooms")} className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-3 text-left transition hover:bg-white/5">
+                    <div className="text-sm font-semibold text-fuchsia-100">Review rooms</div>
+                    <p className="mt-1.5 text-sm text-zinc-300">Open Rooms and fill in vision and current state room by room.</p>
+                  </button>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            <Card className="border-cyan-400/30 bg-gradient-to-br from-cyan-500/18 via-sky-500/10 to-zinc-950 shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base text-sky-100">
+                  <Home className="h-4 w-4 text-sky-400" />
+                  Remodel game plan
+                </CardTitle>
+                <p className="text-sm text-sky-200/80">
+                  Blank canvas first, then priority renovations, then sourcing and polish.
+                </p>
+              </CardHeader>
+              <CardContent className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-xl border border-orange-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-orange-100">1. Blank canvas first</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Clear inherited items, junk, books, and blockers.</p>
+                </div>
+                <div className="rounded-xl border border-amber-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-amber-100">2. Priority projects</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Bathrooms, kitchen, windows, roof, yard, shed-to-gym.</p>
+                </div>
+                <div className="rounded-xl border border-emerald-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-emerald-100">3. Source smart</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Measure first, then compare vendors and quotes.</p>
+                </div>
+                <div className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-fuchsia-100">4. Family logistics</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Use deadlines to force pickup, ship, sell, or donate decisions.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-cyan-400/30 bg-gradient-to-br from-cyan-500/18 via-sky-500/10 to-zinc-950 shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="text-base text-sky-100">Blank Canvas Before Move-In</CardTitle>
+                  <Button size="sm" variant="outline" className="border-sky-500/20 text-sky-100 hover:bg-white/5" onClick={() => openQuickAddFor("Set deadline for relatives to pick up claimed furniture")}>Add</Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {blankCanvasTasks.length > 0 ? blankCanvasTasks.slice(0, 8).map((task) => {
+                  const room = rooms.find((r) => r._id === task.roomId);
+                  return (
+                    <div key={task._id} className="flex items-center gap-3 rounded-lg border border-sky-500/15 bg-black/20 p-3">
+                      <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200 min-w-[96px]">
+                        {getRoomLabel(room)}
+                      </Badge>
+                      <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
+                      <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                    </div>
+                  );
+                }) : (
+                  <StarterTaskList
+                    items={BLANK_CANVAS_STARTERS}
+                    accentClass="border-sky-500/15"
+                    onPick={openQuickAddFor}
+                  />
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-amber-400/30 bg-gradient-to-br from-amber-500/18 via-orange-500/10 to-zinc-950 shadow-[0_0_30px_rgba(245,158,11,0.05)]">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="text-base text-amber-100">Priority Projects</CardTitle>
+                  <Button size="sm" variant="outline" className="border-amber-500/20 text-amber-100 hover:bg-white/5" onClick={() => openQuickAddFor("", "Bathroom")}>Add</Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {priorityProjectTasks.length > 0 ? priorityProjectTasks.slice(0, 8).map((task) => {
+                  const room = rooms.find((r) => r._id === task.roomId);
+                  return (
+                    <div key={task._id} className="flex items-center gap-3 rounded-lg border border-amber-500/15 bg-black/20 p-3">
+                      <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200 min-w-[96px]">
+                        {getRoomLabel(room)}
+                      </Badge>
+                      <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
+                      <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                    </div>
+                  );
+                }) : (
+                  <StarterTaskList
+                    items={PRIORITY_PROJECT_STARTERS}
+                    accentClass="border-amber-500/15"
+                    onPick={openQuickAddFor}
+                  />
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-violet-400/30 bg-gradient-to-br from-violet-500/18 via-indigo-500/10 to-zinc-950 shadow-[0_0_30px_rgba(139,92,246,0.05)]">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="text-base text-violet-100">Decisions Needed</CardTitle>
+                  <Button size="sm" variant="outline" className="border-violet-500/20 text-violet-100 hover:bg-white/5" onClick={() => openQuickAddFor("")}>Add</Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {[...decisionTasks.slice(0, 5), ...decisionIdeas.slice(0, 3)].length > 0 ? (
+                  <div className="space-y-2">
+                    {decisionTasks.slice(0, 5).map((task) => {
+                      const room = rooms.find((r) => r._id === task.roomId);
+                      return (
+                        <div key={task._id} className="rounded-lg border border-violet-500/15 bg-black/20 p-3">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{getRoomLabel(room)}</Badge>
+                            <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-zinc-100">{task.title}</div>
+                        </div>
+                      );
+                    })}
+                    {decisionIdeas.slice(0, 3).map((idea) => {
+                      const room = rooms.find((r) => r._id === idea.roomId);
+                      return (
+                        <div key={idea._id} className="rounded-lg border border-violet-500/15 bg-black/20 p-3">
+                          <div className="flex items-center gap-2">
+                            {room ? <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room.name}</Badge> : null}
+                            <Badge className={PRIORITY_COLORS[idea.priority || "nice-to-have"]}>{idea.priority || "nice-to-have"}</Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-zinc-100">{idea.content}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <StarterTaskList
+                    items={DECISION_STARTERS}
+                    accentClass="border-violet-500/15"
+                    onPick={openQuickAddFor}
+                  />
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-400/30 bg-gradient-to-br from-emerald-500/18 via-teal-500/10 to-zinc-950 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="text-base text-emerald-100">This Week + Sourcing</CardTitle>
+                  <Button size="sm" variant="outline" className="border-emerald-500/20 text-emerald-100 hover:bg-white/5" onClick={() => openQuickAddFor("")}>Add</Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wide text-emerald-300">This week</div>
+                  <div className="space-y-2">
+                    {thisWeekTasks.length > 0 ? thisWeekTasks.slice(0, 6).map((task) => {
+                      const room = rooms.find((r) => r._id === task.roomId);
+                      return (
+                        <div key={task._id} className="flex items-center gap-3 rounded-lg border border-emerald-500/15 bg-black/20 p-3">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200 min-w-[96px]">{getRoomLabel(room)}</Badge>
+                          <span className="flex-1 text-sm text-zinc-100">{task.title}</span>
+                        </div>
+                      );
+                    }) : (
+                      <StarterTaskList
+                        items={SOURCING_STARTERS}
+                        accentClass="border-emerald-500/15"
+                        onPick={openQuickAddFor}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wide text-emerald-300">Sourcing and quote leads</div>
+                  <div className="space-y-2">
+                    {sourcingIdeas.length > 0 ? sourcingIdeas.slice(0, 4).map((idea) => {
+                      const room = rooms.find((r) => r._id === idea.roomId);
+                      return (
+                        <div key={idea._id} className="rounded-lg border border-emerald-500/15 bg-black/20 p-3">
+                          <div className="flex items-center gap-2">
+                            {room ? <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room.name}</Badge> : null}
+                            <Badge className={PRIORITY_COLORS[idea.priority || "nice-to-have"]}>{idea.priority || "nice-to-have"}</Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-zinc-100">{idea.content}</div>
+                          {idea.sourceUrl ? (
+                            <a href={idea.sourceUrl} target="_blank" className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300 hover:text-emerald-200">
+                              <ExternalLink className="h-3 w-3" />
+                              Open source
+                            </a>
+                          ) : null}
+                        </div>
+                      );
+                    }) : <p className="text-sm text-zinc-300">Capture links from Wayfair, Costco, Marketplace, and contractor quotes here as you go.</p>}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* ROOMS TAB */}
         <TabsContent value="rooms" className="mt-4">
@@ -591,10 +1174,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
               {selectedRoomData ? (
                 <>
                   {/* Room Header */}
-                  <Card className="bg-slate-100 border-slate-400">
+                  <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-slate-900">{selectedRoomData.name}</CardTitle>
+                        <CardTitle className="text-white">{selectedRoomData.name}</CardTitle>
                         <Select
                           value={selectedRoomData.status}
                           onValueChange={(v) => updateRoom({ roomId: selectedRoomData._id, status: v })}
@@ -612,24 +1195,24 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="grid md:grid-cols-2 gap-3">
+                      <div className="grid gap-3 md:grid-cols-2">
                         <div>
-                          <label className="text-xs font-medium text-slate-700">Vision</label>
+                          <label className="text-xs font-medium text-zinc-300">Vision</label>
                           <Textarea
                             placeholder="What do you want this room to become?"
                             value={selectedRoomData.vision || ""}
                             onChange={(e) => updateRoom({ roomId: selectedRoomData._id, vision: e.target.value })}
-                            className="mt-1 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
+                            className="mt-1 border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
                             rows={3}
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-slate-700">Current State</label>
+                          <label className="text-xs font-medium text-zinc-300">Current State</label>
                           <Textarea
                             placeholder="What's it like now?"
                             value={selectedRoomData.currentState || ""}
                             onChange={(e) => updateRoom({ roomId: selectedRoomData._id, currentState: e.target.value })}
-                            className="mt-1 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
+                            className="mt-1 border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-500"
                             rows={3}
                           />
                         </div>
@@ -651,10 +1234,10 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   />
 
                   {/* Tasks */}
-                  <Card className="bg-slate-100 border-slate-400">
+                  <Card className="border-zinc-800 bg-zinc-950/90 shadow-none">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base text-slate-900">Tasks ({tasks.length})</CardTitle>
+                        <CardTitle className="text-base text-white">Tasks ({tasks.length})</CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddTask(true)}>
                           <Plus className="h-3 w-3 mr-1" />
                           Add
@@ -663,18 +1246,18 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {tasks.length === 0 ? (
-                        <p className="text-sm text-slate-600">No tasks yet</p>
+                        <p className="text-sm text-zinc-400">No tasks yet</p>
                       ) : (
                         tasks.map((task) => (
                           <div
                             key={task._id}
-                            className={`flex items-center gap-3 p-2 rounded border ${TASK_STATUS_COLORS[task.status]}`}
+                            className={`flex items-center gap-3 rounded border p-2 ${TASK_STATUS_COLORS[task.status]}`}
                           >
                             <Select
                               value={task.status}
                               onValueChange={(v) => updateTask({ taskId: task._id, status: v })}
                             >
-                              <SelectTrigger className="w-[110px] h-7 text-xs bg-white/50">
+                              <SelectTrigger className="h-7 w-[110px] border-white/10 bg-black/20 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -688,13 +1271,13 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                               {task.title}
                             </span>
                             {task.assignee && (
-                              <Badge variant="outline" className="text-xs bg-white/50">
+                              <Badge variant="outline" className="border-white/10 bg-black/20 text-xs text-zinc-200">
                                 <User className="h-3 w-3 mr-1" />
                                 {task.assignee}
                               </Badge>
                             )}
                             {task.estimatedCost && (
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-xs text-zinc-300">
                                 ${task.estimatedCost}
                               </span>
                             )}
@@ -711,7 +1294,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       )}
 
                       {showAddTask && (
-                        <div className="flex gap-2 mt-2 p-2 bg-zinc-50 rounded">
+                        <div className="mt-2 flex gap-2 rounded border border-zinc-800 bg-zinc-900 p-2">
                           <Input
                             placeholder="New task..."
                             value={newTaskTitle}
@@ -767,11 +1350,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   </Card>
 
                   {/* Ideas */}
-                  <Card className="bg-yellow-50 border-yellow-300">
+                  <Card className="border-amber-500/25 bg-amber-500/[0.06] shadow-none">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base flex items-center gap-2 text-yellow-900">
-                          <Lightbulb className="h-4 w-4 text-yellow-600" />
+                        <CardTitle className="text-base flex items-center gap-2 text-amber-100">
+                          <Lightbulb className="h-4 w-4 text-amber-400" />
                           Ideas & Inspiration
                         </CardTitle>
                         <Button size="sm" variant="outline" onClick={() => setShowAddIdea(true)}>
@@ -782,19 +1365,19 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {roomIdeas.filter(i => !i.promoted).length === 0 ? (
-                        <p className="text-sm text-yellow-700">No ideas yet - brainstorm away!</p>
+                        <p className="text-sm text-amber-200">No ideas yet - brainstorm away!</p>
                       ) : (
                         roomIdeas.filter(i => !i.promoted).map((idea) => (
                           <div
                             key={idea._id}
-                            className="flex flex-col gap-2 p-3 rounded border bg-yellow-100 border-yellow-300 text-yellow-900"
+                            className="flex flex-col gap-2 rounded border border-amber-700/30 bg-zinc-950/80 p-3 text-amber-50"
                           >
                             <div className="flex items-start gap-3">
-                              <Lightbulb className="h-4 w-4 text-yellow-600 mt-0.5" />
+                              <Lightbulb className="mt-0.5 h-4 w-4 text-amber-400" />
                               <div className="flex-1">
                                 <p className="text-sm">{idea.content}</p>
                                 {idea.sourceUrl && (
-                                  <a href={idea.sourceUrl} target="_blank" className="text-xs text-blue-600 hover:underline">
+                                  <a href={idea.sourceUrl} target="_blank" className="text-xs text-blue-300 hover:underline">
                                     View inspiration
                                   </a>
                                 )}
@@ -821,17 +1404,17 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                               </Button>
                             </div>
                             {/* Image display and upload */}
-                            <div className="flex items-center gap-2 ml-7">
+                            <div className="ml-7 flex items-center gap-2">
                               {idea.imageUrl ? (
                                 <a href={idea.imageUrl} target="_blank" className="block">
                                   <img 
                                     src={idea.imageUrl} 
                                     alt="Inspiration" 
-                                    className="h-20 w-auto rounded border border-yellow-300 hover:opacity-80 transition"
+                                    className="h-20 w-auto rounded border border-amber-700/30 transition hover:opacity-80"
                                   />
                                 </a>
                               ) : (
-                                <label className="flex items-center gap-1 text-xs text-yellow-700 cursor-pointer hover:text-yellow-900">
+                                <label className="flex cursor-pointer items-center gap-1 text-xs text-amber-300 hover:text-amber-100">
                                   <Image className="h-3 w-3" />
                                   {uploadingIdea === idea._id ? "Uploading..." : "Add photo"}
                                   <input
@@ -851,7 +1434,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       )}
 
                       {showAddIdea && (
-                        <div className="flex flex-col gap-2 mt-2 p-3 border rounded bg-white">
+                        <div className="mt-2 flex flex-col gap-2 rounded border border-zinc-800 bg-zinc-900 p-3">
                           <Textarea
                             placeholder="Describe your idea..."
                             value={newIdeaContent}
@@ -966,16 +1549,16 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     return (
                       <div
                         key={task._id}
-                        className={`flex items-center gap-3 p-2 rounded border ${TASK_STATUS_COLORS[task.status]}`}
+                        className={`flex items-center gap-3 rounded border p-2 ${TASK_STATUS_COLORS[task.status]}`}
                       >
-                        <Badge variant="outline" className="bg-white/50 min-w-[100px]">
-                          {room?.name}
+                        <Badge variant="outline" className="min-w-[100px] border-white/10 bg-black/20 text-zinc-200">
+                          {getRoomLabel(room)}
                         </Badge>
                         <Select
                           value={task.status}
                           onValueChange={(v) => updateTask({ taskId: task._id, status: v })}
                         >
-                          <SelectTrigger className="w-[110px] h-7 text-xs bg-white/50">
+                          <SelectTrigger className="h-7 w-[110px] border-white/10 bg-black/20 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -989,7 +1572,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                           {task.title}
                         </span>
                         {task.assignee && (
-                          <Badge variant="outline" className="text-xs bg-white/50">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-xs text-zinc-200">
                             <User className="h-3 w-3 mr-1" />
                             {task.assignee}
                           </Badge>
@@ -1011,6 +1594,96 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
           </Card>
         </TabsContent>
 
+        {/* BUDGET TAB */}
+        <TabsContent value="budget" className="mt-4">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <Card className="border-emerald-500/25 bg-emerald-500/[0.06] shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base text-emerald-100">
+                  <DollarSign className="h-4 w-4 text-emerald-400" />
+                  Budget by room
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {topBudgetRooms.length > 0 ? topBudgetRooms.map((room) => (
+                  <div key={room._id} className="rounded-lg border border-emerald-500/15 bg-black/20 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-medium text-zinc-100">{room.name}</div>
+                        <div className="text-xs text-zinc-400">{STATUS_LABELS[room.status]}</div>
+                      </div>
+                      <div className="text-right text-sm text-zinc-200">
+                        <div>${(room.budgetEstimate || 0).toLocaleString()} est</div>
+                        <div className="text-xs text-zinc-400">${(room.budgetActual || 0).toLocaleString()} spent</div>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-zinc-300">No room budgets added yet.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="space-y-6">
+              <Card className="border-cyan-500/25 bg-cyan-500/[0.06] shadow-none">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base text-cyan-100">
+                    <FileText className="h-4 w-4 text-cyan-400" />
+                    Quotes to collect
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {quoteTasks.length > 0 ? quoteTasks.slice(0, 8).map((task) => {
+                    const room = rooms.find((r) => r._id === task.roomId);
+                    return (
+                      <div key={task._id} className="rounded-lg border border-cyan-500/15 bg-black/20 p-3 text-sm text-zinc-100">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{getRoomLabel(room)}</Badge>
+                          <Badge className={TASK_STATUS_COLORS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
+                        </div>
+                        <div className="mt-2">{task.title}</div>
+                      </div>
+                    );
+                  }) : (
+                    <p className="text-sm text-zinc-300">Add quote tasks for windows, roof, bathrooms, and kitchen materials.</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="border-fuchsia-500/25 bg-fuchsia-500/[0.06] shadow-none">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base text-fuchsia-100">
+                    <ShoppingCart className="h-4 w-4 text-fuchsia-400" />
+                    Source links and product ideas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {quoteIdeas.length > 0 ? quoteIdeas.slice(0, 8).map((idea) => {
+                    const room = rooms.find((r) => r._id === idea.roomId);
+                    return (
+                      <div key={idea._id} className="rounded-lg border border-fuchsia-500/15 bg-black/20 p-3">
+                        <div className="flex items-center gap-2">
+                          {room ? <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">{room.name}</Badge> : null}
+                          <Badge className={PRIORITY_COLORS[idea.priority || "nice-to-have"]}>{idea.priority || "nice-to-have"}</Badge>
+                        </div>
+                        <div className="mt-2 text-sm text-zinc-100">{idea.content}</div>
+                        {idea.sourceUrl ? (
+                          <a href={idea.sourceUrl} target="_blank" className="mt-2 inline-flex items-center gap-1 text-xs text-fuchsia-300 hover:text-fuchsia-200">
+                            <ExternalLink className="h-3 w-3" />
+                            Open link
+                          </a>
+                        ) : null}
+                      </div>
+                    );
+                  }) : (
+                    <p className="text-sm text-zinc-300">Add Wayfair, Costco, Marketplace, and contractor links here as ideas.</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
         {/* IDEAS TAB */}
         <TabsContent value="ideas" className="mt-4">
           <Card>
@@ -1030,11 +1703,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     return (
                       <div
                         key={idea._id}
-                        className="flex items-start gap-3 p-2 rounded border bg-yellow-50/50 border-yellow-200"
+                        className="flex items-start gap-3 rounded border border-amber-700/30 bg-zinc-950/80 p-2"
                       >
-                        <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5" />
+                        <Lightbulb className="mt-0.5 h-4 w-4 text-amber-400" />
                         {room && (
-                          <Badge variant="outline" className="bg-white/50">
+                          <Badge variant="outline" className="border-white/10 bg-black/20 text-zinc-200">
                             {room.name}
                           </Badge>
                         )}
@@ -1073,6 +1746,83 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
         </TabsContent>
       </Tabs>
 
+      <Dialog open={showMilestoneDialog} onOpenChange={(open) => {
+        setShowMilestoneDialog(open);
+        if (!open) resetMilestoneForm();
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingMilestoneId ? "Edit move-in milestone" : "Add move-in milestone"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Phase</label>
+              <Select value={milestoneStage} onValueChange={(value) => setMilestoneStage(value as MoveInStageId)}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {MOVE_IN_STAGE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Milestone</label>
+              <Input
+                className="mt-1"
+                placeholder="What needs to happen?"
+                value={milestoneTitle}
+                onChange={(e) => setMilestoneTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Target date</label>
+              <Input
+                className="mt-1"
+                type="date"
+                value={milestoneTargetDate}
+                onChange={(e) => setMilestoneTargetDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Notes (optional)</label>
+              <Textarea
+                className="mt-1"
+                rows={3}
+                placeholder="Add context if helpful"
+                value={milestoneDescription}
+                onChange={(e) => setMilestoneDescription(e.target.value)}
+              />
+            </div>
+            <Button
+              className="w-full"
+              disabled={!milestoneTitle.trim() || !milestoneTargetDate}
+              onClick={async () => {
+                const payload = {
+                  title: milestoneTitle.trim(),
+                  stage: milestoneStage,
+                  targetDate: milestoneTargetDate,
+                  description: milestoneDescription.trim() || undefined,
+                };
+
+                if (editingMilestoneId) {
+                  await updateMilestone({ milestoneId: editingMilestoneId, ...payload });
+                } else {
+                  await createMilestone({ userId, ...payload });
+                }
+
+                setShowMilestoneDialog(false);
+                resetMilestoneForm();
+              }}
+            >
+              {editingMilestoneId ? "Save milestone" : "Add milestone"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Quick Add Dialog */}
       <Dialog open={showQuickAdd} onOpenChange={setShowQuickAdd}>
         <DialogContent>
@@ -1081,12 +1831,13 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Room</label>
+              <label className="text-sm font-medium">Room (optional)</label>
               <Select value={newTaskRoom} onValueChange={setNewTaskRoom}>
                 <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select room..." />
+                  <SelectValue placeholder="Whole house / general" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value={GENERAL_ROOM_VALUE}>Whole house / general</SelectItem>
                   {rooms.map((r) => (
                     <SelectItem key={r._id} value={r._id}>{r.name}</SelectItem>
                   ))}
@@ -1118,17 +1869,17 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
             </div>
             <Button 
               className="w-full"
-              disabled={!newTaskRoom || !newTaskTitle.trim()}
+              disabled={!newTaskTitle.trim()}
               onClick={() => {
-                if (newTaskRoom && newTaskTitle.trim()) {
+                if (newTaskTitle.trim()) {
                   createTask({
                     userId,
-                    roomId: newTaskRoom as Id<"homeRemodelRooms">,
+                    roomId: newTaskRoom !== GENERAL_ROOM_VALUE ? (newTaskRoom as Id<"homeRemodelRooms">) : undefined,
                     title: newTaskTitle.trim(),
                     assignee: newTaskAssignee || undefined,
                   });
                   setNewTaskTitle("");
-                  setNewTaskRoom("");
+                  setNewTaskRoom(GENERAL_ROOM_VALUE);
                   setNewTaskAssignee("");
                   setShowQuickAdd(false);
                 }
