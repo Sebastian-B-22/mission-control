@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -10,8 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Users, Search, RefreshCw, Phone, Mail, MessageCircle, X } from "lucide-react";
-
-// ─── Types ────────────────────────────────────────────────────────────────
 
 type Program = "all" | "spring_league" | "camp" | "pdp";
 
@@ -41,23 +39,21 @@ type FamilyWithChildren = {
   regions: string[];
 };
 
-// ─── Config ───────────────────────────────────────────────────────────────
-
-const PROGRAM_CONFIG: Record<string, { label: string; color: string }> = {
-  spring_league: { label: "Spring League", color: "bg-green-100 text-green-800 border-green-200" },
-  camp:          { label: "Summer Camp",   color: "bg-amber-100 text-amber-800 border-amber-200" },
-  pdp:           { label: "PDP",           color: "bg-blue-100 text-blue-800 border-blue-200"    },
-  other:         { label: "Other",         color: "bg-gray-100 text-gray-700 border-gray-200"    },
+const PROGRAM_CONFIG: Record<string, { label: string; className: string }> = {
+  spring_league: { label: "Spring League", className: "bg-green-500/10 text-green-300 border-green-500/20" },
+  camp: { label: "Summer Camp", className: "bg-amber-500/10 text-amber-300 border-amber-500/20" },
+  pdp: { label: "PDP", className: "bg-blue-500/10 text-blue-300 border-blue-500/20" },
+  other: { label: "Other", className: "bg-muted text-muted-foreground border-border" },
 };
 
-const REGION_CONFIG: Record<string, { label: string; color: string }> = {
-  agoura: { label: "Agoura", color: "bg-purple-100 text-purple-800 border-purple-200" },
-  pali:   { label: "Pali",   color: "bg-sky-100 text-sky-800 border-sky-200"          },
+const REGION_CONFIG: Record<string, { label: string; className: string }> = {
+  agoura: { label: "Agoura", className: "bg-red-500/10 text-red-300 border-red-500/20" },
+  pali: { label: "Pali", className: "bg-amber-500/10 text-amber-300 border-amber-500/20" },
 };
 
 function formatPhone(phone: string): string {
   const d = phone.replace(/\D/g, "");
-  if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  if (d.length === 10) return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
   return phone;
 }
 
@@ -70,7 +66,20 @@ function timeAgo(ts: number): string {
   return `${Math.floor(days / 7)}w ago`;
 }
 
-// ─── Family Detail Modal ──────────────────────────────────────────────────
+function getFamilyTone(family: FamilyWithChildren) {
+  const hasAgoura = family.regions.includes("agoura");
+  const hasPali = family.regions.includes("pali");
+
+  if (hasAgoura && !hasPali) {
+    return "border-red-500/20 bg-red-500/[0.04] hover:border-red-400/40";
+  }
+
+  if (hasPali && !hasAgoura) {
+    return "border-amber-500/20 bg-amber-500/[0.04] hover:border-amber-400/40";
+  }
+
+  return "border-border bg-background/40 hover:border-primary/40";
+}
 
 function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | null; onClose: () => void }) {
   const family = useQuery(api.families.getFamily, familyId ? { id: familyId } : "skip");
@@ -82,60 +91,66 @@ function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | n
           <DialogTitle>{family ? `${family.parentFirstName} ${family.parentLastName}` : "Loading..."}</DialogTitle>
         </DialogHeader>
 
-        {!family && <div className="flex justify-center py-8"><RefreshCw className="h-5 w-5 animate-spin text-gray-400" /></div>}
+        {!family && (
+          <div className="flex justify-center py-8">
+            <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        )}
 
         {family && (
           <div className="space-y-5">
-            {/* Contact */}
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2 border border-gray-100">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact</h3>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <a href={`mailto:${family.email}`} className="text-blue-600 hover:underline">{family.email}</a>
+            <div className="rounded-lg border bg-card p-4 space-y-2">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Contact</h3>
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <a href={`mailto:${family.email}`} className="text-primary hover:underline">{family.email}</a>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Phone className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center gap-2 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground" />
                 <span>{formatPhone(family.phone)}</span>
               </div>
               {family.lastQuoMessage && (
-                <div className="flex items-start gap-2 text-sm pt-2 mt-2 border-t border-gray-200">
-                  <MessageCircle className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-2 text-sm pt-2 mt-2 border-t">
+                  <MessageCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-gray-700 italic">&ldquo;{family.lastQuoMessage}&rdquo;</p>
-                    {family.lastQuoDate && <p className="text-gray-400 text-xs mt-1">{timeAgo(family.lastQuoDate)}</p>}
+                    <p className="italic text-muted-foreground">&ldquo;{family.lastQuoMessage}&rdquo;</p>
+                    {family.lastQuoDate && <p className="text-xs text-muted-foreground mt-1">{timeAgo(family.lastQuoDate)}</p>}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Players */}
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Players ({family.children.length})</h3>
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                Players ({family.children.length})
+              </h3>
               <div className="space-y-2">
                 {family.children.map((child: any) => (
-                  <div key={child._id} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">{child.firstName} {child.lastName}</span>
-                      <div className="flex gap-1">
+                  <div key={child._id} className="rounded-lg border bg-card p-3">
+                    <div className="flex items-center justify-between mb-2 gap-3">
+                      <span className="font-medium">{child.firstName} {child.lastName}</span>
+                      <div className="flex gap-1 flex-wrap justify-end">
                         {child.gender && (
-                          <Badge variant="outline" className={`text-xs ${child.gender === "Girls" ? "bg-pink-50 text-pink-700 border-pink-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
+                          <Badge variant="outline" className={child.gender === "Girls" ? "bg-pink-500/10 text-pink-300 border-pink-500/20" : "bg-blue-500/10 text-blue-300 border-blue-500/20"}>
                             {child.gender}
                           </Badge>
                         )}
-                        {child.birthYear && (
-                          <Badge variant="outline" className="text-xs text-gray-600">{child.birthYear}</Badge>
-                        )}
+                        {child.birthYear && <Badge variant="outline">{child.birthYear}</Badge>}
                       </div>
                     </div>
                     {(child as typeof child & { enrollments?: Array<{ _id: string; program: string; region?: string; season?: string; division?: string; practiceDay?: string }> }).enrollments?.map((enr: any) => (
                       <div key={enr._id} className="flex flex-wrap gap-1 mt-1">
-                        <Badge variant="outline" className={`text-xs ${PROGRAM_CONFIG[enr.program]?.color || "bg-gray-100 text-gray-700"}`}>
+                        <Badge variant="outline" className={PROGRAM_CONFIG[enr.program]?.className || PROGRAM_CONFIG.other.className}>
                           {PROGRAM_CONFIG[enr.program]?.label || enr.program}
                         </Badge>
-                        {enr.region && <Badge variant="outline" className={`text-xs ${REGION_CONFIG[enr.region]?.color || "bg-gray-100 text-gray-700"}`}>{REGION_CONFIG[enr.region]?.label || enr.region}</Badge>}
-                        {enr.division && <Badge variant="outline" className="text-xs text-gray-600">{enr.division}</Badge>}
-                        {enr.practiceDay && <Badge variant="outline" className="text-xs text-gray-500">{enr.practiceDay.charAt(0) + enr.practiceDay.slice(1).toLowerCase()}</Badge>}
-                        {enr.season && <span className="text-xs text-gray-400 self-center">{enr.season}</span>}
+                        {enr.region && (
+                          <Badge variant="outline" className={REGION_CONFIG[enr.region]?.className || ""}>
+                            {REGION_CONFIG[enr.region]?.label || enr.region}
+                          </Badge>
+                        )}
+                        {enr.division && <Badge variant="outline">{enr.division}</Badge>}
+                        {enr.practiceDay && <Badge variant="outline">{enr.practiceDay}</Badge>}
+                        {enr.season && <span className="text-xs text-muted-foreground self-center">{enr.season}</span>}
                       </div>
                     ))}
                   </div>
@@ -149,54 +164,79 @@ function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | n
   );
 }
 
-// ─── Family Card ──────────────────────────────────────────────────────────
-
 function FamilyCard({ family, onClick }: { family: FamilyWithChildren; onClick: () => void }) {
   return (
-    <Card onClick={onClick} className="border border-gray-200 hover:border-amber-300 hover:shadow-sm cursor-pointer transition-all duration-150 bg-white">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <div>
-            <p className="font-semibold text-gray-900">{family.parentFirstName} {family.parentLastName}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{family.email}</p>
+    <Card
+      onClick={onClick}
+      className={`cursor-pointer transition-all duration-150 hover:shadow-sm ${getFamilyTone(family)}`}
+    >
+      <CardContent className="p-3.5 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-semibold leading-tight">
+              {family.parentFirstName} {family.parentLastName}
+            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1 min-w-0">
+                <Mail className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate max-w-[210px]">{family.email}</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Phone className="h-3.5 w-3.5 shrink-0" />
+                {formatPhone(family.phone)}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-1 justify-end">
-            {family.programs.map((p) => (
-              <Badge key={p} variant="outline" className={`text-xs ${PROGRAM_CONFIG[p]?.color || "bg-gray-100 text-gray-700"}`}>
-                {PROGRAM_CONFIG[p]?.label || p}
-              </Badge>
-            ))}
+          <div className="flex flex-wrap gap-1 justify-end max-w-[45%]">
             {family.regions.map((r) => (
-              <Badge key={r} variant="outline" className={`text-xs ${REGION_CONFIG[r]?.color || "bg-gray-100 text-gray-700"}`}>
+              <Badge key={r} variant="outline" className={REGION_CONFIG[r]?.className || ""}>
                 {REGION_CONFIG[r]?.label || r}
               </Badge>
             ))}
           </div>
         </div>
 
+        <div className="flex flex-wrap gap-1">
+          {family.programs.map((p) => (
+            <Badge key={p} variant="outline" className={PROGRAM_CONFIG[p]?.className || PROGRAM_CONFIG.other.className}>
+              {PROGRAM_CONFIG[p]?.label || p}
+            </Badge>
+          ))}
+          <Badge variant="secondary">{family.enrollmentCount} enrollments</Badge>
+        </div>
+
         {family.children.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
+          <div className="flex flex-wrap gap-1.5">
             {family.children.map((child) => (
-              <span key={child._id} className="text-xs bg-gray-100 text-gray-600 rounded px-2 py-0.5">
-                {child.firstName}{child.gender ? ` · ${child.gender === "Girls" ? "G" : "B"}` : ""}
+              <span key={child._id} className="text-xs rounded-md border bg-background/70 px-2 py-1 text-muted-foreground">
+                {child.firstName}
+                {child.gender ? ` · ${child.gender === "Girls" ? "G" : "B"}` : ""}
+                {child.birthYear ? ` · ${child.birthYear}` : ""}
               </span>
             ))}
           </div>
         )}
 
-        {family.lastQuoMessage && (
-          <div className="flex items-start gap-1.5 pt-2 border-t border-gray-100">
-            <MessageCircle className="h-3.5 w-3.5 text-gray-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-gray-500 line-clamp-1 flex-1">{family.lastQuoMessage}</p>
-            {family.lastQuoDate && <span className="text-xs text-gray-400 shrink-0">{timeAgo(family.lastQuoDate)}</span>}
+        {family.lastQuoMessage ? (
+          <div className="rounded-md border bg-background/60 px-2.5 py-2 text-xs text-muted-foreground">
+            <div className="flex items-start gap-1.5">
+              <MessageCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="line-clamp-2">{family.lastQuoMessage}</p>
+                {family.lastQuoDate && <p className="mt-1 text-[11px]">{timeAgo(family.lastQuoDate)}</p>}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-0.5">
+            <span>{family.children.length} child{family.children.length === 1 ? "" : "ren"}</span>
+            <span>Open family</span>
           </div>
         )}
       </CardContent>
     </Card>
   );
 }
-
-// ─── Main Component ────────────────────────────────────────────────────────
 
 export function FamilyCRM() {
   const [search, setSearch] = useState("");
@@ -209,25 +249,28 @@ export function FamilyCRM() {
   const stats = useQuery(api.families.getStats);
   const syncAll = useAction(api.jotformSync.syncAll);
 
-  const filtered = families.filter((f: any) => {
-    const matchesSearch =
-      !search.trim() ||
-      `${f.parentFirstName} ${f.parentLastName}`.toLowerCase().includes(search.toLowerCase()) ||
-      f.email.toLowerCase().includes(search.toLowerCase()) ||
-      f.phone.includes(search) ||
-      f.children.some((c: any) => `${c.firstName} ${c.lastName}`.toLowerCase().includes(search.toLowerCase()));
-    const matchesProgram = programFilter === "all" || f.programs.includes(programFilter);
-    return matchesSearch && matchesProgram;
-  });
+  const filtered = useMemo(() => {
+    return families.filter((f: any) => {
+      const matchesSearch =
+        !search.trim() ||
+        `${f.parentFirstName} ${f.parentLastName}`.toLowerCase().includes(search.toLowerCase()) ||
+        f.email.toLowerCase().includes(search.toLowerCase()) ||
+        f.phone.includes(search) ||
+        f.children.some((c: any) => `${c.firstName} ${c.lastName}`.toLowerCase().includes(search.toLowerCase()));
+
+      const matchesProgram = programFilter === "all" || f.programs.includes(programFilter);
+      return matchesSearch && matchesProgram;
+    });
+  }, [families, programFilter, search]);
 
   const handleSync = async () => {
     setSyncing(true);
     setSyncResult(null);
     try {
       const result = await syncAll({});
-      setSyncResult(`Synced ${result.agoura.synced + result.pali.synced} families (Agoura: ${result.agoura.synced}, Pali: ${result.pali.synced})`);
+      setSyncResult(`Synced ${result.agoura.synced + result.pali.synced} records (Agoura: ${result.agoura.synced}, Pali: ${result.pali.synced})`);
     } catch {
-      setSyncResult("Sync failed - check console");
+      setSyncResult("Sync failed, please check the logs.");
     } finally {
       setSyncing(false);
     }
@@ -235,85 +278,94 @@ export function FamilyCRM() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-3xl font-bold">Family CRM</h1>
-          <p className="text-muted-foreground mt-1">All Aspire families across Spring League, Camp, and PDP</p>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-3xl font-bold">Family CRM</h1>
+            <Badge variant="outline" className="border-fuchsia-400/30 bg-fuchsia-500/12 text-fuchsia-100 px-2 py-0.5 text-[11px]">
+              {stats?.totalFamilies ?? filtered.length} families
+            </Badge>
+          </div>
         </div>
         <Button onClick={handleSync} disabled={syncing} variant="outline" size="sm">
           <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Syncing..." : "Sync Jotform"}
+          {syncing ? "Syncing..." : "Refresh CRM"}
         </Button>
       </div>
 
-      {/* Sync Result */}
       {syncResult && (
-        <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-800">
+        <div className="flex items-center justify-between rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-300">
           <span>{syncResult}</span>
-          <button onClick={() => setSyncResult(null)}><X className="h-4 w-4" /></button>
+          <button onClick={() => setSyncResult(null)}>
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
-      {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: "Total Families", value: stats.totalFamilies, icon: "👨‍👩‍👧‍👦" },
-            { label: "Spring League",  value: stats.springLeagueFamilies, icon: "⚽" },
-            { label: "Summer Camp",    value: stats.campFamilies, icon: "🏕️" },
-            { label: "PDP",            value: stats.pdpFamilies, icon: "🏃" },
-          ].map((s) => (
-            <Card key={s.label} className="border border-gray-200 bg-white">
-              <CardContent className="p-4 flex items-center gap-3">
-                <span className="text-2xl">{s.icon}</span>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-                  <p className="text-xs text-gray-500">{s.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(245,158,11,0.04)]">
+          <CardContent className="p-4 md:p-5">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl border border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/28 via-violet-500/12 to-slate-950 p-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-fuchsia-100/90">Families in CRM</div>
+                <div className="text-3xl font-semibold mt-2 text-white">{stats.totalFamilies}</div>
+              </div>
+              <div className="rounded-2xl border border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-slate-950 p-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-100/90">Spring families</div>
+                <div className="text-3xl font-semibold mt-2 text-white">{stats.springLeagueFamilies}</div>
+              </div>
+              <div className="rounded-2xl border border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950 p-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/90">Camp families</div>
+                <div className="text-3xl font-semibold mt-2 text-white">{stats.campFamilies}</div>
+              </div>
+              <div className="rounded-2xl border border-cyan-400/35 bg-gradient-to-br from-cyan-500/26 via-sky-500/12 to-slate-950 p-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/90">PDP families</div>
+                <div className="text-3xl font-semibold mt-2 text-white">{stats.pdpFamilies}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Search + Filter */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by parent name, child name, email, or phone..."
-            className="pl-9"
-          />
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {(["all", "spring_league", "camp", "pdp"] as Program[]).map((p) => (
-            <Button key={p} size="sm" variant={programFilter === p ? "default" : "outline"} onClick={() => setProgramFilter(p)}>
-              {p === "all" ? "All" : PROGRAM_CONFIG[p]?.label || p}
-            </Button>
-          ))}
-        </div>
-      </div>
+      <Card className="bg-background/40">
+        <CardContent className="p-4 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by parent name, child name, email, or phone..."
+                className="pl-9"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {(["all", "spring_league", "camp", "pdp"] as Program[]).map((p) => (
+                <Button key={p} size="sm" variant={programFilter === p ? "default" : "outline"} onClick={() => setProgramFilter(p)}>
+                  {p === "all" ? "All" : PROGRAM_CONFIG[p]?.label || p}
+                </Button>
+              ))}
+            </div>
+          </div>
 
-      <p className="text-sm text-gray-500">
-        {filtered.length} {filtered.length === 1 ? "family" : "families"}
-        {search || programFilter !== "all" ? " matching filters" : ""}
-      </p>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <Badge variant="secondary">{filtered.length} shown</Badge>
+            <span>{search || programFilter !== "all" ? "Filtered family list" : "All families in CRM"}</span>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Grid */}
       {families.length === 0 ? (
-        <Card className="border border-dashed border-gray-200">
+        <Card className="border border-dashed">
           <CardContent className="py-16 flex flex-col items-center gap-4 text-center">
-            <Users className="h-12 w-12 text-gray-300" />
+            <Users className="h-12 w-12 text-muted-foreground" />
             <div>
-              <p className="text-lg font-medium text-gray-600">No families yet</p>
-              <p className="text-sm text-gray-400 mt-1">Click &ldquo;Sync Jotform&rdquo; to import Spring League families</p>
+              <p className="text-lg font-medium">No families yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Use the CRM refresh to pull in current Aspire family records.</p>
             </div>
             <Button onClick={handleSync} disabled={syncing}>
               <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? "animate-spin" : ""}`} />
-              Sync Now
+              Refresh CRM
             </Button>
           </CardContent>
         </Card>

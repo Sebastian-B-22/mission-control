@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarDays, List, LayoutGrid, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, CalendarDays, List, LayoutGrid, Plus, Trash2 } from "lucide-react";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { groupByCategory } from "@/lib/groupByCategory";
 
@@ -60,6 +60,8 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
   const toggleDone = useMutation(api.weeklyGoals.toggleDone);
   const removeGoal = useMutation(api.weeklyGoals.remove);
   const setScheduledDay = useMutation(api.weeklyGoals.setScheduledDay);
+  const updateGoalCategory = useMutation(api.weeklyGoals.updateGoalCategory);
+  const reorderGoals = useMutation(api.weeklyGoals.reorderGoals);
 
   const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -126,6 +128,17 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
     () => groupByCategory(goals, rpmCategories),
     [goals, rpmCategories]
   );
+
+  const moveGoal = async (goalId: Id<"weeklyGoals">, direction: "up" | "down") => {
+    const index = goals.findIndex((goal: any) => goal._id === goalId);
+    if (index === -1) return;
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= goals.length) return;
+
+    const reordered = [...goals];
+    [reordered[index], reordered[swapIndex]] = [reordered[swapIndex], reordered[index]];
+    await reorderGoals({ orderedGoalIds: reordered.map((goal: any) => goal._id) });
+  };
 
   return (
     <div className="space-y-6">
@@ -275,6 +288,33 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                             ))}
                           </SelectContent>
                         </Select>
+                        <Select
+                          value={g.categoryId ?? "none"}
+                          onValueChange={async (value) => {
+                            await updateGoalCategory({
+                              goalId: g._id,
+                              categoryId: value === "none" ? null : (value as Id<"rpmCategories">),
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="w-[170px] h-7 text-xs">
+                            <SelectValue placeholder="Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">No category</SelectItem>
+                            {rpmCategories.map((c) => (
+                              <SelectItem key={c._id} value={c._id}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button variant="ghost" size="icon" onClick={() => moveGoal(g._id, "up")}>
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => moveGoal(g._id, "down")}>
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -397,16 +437,6 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
         </Card>
       )}
 
-      <Card className="bg-zinc-50 dark:bg-zinc-800/50">
-        <CardContent className="pt-6 space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Calendar events are synced from your Mac mini (merged Google accounts) into Mission Control.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Setup note (for sync scripts): your userId is <span className="font-mono">{userId}</span>
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

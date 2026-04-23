@@ -14,14 +14,14 @@ export const CATEGORY_COLORS: Record<string, { border: string; badge: string; bg
     bg: "bg-emerald-950",
   },
   "Home Haven & Sanctuary": {
-    border: "border-l-4 border-l-teal-500",
-    badge: "bg-teal-900/30 text-teal-300 border-teal-500/50",
-    bg: "bg-teal-950",
+    border: "border-l-4 border-l-amber-500",
+    badge: "bg-amber-900/30 text-amber-300 border-amber-500/50",
+    bg: "bg-amber-950",
   },
   "Bangin' Ass Body": {
-    border: "border-l-4 border-l-red-500",
-    badge: "bg-red-900/30 text-red-300 border-red-500/50",
-    bg: "bg-red-950",
+    border: "border-l-4 border-l-orange-500",
+    badge: "bg-orange-900/30 text-orange-300 border-orange-500/50",
+    bg: "bg-orange-950",
   },
   "Extraordinary Friendships": {
     border: "border-l-4 border-l-sky-500",
@@ -41,9 +41,9 @@ export const CATEGORY_COLORS: Record<string, { border: string; badge: string; bg
     bg: "bg-rose-950",
   },
   "HTA Empire Builder": {
-    border: "border-l-4 border-l-violet-500",
-    badge: "bg-violet-900/30 text-violet-300 border-violet-500/50",
-    bg: "bg-violet-950",
+    border: "border-l-4 border-l-indigo-500",
+    badge: "bg-indigo-900/30 text-indigo-300 border-indigo-500/50",
+    bg: "bg-indigo-950",
   },
   "Staff Empowerment & Kickass Workplace": {
     border: "border-l-4 border-l-cyan-500",
@@ -51,9 +51,9 @@ export const CATEGORY_COLORS: Record<string, { border: string; badge: string; bg
     bg: "bg-cyan-950",
   },
   "Marketing & Networking Genius": {
-    border: "border-l-4 border-l-amber-500",
-    badge: "bg-amber-900/30 text-amber-300 border-amber-500/50",
-    bg: "bg-amber-950",
+    border: "border-l-4 border-l-yellow-500",
+    badge: "bg-yellow-900/30 text-yellow-300 border-yellow-500/50",
+    bg: "bg-yellow-950",
   },
   "Operational Systems Guru": {
     border: "border-l-4 border-l-blue-500",

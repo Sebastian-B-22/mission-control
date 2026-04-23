@@ -123,18 +123,17 @@ export const initializeUserData = internalMutation({
 export const getUserByClerkId = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
-    // Get all users with this clerkId (there might be duplicates with bad IDs)
     const users = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
       .collect();
-    
+
     if (users.length === 0) return null;
-    if (users.length === 1) return users[0];
-    
-    // If multiple users found, prefer the one with valid users table ID prefix (kx7)
-    // This handles the case of legacy malformed IDs
-    const validUser = users.find(u => String(u._id).startsWith('kx7'));
-    return validUser || users[0];
+
+    // Prefer real users-table ids and newest record when duplicates exist.
+    const validUsers = users.filter((u) => String(u._id).startsWith("kx"));
+    const candidates = validUsers.length > 0 ? validUsers : users;
+    candidates.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+    return candidates[0];
   },
 });

@@ -234,29 +234,34 @@ export const recordDailyHealth = mutation({
   handler: async (ctx, args) => {
     const { userId, date, sleepHours, steps, activeCalories, weight, whoopSynced } = args;
 
-    // Calculate scores
-    const sleepScore = calculateSleepScore(sleepHours);
-    const stepsScore = calculateStepsScore(steps);
-    const caloriesScore = calculateCaloriesScore(activeCalories);
-    const healthScore = sleepScore + stepsScore + caloriesScore;
-    const isPerfectDay = healthScore === 100;
-
     // Check if record exists for this date
     const existing = await ctx.db
       .query("dailyHealth")
       .withIndex("by_user_and_date", (q) => q.eq("userId", userId).eq("date", date))
       .first();
 
+    const finalSleepHours = sleepHours ?? existing?.sleepHours;
+    const finalSteps = steps ?? existing?.steps;
+    const finalActiveCalories = activeCalories ?? existing?.activeCalories;
+    const finalWeight = weight ?? existing?.weight;
+
+    // Calculate scores from the final persisted values, not just this patch payload.
+    const sleepScore = calculateSleepScore(finalSleepHours);
+    const stepsScore = calculateStepsScore(finalSteps);
+    const caloriesScore = calculateCaloriesScore(finalActiveCalories);
+    const healthScore = sleepScore + stepsScore + caloriesScore;
+    const isPerfectDay = healthScore === 100;
+
     if (existing) {
       // Update existing record
       await ctx.db.patch(existing._id, {
-        sleepHours: sleepHours ?? existing.sleepHours,
+        sleepHours: finalSleepHours,
         sleepScore,
-        steps: steps ?? existing.steps,
+        steps: finalSteps,
         stepsScore,
-        activeCalories: activeCalories ?? existing.activeCalories,
+        activeCalories: finalActiveCalories,
         caloriesScore,
-        weight: weight ?? existing.weight,
+        weight: finalWeight,
         healthScore,
         isPerfectDay,
         whoopSynced: whoopSynced ?? existing.whoopSynced,
@@ -270,13 +275,13 @@ export const recordDailyHealth = mutation({
       return await ctx.db.insert("dailyHealth", {
         userId,
         date,
-        sleepHours,
+        sleepHours: finalSleepHours,
         sleepScore,
-        steps,
+        steps: finalSteps,
         stepsScore,
-        activeCalories,
+        activeCalories: finalActiveCalories,
         caloriesScore,
-        weight,
+        weight: finalWeight,
         healthScore,
         isPerfectDay,
         whoopSynced: whoopSynced ?? false,

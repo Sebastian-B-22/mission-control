@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -74,7 +74,7 @@ const CATEGORIES = {
   },
   music: {
     label: "Music",
-    activities: ["Piano", "Singing", "Listening", "Other"],
+    activities: ["Drum Lesson", "Drum Practice", "Drumeo", "Piano", "Singing", "Listening", "Other"],
     icon: "🎵",
     color: "bg-indigo-500",
   },
@@ -101,6 +101,38 @@ const CATEGORIES = {
     color: "bg-green-500",
   },
 };
+
+type AutoProgressMap = Record<string, Record<string, any>>;
+
+function getLatestAutoSync(progress: AutoProgressMap | null | undefined): number | null {
+  if (!progress) return null;
+
+  let latest: number | null = null;
+  for (const student of Object.values(progress)) {
+    for (const platform of Object.values(student || {})) {
+      const scrapedAt = typeof platform?.scrapedAt === "number" ? platform.scrapedAt : null;
+      if (scrapedAt && (!latest || scrapedAt > latest)) {
+        latest = scrapedAt;
+      }
+    }
+  }
+
+  return latest;
+}
+
+function formatAutoSyncTime(timestamp: number | null | undefined): string {
+  if (!timestamp) return "not synced yet";
+
+  const diffMs = Date.now() - timestamp;
+  const minutes = Math.max(1, Math.floor(diffMs / 60000));
+
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+
+  return `${Math.floor(hours / 24)}d ago`;
+}
 
 export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewProps) {
   const getPstDateKey = () => {
@@ -129,6 +161,34 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
   });
   
   const autoProgress = useQuery(api.homeschoolProgress.getAllProgress, {});
+  const [serverAutoProgress, setServerAutoProgress] = useState<any | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadServerProgress = async () => {
+      try {
+        const res = await fetch(`/api/homeschool-progress?t=${Date.now()}`, {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) setServerAutoProgress(data);
+      } catch (error) {
+        console.error("Failed to load server homeschool progress", error);
+      }
+    };
+
+    loadServerProgress();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  
+  const resolvedAutoProgress = serverAutoProgress || autoProgress;
+  const latestAutoSync = getLatestAutoSync(resolvedAutoProgress);
+  const autoSyncIsStale = latestAutoSync ? Date.now() - latestAutoSync > 6 * 60 * 60 * 1000 : true;
   
   const stats = useQuery(api.homeschoolActivities.getDashboardStats, {
     userId,
@@ -172,14 +232,15 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
   const handleQuickLog = async (category: string, activity: string) => {
     try {
       setQuickAddMessage(null);
-      await quickLog({
+      const result = await quickLog({
         userId,
         date: selectedDate,
         student: selectedStudent,
         category,
         activity,
       });
-      setQuickAddMessage(`Logged: ${activity}`);
+      const label = result?.activity || activity;
+      setQuickAddMessage(result?.toggled ? `Updated: ${label}` : `Logged: ${label}`);
     } catch (e: any) {
       console.error("Quick add failed", e);
       setQuickAddMessage(e?.message || "Quick add failed");
@@ -288,12 +349,23 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
       </div>
 
       {/* Auto-tracked Platforms */}
-      <Card>
+      <Card className={autoSyncIsStale ? "border-amber-500/40" : undefined}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
-            Auto-tracked Platforms
-          </CardTitle>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Calculator className="h-5 w-5" />
+                Auto-tracked Platforms
+              </CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Last sync {formatAutoSyncTime(latestAutoSync)}.
+                {autoSyncIsStale ? " This section only changes when the background scraper runs." : " Fresh enough to trust for today."}
+              </p>
+            </div>
+            <Badge variant={autoSyncIsStale ? "secondary" : "outline"}>
+              {autoSyncIsStale ? "Needs refresh" : "Fresh"}
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-4">
@@ -303,19 +375,29 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                 <Calculator className="h-4 w-4 text-blue-500" />
                 <span className="font-medium">Math Academy</span>
               </div>
-              {autoProgress?.Anthony?.["math-academy"] && (
+              {resolvedAutoProgress?.Anthony?.["math-academy"] && (
                 <div className="text-sm space-y-1">
-                  <p>Anthony: {autoProgress.Anthony["math-academy"].level}</p>
+                  <div className="flex items-center gap-2">
+                    <p>Anthony: {resolvedAutoProgress.Anthony["math-academy"].level}</p>
+                    {resolvedAutoProgress.Anthony["math-academy"].todayCompleted && (
+                      <Badge variant="outline">Done today</Badge>
+                    )}
+                  </div>
                   <p className="text-muted-foreground">
-                    {autoProgress.Anthony["math-academy"].details?.xpToday || 0} XP today
+                    {resolvedAutoProgress.Anthony["math-academy"].details?.xpToday || 0} XP today • synced {formatAutoSyncTime(resolvedAutoProgress.Anthony["math-academy"].scrapedAt)}
                   </p>
                 </div>
               )}
-              {autoProgress?.Roma?.["math-academy"] && (
+              {resolvedAutoProgress?.Roma?.["math-academy"] && (
                 <div className="text-sm space-y-1 mt-2 pt-2 border-t">
-                  <p>Roma: {autoProgress.Roma["math-academy"].level}</p>
+                  <div className="flex items-center gap-2">
+                    <p>Roma: {resolvedAutoProgress.Roma["math-academy"].level}</p>
+                    {resolvedAutoProgress.Roma["math-academy"].todayCompleted && (
+                      <Badge variant="outline">Done today</Badge>
+                    )}
+                  </div>
                   <p className="text-muted-foreground">
-                    {autoProgress.Roma["math-academy"].details?.xpToday || 0} XP today
+                    {resolvedAutoProgress.Roma["math-academy"].details?.xpToday || 0} XP today • synced {formatAutoSyncTime(resolvedAutoProgress.Roma["math-academy"].scrapedAt)}
                   </p>
                 </div>
               )}
@@ -327,19 +409,29 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                 <Brain className="h-4 w-4 text-yellow-500" />
                 <span className="font-medium">Membean</span>
               </div>
-              {autoProgress?.Anthony?.membean && (
+              {resolvedAutoProgress?.Anthony?.membean && (
                 <div className="text-sm space-y-1">
-                  <p>Anthony: {autoProgress.Anthony.membean.level}</p>
+                  <div className="flex items-center gap-2">
+                    <p>Anthony: {resolvedAutoProgress.Anthony.membean.level}</p>
+                    {resolvedAutoProgress.Anthony.membean.todayCompleted && (
+                      <Badge variant="outline">Done today</Badge>
+                    )}
+                  </div>
                   <p className="text-muted-foreground">
-                    {autoProgress.Anthony.membean.weeklyMinutes || 0}m this week
+                    {resolvedAutoProgress.Anthony.membean.weeklyMinutes || 0}m this week • synced {formatAutoSyncTime(resolvedAutoProgress.Anthony.membean.scrapedAt)}
                   </p>
                 </div>
               )}
-              {autoProgress?.Roma?.membean && (
+              {resolvedAutoProgress?.Roma?.membean && (
                 <div className="text-sm space-y-1 mt-2 pt-2 border-t">
-                  <p>Roma: {autoProgress.Roma.membean.level}</p>
+                  <div className="flex items-center gap-2">
+                    <p>Roma: {resolvedAutoProgress.Roma.membean.level}</p>
+                    {resolvedAutoProgress.Roma.membean.todayCompleted && (
+                      <Badge variant="outline">Done today</Badge>
+                    )}
+                  </div>
                   <p className="text-muted-foreground">
-                    {autoProgress.Roma.membean.weeklyMinutes || 0}m this week
+                    {resolvedAutoProgress.Roma.membean.weeklyMinutes || 0}m this week • synced {formatAutoSyncTime(resolvedAutoProgress.Roma.membean.scrapedAt)}
                   </p>
                 </div>
               )}
@@ -351,11 +443,16 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                 <Globe className="h-4 w-4 text-green-500" />
                 <span className="font-medium">Rosetta Stone</span>
               </div>
-              {autoProgress?.Family?.["rosetta-stone"] && (
+              {resolvedAutoProgress?.Family?.["rosetta-stone"] && (
                 <div className="text-sm space-y-1">
-                  <p>Family: {autoProgress.Family["rosetta-stone"].level}</p>
+                  <div className="flex items-center gap-2">
+                    <p>Family: {resolvedAutoProgress.Family["rosetta-stone"].level}</p>
+                    {resolvedAutoProgress.Family["rosetta-stone"].todayCompleted && (
+                      <Badge variant="outline">Done today</Badge>
+                    )}
+                  </div>
                   <p className="text-muted-foreground">
-                    {autoProgress.Family["rosetta-stone"].weeklyMinutes || 0}m this week
+                    {resolvedAutoProgress.Family["rosetta-stone"].weeklyMinutes || 0}m this week • synced {formatAutoSyncTime(resolvedAutoProgress.Family["rosetta-stone"].scrapedAt)}
                   </p>
                 </div>
               )}

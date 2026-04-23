@@ -67,3 +67,22 @@ export const syncRange = mutation({
     return { inserted: args.events.length, startMs: args.startMs, endMs: args.endMs };
   },
 });
+
+// Admin cleanup for orphaned events from wrong userId
+export const cleanupOrphanedEvents = mutation({
+  args: {
+    orphanedUserId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const orphaned = await ctx.db
+      .query("calendarEvents")
+      .withIndex("by_user_start", (q) => q.eq("userId", args.orphanedUserId))
+      .collect();
+
+    for (const e of orphaned) {
+      await ctx.db.delete(e._id);
+    }
+
+    return { deleted: orphaned.length };
+  },
+});

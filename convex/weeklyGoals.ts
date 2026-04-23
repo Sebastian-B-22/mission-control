@@ -57,6 +57,32 @@ export const setScheduledDay = mutation({
   },
 });
 
+export const updateGoalCategory = mutation({
+  args: {
+    goalId: v.id("weeklyGoals"),
+    categoryId: v.union(v.id("rpmCategories"), v.null()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.goalId, {
+      categoryId: args.categoryId ?? undefined,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const reorderGoals = mutation({
+  args: {
+    orderedGoalIds: v.array(v.id("weeklyGoals")),
+  },
+  handler: async (ctx, args) => {
+    await Promise.all(
+      args.orderedGoalIds.map((goalId, index) =>
+        ctx.db.patch(goalId, { order: index, updatedAt: Date.now() })
+      )
+    );
+  },
+});
+
 export const toggleDone = mutation({
   args: { goalId: v.id("weeklyGoals"), done: v.boolean() },
   handler: async (ctx, args) => {

@@ -161,7 +161,7 @@ export function HomeschoolFocusView({ userId }: HomeschoolSubViewProps) {
         <h1 className="text-3xl font-bold">Monthly Focus</h1>
         <p className="text-muted-foreground mt-1">Current & upcoming learning themes</p>
       </div>
-      <MonthlyFocus />
+      <MonthlyFocus mode="page" />
     </div>
   );
 }

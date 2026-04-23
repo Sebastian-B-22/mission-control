@@ -41,7 +41,7 @@ export const ACTIVITY_CONFIG = {
   },
   music: {
     label: "Music",
-    activities: ["Piano", "Singing", "Listening", "Other"],
+    activities: ["Drum Lesson", "Drum Practice", "Drumeo", "Piano", "Singing", "Listening", "Other"],
     icon: "🎵",
   },
   financial: {
@@ -207,16 +207,34 @@ export const quickLog = mutation({
       .withIndex("by_user_date", (q) => q.eq("userId", args.userId).eq("date", args.date))
       .collect();
 
-    const match = existing.find(
+    const sameStudent = (student: string) =>
+      student === args.student || (args.student === "both" && student === "both");
+
+    let match = existing.find(
       (a) =>
-        a.student === args.student &&
+        sameStudent(a.student) &&
         a.category === args.category &&
         a.activity === args.activity
     );
 
+    // Science recap imports often create a specific activity name like
+    // "Health & Body Experiment...". When Corinne taps the generic Science
+    // quick-add button, treat that as toggling the existing science item instead
+    // of creating a second weird duplicate entry.
+    if (!match && args.category === "science") {
+      match = existing.find(
+        (a) => sameStudent(a.student) && a.category === "science"
+      );
+    }
+
     if (match) {
       await ctx.db.patch(match._id, { completed: !match.completed });
-      return { id: match._id, toggled: true, completed: !match.completed };
+      return {
+        id: match._id,
+        toggled: true,
+        completed: !match.completed,
+        activity: match.activity,
+      };
     }
 
     const id = await ctx.db.insert("homeschoolActivities", {
@@ -230,7 +248,7 @@ export const quickLog = mutation({
       createdAt: Date.now(),
     });
 
-    return { id, created: true, completed: true };
+    return { id, created: true, completed: true, activity: args.activity };
   },
 });
 

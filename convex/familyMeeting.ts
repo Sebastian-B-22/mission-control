@@ -55,6 +55,32 @@ export const toggleQuickWin = mutation({
   },
 });
 
+export const updateQuickWinCategory = mutation({
+  args: {
+    id: v.id("quickWins"),
+    categoryId: v.union(v.id("rpmCategories"), v.null()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      categoryId: args.categoryId ?? undefined,
+    });
+  },
+});
+
+export const reorderQuickWins = mutation({
+  args: {
+    orderedIds: v.array(v.id("quickWins")),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    await Promise.all(
+      args.orderedIds.map((id, index) =>
+        ctx.db.patch(id, { createdAt: now + index })
+      )
+    );
+  },
+});
+
 export const deleteQuickWin = mutation({
   args: { id: v.id("quickWins") },
   handler: async (ctx, args) => {
@@ -201,14 +227,27 @@ export const markMovieWatched = mutation({
     rating: v.optional(v.number()),
     notes: v.optional(v.string()),
     favorite: v.optional(v.boolean()),
+    watchedOn: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.id, {
       type: "watched",
-      watchedOn: new Date().toISOString().split("T")[0],
+      watchedOn: args.watchedOn || new Date().toISOString().split("T")[0],
       rating: args.rating,
       notes: args.notes,
       favorite: args.favorite,
+    });
+  },
+});
+
+export const setMovieWatchedDate = mutation({
+  args: {
+    id: v.id("movieLibrary"),
+    watchedOn: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      watchedOn: args.watchedOn,
     });
   },
 });

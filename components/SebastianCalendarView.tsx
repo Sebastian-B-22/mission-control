@@ -116,113 +116,120 @@ export function SebastianCalendarView({ userId }: SebastianCalendarViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Calendar className="h-6 w-6" />
-        <h2 className="text-2xl font-bold">Weekly Calendar</h2>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {showAllCron ? "all active cron" : "important fixed-time cron"}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-white">
+            <Calendar className="h-6 w-6 text-amber-400" />
+            Weekly Calendar
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            See the fixed-time automations that shape the week without crushing them into unreadable columns.
+          </p>
         </div>
+
         <button
-          className="text-xs px-2 py-1 rounded border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/80 px-3 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-white"
           onClick={() => setShowAllCron(v => !v)}
         >
-          {showAllCron ? "Hide noisy" : "Show all"}
+          {showAllCron ? "Hide noisy jobs" : "Show all jobs"}
         </button>
       </div>
 
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 px-4 py-3 text-sm text-muted-foreground">
+        <div>
+          Showing {showAllCron ? "all active cron" : "important fixed-time cron"}
+        </div>
+      </div>
+
       {/* Week Grid */}
-      <div className="grid grid-cols-7 gap-2">
-        {days.map((day) => (
-          <Card
-            key={day.key}
-            className={`${
-              isToday(day.date) ? "border-2 border-amber-500 bg-amber-50/50 dark:bg-amber-900/20" : ""
-            }`}
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold">
-                {day.name}
-              </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                {day.date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-1 pt-2">
-              {/* Cron Jobs for this day */}
-              {dailyRecurring.map((item: any, i: any) => {
-                // Determine if we show this item today
-                const show = 
-                  item.type === "daily" || 
-                  (item.type === "sunday" && day.dayIndex === 0) ||
-                  (item.type === "monday" && day.dayIndex === 1);
+      <div className="overflow-x-auto pb-2">
+        <div className="grid min-w-[1120px] grid-cols-7 gap-3">
+          {days.map((day) => (
+            <Card
+              key={day.key}
+              className={isToday(day.date)
+                ? "border-amber-500/40 bg-amber-500/5 shadow-none"
+                : "border-zinc-800 bg-zinc-950/80 shadow-none"
+              }
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold text-white">
+                  {day.name}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  {day.date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-2 pt-2">
+                {dailyRecurring.map((item: any, i: any) => {
+                  const show =
+                    item.type === "daily" ||
+                    (item.type === "sunday" && day.dayIndex === 0) ||
+                    (item.type === "monday" && day.dayIndex === 1);
 
-                if (!show) return null;
+                  if (!show) return null;
 
-                const isSpecial = item.type !== "daily";
-                const bgClass = isSpecial 
-                  ? "bg-purple-100 dark:bg-purple-900/50 border-purple-200 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-800/50"
-                  : "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700";
+                  const isSpecial = item.type !== "daily";
+                  const bgClass = isSpecial
+                    ? "border-purple-500/30 bg-purple-500/10"
+                    : "border-zinc-800 bg-zinc-900/80";
 
-                return (
-                  <div
-                    key={`${day.key}-${i}`}
-                    className={`p-2 text-xs rounded border transition-colors ${bgClass}`}
-                  >
-                    <div className="flex items-center gap-1">
-                      <span>{item.emoji}</span>
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">{item.time}</span>
+                  return (
+                    <div
+                      key={`${day.key}-${i}`}
+                      className={`rounded-xl border p-2.5 text-xs transition-colors ${bgClass}`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span>{item.emoji}</span>
+                        <span className="font-medium text-zinc-100">{item.time}</span>
+                      </div>
+                      <p className="mt-1.5 line-clamp-2 leading-tight text-zinc-400">{item.task}</p>
                     </div>
-                    <p className="text-xs mt-1 leading-tight text-zinc-700 dark:text-zinc-300 line-clamp-2">{item.task}</p>
-                  </div>
-                );
-              })}
-
-              {/* Active project tasks could go here */}
-            </CardContent>
-          </Card>
-        ))}
+                  );
+                })}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Legend */}
-      <Card className="bg-zinc-50 dark:bg-zinc-800/50">
+      <Card className="border-zinc-800 bg-zinc-950/80 shadow-none">
         <CardHeader>
-          <CardTitle className="text-sm">Legend</CardTitle>
+          <CardTitle className="text-sm text-white">Legend</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-4 h-4 rounded bg-zinc-100 dark:bg-zinc-800 border dark:border-zinc-700"></div>
+          <div className="flex items-center gap-2 text-sm text-zinc-300">
+            <div className="h-4 w-4 rounded border border-zinc-800 bg-zinc-900"></div>
             <span>Daily recurring tasks (automated via cron)</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-4 h-4 rounded bg-purple-100 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-700"></div>
+          <div className="flex items-center gap-2 text-sm text-zinc-300">
+            <div className="h-4 w-4 rounded border border-purple-500/30 bg-purple-500/10"></div>
             <span>Weekly tasks (Specific days)</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-4 h-4 rounded border-2 border-amber-500"></div>
+          <div className="flex items-center gap-2 text-sm text-zinc-300">
+            <div className="h-4 w-4 rounded border border-amber-500/60 bg-amber-500/10"></div>
             <span>Today</span>
           </div>
         </CardContent>
       </Card>
 
       {/* Project Tasks */}
-      <Card>
+      <Card className="border-zinc-800 bg-zinc-950/80 shadow-none">
         <CardHeader>
-          <CardTitle className="text-sm">Active Project Work</CardTitle>
+          <CardTitle className="text-sm text-white">Active Project Work</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {tasks.filter((t: any) => t.status === "in-progress" || t.status === "todo").slice(0, 5).map((task: any) => (
-              <div key={task._id} className="flex items-center justify-between p-2 rounded border dark:border-zinc-700 text-sm">
-                <span>{task.title}</span>
+              <div key={task._id} className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/70 p-3 text-sm">
+                <span className="text-zinc-200">{task.title}</span>
                 <span className={`text-xs px-2 py-0.5 rounded ${
                   task.priority === "high" 
-                    ? "bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300" 
+                    ? "bg-red-500/15 text-red-300" 
                     : task.priority === "medium"
-                    ? "bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300"
-                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300"
+                    ? "bg-amber-500/15 text-amber-300"
+                    : "bg-zinc-800 text-zinc-300"
                 }`}>
                   {task.priority}
                 </span>

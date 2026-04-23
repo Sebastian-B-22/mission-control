@@ -2,6 +2,43 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+function getPstDateKey(timestamp: number): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(timestamp));
+}
+
+function hasDerivedProgress(latest: any, previous: any): boolean {
+  if (!latest || !previous) return false;
+
+  if (latest.platform === "math-academy") {
+    return (latest.details?.xpThisWeek || 0) > (previous.details?.xpThisWeek || 0) ||
+      (latest.details?.percentComplete || 0) > (previous.details?.percentComplete || 0);
+  }
+
+  if (latest.platform === "rosetta-stone") {
+    return (latest.details?.totalTimeMinutes || 0) > (previous.details?.totalTimeMinutes || 0) ||
+      latest.details?.lesson !== previous.details?.lesson ||
+      latest.details?.unit !== previous.details?.unit;
+  }
+
+  if (latest.platform === "membean") {
+    return (latest.details?.minutesTrained || 0) > (previous.details?.minutesTrained || 0) ||
+      (latest.details?.tenMinuteDays || 0) > (previous.details?.tenMinuteDays || 0) ||
+      (latest.details?.goalProgress || 0) > (previous.details?.goalProgress || 0);
+  }
+
+  if (latest.platform === "typing-com") {
+    return (latest.details?.lessonsCompleted || 0) > (previous.details?.lessonsCompleted || 0) ||
+      (latest.details?.wordsPerMinute || 0) > (previous.details?.wordsPerMinute || 0);
+  }
+
+  return false;
+}
+
 // ─── Queries ────────────────────────────────────────────────────────────────
 
 /**
@@ -38,20 +75,41 @@ export const getAllProgress = query({
       .query("homeschoolProgress")
       .order("desc")
       .take(100);
-    
-    // Group by student -> platform
-    const byStudent: Record<string, Record<string, typeof progress[0]>> = {};
-    
+
+    const todayKey = getPstDateKey(Date.now());
+
+    // Group by student -> platform and keep latest + previous snapshot
+    const latestByStudent: Record<string, Record<string, any>> = {};
+    const previousByStudent: Record<string, Record<string, any>> = {};
+
     for (const p of progress) {
-      if (!byStudent[p.studentName]) {
-        byStudent[p.studentName] = {};
+      if (!latestByStudent[p.studentName]) {
+        latestByStudent[p.studentName] = {};
       }
-      if (!byStudent[p.studentName][p.platform]) {
-        byStudent[p.studentName][p.platform] = p;
+      if (!previousByStudent[p.studentName]) {
+        previousByStudent[p.studentName] = {};
+      }
+
+      if (!latestByStudent[p.studentName][p.platform]) {
+        latestByStudent[p.studentName][p.platform] = p;
+      } else if (!previousByStudent[p.studentName][p.platform]) {
+        previousByStudent[p.studentName][p.platform] = p;
       }
     }
-    
-    return byStudent;
+
+    for (const [studentName, platforms] of Object.entries(latestByStudent)) {
+      for (const [platform, latest] of Object.entries(platforms)) {
+        const previous = previousByStudent[studentName]?.[platform];
+        const scrapedToday = getPstDateKey(latest.scrapedAt) === todayKey;
+        const derivedTodayCompleted = latest.todayCompleted || (scrapedToday && hasDerivedProgress(latest, previous));
+        latestByStudent[studentName][platform] = {
+          ...latest,
+          todayCompleted: derivedTodayCompleted,
+        };
+      }
+    }
+
+    return latestByStudent;
   },
 });
 

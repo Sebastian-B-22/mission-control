@@ -113,7 +113,7 @@ export function ProjectTaskList({
             <CardTitle>{title}</CardTitle>
             {headerExtra}
           </div>
-          <CardDescription>{description}</CardDescription>
+          {description ? <CardDescription>{description}</CardDescription> : null}
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Loading...</p>
@@ -132,7 +132,7 @@ export function ProjectTaskList({
           <CardTitle>{title}</CardTitle>
           {headerExtra}
         </div>
-        <CardDescription>{description}</CardDescription>
+        {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add Task Input */}

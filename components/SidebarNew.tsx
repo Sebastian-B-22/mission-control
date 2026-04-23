@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -14,13 +14,9 @@ import {
   Home,
   Briefcase,
   BookOpen,
-  Bot,
-  Brain,
-  Layers,
   Heart,
   ChevronRight,
   ChevronDown,
-  TrendingUp,
   Handshake,
   Users,
   DollarSign,
@@ -37,6 +33,16 @@ interface SidebarProps {
 export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
+
+  useEffect(() => {
+    const activeSection = ["health", "homeschool", "family", "personal", "professional", "aspire", "hta", "agents"].find((section) =>
+      currentView === section || currentView.startsWith(`${section}-`)
+    );
+
+    if (activeSection) {
+      setExpandedSections((prev) => (prev.includes(activeSection) ? prev : [...prev, activeSection]));
+    }
+  }, [currentView]);
 
   // Get Sebastian&apos;s tasks for quick status
   const sebastianTasks = useQuery(api.sebastianTasks.getSebastianTasks, { userId }) || [];
@@ -64,6 +70,73 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
 
   const isExpanded = (section: string) => expandedSections.includes(section);
 
+  const htaChildTones: Record<string, { active: string; idle: string; badge: string }> = {
+    "hta-gtm": {
+      active: "border-l-2 border-cyan-400 bg-cyan-500/12 text-cyan-100",
+      idle: "border-l-2 border-transparent text-zinc-400 hover:border-cyan-500/40 hover:bg-cyan-500/6 hover:text-cyan-100",
+      badge: "bg-cyan-500/12 text-cyan-100",
+    },
+    "hta-product": {
+      active: "border-l-2 border-violet-400 bg-violet-500/12 text-violet-100",
+      idle: "border-l-2 border-transparent text-zinc-400 hover:border-violet-500/40 hover:bg-violet-500/6 hover:text-violet-100",
+      badge: "bg-violet-500/12 text-violet-100",
+    },
+    "hta-curriculum": {
+      active: "border-l-2 border-emerald-400 bg-emerald-500/12 text-emerald-100",
+      idle: "border-l-2 border-transparent text-zinc-400 hover:border-emerald-500/40 hover:bg-emerald-500/6 hover:text-emerald-100",
+      badge: "bg-emerald-500/12 text-emerald-100",
+    },
+    "hta-marketing": {
+      active: "border-l-2 border-amber-400 bg-amber-500/12 text-amber-100",
+      idle: "border-l-2 border-transparent text-zinc-400 hover:border-amber-500/40 hover:bg-amber-500/6 hover:text-amber-100",
+      badge: "bg-amber-500/12 text-amber-100",
+    },
+    "hta-operations": {
+      active: "border-l-2 border-rose-400 bg-rose-500/12 text-rose-100",
+      idle: "border-l-2 border-transparent text-zinc-400 hover:border-rose-500/40 hover:bg-rose-500/6 hover:text-rose-100",
+      badge: "bg-rose-500/12 text-rose-100",
+    },
+  };
+
+  const getChildTone = (section: string | undefined, childView: string, active: boolean) => {
+    if (section === "hta") {
+      const tone = htaChildTones[childView];
+      if (tone) return active ? tone.active : tone.idle;
+    }
+
+    return active
+      ? "text-amber-400 bg-zinc-800 font-medium"
+      : "text-zinc-400 hover:bg-zinc-800";
+  };
+
+  const agentOpsViews = new Set([
+    "sebastian",
+    "agent-ideas",
+    "content-pipeline",
+    "email-drafts",
+    "agent-learnings",
+    "engagement-habits",
+    "agent-hq",
+    "cost-tracker",
+    "agent-huddle-main",
+    "agent-huddle-aspire-ops",
+    "agent-huddle-hta-launch",
+    "agent-huddle-family",
+    "agent-huddle-ideas",
+    "agent-huddle-overnight",
+    "agent-huddle-joy-support",
+    "memory",
+    "memory-panel",
+  ]);
+
+  const isItemActive = (item: any) => {
+    if (item.activeViews) {
+      return item.activeViews.includes(currentView);
+    }
+
+    return currentView === item.view || (item.section && currentView.startsWith(item.section));
+  };
+
   const navigation = [
     {
       name: "Daily",
@@ -79,6 +152,14 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Health",
       icon: Heart,
       view: "health",
+      expandable: true,
+      section: "health",
+      activeViews: ["health", "health-daily", "health-strength", "health-biomap"],
+      children: [
+        { name: "Daily Health", view: "health-daily" },
+        { name: "Strength", view: "health-strength" },
+        { name: "BioMap", view: "health-biomap" },
+      ],
     },
     {
       name: "Homeschool",
@@ -161,14 +242,14 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "aspire",
       children: [
-        { name: "Coach Hub", view: "aspire-coach-hub" },
         { name: "Family CRM", view: "aspire-families" },
-        { name: "Spring League", view: "aspire-spring" },
+        { name: "Spring Ops", view: "aspire-spring" },
+        { name: "Coach Staffing", view: "aspire-coach-hub" },
         { name: "Camps", view: "aspire-camps" },
         { name: "PDP", view: "aspire-pdp" },
         { name: "7v7", view: "aspire-7v7" },
-        { name: "Pali", view: "aspire-pali" },
-        { name: "Agoura", view: "aspire-agoura" },
+        { name: "Pali Tasks", view: "aspire-pali" },
+        { name: "Agoura Tasks", view: "aspire-agoura" },
       ]
     },
     {
@@ -186,36 +267,32 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       ]
     },
     {
-      name: "Sebastian",
-      icon: Bot,
-      view: "sebastian",
-      expandable: true,
-      section: "sebastian",
-      children: [
-        { name: "Projects & Backlog", view: "sebastian" },
-        { name: "Agent Ideas", view: "agent-ideas" },
-        { name: "Content Pipeline", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
-        { name: "Email Drafts", view: "email-drafts" },
-        { name: "Engagement", view: "engagement-habits" },
-        { name: "Memory Search", view: "memory" },
-        { name: "Memory Panel", view: "memory-panel" },
-      ]
-    },
-    {
       name: "Agent Ops",
       icon: Users,
       view: "agent-huddle-main",
       expandable: true,
       section: "agents",
+      activeViews: Array.from(agentOpsViews),
       children: [
-        { name: "Agent HQ", view: "agent-hq" },
+        { type: "label", name: "Work" },
+        { name: "Queue", view: "sebastian" },
+        { name: "Ideas", view: "agent-ideas" },
+        { name: "Content", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
+        { name: "Emails & Texts", view: "email-drafts" },
+        { name: "Training", view: "agent-learnings" },
+        { name: "Engagement", view: "engagement-habits" },
+        { type: "label", name: "Admin" },
+        { name: "Telegram Bridge", view: "agent-hq" },
         { name: "AI Costs", view: "cost-tracker" },
-        { name: "Main Huddle", view: "agent-huddle-main" },
-        { name: "Aspire Ops", view: "agent-huddle-aspire-ops" },
-        { name: "HTA Launch", view: "agent-huddle-hta-launch" },
+        { name: "General", view: "agent-huddle-main" },
+        { name: "Operations", view: "agent-huddle-aspire-ops" },
+        { name: "Marketing", view: "agent-huddle-hta-launch" },
         { name: "Family", view: "agent-huddle-family" },
         { name: "Ideas", view: "agent-huddle-ideas" },
+        { name: "Overnight", view: "agent-huddle-overnight" },
         { name: "Joy Support", view: "agent-huddle-joy-support" },
+        { name: "Memory Search", view: "memory" },
+        { name: "Memory Panel", view: "memory-panel" },
       ]
     },
   ];
@@ -263,7 +340,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                       }
                     }}
                     className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                      currentView === item.view || (item.section && currentView.startsWith(item.section))
+                      isItemActive(item)
                         ? "bg-zinc-800 text-amber-400 font-medium"
                         : "text-zinc-300 hover:bg-zinc-800"
                     }`}
@@ -298,32 +375,37 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 {item.expandable && item.section && isExpanded(item.section) && item.children && item.children.length > 0 && (
                   <div className="ml-4 mt-1 space-y-1 border-l-2 border-zinc-800 pl-2">
                     {item.children.map((child: any) => (
-                      <button
-                        key={child.view}
-                        onClick={() => {
-                          if (child.href) {
-                            window.location.href = child.href;
-                          } else {
-                            onViewChange(child.view);
-                          }
-                          setIsOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${
-                          currentView === child.view
-                            ? "bg-zinc-800 text-amber-400 font-medium"
-                            : "text-zinc-400 hover:bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <ChevronRight className="h-3 w-3" />
-                          <span>{child.name}</span>
+                      child.type === "label" ? (
+                        <div
+                          key={`label-${child.name}`}
+                          className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500"
+                        >
+                          {child.name}
                         </div>
-                        {(child as any).badge !== undefined && (
-                          <span className="bg-zinc-800 text-zinc-300 text-xs px-1.5 py-0.5 rounded">
-                            {(child as any).badge}
-                          </span>
-                        )}
-                      </button>
+                      ) : (
+                        <button
+                          key={child.view}
+                          onClick={() => {
+                            if (child.href) {
+                              window.location.href = child.href;
+                            } else {
+                              onViewChange(child.view);
+                            }
+                            setIsOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${getChildTone(item.section, child.view, currentView === child.view)}`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className="h-3 w-3" />
+                            <span>{child.name}</span>
+                          </div>
+                          {(child as any).badge ? (
+                            <span className={`text-xs px-1.5 py-0.5 rounded ${item.section === "hta" ? (htaChildTones[child.view]?.badge || "bg-zinc-800 text-zinc-300") : "bg-zinc-800 text-zinc-300"}`}>
+                              {(child as any).badge}
+                            </span>
+                          ) : null}
+                        </button>
+                      )
                     ))}
                   </div>
                 )}

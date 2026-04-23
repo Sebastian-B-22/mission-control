@@ -37,10 +37,6 @@ export function QuickWinsCard({ userId, date }: QuickWinsCardProps) {
   }, [date]);
 
   const completed = quickWins.filter((q: any) => q.completed).length;
-  const categoryNameById = useMemo(
-    () => new Map(rpmCategories.map((category: any) => [category._id, category.name])),
-    [rpmCategories]
-  );
 
   // Group quick wins by category for display
   const groupedQuickWins = useMemo(

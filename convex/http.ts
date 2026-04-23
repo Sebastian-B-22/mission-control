@@ -17,8 +17,8 @@ import { internal, api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
 // Re-export type so TypeScript can use it
-type ContentType = "x-post" | "email" | "blog" | "landing-page" | "other";
-type ContentStage = "idea" | "review" | "approved" | "published";
+type ContentType = "x-post" | "x-reply" | "email" | "blog" | "landing-page" | "other";
+type ContentStage = "idea" | "priority" | "later" | "needs-work" | "review" | "approved" | "published" | "dismissed";
 
 const http = httpRouter();
 
@@ -389,13 +389,13 @@ http.route({
     if (!content) return errorResponse("Missing required field: content");
 
     const type = body.type as string;
-    const validTypes: ContentType[] = ["x-post", "email", "blog", "landing-page", "other"];
+    const validTypes: ContentType[] = ["x-post", "x-reply", "email", "blog", "landing-page", "other"];
     if (!type || !validTypes.includes(type as ContentType)) {
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
 
     const stage = (body.stage as string) ?? "review";
-    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "priority", "later", "needs-work", "review", "approved", "published", "dismissed"];
     if (!validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -452,7 +452,7 @@ http.route({
     if (!contentId) return errorResponse("Missing required field: contentId");
 
     const stage = body.stage as string;
-    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "priority", "later", "needs-work", "review", "approved", "published", "dismissed"];
     if (!stage || !validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
@@ -496,12 +496,12 @@ http.route({
     const type = url.searchParams.get("type") || undefined;
     const createdBy = url.searchParams.get("createdBy") || undefined;
 
-    const validStages: ContentStage[] = ["idea", "review", "approved", "published"];
+    const validStages: ContentStage[] = ["idea", "priority", "later", "needs-work", "review", "approved", "published", "dismissed"];
     if (stage && !validStages.includes(stage as ContentStage)) {
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
 
-    const validTypes: ContentType[] = ["x-post", "email", "blog", "landing-page", "other"];
+    const validTypes: ContentType[] = ["x-post", "x-reply", "email", "blog", "landing-page", "other"];
     if (type && !validTypes.includes(type as ContentType)) {
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
@@ -679,22 +679,39 @@ async function verifyStripeWebhook(payload: string, sigHeader: string, secret: s
 }
 
 // ConvertKit tagging + automation trigger
+const AGOURA_SUMMER_CAMP_KIT_TAG_ID = 18708374;
+
 async function tagConvertKit(email: string, firstName: string, weekNumbers: string[]) {
-  const tags = ["Summer Camp 2026", ...weekNumbers.map((n) => `Camp-Week-${n}`)];
   try {
-    // Tag subscriber
-    await fetch("https://api.kit.com/v4/subscribers", {
+    const subscriberRes = await fetch("https://api.kit.com/v4/subscribers", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
-      body: JSON.stringify({ email_address: email, first_name: firstName, tags }),
+      body: JSON.stringify({
+        email_address: email.trim().toLowerCase(),
+        first_name: firstName,
+        state: "active",
+      }),
     });
-    // Trigger confirmation email automation (ID: 1929360)
-    await fetch("https://api.kit.com/v4/automations/1929360/subscribers", {
+
+    const subscriberPayload = await subscriberRes.json();
+    if (!subscriberRes.ok) {
+      throw new Error(`Kit subscriber upsert failed (${subscriberRes.status}): ${JSON.stringify(subscriberPayload)}`);
+    }
+
+    const subscriberId = subscriberPayload?.subscriber?.id;
+    if (!subscriberId) throw new Error("Kit subscriber upsert succeeded but returned no subscriber id");
+
+    const tagRes = await fetch(`https://api.kit.com/v4/tags/${AGOURA_SUMMER_CAMP_KIT_TAG_ID}/subscribers/${subscriberId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
-      body: JSON.stringify({ email_address: email, first_name: firstName }),
+      body: JSON.stringify({}),
     });
-    console.log("[ConvertKit] Tagged and triggered automation for:", email);
+    if (!tagRes.ok) {
+      const errText = await tagRes.text();
+      throw new Error(`Kit tag request failed (${tagRes.status}): ${errText}`);
+    }
+
+    console.log("[ConvertKit] Tagged subscriber for:", email, "weeks:", weekNumbers.join(",") || "none");
   } catch (e) {
     console.error("[ConvertKit] Error:", e);
   }
@@ -707,6 +724,25 @@ const OPENPHONE_AGOURA_LINE = "PN2La7sbgD"; // +18052227212
 interface CampSession {
   type: string;
   selectedDays?: string[];
+}
+
+function formatCampSmsDate(dateString: string) {
+  const date = new Date(`${dateString}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+
+  const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+  return `${weekday} ${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+function expandCampWeekDates(weekNumber: string) {
+  const weekDates: Record<string, string[]> = {
+    "1": ["2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26"],
+    "2": ["2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10"],
+    "3": ["2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24"],
+    "4": ["2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31"],
+  };
+
+  return weekDates[weekNumber] ?? [];
 }
 
 async function sendCampConfirmationSMS(
@@ -724,35 +760,21 @@ async function sendCampConfirmationSMS(
     
     const names = childNames.join(" & ");
     
-    // Build detailed session info per child
-    const weekDates: Record<string, string> = {
-      "1": "June 16-20",
-      "2": "June 23-27", 
-      "3": "July 14-18",
-      "4": "July 21-25",
-    };
-    
-    // Day name mapping
-    const dayNames: Record<string, string> = {
-      "monday": "Mon", "tuesday": "Tue", "wednesday": "Wed", 
-      "thursday": "Thu", "friday": "Fri",
-      "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri"
-    };
-    
     let sessionDetails = "";
     for (const child of childSessions) {
       const sessions = child.sessions || {};
       const parts: string[] = [];
       for (const [wk, sess] of Object.entries(sessions)) {
         const weekNum = wk.replace("week", "");
-        const dates = weekDates[weekNum] || `Week ${weekNum}`;
-        if (sess.selectedDays && sess.selectedDays.length > 0) {
-          // Convert day names to short form
-          const days = sess.selectedDays.map(d => {
-            const lower = d.toLowerCase();
-            return dayNames[lower] || d;
-          }).join(", ");
-          parts.push(`${dates}: ${days}`);
+        if (sess.type === "full") {
+          const fullWeekDates = expandCampWeekDates(weekNum).map(formatCampSmsDate).join(", ");
+          if (fullWeekDates) parts.push(fullWeekDates);
+        } else if (sess.selectedDays && sess.selectedDays.length > 0) {
+          const days = [...sess.selectedDays]
+            .sort((a, b) => a.localeCompare(b))
+            .map(formatCampSmsDate)
+            .join(", ");
+          parts.push(days);
         }
       }
       if (parts.length > 0) {
@@ -766,7 +788,7 @@ async function sendCampConfirmationSMS(
     
     // Build message - no emojis
     let message = `CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for AYSO Region 4 Summer Soccer Camp!\n\n`;
-    message += `Dates: ${sessionDetails}\n`;
+    message += `Days: ${sessionDetails}\n`;
     message += `Total Paid: $${pricing.total}\n\n`;
     message += `Location: Brookside Elementary (enter via Conifer St)\n`;
     message += `Time: 8am-1pm daily\n\n`;
@@ -970,8 +992,8 @@ http.route({
 });
 
 // CORS preflight for all camp routes
-["/camp/availability", "/camp/validate-promo", "/camp/register", "/camp/register-free", "/camp/stripe-webhook",
- "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/promo-codes",
+["/camp/availability", "/camp/trial-day/availability", "/camp/validate-promo", "/camp/register", "/camp/register-free", "/camp/trial-day/register", "/camp/stripe-webhook",
+ "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/checkin", "/camp/admin/promo-codes",
  "/api/family/credit", "/api/family/credit/add", "/api/family/credit/apply"].forEach((path) => {
   http.route({
     path, method: "OPTIONS",
@@ -985,6 +1007,72 @@ http.route({
   handler: httpAction(async (ctx) => {
     const data = await ctx.runQuery(api.camp.getAvailability, {});
     return campJson(data);
+  }),
+});
+
+// GET /camp/trial-day/availability
+http.route({
+  path: "/camp/trial-day/availability", method: "GET",
+  handler: httpAction(async (ctx) => {
+    const data = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
+    return campJson({ availability: data });
+  }),
+});
+
+// POST /camp/trial-day/register
+http.route({
+  path: "/camp/trial-day/register", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const body = await req.json() as {
+        programId: string;
+        session: string;
+        childFirstName: string;
+        childLastName: string;
+        dateOfBirth: string;
+        age?: number;
+        gender: string;
+        parentFirstName: string;
+        parentLastName: string;
+        email: string;
+        phone: string;
+        emergencyContactName: string;
+        emergencyContactPhone: string;
+        medicalNotes?: string;
+        waiverAccepted?: boolean;
+      };
+
+      await ctx.runMutation(api.camp.createTrialDayRegistration, {
+        programId: body.programId,
+        session: body.session,
+        childFirstName: body.childFirstName,
+        childLastName: body.childLastName,
+        dateOfBirth: body.dateOfBirth,
+        age: body.age,
+        gender: body.gender,
+        parentFirstName: body.parentFirstName,
+        parentLastName: body.parentLastName,
+        email: body.email,
+        phone: body.phone,
+        emergencyContactName: body.emergencyContactName,
+        emergencyContactPhone: body.emergencyContactPhone,
+        medicalNotes: body.medicalNotes,
+        waiverAccepted: Boolean(body.waiverAccepted),
+      });
+
+      const availability = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
+      return campJson({
+        success: true,
+        message: "Spot reserved! You are confirmed for the selected May 3 Brookside session. We will follow up with final details.",
+        availability,
+      });
+    } catch (error) {
+      const rawMessage = error instanceof Error ? error.message : "Registration failed";
+      const message = rawMessage.replace(/^Uncaught Error:\s*/, "").split("\n")[0] || "Registration failed";
+      const availability = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
+      const status = message.includes("already has a May 3 trial reservation") || message.includes("session is full") ? 409 : 400;
+      return campJson({ error: message, availability }, status);
+    }
   }),
 });
 
@@ -1090,8 +1178,7 @@ http.route({
       stripePaymentIntentId: pi.id,
     });
 
-    // Publishable key is safe to hardcode (it's a public key)
-    const pubKey = "pk_live_51QEymGGOalwnslJx5edOTSBfcpscpbd95K9tJQqDxcCczz6zg60D9jlOcPw4tNvVyAXQhOXXFWCaWnk11aQZzuMZ00VE1T8rLM";
+    const pubKey = STRIPE_PUBLISHABLE_KEY || "pk_live_51QEymGGOalwnslJx5edOTSBfcpscpbd95K9tJQqDxcCczz6zg60D9jlOcPw4tNvVyAXQhOXXFWCaWnk11aQZzuMZ00VE1T8rLM";
     
     return campJson({
       clientSecret: pi.client_secret,
@@ -1128,6 +1215,8 @@ http.route({
       if (!waiverAccepted) return campError("Waiver must be accepted");
       if (pricing.total > 0) return campError("This endpoint is only for $0 registrations");
       
+      const freePaymentIntentId = `free_${Date.now()}`;
+
       // Create registration directly as paid (no Stripe needed)
       const regId = await ctx.runMutation(api.camp.createRegistration, {
         season: season || "summer-2026",
@@ -1137,13 +1226,12 @@ http.route({
         waiverAccepted,
         promoCode: promoCode || undefined,
         pricing,
-        stripePaymentIntentId: `free_${Date.now()}`, // Fake PI ID for free registrations
+        stripePaymentIntentId: freePaymentIntentId,
       });
       
-      // Mark as paid immediately
-      await ctx.runMutation(api.camp.markFreeRegistration, {
-        registrationId: `free_${Date.now()}`,
-        promoCode: promoCode || undefined,
+      // Mark as paid immediately and run the same downstream bookkeeping as Stripe-paid registrations
+      await ctx.runMutation(internal.camp.markPaid, {
+        stripePaymentIntentId: freePaymentIntentId,
       });
       
       // Get the registration to trigger confirmations
@@ -1305,6 +1393,62 @@ http.route({
       q: url.searchParams.get("q") ?? undefined,
     });
     return campJson(regs);
+  }),
+});
+
+// GET /camp/admin/checkin
+http.route({
+  path: "/camp/admin/checkin", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const url = new URL(req.url);
+    const date = url.searchParams.get("date");
+    if (!date) return campError("date query param required");
+
+    const roster = await ctx.runQuery(api.camp.getCheckInRoster, {
+      date,
+      regionKey: url.searchParams.get("region") ?? "agoura",
+    });
+    return campJson(roster);
+  }),
+});
+
+// POST /camp/admin/checkin
+http.route({
+  path: "/camp/admin/checkin", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    let body: any;
+    try { body = await req.json(); } catch { return campError("Invalid JSON"); }
+
+    if (body.type === "walkin") {
+      const record = await ctx.runMutation(api.camp.addWalkIn, {
+        date: body.date,
+        regionKey: body.regionKey || "agoura",
+        childName: body.childName,
+        age: Number(body.age),
+        emergencyPhone: body.emergencyPhone,
+        parentPhone: body.parentPhone || undefined,
+        weekId: body.weekId || undefined,
+      });
+      return campJson(record, 201);
+    }
+
+    const record = await ctx.runMutation(api.camp.recordCheckInAction, {
+      key: body.key,
+      date: body.date,
+      regionKey: body.regionKey || "agoura",
+      action: body.action,
+      childName: body.childName || undefined,
+      age: body.age ?? undefined,
+      emergencyPhone: body.emergencyPhone || undefined,
+      parentPhone: body.parentPhone || undefined,
+      weekId: body.weekId || undefined,
+      registrationId: body.registrationId || undefined,
+      childIndex: body.childIndex ?? undefined,
+      isWalkIn: body.isWalkIn ?? undefined,
+    });
+    return campJson(record, 200);
   }),
 });
 
@@ -1641,6 +1785,7 @@ const HUDDLE_CHANNELS = {
   "hta-launch": { name: "HTA Launch", description: "Marketing, product, launch prep" },
   family: { name: "Family", description: "Kids' learning, projects" },
   ideas: { name: "Ideas", description: "Brainstorming, discussions" },
+  "overnight-strategy": { name: "Overnight Huddle", description: "Overnight strategy pass for goals, workflow, revenue, retention, and tomorrow's priorities" },
   "joy-support": { name: "Joy Support", description: "Joy asking Sebastian for help with Carolyn" },
 };
 
@@ -1671,8 +1816,8 @@ http.route({
   }),
 });
 
-// POST /huddle - Post a message
-// Body: { agent: string, message: string, channel: string, mentions?: string[], replyTo?: string }
+// POST /huddle - Post a message or start a mission
+// Body: { agent: string, message: string, channel: string, mentions?: string[], replyTo?: string, missionId?: string, startMission?: boolean }
 http.route({
   path: "/huddle", method: "POST",
   handler: httpAction(async (ctx, req) => {
@@ -1684,37 +1829,55 @@ http.route({
       channel?: string;
       mentions?: string[];
       replyTo?: string;
+      missionId?: string;
+      startMission?: boolean;
     };
     
     if (!body.agent || !body.message) {
       return jsonResponse({ error: "Missing required fields: agent, message" }, 400);
     }
     
-    // Validate agent name
-    const validAgents = ["sebastian", "scout", "maven", "compass", "james", "corinne"];
+    const validAgents = ["sebastian", "scout", "maven", "compass", "james", "corinne", "joy"];
     if (!validAgents.includes(body.agent.toLowerCase())) {
       return jsonResponse({ error: `Invalid agent. Must be one of: ${validAgents.join(", ")}` }, 400);
     }
     
-    // Default to main channel
     const channel = body.channel || "main";
     
-    // Validate channel
     if (!Object.keys(HUDDLE_CHANNELS).includes(channel)) {
       return jsonResponse({ 
         error: `Invalid channel. Must be one of: ${Object.keys(HUDDLE_CHANNELS).join(", ")}` 
       }, 400);
+    }
+
+    if (body.startMission) {
+      const result = await ctx.runMutation(api.agentHuddle.startMission, {
+        agent: body.agent.toLowerCase(),
+        message: body.message,
+        channel,
+        mentions: body.mentions,
+        participants: body.mentions,
+      });
+
+      return jsonResponse({
+        success: true,
+        channel,
+        missionId: result.missionId,
+        messageId: result.messageId,
+        status: result.status,
+      });
     }
     
     const messageId = await ctx.runMutation(internal.agentHuddle.postInternal, {
       agent: body.agent.toLowerCase(),
       message: body.message,
       channel,
+      missionId: body.missionId as Id<"agentHuddleMissions"> | undefined,
       mentions: body.mentions,
       replyTo: body.replyTo as Id<"agentHuddle"> | undefined,
     });
     
-    return jsonResponse({ success: true, messageId, channel });
+    return jsonResponse({ success: true, messageId, channel, missionId: body.missionId });
   }),
 });
 
@@ -1949,19 +2112,26 @@ http.route({
 });
 
 // POST /telegram/outbox/sent - Mark an outbox item as sent
-// Body: { id: string, telegramMessageId?: string }
+// Body: { id: string, telegramMessageId?: string, deliveredAccountId?: string, deliveredThreadId?: string }
 http.route({
   path: "/telegram/outbox/sent",
   method: "POST",
   handler: httpAction(async (ctx, req) => {
     if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
 
-    const body = (await req.json()) as { id?: string; telegramMessageId?: string };
+    const body = (await req.json()) as {
+      id?: string;
+      telegramMessageId?: string;
+      deliveredAccountId?: string;
+      deliveredThreadId?: string;
+    };
     if (!body.id) return jsonResponse({ error: "Missing id" }, 400);
 
     await ctx.runMutation(internal.telegramOutbox.markSentInternal, {
       id: body.id as Id<"telegramOutbox">,
       telegramMessageId: body.telegramMessageId,
+      deliveredAccountId: body.deliveredAccountId,
+      deliveredThreadId: body.deliveredThreadId,
     });
 
     return jsonResponse({ success: true });
@@ -2005,6 +2175,49 @@ http.route({
   path: "/telegram/outbox/failed",
   method: "OPTIONS",
   handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+// POST /telegram/inbox/ingest - Bridge a Telegram reply back into Agent Huddle
+// Body: { text: string, topic?: string, channel?: string, author?: string, agent?: string, telegramMessageId?: string, telegramThreadId?: string, replyToTelegramMessageId?: string }
+http.route({
+  path: "/telegram/inbox/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/telegram/inbox/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!validateApiKey(req)) return jsonResponse({ error: "Unauthorized" }, 401);
+
+    const body = (await req.json()) as {
+      text?: string;
+      topic?: string;
+      channel?: string;
+      author?: string;
+      agent?: string;
+      telegramMessageId?: string;
+      telegramThreadId?: string;
+      replyToTelegramMessageId?: string;
+    };
+
+    const text = String(body.text || "").trim();
+    if (!text) return jsonResponse({ error: "Missing required field: text" }, 400);
+
+    const messageId = await ctx.runMutation(internal.telegramOutbox.ingestTelegramReplyInternal, {
+      text,
+      topic: body.topic ? String(body.topic) : undefined,
+      channel: body.channel ? String(body.channel) : undefined,
+      author: body.author ? String(body.author) : undefined,
+      agent: body.agent ? String(body.agent) : undefined,
+      telegramMessageId: body.telegramMessageId ? String(body.telegramMessageId) : undefined,
+      telegramThreadId: body.telegramThreadId ? String(body.telegramThreadId) : undefined,
+      replyToTelegramMessageId: body.replyToTelegramMessageId ? String(body.replyToTelegramMessageId) : undefined,
+    });
+
+    return jsonResponse({ ok: true, messageId }, 201);
+  }),
 });
 
 // ─── POST /pending-items/create - Create a Pending / Next Up item ─────────

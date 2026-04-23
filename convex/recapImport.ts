@@ -1,6 +1,54 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 
+function extractScienceActivity(notes: string): string {
+  const trimmed = notes.trim();
+  if (!trimmed) return "Experiment";
+
+  const clean = (value: string) =>
+    value.replace(/\s+/g, " ").replace(/^[,.;:\s]+|[,.;:\s]+$/g, "").trim();
+
+  const lines = trimmed.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const explicitScienceLine = lines.find((line) => /^science\s*[:\-]/i.test(line));
+  if (explicitScienceLine) {
+    return clean(explicitScienceLine.replace(/^science\s*[:\-]\s*/i, "")).slice(0, 120) || "Experiment";
+  }
+
+  const bookTitleMatch = trimmed.match(
+    /(?:^|[,.;]|\band\b)\s*(?:we\s+)?(?:read\s+)?([^,.]+?)\s+book\s+for science\b/i
+  );
+  const bookTitle = bookTitleMatch ? clean(bookTitleMatch[1]) : "";
+
+  const chapterMatch = trimmed.match(/book\s+for science\s*\(([^)]+)\)/i);
+  const chapterDetail = chapterMatch ? clean(chapterMatch[1]) : "";
+
+  const videoMatch = trimmed.match(/watched\s+(?:youtube\s+)?videos?\s+(?:on|about)\s+(.+?)\s+for science\b/i);
+  const videoTopic = videoMatch ? clean(videoMatch[1]) : "";
+
+  const parts: string[] = [];
+  if (bookTitle) {
+    parts.push(chapterDetail ? `${bookTitle} (${chapterDetail})` : bookTitle);
+  }
+  if (videoTopic) {
+    parts.push(`${videoTopic} video`);
+  }
+
+  if (parts.length > 0) {
+    return parts.join(" + ").slice(0, 120);
+  }
+
+  if (/health\s*&\s*body/i.test(trimmed) && /esophagus/i.test(trimmed)) {
+    return "Health & Body Experiment - Esophagus";
+  }
+  if (/esophagus/i.test(trimmed)) return "Esophagus experiment";
+  if (/learning lab/i.test(trimmed)) return "Learning Lab experiment";
+  if (/astrophysics/i.test(trimmed) && /artemis\s*2/i.test(trimmed)) return "Astrophysics + Artemis 2";
+  if (/astrophysics/i.test(trimmed)) return "Astrophysics";
+  if (/artemis\s*2/i.test(trimmed)) return "Artemis 2";
+
+  return "Experiment";
+}
+
 // Import Daily Recap notes -> homeschoolActivities for the given date.
 // Idempotent: won't create duplicates for same (date, category, activity).
 export const importRecapToProgress = mutation({
@@ -33,6 +81,7 @@ export const importRecapToProgress = mutation({
 
     // Math
     if (has("math academy")) candidates.push({ category: "math", activity: "Math Academy" });
+    if (has("wonder math")) candidates.push({ category: "math", activity: "Wonder Math", notes });
 
     // Writing / language
     if (has("membean")) candidates.push({ category: "writing", activity: "Membean" });
@@ -63,27 +112,27 @@ export const importRecapToProgress = mutation({
 
     // Science - keep it specific
     if (has("science") || has("experiment") || has("esophagus") || has("learning lab") || has("science kit") || has("health & body")) {
-      // Prefer explicit "Science:" line, otherwise use best-effort from known phrases.
-      let detail = "Experiment";
-      const lines = notes.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-      const scienceLine = lines.find((l) => l.toLowerCase().startsWith("science"));
-      if (scienceLine) {
-        detail = scienceLine.replace(/^science\s*[:\-]\s*/i, "").slice(0, 120) || detail;
-      } else if (has("health & body") && has("esophagus")) {
-        detail = "Health & Body Experiment (day 4) - Esophagus";
-      } else if (has("science kit") && has("day 4") && has("esophagus")) {
-        detail = "Health & Body Experiment (day 4) - Esophagus";
-      } else if (has("esophagus")) {
-        detail = "Esophagus experiment";
-      } else if (has("learning lab")) {
-        detail = "Learning Lab experiment";
-      }
+      const detail = extractScienceActivity(notes);
       candidates.push({ category: "science", activity: detail, notes });
     }
 
     // Art / Music
     if (has("drawing") || has("sketch")) candidates.push({ category: "art", activity: "Drawing", notes });
-    if (has("music") || has("piano")) candidates.push({ category: "music", activity: "Music", notes });
+    if (
+      has("music") ||
+      has("piano") ||
+      has("drumming") ||
+      has("drum practice") ||
+      has("drum lesson") ||
+      has("drums") ||
+      has("drumeo")
+    ) {
+      let activity = "Music";
+      if (has("drumeo")) activity = "Drumeo";
+      else if (has("drum lesson")) activity = "Drum Lesson";
+      else if (has("drum practice") || has("drumming") || has("drums")) activity = "Drum Practice";
+      candidates.push({ category: "music", activity, notes });
+    }
 
     // Financial literacy
     if (has("money") || has("budget") || has("allowance") || has("invest")) {
@@ -124,5 +173,68 @@ export const importRecapToProgress = mutation({
     }
 
     return { ok: true, inserted };
+  },
+});
+
+export const repairScienceForDate = mutation({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const recap = await ctx.db
+      .query("dailyRecap")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", args.userId).eq("date", args.date))
+      .first();
+
+    const notes = (recap?.notes ?? "").trim();
+    if (!notes) {
+      return { ok: false, reason: "no-recap" };
+    }
+
+    const nextActivity = extractScienceActivity(notes);
+
+    const activities = await ctx.db
+      .query("homeschoolActivities")
+      .withIndex("by_user_date", (q) => q.eq("userId", args.userId).eq("date", args.date))
+      .collect();
+
+    const scienceActivities = activities
+      .filter((activity) => activity.category === "science")
+      .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+
+    if (scienceActivities.length === 0) {
+      const id = await ctx.db.insert("homeschoolActivities", {
+        userId: args.userId,
+        date: args.date,
+        student: "both",
+        category: "science",
+        activity: nextActivity,
+        completed: true,
+        notes,
+        createdAt: Date.now(),
+      });
+
+      return { ok: true, inserted: 1, patched: 0, deleted: 0, activity: nextActivity, id };
+    }
+
+    const [primary, ...duplicates] = scienceActivities;
+    await ctx.db.patch(primary._id, {
+      activity: nextActivity,
+      notes,
+    });
+
+    for (const duplicate of duplicates) {
+      await ctx.db.delete(duplicate._id);
+    }
+
+    return {
+      ok: true,
+      inserted: 0,
+      patched: 1,
+      deleted: duplicates.length,
+      activity: nextActivity,
+      id: primary._id,
+    };
   },
 });

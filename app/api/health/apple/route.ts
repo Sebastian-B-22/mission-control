@@ -7,21 +7,22 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 // API key for Health Auto Export app
 const HEALTH_EXPORT_API_KEY = process.env.HEALTH_EXPORT_API_KEY || "hae-corinne-2026";
 
-// Health Auto Export sends data in this format:
-// { data: { metrics: [{ name: "step_count", units: "steps", data: [{ qty, date }] }] } }
+interface HealthMetricEntry {
+  qty?: number;
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+  totalSleep?: number;
+  asleep?: number;
+  inBed?: number;
+  sleepStart?: string;
+  sleepEnd?: string;
+}
 
 interface HealthMetric {
   name: string;
   units: string;
-  data: Array<{
-    qty?: number;
-    date?: string;
-    totalSleep?: number;
-    asleep?: number;
-    inBed?: number;
-    sleepStart?: string;
-    sleepEnd?: string;
-  }>;
+  data: HealthMetricEntry[];
 }
 
 interface HealthAutoExportPayload {
@@ -36,14 +37,91 @@ interface HealthAutoExportPayload {
   };
 }
 
+type DailyHealthImport = {
+  steps?: number;
+  sleepHours?: number;
+  activeCalories?: number;
+  weight?: number;
+};
+
+function normalizeMetricName(name: string | undefined): string {
+  return (name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function extractDateKey(...values: Array<string | undefined>): string | undefined {
+  for (const value of values) {
+    if (!value) continue;
+    const match = value.match(/\d{4}-\d{2}-\d{2}/);
+    if (match) return match[0];
+  }
+  return undefined;
+}
+
+function metricKind(metricName: string): "steps" | "sleep" | "calories" | "weight" | null {
+  const normalized = normalizeMetricName(metricName);
+
+  if (["stepcount", "steps", "hkquantitytypeidentifierstepcount"].includes(normalized)) {
+    return "steps";
+  }
+
+  if (["sleepanalysis", "sleep", "hkcategorytypeidentifiersleepanalysis"].includes(normalized)) {
+    return "sleep";
+  }
+
+  if (["activeenergy", "activeenergyburned", "hkquantitytypeidentifieractiveenergyburned"].includes(normalized)) {
+    return "calories";
+  }
+
+  if (["weight", "bodymass", "hkquantitytypeidentifierbodymass"].includes(normalized)) {
+    return "weight";
+  }
+
+  return null;
+}
+
+function toSleepHours(entry: HealthMetricEntry, units: string | undefined): number | undefined {
+  const normalizedUnits = (units || "").toLowerCase();
+  let value = entry.totalSleep ?? entry.asleep;
+
+  if (typeof value !== "number" && entry.sleepStart && entry.sleepEnd) {
+    const start = new Date(entry.sleepStart).getTime();
+    const end = new Date(entry.sleepEnd).getTime();
+    if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+      return Math.round((((end - start) / 3600000) * 10)) / 10;
+    }
+  }
+
+  if (typeof value !== "number") {
+    return undefined;
+  }
+
+  if (normalizedUnits.includes("hr") || normalizedUnits.includes("hour")) {
+    return Math.round(value * 10) / 10;
+  }
+
+  if (normalizedUnits.includes("sec")) {
+    return Math.round((value / 3600) * 10) / 10;
+  }
+
+  if (normalizedUnits.includes("min")) {
+    return Math.round((value / 60) * 10) / 10;
+  }
+
+  // Health export payloads are usually minutes when not explicit.
+  if (value > 24) {
+    return Math.round((value / 60) * 10) / 10;
+  }
+
+  return Math.round(value * 10) / 10;
+}
+
 export async function POST(request: Request) {
   try {
-    // Check API key
     const authHeader = request.headers.get("Authorization");
-    const apiKey = authHeader?.replace("Bearer ", "") || 
-                   request.headers.get("X-API-Key") ||
-                   new URL(request.url).searchParams.get("key");
-    
+    const apiKey = authHeader?.replace("Bearer ", "") ||
+      request.headers.get("X-API-Key") ||
+      new URL(request.url).searchParams.get("key");
+
     if (apiKey !== HEALTH_EXPORT_API_KEY) {
       console.error("Invalid API key for Health Auto Export");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,53 +134,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No metrics data" }, { status: 400 });
     }
 
-    // Process metrics by date
-    const dataByDate: Record<string, { steps?: number; sleepHours?: number; activeCalories?: number; weight?: number }> = {};
+    const dataByDate: Record<string, DailyHealthImport> = {};
 
     for (const metric of payload.data.metrics) {
-      const metricName = metric.name.toLowerCase();
-      
+      const kind = metricKind(metric.name);
+      if (!kind) continue;
+
       for (const entry of metric.data) {
-        // Extract date (YYYY-MM-DD format)
-        let dateStr: string | undefined;
-        if (entry.date) {
-          dateStr = entry.date.split(" ")[0]; // "2026-02-25 10:00:00 -0800" -> "2026-02-25"
-        }
+        const dateStr = extractDateKey(entry.date, entry.endDate, entry.startDate, entry.sleepEnd, entry.sleepStart);
         if (!dateStr) continue;
 
         if (!dataByDate[dateStr]) {
           dataByDate[dateStr] = {};
         }
 
-        // Map metric names to our fields
-        if (metricName === "step_count" || metricName === "steps") {
+        if (kind === "steps") {
           const currentSteps = dataByDate[dateStr].steps || 0;
           dataByDate[dateStr].steps = currentSteps + (entry.qty || 0);
-        } else if (metricName === "sleep_analysis" || metricName === "sleep") {
-          // Sleep data - check units (can be "hr" or "min")
-          const isHours = metric.units?.toLowerCase() === "hr";
-          let sleepValue = entry.totalSleep || entry.asleep || 0;
-          
-          if (isHours) {
-            // Already in hours
-            dataByDate[dateStr].sleepHours = Math.round(sleepValue * 10) / 10;
-          } else {
-            // Assume minutes, convert to hours
-            dataByDate[dateStr].sleepHours = Math.round((sleepValue / 60) * 10) / 10;
+          continue;
+        }
+
+        if (kind === "sleep") {
+          const sleepHours = toSleepHours(entry, metric.units);
+          if (typeof sleepHours === "number") {
+            dataByDate[dateStr].sleepHours = Math.max(dataByDate[dateStr].sleepHours || 0, sleepHours);
           }
-        } else if (metricName === "active_energy" || metricName === "active_energy_burned") {
+          continue;
+        }
+
+        if (kind === "calories") {
           const currentCals = dataByDate[dateStr].activeCalories || 0;
-          // Convert kJ to kcal if needed
           let calories = entry.qty || 0;
-          if (metric.units.toLowerCase().includes("kj")) {
+          if ((metric.units || "").toLowerCase().includes("kj")) {
             calories = calories / 4.184;
           }
           dataByDate[dateStr].activeCalories = Math.round(currentCals + calories);
-        } else if (metricName === "weight" || metricName === "body_mass") {
-          // Weight - use most recent reading for the day
+          continue;
+        }
+
+        if (kind === "weight") {
           let weight = entry.qty || 0;
-          // Convert kg to lbs if needed (store in lbs)
-          if (metric.units.toLowerCase() === "kg") {
+          if ((metric.units || "").toLowerCase() === "kg") {
             weight = weight * 2.20462;
           }
           dataByDate[dateStr].weight = Math.round(weight * 10) / 10;
@@ -110,54 +182,49 @@ export async function POST(request: Request) {
       }
     }
 
-    // Also check workouts for active energy
     if (payload.data.workouts) {
       for (const workout of payload.data.workouts) {
-        if (workout.activeEnergyBurned) {
-          const dateStr = workout.start.split(" ")[0];
-          if (!dataByDate[dateStr]) {
-            dataByDate[dateStr] = {};
-          }
-          let calories = workout.activeEnergyBurned.qty;
-          if (workout.activeEnergyBurned.units.toLowerCase().includes("kj")) {
-            calories = calories / 4.184;
-          }
-          dataByDate[dateStr].activeCalories = (dataByDate[dateStr].activeCalories || 0) + Math.round(calories);
+        if (!workout.activeEnergyBurned) continue;
+
+        const dateStr = extractDateKey(workout.start, workout.end);
+        if (!dateStr) continue;
+
+        if (!dataByDate[dateStr]) {
+          dataByDate[dateStr] = {};
         }
+
+        let calories = workout.activeEnergyBurned.qty;
+        if (workout.activeEnergyBurned.units.toLowerCase().includes("kj")) {
+          calories = calories / 4.184;
+        }
+
+        dataByDate[dateStr].activeCalories = (dataByDate[dateStr].activeCalories || 0) + Math.round(calories);
       }
     }
 
-    // Store each day's data
-    // Get Corinne's Clerk ID from environment variable
     const CORINNE_CLERK_ID = process.env.CORINNE_CLERK_ID;
     if (!CORINNE_CLERK_ID) {
       console.error("CORINNE_CLERK_ID not set");
       return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
+    const user = await convex.query(api.users.getUserByClerkId, { clerkId: CORINNE_CLERK_ID });
+    if (!user) {
+      console.error("User not found for Clerk ID:", CORINNE_CLERK_ID);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const results = [];
     for (const [date, data] of Object.entries(dataByDate)) {
       try {
-        // Get user from Clerk ID
-        const user = await convex.query(api.users.getUserByClerkId, { clerkId: CORINNE_CLERK_ID });
-        if (!user) {
-          console.error("User not found for Clerk ID:", CORINNE_CLERK_ID);
-          continue;
-        }
-
-        // Get existing data to preserve Whoop data
         const existingHealth = await convex.query(api.health.getHealthByDate, {
           userId: user._id,
           date,
         });
 
-        // Record the health data
-        // For steps: use MAX of existing vs new (handles partial day exports)
-        // For sleep: use new value if provided (sleep is final once recorded)
-        // For calories: use MAX (same logic as steps)
         const finalSteps = Math.max(data.steps ?? 0, existingHealth?.steps ?? 0);
         const finalCalories = Math.max(data.activeCalories ?? 0, existingHealth?.activeCalories ?? 0);
-        
+
         await convex.mutation(api.health.recordDailyHealth, {
           userId: user._id,
           date,
@@ -184,22 +251,35 @@ export async function POST(request: Request) {
     console.error("Health Auto Export error:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Processing failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// GET endpoint to test the connection
 export async function GET(request: Request) {
   const apiKey = new URL(request.url).searchParams.get("key");
-  
+
   if (apiKey !== HEALTH_EXPORT_API_KEY) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   return NextResponse.json({
     status: "ok",
     message: "Health Auto Export API is ready",
-    supportedMetrics: ["step_count", "sleep_analysis", "active_energy", "weight", "body_mass"],
+    supportedMetrics: [
+      "step_count",
+      "stepCount",
+      "HKQuantityTypeIdentifierStepCount",
+      "sleep_analysis",
+      "sleepAnalysis",
+      "HKCategoryTypeIdentifierSleepAnalysis",
+      "active_energy",
+      "activeEnergyBurned",
+      "HKQuantityTypeIdentifierActiveEnergyBurned",
+      "weight",
+      "body_mass",
+      "bodyMass",
+      "HKQuantityTypeIdentifierBodyMass",
+    ],
   });
 }

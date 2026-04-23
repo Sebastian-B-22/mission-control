@@ -43,6 +43,49 @@ function parsePhone(val: unknown): string {
   return String(val).trim();
 }
 
+function parsePaymentConfig(val: unknown): Record<string, unknown> | null {
+  if (!val || typeof val !== "object") return null;
+  const raw = (val as Record<string, unknown>)["1"];
+  if (typeof raw !== "string") return null;
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function getSelectedOption(config: Record<string, unknown> | null, optionNames: string[]): string | null {
+  const options = config?.options;
+  if (!Array.isArray(options)) return null;
+
+  for (const option of options) {
+    if (!option || typeof option !== "object") continue;
+    const record = option as Record<string, unknown>;
+    const name = String(record.name || "").trim().toLowerCase();
+    if (optionNames.some((candidate) => name === candidate.trim().toLowerCase())) {
+      const selected = String(record.selected || "").trim();
+      if (selected) return selected;
+    }
+  }
+
+  return null;
+}
+
+function normalizePracticeDay(val: string | null): string | null {
+  if (!val) return null;
+  const trimmed = val.trim();
+  if (!trimmed) return null;
+
+  const weekdayMatch = trimmed.match(/monday|tuesday|wednesday|thursday|friday/i);
+  if (weekdayMatch) return weekdayMatch[0].toUpperCase();
+
+  if (/game day only|game time slot|saturday/i.test(trimmed)) {
+    return "GAME DAY ONLY";
+  }
+
+  return trimmed;
+}
+
 // Shared sync logic extracted so both actions can call it without circular refs
 async function doSync(
   ctx: ActionCtx,
@@ -75,20 +118,29 @@ async function doSync(
     const phone = parsePhone(ans["15"]?.answer);
     if (!email) { skipped++; continue; }
 
-    // Birth year (Q51 Agoura, Q48 Pali)
+    const paymentConfig = parsePaymentConfig(ans["26"]?.answer);
+
+    // Birth year (Q51 Agoura, Q48 Pali, with product-option fallback)
     const byField = region === "agoura" ? "51" : "48";
-    const birthYearRaw = ans[byField]?.answer;
+    const birthYearRaw =
+      ans[byField]?.answer || getSelectedOption(paymentConfig, ["Select Birth Year", "Birth Year"]);
     const birthYear = birthYearRaw ? parseInt(String(birthYearRaw)) : null;
 
-    // Gender + practice day from Stripe prettyFormat (Q26)
+    // Gender + practice day from Stripe payload first, prettyFormat fallback second
     const pf = String(ans["26"]?.prettyFormat || "");
-    const genderMatch = region === "agoura"
-      ? pf.match(/Select Gender:\s*(Boys|Girls)/i)
-      : pf.match(/Gender:\s*(Boys|Girls)/i);
-    const gender = genderMatch ? genderMatch[1] : null;
+    const genderFromOptions = getSelectedOption(paymentConfig, ["Select Gender", "Gender"]);
+    const genderMatch = pf.match(/(?:Select Gender|Gender):\s*(Boys|Girls)/i);
+    const gender = genderFromOptions || (genderMatch ? genderMatch[1] : null);
 
-    const dayMatch = pf.match(/Spring League - (MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY)/i);
-    const practiceDay = dayMatch ? dayMatch[1] : null;
+    const practiceDayFromOptions = normalizePracticeDay(
+      getSelectedOption(paymentConfig, ["Select Practice Day", "Practice Day", "Game Time Slot (Saturdays)"])
+    );
+    const correctionPracticeDay = normalizePracticeDay(String(ans["56"]?.answer || ""));
+    const dayMatch = pf.match(/(?:Spring League -\s*)?(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY)|Practice Day:\s*(Monday|Tuesday|Wednesday|Thursday|Friday)|Select Practice Day:\s*(Monday|Tuesday|Wednesday|Thursday|Friday)|Game Time Slot \(Saturdays\):\s*([^,)]+)/i);
+    const practiceDay =
+      practiceDayFromOptions ||
+      (dayMatch ? normalizePracticeDay(dayMatch[0]) : null) ||
+      correctionPracticeDay;
 
     const division = birthYear ? getDivision(birthYear) : null;
 

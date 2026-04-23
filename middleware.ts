@@ -11,6 +11,9 @@ const isPublicRoute = createRouteMatcher([
   "/api/health/steps(.*)",
   "/api/registrations/update(.*)",
   "/api/cron/update(.*)",
+  "/api/health-check(.*)",
+  "/api/movie-meta(.*)",
+  "/api/movie-poster(.*)",
 ]);
 
 

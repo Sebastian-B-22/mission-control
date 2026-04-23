@@ -45,6 +45,47 @@ function formatTime12h(time24: string): string {
   return `${hour12}:${minute} ${ampm}`;
 }
 
+function extractScienceActivity(notes: string): string {
+  const trimmed = notes.trim();
+  if (!trimmed) return "Experiment";
+
+  const clean = (value: string) =>
+    value.replace(/\s+/g, " ").replace(/^[,.;:\s]+|[,.;:\s]+$/g, "").trim();
+
+  const lines = trimmed.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const explicitScienceLine = lines.find((line) => /^science\s*[:\-]/i.test(line));
+  if (explicitScienceLine) {
+    return clean(explicitScienceLine.replace(/^science\s*[:\-]\s*/i, "")).slice(0, 80) || "Experiment";
+  }
+
+  const bookTitleMatch = trimmed.match(
+    /(?:^|[,.;]|\band\b)\s*(?:we\s+)?(?:read\s+)?([^,.]+?)\s+book\s+for science\b/i
+  );
+  const bookTitle = bookTitleMatch ? clean(bookTitleMatch[1]) : "";
+
+  const chapterMatch = trimmed.match(/book\s+for science\s*\(([^)]+)\)/i);
+  const chapterDetail = chapterMatch ? clean(chapterMatch[1]) : "";
+
+  const videoMatch = trimmed.match(/watched\s+(?:youtube\s+)?videos?\s+(?:on|about)\s+(.+?)\s+for science\b/i);
+  const videoTopic = videoMatch ? clean(videoMatch[1]) : "";
+
+  const parts: string[] = [];
+  if (bookTitle) parts.push(chapterDetail ? `${bookTitle} (${chapterDetail})` : bookTitle);
+  if (videoTopic) parts.push(`${videoTopic} video`);
+
+  if (parts.length > 0) {
+    return parts.join(" + ").slice(0, 80);
+  }
+
+  if (/esophagus/i.test(trimmed)) return "Esophagus experiment";
+  if (/learning lab/i.test(trimmed)) return "Learning Lab experiment";
+  if (/astrophysics/i.test(trimmed) && /artemis\s*2/i.test(trimmed)) return "Astrophysics + Artemis 2";
+  if (/astrophysics/i.test(trimmed)) return "Astrophysics";
+  if (/artemis\s*2/i.test(trimmed)) return "Artemis 2";
+
+  return "Experiment";
+}
+
 // TODO: Make this dynamic - pull from Monthly objectives/goals in Convex
 // Currently static mapping, should query hsObjectives and hsResources
 // to rotate suggestions based on current month's focus areas
@@ -413,17 +454,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
 
       // Science / experiments - keep it specific
       if (has("science") || has("experiment") || has("esophagus") || has("learning lab") || has("science kit")) {
-        // Try to extract a specific description from the recap.
-        let detail = "Experiment";
-        const lines = notes.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-        const scienceLine = lines.find((l) => l.toLowerCase().includes("science"));
-        if (scienceLine) {
-          detail = scienceLine.replace(/^science\s*[:\-]\s*/i, "").slice(0, 80);
-        } else if (has("esophagus")) {
-          detail = "Esophagus experiment";
-        } else if (has("learning lab")) {
-          detail = "Learning Lab experiment";
-        }
+        const detail = extractScienceActivity(notes);
         candidates.push({ category: "science", activity: detail, notes: notes });
       }
 
@@ -488,8 +519,21 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
       if (has("3d print") || has("3d-print") || has("3d printing")) candidates.push({ category: "art", activity: "3D Printing", notes: notes });
       
       // Music
-      if (has("music") || has("piano") || has("guitar") || has("singing") || has("ukulele")) {
-        candidates.push({ category: "music", activity: "Music", notes: notes });
+      if (
+        has("music") ||
+        has("piano") ||
+        has("guitar") ||
+        has("singing") ||
+        has("ukulele") ||
+        has("drum") ||
+        has("drumming") ||
+        has("drumeo")
+      ) {
+        let activity = "Music";
+        if (has("drumeo")) activity = "Drumeo";
+        else if (has("drum lesson") || has("drum lessons")) activity = "Drum Lesson";
+        else if (has("drum practice") || has("drumming") || has("drums")) activity = "Drum Practice";
+        candidates.push({ category: "music", activity, notes: notes });
       }
       
       // Geography / Social Studies

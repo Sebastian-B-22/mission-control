@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function MavenVerificationDashboard() {
   const stats = useQuery(api.contentVerification.getVerificationStats, {});
@@ -15,43 +15,32 @@ export function MavenVerificationDashboard() {
     );
   }
 
+  const topIssues = stats.commonIssues.slice(0, 2);
+  const latestTrend = stats.weeklyTrend[stats.weeklyTrend.length - 1];
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <Card className="bg-gray-900/60 border-gray-800">
-        <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-300">Verification Pass Rate</CardTitle></CardHeader>
-        <CardContent><p className="text-2xl font-bold text-green-400">{stats.passRate}%</p></CardContent>
-      </Card>
+    <div className="grid gap-2 lg:grid-cols-4">
+      <div className="rounded-xl border border-gray-800 bg-gray-900/60 px-3 py-2">
+        <div className="text-[10px] uppercase tracking-wide text-gray-500">Verification</div>
+        <p className="mt-1 text-lg font-semibold text-green-400">{stats.passRate}%</p>
+      </div>
 
-      <Card className="bg-gray-900/60 border-gray-800">
-        <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-300">Common Issues</CardTitle></CardHeader>
-        <CardContent className="space-y-1">
-          {stats.commonIssues.length === 0 ? (
-            <p className="text-sm text-gray-400">No major issues yet</p>
-          ) : stats.commonIssues.map((i: any) => (
-            <p key={i.issue} className="text-sm text-amber-300">• {i.issue} ({i.count})</p>
-          ))}
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-gray-800 bg-gray-900/60 px-3 py-2">
+        <div className="text-[10px] uppercase tracking-wide text-gray-500">Common issues</div>
+        <p className="mt-1 text-xs text-amber-300">
+          {topIssues.length === 0 ? "None" : topIssues.map((i: any) => `${i.issue} (${i.count})`).join(" • ")}
+        </p>
+      </div>
 
-      <Card className="bg-gray-900/60 border-gray-800">
-        <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-300">Tone Drift</CardTitle></CardHeader>
-        <CardContent>
-          <p className={`text-2xl font-bold ${stats.toneDrift >= 70 ? "text-green-400" : "text-amber-400"}`}>{stats.toneDrift}</p>
-          <p className="text-xs text-gray-500">Avg of last 10 tone scores</p>
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-gray-800 bg-gray-900/60 px-3 py-2">
+        <div className="text-[10px] uppercase tracking-wide text-gray-500">Tone drift</div>
+        <p className={`mt-1 text-lg font-semibold ${stats.toneDrift >= 70 ? "text-green-400" : "text-amber-400"}`}>{stats.toneDrift}</p>
+      </div>
 
-      <Card className="bg-gray-900/60 border-gray-800">
-        <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-300">Weekly Trend</CardTitle></CardHeader>
-        <CardContent className="space-y-1">
-          {stats.weeklyTrend.map((d: any) => (
-            <div key={d.dayOffset} className="flex items-center justify-between text-xs">
-              <span className="text-gray-500">Day {d.dayOffset + 1}</span>
-              <span className="text-gray-300">{d.passRate}% ({d.count})</span>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-gray-800 bg-gray-900/60 px-3 py-2">
+        <div className="text-[10px] uppercase tracking-wide text-gray-500">Trend</div>
+        <p className="mt-1 text-lg font-semibold text-gray-200">{latestTrend ? `${latestTrend.passRate}%` : "-"}</p>
+      </div>
     </div>
   );
 }

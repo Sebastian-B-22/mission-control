@@ -78,6 +78,23 @@ export const toggleFiveToThriveTask = mutation({
   },
 });
 
+export const updateFiveToThriveTasks = mutation({
+  args: {
+    id: v.id("fiveToThrive"),
+    tasks: v.array(
+      v.object({
+        text: v.string(),
+        completed: v.boolean(),
+        categoryId: v.optional(v.id("rpmCategories")),
+        completedAt: v.optional(v.number()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { tasks: args.tasks });
+  },
+});
+
 // Daily Reflections
 export const saveDailyReflection = mutation({
   args: {
@@ -144,5 +161,78 @@ export const getRecentReflections = query({
       .withIndex("by_user_and_date", (q) => q.eq("userId", args.userId))
       .order("desc")
       .take(args.limit || 7);
+  },
+});
+
+// Daily Canvas Notes
+export const getDailyCanvasNote = query({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+    kind: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("dailyCanvasNotes")
+      .withIndex("by_user_date_kind", (q) =>
+        q.eq("userId", args.userId).eq("date", args.date).eq("kind", args.kind)
+      )
+      .first();
+  },
+});
+
+export const saveDailyCanvasNote = mutation({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+    kind: v.string(),
+    data: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("dailyCanvasNotes")
+      .withIndex("by_user_date_kind", (q) =>
+        q.eq("userId", args.userId).eq("date", args.date).eq("kind", args.kind)
+      )
+      .first();
+
+    const now = Date.now();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        data: args.data,
+        updatedAt: now,
+      });
+      return existing._id;
+    }
+
+    return await ctx.db.insert("dailyCanvasNotes", {
+      userId: args.userId,
+      date: args.date,
+      kind: args.kind,
+      data: args.data,
+      createdAt: now,
+      updatedAt: now,
+    });
+  },
+});
+
+export const deleteDailyCanvasNote = mutation({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+    kind: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("dailyCanvasNotes")
+      .withIndex("by_user_date_kind", (q) =>
+        q.eq("userId", args.userId).eq("date", args.date).eq("kind", args.kind)
+      )
+      .first();
+
+    if (existing) {
+      await ctx.db.delete(existing._id);
+    }
   },
 });

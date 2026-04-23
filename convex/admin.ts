@@ -94,10 +94,94 @@ export const migrateSebastianTasks = mutation({
   },
 });
 
+function extractScienceActivity(notes: string): string {
+  const trimmed = notes.trim();
+  if (!trimmed) return "Experiment";
+
+  const clean = (value: string) =>
+    value.replace(/\s+/g, " ").replace(/^[,.;:\s]+|[,.;:\s]+$/g, "").trim();
+
+  const bookTitleMatch = trimmed.match(
+    /(?:^|[,.;]|\band\b)\s*(?:we\s+)?(?:read\s+)?([^,.]+?)\s+book\s+for science\b/i
+  );
+  const bookTitle = bookTitleMatch ? clean(bookTitleMatch[1]) : "";
+
+  const chapterMatch = trimmed.match(/book\s+for science\s*\(([^)]+)\)/i);
+  const chapterDetail = chapterMatch ? clean(chapterMatch[1]) : "";
+
+  const videoMatch = trimmed.match(/watched\s+(?:youtube\s+)?videos?\s+(?:on|about)\s+(.+?)\s+for science\b/i);
+  const videoTopic = videoMatch ? clean(videoMatch[1]) : "";
+
+  const parts: string[] = [];
+  if (bookTitle) parts.push(chapterDetail ? `${bookTitle} (${chapterDetail})` : bookTitle);
+  if (videoTopic) parts.push(`${videoTopic} video`);
+
+  if (parts.length > 0) return parts.join(" + ").slice(0, 120);
+  if (/health\s*&\s*body/i.test(trimmed) && /esophagus/i.test(trimmed)) return "Health & Body Experiment - Esophagus";
+  if (/esophagus/i.test(trimmed)) return "Esophagus experiment";
+  if (/learning lab/i.test(trimmed)) return "Learning Lab experiment";
+  if (/astrophysics/i.test(trimmed) && /artemis\s*2/i.test(trimmed)) return "Astrophysics + Artemis 2";
+  if (/astrophysics/i.test(trimmed)) return "Astrophysics";
+  if (/artemis\s*2/i.test(trimmed)) return "Artemis 2";
+
+  return "Experiment";
+}
+
 // Dedupe books by title (keep oldest)
 export const dedupeBooks = mutation({
-  args: { userId: v.string() },
+  args: {
+    userId: v.string(),
+    mode: v.optional(v.string()),
+    date: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
+    if (args.mode === "repairScience") {
+      if (!args.date) throw new Error("date is required for repairScience");
+
+      const recaps = await ctx.db.query("dailyRecap").collect();
+      const recap = recaps.find((r: any) => r.userId === args.userId && r.date === args.date);
+      const notes = (recap?.notes ?? "").trim();
+      if (!notes) {
+        return { success: false, message: "No recap found for that date" };
+      }
+
+      const activities = await ctx.db.query("homeschoolActivities").collect();
+      const scienceActivities = activities
+        .filter((activity: any) => activity.userId === args.userId && activity.date === args.date && activity.category === "science")
+        .sort((a: any, b: any) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+
+      const nextActivity = extractScienceActivity(notes);
+
+      if (scienceActivities.length === 0) {
+        const id = await ctx.db.insert("homeschoolActivities", {
+          userId: args.userId as any,
+          date: args.date,
+          student: "both",
+          category: "science",
+          activity: nextActivity,
+          completed: true,
+          notes,
+          createdAt: Date.now(),
+        });
+        return { success: true, inserted: 1, patched: 0, deleted: 0, activity: nextActivity, id };
+      }
+
+      const [primary, ...duplicates] = scienceActivities;
+      await ctx.db.patch(primary._id, { activity: nextActivity, notes });
+      for (const duplicate of duplicates) {
+        await ctx.db.delete(duplicate._id);
+      }
+
+      return {
+        success: true,
+        inserted: 0,
+        patched: 1,
+        deleted: duplicates.length,
+        activity: nextActivity,
+        id: primary._id,
+      };
+    }
+
     const books = await ctx.db.query("bookLibrary").collect();
     const userBooks = books.filter((b: any) => b.userId === args.userId);
     
@@ -782,6 +866,227 @@ export const clearHTATasks = mutation({
       success: true, 
       message: `Cleared ${htaTasks.length} HTA tasks`,
       count: htaTasks.length 
+    };
+  },
+});
+
+// Reset HTA to a current June 15 signup sprint
+export const resetHTALaunchSprint = mutation({
+  args: {
+    clerkId: v.string(),
+    clearFirst: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    let cleared = 0;
+    if (args.clearFirst !== false) {
+      const existingTasks = await ctx.db
+        .query("projectTasks")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .filter((q) => q.eq(q.field("project"), "hta"))
+        .collect();
+
+      cleared = existingTasks.length;
+      for (const task of existingTasks) {
+        await ctx.db.delete(task._id);
+      }
+    }
+
+    const teamMembers = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const corinne = teamMembers.find((m) => m.name === "Corinne");
+    const sebastian = teamMembers.find((m) => m.name === "Sebastian");
+    const allie = teamMembers.find((m) => m.name === "Allie");
+
+    const sprintTasks = [
+      // GTM
+      {
+        subProject: "gtm",
+        title: "Finalize Founding Families offer, pricing, and founder bonus",
+        dueDate: "2026-04-19",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "gtm",
+        title: "Draft the offer architecture, FAQ, and objection handling",
+        dueDate: "2026-04-20",
+        assignedToId: sebastian?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "gtm",
+        title: "Set June 15 signup target, founding families cap, and launch success metric",
+        dueDate: "2026-04-21",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "gtm",
+        title: "Open HTA signups on June 15",
+        dueDate: "2026-06-15",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+
+      // Product
+      {
+        subProject: "product",
+        title: "Approve Welcome Box v1 contents and what families actually receive",
+        dueDate: "2026-04-22",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "product",
+        title: "Build item sourcing sheet with vendor options, MOQ, and cost ranges",
+        dueDate: "2026-04-24",
+        assignedToId: allie?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "product",
+        title: "Create box COGS tracker and first-pass packout checklist",
+        dueDate: "2026-04-26",
+        assignedToId: allie?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "product",
+        title: "Approve final launch box scope before sales go live",
+        dueDate: "2026-05-10",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+
+      // Curriculum
+      {
+        subProject: "curriculum",
+        title: "Lock Month 1 theme, age-band outcomes, and parent promise",
+        dueDate: "2026-04-24",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "curriculum",
+        title: "Create first-pass mission, story, and sample asset mockups for launch",
+        dueDate: "2026-04-29",
+        assignedToId: sebastian?._id,
+        priority: "medium" as const,
+      },
+      {
+        subProject: "curriculum",
+        title: "Finalize the sample mission and parent quick-start for the sales page",
+        dueDate: "2026-05-05",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "curriculum",
+        title: "Organize approved curriculum assets for landing page, email, and onboarding use",
+        dueDate: "2026-05-07",
+        assignedToId: allie?._id,
+        priority: "medium" as const,
+      },
+
+      // Marketing
+      {
+        subProject: "marketing",
+        title: "Draft landing page copy with StoryBrand structure, FAQ, and CTA sections",
+        dueDate: "2026-04-23",
+        assignedToId: sebastian?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "marketing",
+        title: "Approve HTA positioning, headline direction, and parent-facing promise",
+        dueDate: "2026-04-28",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "marketing",
+        title: "Build launch asset tracker and lead list sheet for waitlist and outreach",
+        dueDate: "2026-04-30",
+        assignedToId: allie?._id,
+        priority: "medium" as const,
+      },
+      {
+        subProject: "marketing",
+        title: "Prepare launch email, text, and social announcement set",
+        dueDate: "2026-05-20",
+        assignedToId: sebastian?._id,
+        priority: "high" as const,
+      },
+
+      // Operations
+      {
+        subProject: "operations",
+        title: "Build the signup flow, payment path, and confirmation screen",
+        dueDate: "2026-05-08",
+        assignedToId: sebastian?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "operations",
+        title: "Build confirmation email and onboarding automation for new signups",
+        dueDate: "2026-05-15",
+        assignedToId: sebastian?._id,
+        priority: "high" as const,
+      },
+      {
+        subProject: "operations",
+        title: "Create fulfillment tracker, shipping checklist, and launch QA sheet",
+        dueDate: "2026-05-18",
+        assignedToId: allie?._id,
+        priority: "medium" as const,
+      },
+      {
+        subProject: "operations",
+        title: "Approve the full signup experience after QA and before launch day",
+        dueDate: "2026-06-10",
+        assignedToId: corinne?._id,
+        priority: "high" as const,
+      },
+    ];
+
+    const orderBySubProject: Record<string, number> = {};
+    let inserted = 0;
+
+    for (const task of sprintTasks) {
+      const order = orderBySubProject[task.subProject] || 0;
+      await ctx.db.insert("projectTasks", {
+        userId: user._id,
+        project: "hta",
+        subProject: task.subProject,
+        title: task.title,
+        assignedToId: task.assignedToId,
+        status: "todo",
+        dueDate: task.dueDate,
+        priority: task.priority,
+        order,
+        createdAt: Date.now(),
+      });
+      orderBySubProject[task.subProject] = order + 1;
+      inserted++;
+    }
+
+    return {
+      success: true,
+      cleared,
+      inserted,
+      message: `Rebuilt HTA as a June 15 sprint with ${inserted} tasks`,
     };
   },
 });
@@ -1541,5 +1846,123 @@ export const removeDuplicateScheduleBlocks = mutation({
       duplicatesRemoved: deletedCount,
       remainingBlocks: allBlocks.length - deletedCount
     };
+  },
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA OWNERSHIP INVESTIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const investigateDataOwnership = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+    
+    const results: Record<string, Record<string, number>> = {};
+    
+    const tables = [
+      "rpmCategories",
+      "teamMembers",
+      "habitTemplates",
+      "bookLibrary",
+      "sebastianTasks",
+      "familyMeetings",
+      "movieLibrary",
+      "dailyHealth",
+      "calendarEvents",
+    ] as const;
+    
+    for (const table of tables) {
+      results[table] = {};
+      const records = await ctx.db.query(table as any).collect();
+      for (const record of records) {
+        const uid = String((record as any).userId);
+        results[table][uid] = (results[table][uid] || 0) + 1;
+      }
+    }
+    
+    return {
+      users: users.map(u => ({
+        id: String(u._id),
+        clerkId: u.clerkId,
+        email: u.email,
+        name: u.name,
+      })),
+      tableCounts: results,
+    };
+  },
+});
+
+export const rebindDataToNewUser = mutation({
+  args: {
+    oldUserId: v.string(),
+    newUserId: v.string(),
+    tables: v.array(v.string()),
+    dryRun: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const { oldUserId, newUserId, tables, dryRun } = args;
+    
+    const results: Record<string, { found: number; updated: number }> = {};
+    
+    for (const tableName of tables) {
+      results[tableName] = { found: 0, updated: 0 };
+      
+      const records = await ctx.db.query(tableName as any).collect();
+      
+      for (const record of records) {
+        if (String((record as any).userId) === oldUserId) {
+          results[tableName].found++;
+          
+          if (!dryRun) {
+            await ctx.db.patch(record._id, { userId: newUserId as any });
+            results[tableName].updated++;
+          }
+        }
+      }
+    }
+    
+    return {
+      success: true,
+      dryRun,
+      oldUserId,
+      newUserId,
+      results,
+    };
+  },
+});
+
+export const cleanupDuplicatesByUserForTable = mutation({
+  args: {
+    userId: v.string(),
+    table: v.string(),
+    dedupKeyFields: v.array(v.string()),
+  },
+  handler: async (ctx, { userId, table, dedupKeyFields }) => {
+    const records = await ctx.db.query(table as any).collect();
+    const userRecords = records.filter((r: any) => String(r.userId) === userId);
+    
+    const groups = new Map<string, typeof userRecords>();
+    for (const record of userRecords) {
+      const key = dedupKeyFields.map(f => String((record as any)[f] ?? "").toLowerCase().trim()).join("::");
+      const arr = groups.get(key) ?? [];
+      arr.push(record);
+      groups.set(key, arr);
+    }
+    
+    let deleted = 0;
+    const groupsArray = Array.from(groups.values());
+    for (const group of groupsArray) {
+      if (group.length <= 1) continue;
+      
+      group.sort((a, b) => (b._creationTime ?? 0) - (a._creationTime ?? 0));
+      
+      for (const dupe of group.slice(1)) {
+        await ctx.db.delete(dupe._id);
+        deleted++;
+      }
+    }
+    
+    return { success: true, deleted, kept: userRecords.length - deleted };
   },
 });

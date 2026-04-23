@@ -35,11 +35,6 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   const toggleTask = useMutation(api.daily.toggleFiveToThriveTask);
 
   const tasks = fiveToThrive?.tasks || [];
-  const categoryNameById = useMemo(
-    () => new Map(rpmCategories.map((category: any) => [category._id, category.name])),
-    [rpmCategories]
-  );
-
   // Group tasks by category for display
   const tasksWithIndex = useMemo(
     () => tasks.map((task: any, index: number) => ({ ...task, originalIndex: index })),

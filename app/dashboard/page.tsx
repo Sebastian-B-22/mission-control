@@ -31,6 +31,7 @@ import { MavenVerificationDashboard } from "@/components/MavenVerificationDashbo
 import { EmailDraftsView } from "@/components/EmailDraftsView";
 import { MemoryView } from "@/components/MemoryView";
 import { EngagementHabits } from "@/components/EngagementHabits";
+import { AgentLearningsReview } from "@/components/AgentLearningsReview";
 import { SidebarNew } from "@/components/SidebarNew";
 import { QuickWinsCard } from "@/components/QuickWinsCard";
 import { FamilyMeetingDashboard } from "@/components/FamilyMeetingDashboard";
@@ -69,11 +70,13 @@ import { HomeRemodelView } from "@/components/views/HomeRemodelView";
 import { WeeklyView } from "@/components/WeeklyView";
 import { AgentSquad } from "@/components/AgentSquad";
 import { AgentHQ } from "@/components/AgentHQ";
-import { DashboardTopBar } from "@/components/DashboardTopBar";
 import { OnboardingWizardDialog } from "@/components/OnboardingWizardDialog";
 import { CostTrackerCard } from "@/components/CostTrackerCard";
 import { CostTrackerView } from "@/components/views/CostTrackerView";
 import { MemoryPanelView } from "@/components/views/MemoryPanelView";
+import { AgentWorkflowShell } from "@/components/AgentWorkflowShell";
+import { DailyHandwritingPad } from "@/components/DailyHandwritingPad";
+import { Brain, Lightbulb, Mail, PenSquare, TrendingUp } from "lucide-react";
 import CampAdminView from "./camp-admin/page";
 
 export default function DashboardPage() {
@@ -151,6 +154,14 @@ export default function DashboardPage() {
   };
 
   const [today, setToday] = useState(() => getPSTDate());
+  const standaloneSurfaceViews = new Set([
+    "sebastian",
+    "agent-ideas",
+    "content-pipeline",
+    "email-drafts",
+    "agent-learnings",
+    "engagement-habits",
+  ]);
 
   // Update date at midnight PST
   useEffect(() => {
@@ -208,6 +219,10 @@ export default function DashboardPage() {
 
 
   const editingCategory = categories?.find((c: any) => c._id === editingCategoryId);
+
+  const handleHealthTabChange = (tab: "daily" | "strength" | "biomap") => {
+    setCurrentView(tab === "daily" ? "health" : `health-${tab}`);
+  };
 
   // Auto-prompt onboarding for first-time (or not dismissed) users
   useEffect(() => {
@@ -280,6 +295,7 @@ export default function DashboardPage() {
               <QuickWinsCard userId={convexUser._id} date={today} />
             </div>
             <EveningReflection userId={convexUser._id} date={today} />
+            <DailyHandwritingPad key={today} userId={convexUser._id} date={today} />
           </div>
         );
 
@@ -339,6 +355,12 @@ export default function DashboardPage() {
         return (
           <div className="h-[calc(100vh-120px)]">
             <AgentHuddle initialChannel="ideas" />
+          </div>
+        );
+      case "agent-huddle-overnight":
+        return (
+          <div className="h-[calc(100vh-120px)]">
+            <AgentHuddle initialChannel="overnight-strategy" />
           </div>
         );
       case "agent-huddle-joy-support":
@@ -519,19 +541,15 @@ export default function DashboardPage() {
       // Legacy views
       case "agent-ideas":
         return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <span>💡</span> Agent Ideas
-                </h2>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Ideas and suggestions from your AI agents
-                </p>
-              </div>
-            </div>
-            <AgentIdeasWidget />
-          </div>
+          <AgentWorkflowShell
+            title="Ideas"
+            description="Capture promising agent suggestions, triage what deserves attention, and convert the good ones into real work."
+            icon={<Lightbulb className="h-5 w-5 text-amber-500" />}
+            stageLabel="Capture"
+            activeStep="ideas"
+          >
+            <AgentIdeasWidget userId={convexUser._id} />
+          </AgentWorkflowShell>
         );
 
       case "agent-huddle":
@@ -543,24 +561,43 @@ export default function DashboardPage() {
 
       case "content-pipeline":
         return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <span>🎯</span> Content Pipeline
-                </h2>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Maven&apos;s drafts waiting for your review &amp; approval
-                </p>
-              </div>
-            </div>
+          <AgentWorkflowShell
+            title="Content"
+            description="Review agent-generated drafts, approve what is ready, and keep the pipeline moving toward publication."
+            icon={<PenSquare className="h-5 w-5 text-amber-500" />}
+            stageLabel="Review"
+            activeStep="content"
+          >
             <MavenVerificationDashboard />
             <ContentPipeline />
-          </div>
+          </AgentWorkflowShell>
         );
 
       case "email-drafts":
-        return <EmailDraftsView />;
+        return (
+          <AgentWorkflowShell
+            title="Emails & Texts"
+            description="Shape email and text drafts into send-ready messages, with a cleaner loop for copy review, approval, and agent suggestions."
+            icon={<Mail className="h-5 w-5 text-amber-500" />}
+            stageLabel="Refine"
+            activeStep="messages"
+          >
+            <EmailDraftsView showHeader={false} />
+          </AgentWorkflowShell>
+        );
+
+      case "agent-learnings":
+        return (
+          <AgentWorkflowShell
+            title="Training"
+            description="Accept, reject, or archive proposed learnings so the system gets better without accumulating junk."
+            icon={<Brain className="h-5 w-5 text-amber-500" />}
+            stageLabel="Train"
+            activeStep="training"
+          >
+            <AgentLearningsReview />
+          </AgentWorkflowShell>
+        );
 
       case "memory":
         return <MemoryView />;
@@ -570,19 +607,15 @@ export default function DashboardPage() {
 
       case "engagement-habits":
         return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <span>📈</span> Engagement Habits
-                </h2>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Track your daily social media engagement to build consistency
-                </p>
-              </div>
-            </div>
+          <AgentWorkflowShell
+            title="Engagement"
+            description="Support the workflow with a lightweight daily engagement habit so content and conversation stay connected."
+            icon={<TrendingUp className="h-5 w-5 text-amber-500" />}
+            stageLabel="Practice"
+            activeStep="engagement"
+          >
             <EngagementHabits userId={convexUser._id} />
-          </div>
+          </AgentWorkflowShell>
         );
 
       case "family-meeting":
@@ -612,11 +645,16 @@ export default function DashboardPage() {
         return <CostTrackerView userId={convexUser._id} />;
 
       case "health":
-        return <HealthDashboard userId={convexUser._id} />;
+      case "health-daily":
+        return <HealthDashboard userId={convexUser._id} initialTab="daily" onTabChange={handleHealthTabChange} />;
+      case "health-strength":
+        return <HealthDashboard userId={convexUser._id} initialTab="strength" onTabChange={handleHealthTabChange} />;
+      case "health-biomap":
+        return <HealthDashboard userId={convexUser._id} initialTab="biomap" onTabChange={handleHealthTabChange} />;
 
       // HTA views
       case "hta-overview":
-        return <HTAOverview userId={convexUser._id} />;
+        return <HTAOverview userId={convexUser._id} onNavigate={setCurrentView} />;
       case "hta-gtm":
         return <HTASubView userId={convexUser._id} subProject="gtm" title="GTM Timeline" description="Launch milestones, key dates & GTM strategy" />;
       case "hta-product":
@@ -630,13 +668,13 @@ export default function DashboardPage() {
 
       // Aspire views
       case "aspire-overview":
-        return <AspireOverview userId={convexUser._id} />;
+        return <AspireOverview userId={convexUser._id} onNavigate={setCurrentView} />;
       case "aspire-pali":
         return <AspireSubView userId={convexUser._id} subProject="pali" title="Pali (Region 69)" description="Pacific Palisades programs & coordination" />;
       case "aspire-agoura":
         return <AspireSubView userId={convexUser._id} subProject="agoura" title="Agoura (Region 4)" description="Agoura programs & coordination" />;
       case "aspire-spring":
-        return <AspireSpringView userId={convexUser._id} />;
+        return <AspireSpringView userId={convexUser._id} onNavigate={setCurrentView} />;
       case "aspire-camps":
         return <AspireCampsView userId={convexUser._id} />;
       case "aspire-camp-admin":
@@ -706,38 +744,16 @@ export default function DashboardPage() {
 
       <div className="lg:pl-64 min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
-          {(() => {
-            const sebastianViews = new Set([
-              "sebastian",
-              "agent-ideas",
-              "content-pipeline",
-              "email-drafts",
-              "engagement-habits",
-              "memory",
-              "memory-panel",
-            ]);
-
-            const showOpsTopBar = currentView.startsWith("agent-") || sebastianViews.has(currentView);
-
-            return showOpsTopBar ? (
-              <DashboardTopBar
-                userId={convexUser._id}
-                onOpenOnboarding={() => setOnboardingOpen(true)}
-                onResetOnboarding={async () => {
-                  await resetOnboarding({ userId: convexUser._id });
-                  setOnboardingOpen(true);
-                }}
-              />
-            ) : null;
-          })()}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
-              Mission Control
-            </h1>
-            <p className="text-muted-foreground">
-              Hi {user?.firstName || "Corinne"}. Let&apos;s make today epic!
-            </p>
-          </div>
+          {!standaloneSurfaceViews.has(currentView) ? (
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">
+                Mission Control
+              </h1>
+              <p className="text-muted-foreground">
+                Hi {user?.firstName || "Corinne"}. Let&apos;s make today epic!
+              </p>
+            </div>
+          ) : null}
 
           {/* Render current view content */}
           {renderContent()}

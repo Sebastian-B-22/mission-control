@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 
 type TopicKey = "operations" | "marketing" | "family" | "ideas" | "general";
 
-type ChannelKey = "main" | "aspire-ops" | "hta-launch" | "family" | "ideas";
+type ChannelKey = "main" | "aspire-ops" | "hta-launch" | "family" | "ideas" | "overnight-strategy";
 
 const TOPICS: Array<{ key: TopicKey; label: string }> = [
   { key: "operations", label: "Operations" },
@@ -32,6 +32,7 @@ const CHANNELS: Array<{ key: ChannelKey; label: string }> = [
   { key: "hta-launch", label: "Marketing" },
   { key: "family", label: "Family" },
   { key: "ideas", label: "Ideas" },
+  { key: "overnight-strategy", label: "Overnight" },
 ];
 
 function formatTime(ts: number) {
@@ -70,7 +71,11 @@ type HuddleMsg = Doc<"agentHuddle"> & {
   mentions?: string[];
   deliveredToTopic?: string;
   deliveredAt?: number;
+  source?: "mission-control" | "telegram" | "huddle" | "agent-trigger" | "manual" | "system";
+  sourceAuthor?: string;
 };
+
+type TelegramOutboxMsg = Doc<"telegramOutbox">;
 
 export function AgentHQ({ userId }: { userId: Id<"users"> }) {
   const [topic, setTopic] = useState<TopicKey>("general");
@@ -92,6 +97,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
     userId,
     limit: 20,
   });
+  const recentOutbox = useQuery(api.telegramOutbox.getRecent, { limit: 12 }) as TelegramOutboxMsg[] | undefined;
 
   // Pending / Next Up
   const createPendingItem = useMutation(api.pendingItems.create);
@@ -219,7 +225,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
       }
 
       setText("");
-      setSendOk("Queued to Telegram outbox");
+      setSendOk("Posted to Huddle and queued to Telegram");
       setTimeout(() => setSendOk(null), 2500);
     } catch (e) {
       setSendError(e instanceof Error ? e.message : String(e));
@@ -283,388 +289,24 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Agent HQ</h1>
+          <h1 className="text-2xl font-bold">Telegram Bridge</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Quick broadcast + huddle pulse + pings for Corinne
+            Mission Control is the hub. Telegram is the fast edge. Sebastian routes the work.
           </p>
         </div>
-        <a
-          href="/api/paperclip/agents"
-          className="text-xs text-blue-400 hover:text-blue-300"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Paperclip ↗
-        </a>
       </div>
 
-      {/* Health (Gateway) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Health</CardTitle>
-          <p className="text-xs text-muted-foreground">
-            Run host checks via the OpenClaw gateway. (No autofix yet.)
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Latest pushed results (works even if gateway is disconnected) */}
-          <div className="border border-zinc-800 rounded-lg p-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="text-xs font-medium text-zinc-200">Latest pushed checks</div>
-              <div className="text-[11px] text-muted-foreground">Persisted in Convex</div>
-            </div>
-
-            {!recentHealthRuns ? (
-              <div className="mt-2 text-xs text-muted-foreground">Loading…</div>
-            ) : recentHealthRuns.length === 0 ? (
-              <div className="mt-2 text-xs text-muted-foreground">
-                No pushed health runs yet. (These come from the Mac mini scripts.)
-              </div>
-            ) : (
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[{ label: "Doctor", run: latestDoctorRun }, { label: "Security audit", run: latestSecurityRun }].map(({ label, run }) => (
-                  <div key={label} className="border border-zinc-800 rounded-lg p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="text-xs font-medium">{label}</div>
-                        <div className="text-[11px] text-muted-foreground">
-                          {run ? formatTime(run.createdAt) : "No data"}
-                        </div>
-                      </div>
-                      {run ? (
-                        <Badge variant={statusBadgeVariant(run.status)} className="text-[10px]">
-                          {run.status}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-[10px]">missing</Badge>
-                      )}
-                    </div>
-
-                    {run ? (
-                      <>
-                        <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
-                          <Badge variant="destructive">Critical {run.counts?.critical ?? groupBySeverity(run.rawText).critical.length}</Badge>
-                          <Badge variant="secondary">Warn {run.counts?.warn ?? groupBySeverity(run.rawText).warn.length}</Badge>
-                          <Badge variant="outline">Info {run.counts?.info ?? groupBySeverity(run.rawText).info.length}</Badge>
-                        </div>
-                        <details className="mt-2 border border-zinc-800 rounded-lg p-2">
-                          <summary className="cursor-pointer text-xs text-zinc-300">Raw output</summary>
-                          <pre className="mt-2 text-[11px] whitespace-pre-wrap text-zinc-200">{run.rawText}</pre>
-                        </details>
-                      </>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {!gw.connected ? (
-            <div className="border border-zinc-800 rounded-lg p-3 text-xs text-zinc-300">
-              <div className="font-medium text-zinc-200">Gateway disconnected</div>
-              <div className="mt-1 text-muted-foreground">
-                Panels that require the operator host are disabled. Set <code className="text-zinc-200">OPENCLAW_GATEWAY_URL</code> and ensure the gateway is reachable.
-              </div>
-              {gw.error ? <div className="mt-2 text-[11px] text-red-400">{gw.error}</div> : null}
-            </div>
-          ) : null}
-
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={runDoctor} disabled={!gw.connected || doctorRunning}>
-              {doctorRunning ? "Running Doctor…" : "Run OpenClaw Doctor"}
-            </Button>
-            <Button size="sm" variant="secondary" onClick={runSecurityAudit} disabled={!gw.connected || securityRunning}>
-              {securityRunning ? "Running Security Audit…" : "Run Security Audit (deep)"}
-            </Button>
-          </div>
-
-          {healthErr ? <p className="text-xs text-red-400">{healthErr}</p> : null}
-
-          {/* Results */}
-          {doctorGrouped ? (
-            <div className="space-y-2">
-              <div className="text-xs font-medium">Doctor results</div>
-              <div className="flex flex-wrap gap-2 text-[11px]">
-                <Badge variant="destructive">Critical {doctorGrouped.critical.length}</Badge>
-                <Badge variant="secondary">Warn {doctorGrouped.warn.length}</Badge>
-                <Badge variant="outline">Info {doctorGrouped.info.length}</Badge>
-              </div>
-              <details className="border border-zinc-800 rounded-lg p-3">
-                <summary className="cursor-pointer text-xs text-zinc-300">Raw output</summary>
-                <pre className="mt-2 text-[11px] whitespace-pre-wrap text-zinc-200">{doctorOut}</pre>
-              </details>
-            </div>
-          ) : null}
-
-          {securityGrouped ? (
-            <div className="space-y-2">
-              <div className="text-xs font-medium">Security audit results</div>
-              <div className="flex flex-wrap gap-2 text-[11px]">
-                <Badge variant="destructive">Critical {securityGrouped.critical.length}</Badge>
-                <Badge variant="secondary">Warn {securityGrouped.warn.length}</Badge>
-                <Badge variant="outline">Info {securityGrouped.info.length}</Badge>
-              </div>
-              <details className="border border-zinc-800 rounded-lg p-3">
-                <summary className="cursor-pointer text-xs text-zinc-300">Raw output</summary>
-                <pre className="mt-2 text-[11px] whitespace-pre-wrap text-zinc-200">{securityOut}</pre>
-              </details>
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 px-4 py-3 text-sm text-sky-100">
+        <span className="font-medium text-white">Default model:</span> Telegram with Sebastian for fast operating conversation, Mission Control for tracking, backlog, drafts, and internal agent collaboration.
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Overnight Inbox */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-1 border-sky-500/20 bg-sky-500/5">
           <CardHeader>
-            <CardTitle className="text-base">Overnight Inbox (since 7am)</CardTitle>
-            <p className="text-xs text-muted-foreground">
-              New items pushed in by the Mac mini poller for quick morning triage.
+            <CardTitle className="text-base">Telegram Bridge</CardTitle>
+            <p className="text-xs text-sky-100/70">
+              Send from Mission Control into Telegram topics. Human replies in Telegram are meant to flow back here.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {!overnightItems ? (
-              <p className="text-xs text-muted-foreground">Loading…</p>
-            ) : overnightItems.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No new items since 9pm.</p>
-            ) : (
-              <div className="space-y-2 max-h-[360px] overflow-auto pr-2">
-                {overnightItems.map((it) => (
-                  <div key={it._id} className="border border-zinc-800 rounded-lg p-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="secondary" className="text-[10px]">{it.source}</Badge>
-                          {it.channel ? (
-                            <Badge variant="outline" className="text-[10px]">ch: {it.channel}</Badge>
-                          ) : null}
-                          {it.topic ? (
-                            <Badge variant="outline" className="text-[10px]">topic: {it.topic}</Badge>
-                          ) : null}
-                          {it.author ? (
-                            <Badge variant="outline" className="text-[10px]">by {it.author}</Badge>
-                          ) : null}
-                          <Badge variant="outline" className="text-[10px]">{formatTime(it.createdAt)}</Badge>
-                        </div>
-                        <div className="mt-2 text-sm whitespace-pre-wrap text-zinc-200">{it.text}</div>
-                        {it.tags?.length ? (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {it.tags.map((t: string) => (
-                              <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="flex flex-col gap-2 shrink-0">
-                        <Button
-                          size="sm"
-                          onClick={async () => {
-                            await overnightPromoteToProjects({
-                              id: it._id,
-                              userId,
-                              status: "backlog",
-                            });
-                          }}
-                        >
-                          Promote to Projects
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={async () => {
-                            await overnightPromoteToPending({
-                              id: it._id,
-                              owner: "corinne",
-                            });
-                          }}
-                        >
-                          Promote to Pending
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={async () => {
-                            await overnightArchive({ id: it._id });
-                          }}
-                        >
-                          Archive
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Pending / Next Up */}
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="text-base">Pending / Next Up</CardTitle>
-            <p className="text-xs text-muted-foreground">
-              A lightweight list of open items to track what needs doing next.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Quick add */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
-              <div className="md:col-span-5 space-y-2">
-                <Label htmlFor="pi-title">Title</Label>
-                <Input
-                  id="pi-title"
-                  value={piTitle}
-                  onChange={(e) => setPiTitle(e.target.value)}
-                  placeholder="e.g. Follow up with Agoura roster"
-                />
-              </div>
-              <div className="md:col-span-3 space-y-2">
-                <Label htmlFor="pi-owner">Owner</Label>
-                <Input
-                  id="pi-owner"
-                  value={piOwner}
-                  onChange={(e) => setPiOwner(e.target.value)}
-                  placeholder="corinne / sebastian / scout"
-                />
-              </div>
-              <div className="md:col-span-4 space-y-2">
-                <Label htmlFor="pi-tags">Tags (comma-separated)</Label>
-                <Input
-                  id="pi-tags"
-                  value={piTags}
-                  onChange={(e) => setPiTags(e.target.value)}
-                  placeholder="aspire, registration"
-                />
-              </div>
-              <div className="md:col-span-12 space-y-2">
-                <Label htmlFor="pi-details">Details (optional)</Label>
-                <Textarea
-                  id="pi-details"
-                  value={piDetails}
-                  onChange={(e) => setPiDetails(e.target.value)}
-                  placeholder="Context, links, what ‘done’ means…"
-                  className="min-h-[70px]"
-                />
-              </div>
-              <div className="md:col-span-12 flex items-center gap-3">
-                <Button onClick={addPendingItem} disabled={piSaving || !piTitle.trim()}>
-                  {piSaving ? "Adding..." : "Add"}
-                </Button>
-                {piError && <p className="text-xs text-red-400">{piError}</p>}
-              </div>
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row md:items-end gap-3">
-              <div className="w-full md:w-[220px] space-y-2">
-                <Label htmlFor="pi-filter-owner">Filter owner</Label>
-                <Input
-                  id="pi-filter-owner"
-                  value={pendingOwnerFilter === "all" ? "" : pendingOwnerFilter}
-                  onChange={(e) => setPendingOwnerFilter(e.target.value.trim() ? e.target.value.trim() : "all")}
-                  placeholder="(blank = all)"
-                />
-              </div>
-              <div className="w-full md:w-[220px] space-y-2">
-                <Label htmlFor="pi-filter-tag">Filter tag</Label>
-                <Input
-                  id="pi-filter-tag"
-                  value={pendingTagFilter}
-                  onChange={(e) => setPendingTagFilter(e.target.value)}
-                  placeholder="e.g. aspire"
-                />
-              </div>
-              <div className="flex items-center gap-2 md:pb-2">
-                <Checkbox
-                  id="pi-include-done"
-                  checked={pendingIncludeDone}
-                  onCheckedChange={(v) => setPendingIncludeDone(Boolean(v))}
-                />
-                <Label htmlFor="pi-include-done" className="text-sm">
-                  Include done
-                </Label>
-              </div>
-            </div>
-
-            {/* List */}
-            <div className="space-y-2 max-h-[360px] overflow-auto pr-2">
-              {!pendingItems ? (
-                <p className="text-xs text-muted-foreground">Loading…</p>
-              ) : pendingItems.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No pending items.</p>
-              ) : (
-                pendingItems.map((item) => (
-                  <div key={item._id} className="border border-zinc-800 rounded-lg p-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-medium text-sm truncate">{item.title}</span>
-                          <Badge variant={item.status === "blocked" ? "destructive" : item.status === "done" ? "secondary" : "outline"} className="text-[10px]">
-                            {item.status}
-                          </Badge>
-                          <Badge variant="outline" className="text-[10px]">
-                            owner: {item.owner}
-                          </Badge>
-                          <Badge variant="outline" className="text-[10px]">
-                            {item.source}
-                          </Badge>
-                        </div>
-                        {item.details && (
-                          <div className="mt-2 text-sm whitespace-pre-wrap text-zinc-200">{item.details}</div>
-                        )}
-                        {item.tags?.length ? (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {item.tags.map((t: string) => (
-                              <Badge key={t} variant="secondary" className="text-[10px]">
-                                {t}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="flex flex-col gap-2 shrink-0">
-                        {item.status !== "done" && (
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={() => setPendingItemStatus({ id: item._id, status: "done" })}
-                          >
-                            Mark done
-                          </Button>
-                        )}
-                        {item.status !== "blocked" && item.status !== "done" && (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => setPendingItemStatus({ id: item._id, status: "blocked" })}
-                          >
-                            Block
-                          </Button>
-                        )}
-                        {item.status === "blocked" && (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => setPendingItemStatus({ id: item._id, status: "open" })}
-                          >
-                            Unblock
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Send */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base">Quick Send</CardTitle>
             <div className="flex flex-wrap gap-2 mt-2">
               {TOPICS.map((t) => (
                 <Button
@@ -682,8 +324,8 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Type a message to send into the Agent HQ Telegram topics..."
-              className="min-h-[140px]"
+              placeholder="Send from Mission Control to a Telegram topic. Example: TEST bridge please reply 'got it'"
+              className="min-h-[180px] border-sky-500/20 bg-zinc-950/80"
             />
             <div className="flex items-center gap-3">
               <Button onClick={send} disabled={sending || !text.trim()}>
@@ -694,19 +336,65 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
             {sendError && <p className="text-xs text-red-400">{sendError}</p>}
             {sendOk && <p className="text-xs text-green-500">{sendOk}</p>}
             <p className="text-xs text-muted-foreground">
-              This queues a Telegram send. The Mac mini poller delivers it via OpenClaw.
+              This is the only Mission Control composer that sends to Telegram.
             </p>
           </CardContent>
         </Card>
 
-        {/* What's happening */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 border-emerald-500/20 bg-emerald-500/5">
           <CardHeader>
-            <CardTitle className="text-base">Whats happening</CardTitle>
+            <CardTitle className="text-base">Recent bridge activity</CardTitle>
+            <p className="text-xs text-emerald-100/70">
+              Outbound messages queued for Telegram and their delivery status.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-[520px] overflow-auto pr-2">
+              {!recentOutbox ? (
+                <p className="text-xs text-muted-foreground">Loading…</p>
+              ) : recentOutbox.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No recent bridge messages.</p>
+              ) : (
+                recentOutbox.map((m) => (
+                  <div key={m._id} className="border border-zinc-800 rounded-lg p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-400">
+                        <Badge variant="outline" className="text-[10px]">topic: {m.topic}</Badge>
+                        {m.deliveredThreadId ? <Badge variant="outline" className="text-[10px]">thread: {m.deliveredThreadId}</Badge> : null}
+                        <span>{formatTime(m.createdAt)}</span>
+                      </div>
+                      <Badge
+                        variant={m.status === "failed" ? "destructive" : m.status === "sent" ? "secondary" : "outline"}
+                        className="text-[10px]"
+                      >
+                        {m.status}
+                      </Badge>
+                    </div>
+                    <div className="mt-2 text-sm whitespace-pre-wrap">{m.text}</div>
+                    <div className="mt-2 text-[11px] text-muted-foreground">
+                      {m.status === "sent"
+                        ? `Delivered${m.sentAt ? ` at ${formatTime(m.sentAt)}` : ""}${m.deliveredAccountId ? ` via ${m.deliveredAccountId}` : ""}`
+                        : m.status === "failed"
+                          ? m.error || "Send failed"
+                          : "Queued for Mac mini poller"}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-1 border-violet-500/20 bg-violet-500/5">
+          <CardHeader>
+            <CardTitle className="text-base">Recent internal huddle</CardTitle>
+            <p className="text-xs text-violet-100/70">
+              Actual agent conversation inside Mission Control.
+            </p>
           </CardHeader>
           <CardContent className="space-y-3">
             <Tabs value={feedChannel} onValueChange={(v) => setFeedChannel(v as ChannelKey)}>
-              <TabsList className="flex flex-wrap h-auto">
+              <TabsList className="flex flex-wrap h-auto border border-violet-500/10 bg-violet-950/30">
                 {CHANNELS.map((c) => (
                   <TabsTrigger key={c.key} value={c.key} className="text-xs">
                     {c.label}
@@ -715,7 +403,7 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
               </TabsList>
               {CHANNELS.map((c) => (
                 <TabsContent key={c.key} value={c.key}>
-                  <div className="space-y-3 max-h-[460px] overflow-auto pr-2">
+                  <div className="space-y-3 max-h-[520px] overflow-auto pr-2">
                     {feedItems.length === 0 ? (
                       <p className="text-xs text-muted-foreground">No recent messages.</p>
                     ) : (
@@ -732,6 +420,11 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
                             </Badge>
                           </div>
                           <div className="mt-2 text-sm whitespace-pre-wrap">{m.message}</div>
+                          {m.source === "telegram" ? (
+                            <div className="mt-2 text-[11px] text-blue-300">
+                              From Telegram{m.sourceAuthor ? ` by ${m.sourceAuthor}` : ""}
+                            </div>
+                          ) : null}
                         </div>
                       ))
                     )}
@@ -741,43 +434,8 @@ export function AgentHQ({ userId }: { userId: Id<"users"> }) {
             </Tabs>
           </CardContent>
         </Card>
-
-        {/* Pings */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base">Pings for you</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 max-h-[560px] overflow-auto pr-2">
-              {pings.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No @corinne mentions in recent huddle.</p>
-              ) : (
-                pings.map((m) => (
-                  <div key={m._id} className="border border-zinc-800 rounded-lg p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-xs text-zinc-300">
-                        <span className="font-medium">{m.agent}</span>
-                        <span className="text-zinc-500">  </span>
-                        <span className="text-zinc-500">{formatTime(m.createdAt)}</span>
-                      </div>
-                      <Badge variant="outline" className="text-[10px]">
-                        {m.channel || "main"}
-                      </Badge>
-                    </div>
-                    <div className="mt-2 text-sm whitespace-pre-wrap">{m.message}</div>
-                    {(m.deliveredToTopic || m.deliveredAt) && (
-                      <div className="mt-2 text-[11px] text-muted-foreground">
-                        Delivered{m.deliveredToTopic ? ` to ${m.deliveredToTopic}` : ""}
-                        {m.deliveredAt ? ` at ${formatTime(m.deliveredAt)}` : ""}
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
     </div>
   );
 }

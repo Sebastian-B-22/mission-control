@@ -37,10 +37,12 @@ export default function CampAdminPage() {
   const formatDays = (sessions: any) => {
     const parts: string[] = [];
     const weekNames: Record<string, string> = {
-      "week1": "W1 (Jun 16-20)",
-      "week2": "W2 (Jun 23-27)",
-      "week3": "W3 (Jul 14-18)",
-      "week4": "W4 (Jul 21-25)",
+      "week1": "A1 (Jun 22-26)",
+      "week2": "A2 (Jul 6-10)",
+      "week3": "A3 (Jul 20-24)",
+      "week4": "A4 (Jul 27-31)",
+      "week5": "P1 (TBD)",
+      "week6": "P2 (TBD)",
     };
     
     for (const [wk, sess] of Object.entries(sessions || {})) {

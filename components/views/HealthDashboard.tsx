@@ -31,12 +31,16 @@ import {
   Trophy,
   Calendar,
   Droplet,
+  Dumbbell,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BioMapView } from "./BioMapView";
+import { WorkoutTrackerTab } from "./WorkoutTrackerTab";
 
 interface HealthDashboardProps {
   userId: Id<"users">;
+  initialTab?: "daily" | "strength" | "biomap";
+  onTabChange?: (tab: "daily" | "strength" | "biomap") => void;
 }
 
 // Get color based on score - matches Don't Die color scheme
@@ -241,7 +245,7 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
   );
 }
 
-export function HealthDashboard({ userId }: HealthDashboardProps) {
+export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: HealthDashboardProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [stepsInput, setStepsInput] = useState("");
@@ -323,17 +327,33 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
     return `${h}h${m > 0 ? `${m}m` : ''}`;
   };
 
-  const [activeTab, setActiveTab] = useState("daily");
+  const [activeTab, setActiveTab] = useState<"daily" | "strength" | "biomap">(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   return (
     <div className="space-y-6">
       {/* Header with Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => {
+          const tab = value as "daily" | "strength" | "biomap";
+          setActiveTab(tab);
+          onTabChange?.(tab);
+        }}
+        className="w-full"
+      >
         <div className="flex items-center justify-between mb-4">
           <TabsList className="bg-zinc-800">
             <TabsTrigger value="daily" className="data-[state=active]:bg-purple-600">
               <Heart className="h-4 w-4 mr-2" />
               Daily Health
+            </TabsTrigger>
+            <TabsTrigger value="strength" className="data-[state=active]:bg-amber-500 data-[state=active]:text-zinc-950">
+              <Dumbbell className="h-4 w-4 mr-2" />
+              Strength
             </TabsTrigger>
             <TabsTrigger value="biomap" className="data-[state=active]:bg-emerald-600">
               <Droplet className="h-4 w-4 mr-2" />
@@ -695,6 +715,10 @@ export function HealthDashboard({ userId }: HealthDashboardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="strength">
+          <WorkoutTrackerTab userId={userId} />
         </TabsContent>
 
         {/* BioMap Tab */}

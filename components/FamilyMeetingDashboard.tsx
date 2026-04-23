@@ -23,6 +23,90 @@ function startOfWeekSunday(date = new Date()) {
   return d.toISOString().split("T")[0];
 }
 
+type MovieMeta = {
+  posterUrl?: string;
+  year?: string;
+  rating?: string;
+};
+
+async function fetchMovieMeta(title: string): Promise<MovieMeta> {
+  const res = await fetch(`/api/movie-meta?title=${encodeURIComponent(title)}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Movie lookup failed for ${title}`);
+  }
+
+  return res.json();
+}
+
+function MovieCard({
+  movie,
+  meta,
+  onVote,
+  onMarkWatched,
+}: {
+  movie: any;
+  meta?: MovieMeta;
+  onVote?: () => void;
+  onMarkWatched?: () => void;
+}) {
+  return (
+    <div className="border rounded-lg p-3">
+      <div className="flex gap-3">
+        {meta?.posterUrl ? (
+          <img
+            src={meta.posterUrl}
+            alt={`${movie.title} poster`}
+            className="h-24 w-16 rounded object-cover border shrink-0"
+          />
+        ) : (
+          <div className="h-24 w-16 rounded border shrink-0 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xl">
+            🎬
+          </div>
+        )}
+
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="font-medium leading-tight">{movie.title}</p>
+              <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                {meta?.year && <span className="rounded-full border px-2 py-0.5">{meta.year}</span>}
+                {(meta?.rating || movie.rating) && (
+                  <span className="rounded-full border px-2 py-0.5">
+                    {meta?.rating || `${movie.rating}/5`}
+                  </span>
+                )}
+                {movie.rating && meta?.rating && (
+                  <span className="rounded-full border px-2 py-0.5">Family {movie.rating}/5</span>
+                )}
+                {movie.favorite ? <span className="rounded-full border px-2 py-0.5">⭐ Favorite</span> : null}
+              </div>
+            </div>
+            {movie.type === "suggestion" ? (
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{movie.votes.length} votes</span>
+            ) : null}
+          </div>
+
+          <div className="text-xs text-muted-foreground space-y-1">
+            {movie.watchedOn ? <p>Watched {movie.watchedOn}</p> : null}
+            {movie.notes ? <p>{movie.notes}</p> : null}
+          </div>
+
+          {movie.type === "suggestion" ? (
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button size="sm" variant="outline" onClick={onVote}>Vote</Button>
+              <Button size="sm" onClick={onMarkWatched}>Mark Watched</Button>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function FamilyMeetingDashboard({ userId, section }: Props) {
   const today = new Date().toISOString().split("T")[0];
   const weekOf = startOfWeekSunday();
@@ -53,6 +137,9 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
   const [gameName, setGameName] = useState("");
   const [gameWinner, setGameWinner] = useState(defaultMembers[0]);
   const [gameMoment, setGameMoment] = useState("");
+  const [showSuggestedMovies, setShowSuggestedMovies] = useState(false);
+  const [showWatchedMovies, setShowWatchedMovies] = useState(false);
+  const [movieMeta, setMovieMeta] = useState<Record<string, MovieMeta>>({});
 
   const familyMembers = meeting?.familyMembers || defaultMembers;
 
@@ -66,6 +153,41 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
   const suggestions = movieItems.filter((m: any) => m.type === "suggestion");
   const watched = movieItems.filter((m: any) => m.type === "watched");
   const activeQueue = discussionQueue.filter((q: any) => q.status !== "archived");
+
+  useEffect(() => {
+    let cancelled = false;
+    const titles = Array.from(new Set(movieItems.map((movie: any) => movie.title).filter(Boolean)));
+    const missingTitles = titles.filter((title) => !movieMeta[title]);
+
+    if (missingTitles.length === 0) return;
+
+    const loadMovieMeta = async () => {
+      const updates = await Promise.all(
+        missingTitles.map(async (title) => {
+          try {
+            return [title, await fetchMovieMeta(title)] as const;
+          } catch {
+            return [title, {}] as const;
+          }
+        })
+      );
+
+      if (cancelled) return;
+
+      setMovieMeta((current) => {
+        const next = { ...current };
+        for (const [title, meta] of updates) {
+          next[title] = meta;
+        }
+        return next;
+      });
+    };
+
+    loadMovieMeta();
+    return () => {
+      cancelled = true;
+    };
+  }, [movieItems, movieMeta]);
 
   const meetingDoc = useMemo(() => {
     return {
@@ -91,10 +213,8 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
     });
   };
 
-  // Helper to determine which sections to show
   const showSection = (sectionName: string) => !section || section === sectionName;
-  
-  // Section titles for sub-views
+
   const sectionTitles: Record<string, string> = {
     acknowledgements: "💝 Acknowledgements & Shout-Outs",
     discussion: "💬 Discussion Queue",
@@ -261,7 +381,7 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
             <CardTitle className="text-purple-400">🎬 Friday Movie Nights</CardTitle>
             <CardDescription>Suggestions, voting, watched history.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <div className="grid gap-2 sm:grid-cols-2">
               <Input value={movieTitle} onChange={(e) => setMovieTitle(e.target.value)} placeholder="Movie suggestion" />
               <Select value={movieBy} onValueChange={setMovieBy}>
@@ -274,19 +394,47 @@ export function FamilyMeetingDashboard({ userId, section }: Props) {
               await addMovieSuggestion({ userId, title: movieTitle.trim(), suggestedBy: movieBy });
               setMovieTitle("");
             }}>Add Movie</Button>
-            <div className="space-y-2">
-              {suggestions.map((m: any) => (
-                <div key={m._id} className="border rounded p-2 text-sm space-y-2">
-                  <div className="flex items-center justify-between"><span>{m.title}</span><span>{m.votes.length} votes</span></div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => voteMovie({ id: m._id, voter: "Corinne" })}>Vote</Button>
-                    <Button size="sm" onClick={() => markMovieWatched({ id: m._id, rating: 5, notes: "Great family pick", favorite: false })}>Mark Watched</Button>
-                  </div>
+
+            <div className="space-y-3">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between rounded-lg border px-3 py-2 text-left"
+                onClick={() => setShowSuggestedMovies((open) => !open)}
+              >
+                <span className="font-medium">Suggested movies to watch ({suggestions.length})</span>
+                <span className="text-muted-foreground">{showSuggestedMovies ? "▾" : "▸"}</span>
+              </button>
+
+              {showSuggestedMovies && (
+                <div className="space-y-3">
+                  {suggestions.length ? suggestions.map((m: any) => (
+                    <MovieCard
+                      key={m._id}
+                      movie={m}
+                      meta={movieMeta[m.title]}
+                      onVote={() => voteMovie({ id: m._id, voter: "Corinne" })}
+                      onMarkWatched={() => markMovieWatched({ id: m._id, rating: 5, notes: "Great family pick", favorite: false })}
+                    />
+                  )) : <p className="text-sm text-muted-foreground">No suggested movies yet.</p>}
                 </div>
-              ))}
-              {watched.slice(0, 4).map((m: any) => (
-                <div key={m._id} className="border rounded p-2 text-xs text-muted-foreground">Watched: {m.title} {m.rating ? `• ${m.rating}/5` : ""} {m.favorite ? "⭐" : ""}</div>
-              ))}
+              )}
+
+              <button
+                type="button"
+                className="w-full flex items-center justify-between rounded-lg border px-3 py-2 text-left"
+                onClick={() => setShowWatchedMovies((open) => !open)}
+              >
+                <span className="font-medium">Movies we&apos;ve watched ({watched.length})</span>
+                <span className="text-muted-foreground">{showWatchedMovies ? "▾" : "▸"}</span>
+              </button>
+
+              {showWatchedMovies && (
+                <div className="space-y-3">
+                  {watched.length ? watched.map((m: any) => (
+                    <MovieCard key={m._id} movie={m} meta={movieMeta[m.title]} />
+                  )) : <p className="text-sm text-muted-foreground">No watched movies yet.</p>}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>}
