@@ -267,7 +267,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       ]
     },
     {
-      name: "Agent Ops",
+      name: "Huddle",
       icon: Users,
       view: "agent-huddle-main",
       expandable: true,

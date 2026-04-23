@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
-import { ArrowRight, Calendar, ClipboardList, MessageSquare, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
 
 interface AspireOverviewProps {
   userId: Id<"users">;
@@ -222,37 +222,6 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
     },
   ];
 
-  const workflow = [
-    {
-      title: "1. Watch registrations by location",
-      detail: "Agoura and Pali need separate numbers at a glance so demand and urgency are obvious.",
-      icon: Users,
-      tone: "border-cyan-400/25 bg-gradient-to-br from-cyan-500/18 via-sky-500/10 to-slate-950",
-      iconTone: "text-cyan-200",
-    },
-    {
-      title: "2. Turn signups into rosters",
-      detail: "Group kids by age and slot, handle exceptions, and expose what still breaks placement.",
-      icon: ClipboardList,
-      tone: "border-amber-400/25 bg-gradient-to-br from-amber-500/18 via-orange-500/10 to-slate-950",
-      iconTone: "text-amber-200",
-    },
-    {
-      title: "3. Staff the week",
-      detail: "Confirm coach coverage, cert status, and schedule gaps before they become parent problems.",
-      icon: ShieldCheck,
-      tone: "border-emerald-400/25 bg-gradient-to-br from-emerald-500/18 via-teal-500/10 to-slate-950",
-      iconTone: "text-emerald-200",
-    },
-    {
-      title: "4. Communicate clearly",
-      detail: "Use clean program and location data so parent communication is specific and trustworthy.",
-      icon: MessageSquare,
-      tone: "border-violet-400/25 bg-gradient-to-br from-violet-500/18 via-fuchsia-500/10 to-slate-950",
-      iconTone: "text-violet-200",
-    },
-  ];
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -281,26 +250,47 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-zinc-800 bg-zinc-950/80 shadow-[0_0_30px_rgba(34,211,238,0.04)]">
+      <Card className="border-rose-400/30 bg-gradient-to-br from-rose-500/16 via-red-500/10 to-zinc-950 shadow-[0_0_30px_rgba(244,63,94,0.05)]">
         <CardHeader className="pb-3">
-          <CardTitle>How this section should flow</CardTitle>
-          <CardDescription>
-            Aspire works better when the information follows the real business rhythm instead of forcing everything into one generic bucket.
+          <CardTitle className="text-white">What needs attention first</CardTitle>
+          <CardDescription className="text-zinc-300">
+            The most urgent open items across Aspire right now.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {workflow.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.title} className={`rounded-2xl border p-4 ${item.tone}`}>
-                <div className="flex items-center gap-2 mb-3">
-                  <Icon className={`h-4 w-4 ${item.iconTone}`} />
-                  <h3 className="font-semibold">{item.title}</h3>
+        <CardContent>
+          {urgentTasks.length === 0 ? (
+            <div className="rounded-xl border border-white/8 bg-black/25 p-4 text-sm text-zinc-200">No open Aspire tasks right now. Nice.</div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {urgentTasks.map((task: any) => (
+                <div
+                  key={task._id}
+                  className="flex flex-col gap-2 rounded-xl border border-white/8 bg-black/25 p-3"
+                >
+                  <div>
+                    <div className="font-medium text-white">{task.title}</div>
+                    <div className="text-sm text-zinc-300">
+                      {SUBPROJECT_LABELS[task.subProject] || task.subProject}
+                      {task.assignedTo?.name ? ` · ${task.assignedTo.name}` : " · Unassigned"}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <Badge variant={task.priority === "high" ? "destructive" : "outline"}>
+                      {task.priority}
+                    </Badge>
+                    {task.dueDate ? (
+                      <Badge variant="outline">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {task.dueDate}
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">No due date</Badge>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-slate-200/75">{item.detail}</p>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -336,59 +326,13 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr] items-start">
-        <ProjectTaskList
-          userId={userId}
-          project="aspire"
-          subProject="ops"
-          title="Aspire task log"
-          description="Drop anything here that needs done across Aspire before sorting it into a more specific lane."
-        />
-
-        <Card className="border-rose-400/30 bg-gradient-to-br from-rose-500/16 via-red-500/10 to-zinc-950 shadow-[0_0_30px_rgba(244,63,94,0.05)]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white">What needs attention first</CardTitle>
-            <CardDescription className="text-zinc-300">
-              The most urgent open items across Aspire right now.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {urgentTasks.length === 0 ? (
-              <div className="rounded-xl border border-white/8 bg-black/25 p-4 text-sm text-zinc-200">No open Aspire tasks right now. Nice.</div>
-            ) : (
-              <div className="space-y-3">
-                {urgentTasks.map((task: any) => (
-                  <div
-                    key={task._id}
-                    className="flex flex-col gap-2 rounded-xl border border-white/8 bg-black/25 p-3"
-                  >
-                    <div>
-                      <div className="font-medium text-white">{task.title}</div>
-                      <div className="text-sm text-zinc-300">
-                        {SUBPROJECT_LABELS[task.subProject] || task.subProject}
-                        {task.assignedTo?.name ? ` · ${task.assignedTo.name}` : " · Unassigned"}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                      <Badge variant={task.priority === "high" ? "destructive" : "outline"}>
-                        {task.priority}
-                      </Badge>
-                      {task.dueDate ? (
-                        <Badge variant="outline">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {task.dueDate}
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">No due date</Badge>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <ProjectTaskList
+        userId={userId}
+        project="aspire"
+        subProject="ops"
+        title="Aspire task log"
+        description="Drop anything here that needs done across Aspire before sorting it into a more specific lane."
+      />
     </div>
   );
 }
