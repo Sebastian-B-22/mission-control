@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 type OpenClawCronList = {
   jobs?: Array<{
@@ -42,6 +41,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const convex = getConvexHttpClient();
 
     const jobs = body.jobs.map((j) => {
       const expr = j.schedule?.kind === "cron" ? j.schedule?.expr : undefined;

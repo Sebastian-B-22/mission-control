@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET() {
   const { userId: clerkId } = await auth();
   if (!clerkId) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }
+
+  const convex = getConvexHttpClient();
 
   // Make sure user exists in Convex
   let u = await convex.query(api.users.getUserByClerkId, { clerkId });

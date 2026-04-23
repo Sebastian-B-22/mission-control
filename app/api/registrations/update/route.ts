@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 /**
  * POST /api/registrations/update
@@ -47,6 +46,8 @@ export async function POST(request: NextRequest) {
     }
     
     // Call Convex mutation
+    const convex = getConvexHttpClient();
+
     const result = await convex.mutation(api.registrations.bulkUpdateCounts, {
       counts: body.counts,
     });

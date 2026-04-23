@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 import { api } from "@/convex/_generated/api";
 
 
@@ -10,7 +10,6 @@ const REDIRECT_URI = process.env.NODE_ENV === "production"
   ? "https://mission-control-kappa-peach.vercel.app/api/auth/whoop/callback"
   : "http://localhost:3000/api/auth/whoop/callback";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(request: Request) {
   console.log("WHOOP callback hit:", request.url);
@@ -76,6 +75,8 @@ export async function GET(request: Request) {
     console.log("WHOOP tokens received, expires_in:", tokens.expires_in, "scope:", tokens.scope);
 
     // Store tokens in Convex
+    const convex = getConvexHttpClient();
+
     await convex.mutation(api.health.storeWhoopTokens, {
       clerkId: userId,
       accessToken: tokens.access_token,
