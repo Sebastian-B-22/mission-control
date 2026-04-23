@@ -137,6 +137,14 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     return currentView === item.view || (item.section && currentView.startsWith(item.section));
   };
 
+  const isChildActive = (child: any) => {
+    if (child.activeViews) {
+      return child.activeViews.includes(currentView);
+    }
+
+    return currentView === child.view;
+  };
+
   const navigation = [
     {
       name: "Daily",
@@ -267,7 +275,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       ]
     },
     {
-      name: "Huddle",
+      name: "Agent Ops",
       icon: Users,
       view: "agent-huddle-main",
       expandable: true,
@@ -282,15 +290,9 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Training", view: "agent-learnings" },
         { name: "Engagement", view: "engagement-habits" },
         { type: "label", name: "Admin" },
+        { name: "Huddle", view: "agent-huddle-main", activeViews: ["agent-huddle-main", "agent-huddle-aspire-ops", "agent-huddle-hta-launch", "agent-huddle-family", "agent-huddle-ideas", "agent-huddle-overnight", "agent-huddle-joy-support"] },
         { name: "Telegram Bridge", view: "agent-hq" },
         { name: "AI Costs", view: "cost-tracker" },
-        { name: "General", view: "agent-huddle-main" },
-        { name: "Operations", view: "agent-huddle-aspire-ops" },
-        { name: "Marketing", view: "agent-huddle-hta-launch" },
-        { name: "Family", view: "agent-huddle-family" },
-        { name: "Ideas", view: "agent-huddle-ideas" },
-        { name: "Overnight", view: "agent-huddle-overnight" },
-        { name: "Joy Support", view: "agent-huddle-joy-support" },
         { name: "Memory Search", view: "memory" },
         { name: "Memory Panel", view: "memory-panel" },
       ]
@@ -393,7 +395,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                             }
                             setIsOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${getChildTone(item.section, child.view, currentView === child.view)}`}
+                          className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${getChildTone(item.section, child.view, isChildActive(child))}`}
                         >
                           <div className="flex items-center gap-2">
                             <ChevronRight className="h-3 w-3" />
