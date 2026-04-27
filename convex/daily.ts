@@ -11,6 +11,7 @@ export const saveFiveToThrive = mutation({
         text: v.string(),
         completed: v.boolean(),
         categoryId: v.optional(v.id("rpmCategories")),
+        sourceWeeklyGoalId: v.optional(v.id("weeklyGoals")),
         completedAt: v.optional(v.number()),
       })
     ),
@@ -86,6 +87,7 @@ export const updateFiveToThriveTasks = mutation({
         text: v.string(),
         completed: v.boolean(),
         categoryId: v.optional(v.id("rpmCategories")),
+        sourceWeeklyGoalId: v.optional(v.id("weeklyGoals")),
         completedAt: v.optional(v.number()),
       })
     ),

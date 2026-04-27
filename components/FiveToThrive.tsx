@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2 } from "lucide-react";
+import { CalendarPlus, Plus, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { groupByCategory } from "@/lib/groupByCategory";
@@ -18,9 +18,32 @@ interface FiveToThriveProps {
   date: string; // YYYY-MM-DD format
 }
 
+function startOfWeekMondayFromDateKey(dateKey: string): Date {
+  const d = new Date(`${dateKey}T00:00:00`);
+  const diff = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function toDateKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function mondayDayIndex(dateKey: string): number {
+  const d = new Date(`${dateKey}T00:00:00`);
+  return (d.getDay() + 6) % 7;
+}
+
 export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   const [newTask, setNewTask] = useState("");
+  const [selectedWeeklyGoalId, setSelectedWeeklyGoalId] = useState<string>("none");
   const [selectedCategoryId, setSelectedCategoryId] = useState<Id<"rpmCategories"> | undefined>(undefined);
+  const weekOf = useMemo(() => toDateKey(startOfWeekMondayFromDateKey(date)), [date]);
+  const dayIndex = useMemo(() => mondayDayIndex(date), [date]);
 
   // Query
   const fiveToThrive = useQuery(api.daily.getFiveToThrive, {
@@ -29,12 +52,24 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
   });
   const rpmCategoriesQuery = useQuery(api.rpm.getCategoriesByUser, { userId });
   const rpmCategories = useMemo(() => rpmCategoriesQuery ?? [], [rpmCategoriesQuery]);
+  const weeklyGoals = useQuery(api.weeklyGoals.listByWeek, { userId, weekOf }) || [];
 
   // Mutations
   const saveFiveToThrive = useMutation(api.daily.saveFiveToThrive);
   const toggleTask = useMutation(api.daily.toggleFiveToThriveTask);
 
   const tasks = fiveToThrive?.tasks || [];
+  const selectableWeeklyGoals = useMemo(() => {
+    const alreadyAdded = new Set(tasks.map((task: any) => task.sourceWeeklyGoalId).filter(Boolean));
+    return weeklyGoals
+      .filter((goal: any) => !goal.done && !alreadyAdded.has(goal._id))
+      .sort((a: any, b: any) => {
+        const aToday = a.scheduledDay === dayIndex ? 0 : 1;
+        const bToday = b.scheduledDay === dayIndex ? 0 : 1;
+        const important = Number(Boolean(b.important)) - Number(Boolean(a.important));
+        return aToday - bToday || important || a.order - b.order;
+      });
+  }, [weeklyGoals, tasks, dayIndex]);
   // Group tasks by category for display
   const tasksWithIndex = useMemo(
     () => tasks.map((task: any, index: number) => ({ ...task, originalIndex: index })),
@@ -65,6 +100,28 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
       setNewTask("");
       setSelectedCategoryId(undefined);
     }
+  };
+
+  const handleAddWeeklyGoal = async () => {
+    if (selectedWeeklyGoalId === "none" || tasks.length >= 5) return;
+    const goal = weeklyGoals.find((g: any) => g._id === selectedWeeklyGoalId);
+    if (!goal) return;
+
+    await saveFiveToThrive({
+      userId,
+      date,
+      tasks: [
+        ...tasks,
+        {
+          text: goal.text,
+          completed: false,
+          categoryId: goal.categoryId,
+          sourceWeeklyGoalId: goal._id,
+        },
+      ],
+    });
+
+    setSelectedWeeklyGoalId("none");
   };
 
   const handleToggleTask = async (index: number) => {
@@ -126,8 +183,29 @@ export function FiveToThrive({ userId, date }: FiveToThriveProps) {
         {tasks.length < 5 && (
           <div className="space-y-2">
             <div className="flex gap-2">
+              <Select value={selectedWeeklyGoalId} onValueChange={setSelectedWeeklyGoalId}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Pull from this week's goals" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Select from weekly goals...</SelectItem>
+                  {selectableWeeklyGoals.map((goal: any) => (
+                    <SelectItem key={goal._id} value={goal._id}>
+                      {goal.important ? "⭐ " : ""}
+                      {goal.scheduledDay === dayIndex ? "Today - " : goal.scheduledDay === undefined ? "Any - " : ""}
+                      {goal.text}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button onClick={handleAddWeeklyGoal} size="sm" variant="outline" disabled={selectedWeeklyGoalId === "none"}>
+                <CalendarPlus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+            <div className="flex gap-2">
               <Input
-                placeholder="Add your must-do for today..."
+                placeholder="Or type a must-do that came up today..."
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
                 onKeyPress={handleKeyPress}

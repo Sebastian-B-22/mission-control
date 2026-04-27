@@ -80,6 +80,7 @@ export default defineSchema({
         text: v.string(),
         completed: v.boolean(),
         categoryId: v.optional(v.id("rpmCategories")),
+        sourceWeeklyGoalId: v.optional(v.id("weeklyGoals")),
         completedAt: v.optional(v.number()),
       })
     ),
@@ -1417,6 +1418,7 @@ export default defineSchema({
     text: v.string(),
     categoryId: v.optional(v.id("rpmCategories")),
     scheduledDay: v.optional(v.number()), // 0=Mon, 1=Tue, ... 6=Sun; undefined = unscheduled
+    important: v.optional(v.boolean()), // Friday Finisher / must-win marker
     done: v.boolean(),
     order: v.number(),
     createdAt: v.number(),

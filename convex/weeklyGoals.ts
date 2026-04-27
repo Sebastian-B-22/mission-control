@@ -20,6 +20,7 @@ export const add = mutation({
     text: v.string(),
     categoryId: v.optional(v.id("rpmCategories")),
     scheduledDay: v.optional(v.number()), // 0=Mon, 1=Tue, ... 6=Sun
+    important: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -36,6 +37,7 @@ export const add = mutation({
       text: args.text,
       categoryId: args.categoryId,
       scheduledDay: args.scheduledDay,
+      important: args.important ?? false,
       done: false,
       order: maxOrder + 1,
       createdAt: now,
@@ -87,6 +89,13 @@ export const toggleDone = mutation({
   args: { goalId: v.id("weeklyGoals"), done: v.boolean() },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.goalId, { done: args.done, updatedAt: Date.now() });
+  },
+});
+
+export const toggleImportant = mutation({
+  args: { goalId: v.id("weeklyGoals"), important: v.boolean() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.goalId, { important: args.important, updatedAt: Date.now() });
   },
 });
 
