@@ -6,7 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, Flame, Moon, Footprints, Zap } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface HealthWidgetProps {
   userId: Id<"users">;
@@ -162,7 +162,12 @@ function WeekPreview({ userId }: { userId: Id<"users"> }) {
 
 export function HealthWidget({ userId }: HealthWidgetProps) {
   const [syncing, setSyncing] = useState(false);
+  const today = useMemo(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  }, []);
   const monthStats = useQuery(api.health.getMonthStats, { userId });
+  const latestHealth = useQuery(api.health.getLatestHealthOnOrBefore, { userId, date: today });
   const isWhoopConnected = useQuery(api.health.isWhoopConnected, { userId });
   const healthGoals = useQuery(api.health.getHealthGoals, { userId });
 
@@ -208,6 +213,18 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
     return `${h}h${m > 0 ? `${m}m` : ''}`;
   };
 
+  const displayHealth = latestHealth && (!monthStats.todayScore || monthStats.todayScore === 0)
+    ? latestHealth
+    : null;
+  const displayScore = displayHealth?.healthScore ?? monthStats.todayScore;
+  const displaySleep = displayHealth?.sleepHours ?? monthStats.todaySleep;
+  const displaySteps = displayHealth?.steps ?? monthStats.todaySteps;
+  const displayCalories = displayHealth?.activeCalories ?? monthStats.todayCalories;
+  const isShowingLatest = Boolean(displayHealth && displayHealth.date !== today);
+  const latestDateLabel = displayHealth
+    ? new Date(`${displayHealth.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
+    : null;
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -215,6 +232,9 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
           <div className="flex items-center gap-2">
             <Heart className="h-5 w-5 text-purple-400" />
             Health Score
+            {isShowingLatest && latestDateLabel ? (
+              <span className="text-xs font-normal text-zinc-500">Latest: {latestDateLabel}</span>
+            ) : null}
           </div>
           {/* Whoop syncs automatically via Open Wearables - no manual connection needed */}
           <Button
@@ -235,7 +255,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
 
         {/* Hero Score Ring */}
         <div className="flex justify-center mb-4">
-          <ScoreRing score={monthStats.todayScore} size={140} />
+          <ScoreRing score={displayScore} size={140} />
         </div>
 
         {/* Three Metric Pills */}
@@ -243,7 +263,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
           {/* Sleep Pill - gold when goal met */}
           {(() => {
             const sleepGoal = healthGoals?.sleepGoalHours ?? 7;
-            const isComplete = (monthStats.todaySleep ?? 0) >= sleepGoal;
+            const isComplete = (displaySleep ?? 0) >= sleepGoal;
             return (
               <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
                 isComplete 
@@ -252,7 +272,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
               }`}>
                 <Moon className={`h-4 w-4 ${isComplete ? 'text-yellow-400' : 'text-blue-400'}`} />
                 <span className="text-sm text-zinc-100 font-medium">
-                  {monthStats.todaySleep ? formatSleep(monthStats.todaySleep) : '0h'}
+                  {displaySleep ? formatSleep(displaySleep) : '0h'}
                   <span className={isComplete ? 'text-yellow-400/70 ml-1' : 'text-zinc-500 ml-1'}>
                     /{sleepGoal}h
                   </span>
@@ -264,7 +284,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
           {/* Steps Pill - gold when goal met */}
           {(() => {
             const stepsGoal = healthGoals?.stepsGoal ?? 3500;
-            const isComplete = (monthStats.todaySteps ?? 0) >= stepsGoal;
+            const isComplete = (displaySteps ?? 0) >= stepsGoal;
             return (
               <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
                 isComplete 
@@ -273,7 +293,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
               }`}>
                 <Footprints className={`h-4 w-4 ${isComplete ? 'text-yellow-400' : 'text-purple-400'}`} />
                 <span className="text-sm text-zinc-100 font-medium">
-                  {monthStats.todaySteps ? Math.round(monthStats.todaySteps / 1000) : 0}
+                  {displaySteps ? Math.round(displaySteps / 1000) : 0}
                   <span className={isComplete ? 'text-yellow-400/70 ml-0.5' : 'text-zinc-500 ml-0.5'}>K</span>
                   <span className={isComplete ? 'text-yellow-400/70 ml-1' : 'text-zinc-500 ml-1'}>
                     /{Math.round(stepsGoal / 1000)}K
@@ -286,7 +306,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
           {/* Calories Pill - gold when goal met */}
           {(() => {
             const caloriesGoal = healthGoals?.caloriesGoal ?? 350;
-            const isComplete = (monthStats.todayCalories ?? 0) >= caloriesGoal;
+            const isComplete = (displayCalories ?? 0) >= caloriesGoal;
             return (
               <div className={`flex items-center gap-2 px-3 py-2 rounded-full border ${
                 isComplete 
@@ -295,7 +315,7 @@ export function HealthWidget({ userId }: HealthWidgetProps) {
               }`}>
                 <Flame className={`h-4 w-4 ${isComplete ? 'text-yellow-400' : 'text-orange-400'}`} />
                 <span className="text-sm text-zinc-100 font-medium">
-                  {monthStats.todayCalories ?? 0}
+                  {displayCalories ?? 0}
                   <span className={isComplete ? 'text-yellow-400/70 ml-1' : 'text-zinc-500 ml-1'}>
                     /{caloriesGoal}
                   </span>

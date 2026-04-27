@@ -47,6 +47,22 @@ export const getHealthByDate = query({
   },
 });
 
+// Get the most recent health record on or before a date.
+// Useful because wearable data usually lands for yesterday, not today.
+export const getLatestHealthOnOrBefore = query({
+  args: { userId: v.id("users"), date: v.string() },
+  handler: async (ctx, { userId, date }) => {
+    const records = await ctx.db
+      .query("dailyHealth")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    return records
+      .filter((h) => h.date <= date)
+      .sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
+  },
+});
+
 // Get health data for a month (for calendar view)
 export const getMonthHealth = query({
   args: { userId: v.id("users"), yearMonth: v.string() }, // YYYY-MM format

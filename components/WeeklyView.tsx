@@ -257,7 +257,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                   {group.items.map((g) => (
                     <div
                       key={g._id}
-                      className={`flex items-center justify-between gap-3 rounded border p-2 ${group.categoryName ? getCategoryColor(group.categoryName).border : ""} ${g.scheduledDay === undefined && !g.done ? "bg-amber-50/80 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800" : ""} ${g.important && !g.done ? "ring-1 ring-yellow-300/70" : ""}`}
+                      className={`flex items-center justify-between gap-3 rounded border p-2 ${group.categoryName ? getCategoryColor(group.categoryName).border : ""} ${g.important && !g.done ? "ring-1 ring-yellow-300/70" : ""}`}
                     >
                       <label className="flex items-center gap-3 text-sm flex-1 cursor-pointer">
                         <input
@@ -290,7 +290,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
                             });
                           }}
                         >
-                          <SelectTrigger className={`w-[80px] h-7 text-xs ${g.scheduledDay === undefined && !g.done ? "border-amber-300 bg-amber-100/70 dark:bg-amber-950/30" : ""}`}>
+                          <SelectTrigger className="w-[80px] h-7 text-xs">
                             <SelectValue placeholder="Day" />
                           </SelectTrigger>
                           <SelectContent>
@@ -379,46 +379,6 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
             </CardContent>
           </Card>
 
-          <Card className="md:col-span-2 border-amber-200 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-950/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Unassigned / Anytime ({unassignedGoals.length})</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {unassignedGoals.length > 0 ? (
-                unassignedGoals.map((g: any) => (
-                  <div key={g._id} className="flex items-center justify-between gap-2 rounded border bg-background/70 p-2 text-sm">
-                    <label className="flex items-center gap-2 flex-1 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={g.done}
-                        onChange={async (e) => toggleDone({ goalId: g._id, done: e.target.checked })}
-                      />
-                      <span>{g.important ? "⭐ " : ""}{g.text}</span>
-                    </label>
-                    <Select
-                      value="none"
-                      onValueChange={async (v) => {
-                        await setScheduledDay({ goalId: g._id, scheduledDay: v === "none" ? null : parseInt(v) });
-                      }}
-                    >
-                      <SelectTrigger className="w-[90px] h-7 text-xs border-amber-300 bg-amber-100/70 dark:bg-amber-950/30">
-                        <SelectValue placeholder="Day" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Any</SelectItem>
-                        {DAY_NAMES.map((d, i) => (
-                          <SelectItem key={i} value={String(i)}>{d}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-muted-foreground">Nothing floating. Everything has a day or is done.</p>
-              )}
-            </CardContent>
-          </Card>
-
           {days.map((day, dayIndex) => {
             const dayKey = toPSTDateKey(day.getTime());
             const list = eventsByDay.get(dayKey) || [];
@@ -482,6 +442,46 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
               </Card>
             );
           })}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Unassigned / Anytime ({unassignedGoals.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {unassignedGoals.length > 0 ? (
+                unassignedGoals.map((g: any) => (
+                  <div key={g._id} className="flex items-center justify-between gap-2 text-sm">
+                    <label className="flex items-center gap-2 flex-1 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={g.done}
+                        onChange={async (e) => toggleDone({ goalId: g._id, done: e.target.checked })}
+                        className="h-3 w-3"
+                      />
+                      <span>{g.important ? "⭐ " : ""}{g.text}</span>
+                    </label>
+                    <Select
+                      value="none"
+                      onValueChange={async (v) => {
+                        await setScheduledDay({ goalId: g._id, scheduledDay: v === "none" ? null : parseInt(v) });
+                      }}
+                    >
+                      <SelectTrigger className="w-[80px] h-7 text-xs">
+                        <SelectValue placeholder="Day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Any</SelectItem>
+                        {DAY_NAMES.map((d, i) => (
+                          <SelectItem key={i} value={String(i)}>{d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground">Nothing floating. Everything has a day or is done.</p>
+              )}
+            </CardContent>
+          </Card>
         </div>
       ) : (
         <Card>

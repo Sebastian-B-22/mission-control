@@ -249,8 +249,11 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [stepsInput, setStepsInput] = useState("");
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const monthStats = useQuery(api.health.getMonthStats, { userId });
+  const latestHealth = useQuery(api.health.getLatestHealthOnOrBefore, { userId, date: today });
   const healthGoals = useQuery(api.health.getHealthGoals, { userId });
 
   const yearMonth = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}`;
@@ -299,17 +302,27 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
   };
 
   const calendarDays = generateCalendarDays();
-  const today = new Date().toISOString().split("T")[0];
+  const displayHealth = latestHealth && (!monthStats?.todayScore || monthStats.todayScore === 0)
+    ? latestHealth
+    : null;
+  const displayScore = displayHealth?.healthScore ?? monthStats?.todayScore ?? 0;
+  const displaySleep = displayHealth?.sleepHours ?? monthStats?.todaySleep;
+  const displaySteps = displayHealth?.steps ?? monthStats?.todaySteps;
+  const displayCalories = displayHealth?.activeCalories ?? monthStats?.todayCalories;
+  const isShowingLatest = Boolean(displayHealth && displayHealth.date !== today);
+  const latestDateLabel = displayHealth
+    ? new Date(`${displayHealth.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
+    : null;
 
   // Calculate progress toward goals
-  const sleepProgress = monthStats?.todaySleep
-    ? Math.min((monthStats.todaySleep / (healthGoals?.sleepGoalHours ?? 7)) * 100, 100)
+  const sleepProgress = displaySleep
+    ? Math.min((displaySleep / (healthGoals?.sleepGoalHours ?? 7)) * 100, 100)
     : 0;
-  const stepsProgress = monthStats?.todaySteps
-    ? Math.min((monthStats.todaySteps / (healthGoals?.stepsGoal ?? 3500)) * 100, 100)
+  const stepsProgress = displaySteps
+    ? Math.min((displaySteps / (healthGoals?.stepsGoal ?? 3500)) * 100, 100)
     : 0;
-  const caloriesProgress = monthStats?.todayCalories
-    ? Math.min((monthStats.todayCalories / (healthGoals?.caloriesGoal ?? 350)) * 100, 100)
+  const caloriesProgress = displayCalories
+    ? Math.min((displayCalories / (healthGoals?.caloriesGoal ?? 350)) * 100, 100)
     : 0;
 
   // Goal level progression
@@ -369,7 +382,9 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
         {/* Today's Score + Progress */}
         <Card className="lg:col-span-1 bg-zinc-900 border-zinc-800">
           <CardHeader>
-            <CardTitle className="text-lg text-zinc-100">Today</CardTitle>
+            <CardTitle className="text-lg text-zinc-100">
+              {isShowingLatest && latestDateLabel ? `Latest (${latestDateLabel})` : "Today"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Week Preview */}
@@ -377,7 +392,7 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
 
             {/* Score Ring */}
             <div className="flex justify-center">
-              <ScoreRing score={monthStats?.todayScore ?? 0} />
+              <ScoreRing score={displayScore} />
             </div>
 
             {/* Metric Pills */}
@@ -389,7 +404,7 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
                   <div>
                     <p className="text-sm text-zinc-400">Sleep</p>
                     <p className="text-lg font-semibold text-zinc-100">
-                      {monthStats?.todaySleep ? formatSleep(monthStats.todaySleep) : '0h'}
+                      {displaySleep ? formatSleep(displaySleep) : '0h'}
                       <span className="text-sm text-zinc-500 ml-1">
                         / {healthGoals?.sleepGoalHours ?? 7}h
                       </span>
@@ -409,7 +424,7 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
                   <div>
                     <p className="text-sm text-zinc-400">Steps</p>
                     <p className="text-lg font-semibold text-zinc-100">
-                      {monthStats?.todaySteps?.toLocaleString() ?? '0'}
+                      {displaySteps?.toLocaleString() ?? '0'}
                       <span className="text-sm text-zinc-500 ml-1">
                         / {(healthGoals?.stepsGoal ?? 3500).toLocaleString()}
                       </span>
@@ -429,7 +444,7 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
                   <div>
                     <p className="text-sm text-zinc-400">Active Calories</p>
                     <p className="text-lg font-semibold text-zinc-100">
-                      {monthStats?.todayCalories ?? 0}
+                      {displayCalories ?? 0}
                       <span className="text-sm text-zinc-500 ml-1">
                         / {healthGoals?.caloriesGoal ?? 350}
                       </span>
