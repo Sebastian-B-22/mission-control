@@ -265,8 +265,11 @@ export const recordDailyHealth = mutation({
     const sleepScore = calculateSleepScore(finalSleepHours);
     const stepsScore = calculateStepsScore(finalSteps);
     const caloriesScore = calculateCaloriesScore(finalActiveCalories);
-    const healthScore = sleepScore + stepsScore + caloriesScore;
-    const isPerfectDay = healthScore === 100;
+    const calculatedHealthScore = sleepScore + stepsScore + caloriesScore;
+    // Don't Die can provide a richer daily score than our simple goal formula.
+    // If a richer score is already stored, do not downgrade it on partial Apple/Whoop re-syncs.
+    const healthScore = Math.max(calculatedHealthScore, existing?.healthScore ?? 0);
+    const isPerfectDay = healthScore >= 100;
 
     if (existing) {
       // Update existing record

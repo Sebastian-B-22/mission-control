@@ -349,7 +349,7 @@ export function WeeklyView({ userId }: { userId: Id<"users"> }) {
       {/* Calendar */}
       {mode === "agenda" ? (
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="md:col-span-2 border-yellow-200 bg-yellow-50/70 dark:border-yellow-800 dark:bg-yellow-950/20">
+          <Card className="md:col-span-2 border-yellow-400/60 bg-yellow-500/10 shadow-[0_0_30px_rgba(234,179,8,0.08)] dark:border-yellow-400/50 dark:bg-yellow-500/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-500" />
