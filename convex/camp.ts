@@ -579,6 +579,72 @@ export const backfillTrialDayFamilyCrm = mutation({
   },
 });
 
+export const cleanupMay17MiniCampTestRegistrations = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const testEmail = "corinnebriers@gmail.com";
+    const registrations = await ctx.db
+      .query("campTrialDayRegistrations")
+      .withIndex("by_email", (q) => q.eq("email", testEmail))
+      .filter((q) => q.and(
+        q.eq(q.field("programId"), MAY17_MINI_CAMP_PROGRAM_ID),
+        q.eq(q.field("eventDate"), MAY17_MINI_CAMP_EVENT_DATE),
+        q.eq(q.field("parentFirstName"), "Kim"),
+        q.eq(q.field("parentLastName"), "Test")
+      ))
+      .collect();
+
+    for (const registration of registrations) {
+      await ctx.db.delete(registration._id);
+    }
+
+    const family = await ctx.db
+      .query("families")
+      .withIndex("by_email", (q) => q.eq("email", testEmail))
+      .filter((q) => q.and(
+        q.eq(q.field("parentFirstName"), "Kim"),
+        q.eq(q.field("parentLastName"), "Test")
+      ))
+      .first();
+
+    let deletedEnrollments = 0;
+    let deletedChildren = 0;
+    let deletedFamily = 0;
+
+    if (family) {
+      const children = await ctx.db
+        .query("children")
+        .withIndex("by_family", (q) => q.eq("familyId", family._id))
+        .collect();
+
+      for (const child of children) {
+        const enrollments = await ctx.db
+          .query("enrollments")
+          .withIndex("by_child", (q) => q.eq("childId", child._id))
+          .collect();
+
+        for (const enrollment of enrollments) {
+          await ctx.db.delete(enrollment._id);
+          deletedEnrollments += 1;
+        }
+
+        await ctx.db.delete(child._id);
+        deletedChildren += 1;
+      }
+
+      await ctx.db.delete(family._id);
+      deletedFamily = 1;
+    }
+
+    return {
+      deletedRegistrations: registrations.length,
+      deletedEnrollments,
+      deletedChildren,
+      deletedFamily,
+    };
+  },
+});
+
 export const createTrialDayRegistration = mutation({
   args: {
     programId: v.string(),
