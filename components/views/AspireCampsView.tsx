@@ -14,8 +14,14 @@ interface AspireCampsViewProps {
 
 export function AspireCampsView({ userId }: AspireCampsViewProps) {
   const campStats = useQuery(api.camp.getStats, {});
+  const miniCampAvailability = useQuery(api.camp.getTrialDayAvailability, {});
+  const miniCampRegistrations = useQuery(api.camp.listTrialDayRegistrations, {}) ?? [];
 
   const regions = useMemo(() => campStats?.byRegion || [], [campStats]);
+  const miniCampReserved = useMemo(
+    () => (miniCampAvailability || []).reduce((sum: number, session: any) => sum + (session.reserved || 0), 0),
+    [miniCampAvailability]
+  );
 
   return (
     <div className="space-y-6">
@@ -28,7 +34,7 @@ export function AspireCampsView({ userId }: AspireCampsViewProps) {
 
       <Card>
         <CardContent className="p-4">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-3">
               <div className="text-xs uppercase tracking-wide text-emerald-300/90">Paid camp families</div>
               <div className="text-2xl font-bold mt-1">{campStats?.totalFamilies ?? 0}</div>
@@ -46,6 +52,70 @@ export function AspireCampsView({ userId }: AspireCampsViewProps) {
               <div className="text-xs uppercase tracking-wide text-purple-300/90">Revenue</div>
               <div className="text-2xl font-bold mt-1">${campStats?.totalRevenue ?? 0}</div>
             </div>
+            <div className="rounded-xl border border-orange-500/20 bg-orange-500/[0.05] p-3">
+              <div className="text-xs uppercase tracking-wide text-orange-300/90">Mini Camp May 17</div>
+              <div className="text-2xl font-bold mt-1">{miniCampReserved}</div>
+              <div className="text-xs text-muted-foreground mt-1">free trial reservations</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-orange-500/20 bg-orange-500/[0.04]">
+        <CardHeader>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <div className="text-xs uppercase tracking-[0.18em] text-orange-300/90 mb-2">Free trial event</div>
+              <CardTitle>Mini Camp - May 17, Brookside</CardTitle>
+              <CardDescription className="mt-1">
+                Live reservations from the registration form. These also sync into Family CRM as Mini Camp enrollments.
+              </CardDescription>
+            </div>
+            <Badge variant="outline" className="bg-orange-500/10 text-orange-300 border-orange-500/20">
+              {miniCampReserved} confirmed
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            {(miniCampAvailability || []).map((session: any) => (
+              <div key={session.session} className="rounded-xl border bg-background/60 p-4">
+                <div className="font-semibold">{session.session}</div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {session.reserved}/{session.capacity} reserved - {session.remaining} open
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border bg-background/50">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-muted-foreground">
+                  <th className="text-left p-2">Player</th>
+                  <th className="text-left p-2">Parent</th>
+                  <th className="text-left p-2">Phone</th>
+                  <th className="text-left p-2">Session</th>
+                  <th className="text-left p-2">Emergency</th>
+                </tr>
+              </thead>
+              <tbody>
+                {miniCampRegistrations.map((registration: any) => (
+                  <tr key={registration._id} className="border-b last:border-0">
+                    <td className="p-2 font-medium">{registration.childFirstName} {registration.childLastName}</td>
+                    <td className="p-2">{registration.parentFirstName} {registration.parentLastName}<div className="text-xs text-muted-foreground">{registration.email}</div></td>
+                    <td className="p-2">{registration.phone}</td>
+                    <td className="p-2">{registration.session}</td>
+                    <td className="p-2">{registration.emergencyContactName}<div className="text-xs text-muted-foreground">{registration.emergencyContactPhone}</div></td>
+                  </tr>
+                ))}
+                {miniCampRegistrations.length === 0 && (
+                  <tr>
+                    <td className="p-4 text-center text-muted-foreground" colSpan={5}>No mini camp registrations yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

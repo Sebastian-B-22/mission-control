@@ -206,10 +206,10 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       ],
     },
     {
-      title: "Camps",
-      description: "Camp ops should be tracked by actual week, not one giant combined bucket.",
+      title: "Camps + Mini Camp",
+      description: "Summer camp ops plus the May 17 free Mini Camp registration list and session counts.",
       view: "aspire-camps",
-      buttonLabel: "Open Camps",
+      buttonLabel: "Open Camps + Mini Camp",
       eyebrow: "Week-by-week delivery",
       tone: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/26 via-teal-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
       badgeTone: "border-emerald-400/30 bg-emerald-500/18 text-emerald-100",

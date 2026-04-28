@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Users, Search, RefreshCw, Phone, Mail, MessageCircle, X } from "lucide-react";
 
-type Program = "all" | "spring_league" | "camp" | "pdp";
+type Program = "all" | "spring_league" | "camp" | "mini_camp" | "pdp";
 
 type FamilyWithChildren = {
   _id: Id<"families">;
@@ -42,6 +42,7 @@ type FamilyWithChildren = {
 const PROGRAM_CONFIG: Record<string, { label: string; className: string }> = {
   spring_league: { label: "Spring League", className: "bg-green-500/10 text-green-300 border-green-500/20" },
   camp: { label: "Summer Camp", className: "bg-amber-500/10 text-amber-300 border-amber-500/20" },
+  mini_camp: { label: "Mini Camp", className: "bg-orange-500/10 text-orange-300 border-orange-500/20" },
   pdp: { label: "PDP", className: "bg-blue-500/10 text-blue-300 border-blue-500/20" },
   other: { label: "Other", className: "bg-muted text-muted-foreground border-border" },
 };
@@ -305,7 +306,7 @@ export function FamilyCRM() {
       {stats && (
         <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(245,158,11,0.04)]">
           <CardContent className="p-4 md:p-5">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
               <div className="rounded-2xl border border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/28 via-violet-500/12 to-slate-950 p-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-fuchsia-100/90">Families in CRM</div>
                 <div className="text-3xl font-semibold mt-2 text-white">{stats.totalFamilies}</div>
@@ -317,6 +318,10 @@ export function FamilyCRM() {
               <div className="rounded-2xl border border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950 p-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/90">Camp families</div>
                 <div className="text-3xl font-semibold mt-2 text-white">{stats.campFamilies}</div>
+              </div>
+              <div className="rounded-2xl border border-orange-400/35 bg-gradient-to-br from-orange-500/28 via-red-500/12 to-slate-950 p-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-orange-100/90">Mini camp</div>
+                <div className="text-3xl font-semibold mt-2 text-white">{stats.miniCampFamilies ?? 0}</div>
               </div>
               <div className="rounded-2xl border border-cyan-400/35 bg-gradient-to-br from-cyan-500/26 via-sky-500/12 to-slate-950 p-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/90">PDP families</div>
@@ -340,7 +345,7 @@ export function FamilyCRM() {
               />
             </div>
             <div className="flex gap-2 flex-wrap">
-              {(["all", "spring_league", "camp", "pdp"] as Program[]).map((p) => (
+              {(["all", "spring_league", "camp", "mini_camp", "pdp"] as Program[]).map((p) => (
                 <Button key={p} size="sm" variant={programFilter === p ? "default" : "outline"} onClick={() => setProgramFilter(p)}>
                   {p === "all" ? "All" : PROGRAM_CONFIG[p]?.label || p}
                 </Button>

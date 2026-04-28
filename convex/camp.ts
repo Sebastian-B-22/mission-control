@@ -102,6 +102,102 @@ const MAY17_MINI_CAMP_SESSIONS = [
   "Afternoon Session (12:00 PM - 2:30 PM)",
 ] as const;
 
+async function syncTrialRegistrationToFamilyCrm(ctx: any, registration: {
+  childFirstName: string;
+  childLastName: string;
+  dateOfBirth: string;
+  gender: string;
+  parentFirstName: string;
+  parentLastName: string;
+  email: string;
+  phone: string;
+  region: string;
+  session: string;
+  status: string;
+}) {
+  const now = Date.now();
+  const email = registration.email.trim().toLowerCase();
+
+  let family = await ctx.db
+    .query("families")
+    .withIndex("by_email", (q: any) => q.eq("email", email))
+    .first();
+
+  let familyId = family?._id;
+  if (familyId) {
+    await ctx.db.patch(familyId, {
+      parentFirstName: registration.parentFirstName.trim(),
+      parentLastName: registration.parentLastName.trim(),
+      email,
+      phone: registration.phone.trim(),
+      updatedAt: now,
+    });
+  } else {
+    familyId = await ctx.db.insert("families", {
+      parentFirstName: registration.parentFirstName.trim(),
+      parentLastName: registration.parentLastName.trim(),
+      email,
+      phone: registration.phone.trim(),
+      tags: ["mini-camp"],
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  const existingChildren = await ctx.db
+    .query("children")
+    .withIndex("by_family", (q: any) => q.eq("familyId", familyId))
+    .collect();
+
+  const child = existingChildren.find((candidate: any) =>
+    candidate.firstName.trim().toLowerCase() === registration.childFirstName.trim().toLowerCase()
+    && candidate.lastName.trim().toLowerCase() === registration.childLastName.trim().toLowerCase()
+  );
+
+  let childId = child?._id;
+  if (childId) {
+    await ctx.db.patch(childId, {
+      dob: registration.dateOfBirth,
+      gender: registration.gender,
+    });
+  } else {
+    childId = await ctx.db.insert("children", {
+      familyId,
+      firstName: registration.childFirstName.trim(),
+      lastName: registration.childLastName.trim(),
+      dob: registration.dateOfBirth,
+      gender: registration.gender,
+      createdAt: now,
+    });
+  }
+
+  const existingEnrollment = await ctx.db
+    .query("enrollments")
+    .withIndex("by_child", (q: any) => q.eq("childId", childId))
+    .filter((q: any) => q.and(
+      q.eq(q.field("program"), "mini_camp"),
+      q.eq(q.field("season"), MAY17_MINI_CAMP_EVENT_DATE)
+    ))
+    .first();
+
+  const enrollment = {
+    childId,
+    familyId,
+    program: "mini_camp",
+    region: registration.region,
+    season: MAY17_MINI_CAMP_EVENT_DATE,
+    division: registration.session,
+    status: registration.status,
+    notes: "May 17 Free Mini Camp",
+  };
+
+  if (existingEnrollment) {
+    await ctx.db.patch(existingEnrollment._id, enrollment);
+  } else {
+    await ctx.db.insert("enrollments", { ...enrollment, createdAt: now });
+  }
+}
+
 const CAMP_WEEK_BLUEPRINT_MAP = Object.fromEntries(
   CAMP_WEEK_BLUEPRINTS.map((week) => [week.weekId, week])
 ) as Record<string, (typeof CAMP_WEEK_BLUEPRINTS)[number]>;
@@ -448,6 +544,41 @@ export const getTrialDayAvailability = query({
   },
 });
 
+export const listTrialDayRegistrations = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("campTrialDayRegistrations")
+      .withIndex("by_status", (q) => q.eq("status", "confirmed"))
+      .filter((q) => q.and(
+        q.eq(q.field("programId"), MAY17_MINI_CAMP_PROGRAM_ID),
+        q.eq(q.field("eventDate"), MAY17_MINI_CAMP_EVENT_DATE)
+      ))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const backfillTrialDayFamilyCrm = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const registrations = await ctx.db
+      .query("campTrialDayRegistrations")
+      .filter((q) => q.and(
+        q.eq(q.field("programId"), MAY17_MINI_CAMP_PROGRAM_ID),
+        q.eq(q.field("eventDate"), MAY17_MINI_CAMP_EVENT_DATE),
+        q.eq(q.field("status"), "confirmed")
+      ))
+      .collect();
+
+    for (const registration of registrations) {
+      await syncTrialRegistrationToFamilyCrm(ctx, registration);
+    }
+
+    return { synced: registrations.length };
+  },
+});
+
 export const createTrialDayRegistration = mutation({
   args: {
     programId: v.string(),
@@ -517,7 +648,7 @@ export const createTrialDayRegistration = mutation({
       throw new Error("That session is full. Please choose the other option if spots remain.");
     }
 
-    return ctx.db.insert("campTrialDayRegistrations", {
+    const registration = {
       programId: MAY17_MINI_CAMP_PROGRAM_ID,
       eventDate: MAY17_MINI_CAMP_EVENT_DATE,
       region: "agoura",
@@ -537,7 +668,11 @@ export const createTrialDayRegistration = mutation({
       waiverAccepted: args.waiverAccepted,
       status: "confirmed",
       createdAt: Date.now(),
-    });
+    };
+
+    const registrationId = await ctx.db.insert("campTrialDayRegistrations", registration);
+    await syncTrialRegistrationToFamilyCrm(ctx, registration);
+    return registrationId;
   },
 });
 

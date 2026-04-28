@@ -102,11 +102,13 @@ export const getStats = query({
     const enrollments = await ctx.db.query("enrollments").collect();
     const springLeague = enrollments.filter((e) => e.program === "spring_league");
     const camp = enrollments.filter((e) => e.program === "camp");
+    const miniCamp = enrollments.filter((e) => e.program === "mini_camp");
     const pdp = enrollments.filter((e) => e.program === "pdp");
     return {
       totalFamilies: families.length,
       springLeagueFamilies: new Set(springLeague.map((e) => e.familyId)).size,
       campFamilies: new Set(camp.map((e) => e.familyId)).size,
+      miniCampFamilies: new Set(miniCamp.map((e) => e.familyId)).size,
       pdpFamilies: new Set(pdp.map((e) => e.familyId)).size,
     };
   },
