@@ -813,6 +813,47 @@ async function sendCampConfirmationSMS(
   }
 }
 
+async function sendMiniCampConfirmationSMS(
+  phone: string,
+  childNames: string[],
+  sessionLabels: string[]
+) {
+  try {
+    let normalized = phone.replace(/[^0-9]/g, "");
+    if (normalized.length === 10) normalized = "1" + normalized;
+    if (!normalized.startsWith("+")) normalized = "+" + normalized;
+
+    const names = childNames.join(" & ");
+    const sessions = [...new Set(sessionLabels)].join("; ");
+    let message = `CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for the Free AYSO Soccer Camp on Sunday, May 17th.\n\n`;
+    message += `Session: ${sessions}\n`;
+    message += `Location: Brookside Elementary (enter via Conifer St)\n\n`;
+    message += `Bring: Water, snack, sunscreen, and clothes/shoes for soccer fun.\n\n`;
+    message += `Questions? Just reply to this text!\n\n-Coach Corinne`;
+
+    const res = await fetch("https://api.openphone.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": OPENPHONE_API_KEY,
+      },
+      body: JSON.stringify({
+        from: OPENPHONE_AGOURA_LINE,
+        to: [normalized],
+        content: message,
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`OpenPhone ${res.status}: ${text}`);
+    }
+    console.log("[OpenPhone] Sent mini camp SMS to:", normalized);
+  } catch (e) {
+    console.error("[OpenPhone] Mini camp SMS Error:", e);
+  }
+}
+
 // ─── Health Data Ingest (from Health Auto Export app) ─────────────────────────
 
 // CORS preflight for health endpoint
@@ -992,7 +1033,7 @@ http.route({
 });
 
 // CORS preflight for all camp routes
-["/camp/availability", "/camp/trial-day/availability", "/camp/validate-promo", "/camp/register", "/camp/register-free", "/camp/trial-day/register", "/camp/stripe-webhook",
+["/camp/availability", "/camp/trial-day/availability", "/camp/validate-promo", "/camp/register", "/camp/register-free", "/camp/register-trial", "/camp/trial-day/register", "/camp/stripe-webhook",
  "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/checkin", "/camp/admin/promo-codes",
  "/api/family/credit", "/api/family/credit/add", "/api/family/credit/apply"].forEach((path) => {
   http.route({
@@ -1016,6 +1057,83 @@ http.route({
   handler: httpAction(async (ctx) => {
     const data = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
     return campJson({ availability: data });
+  }),
+});
+
+// POST /camp/register-trial (registration-site payload for free mini camp)
+http.route({
+  path: "/camp/register-trial", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const body = await req.json() as {
+        programSlug?: string;
+        parent: { firstName: string; lastName: string; email: string; phone: string };
+        children: Array<{ firstName: string; lastName: string; birthDate: string; age?: number; gender: string; allergies?: string; trialSession: string }>;
+        emergencyContact: { name: string; phone: string };
+        waiverAccepted: boolean;
+      };
+
+      const parent = body.parent;
+      const children = body.children || [];
+      if (!parent?.email || !parent?.firstName || !parent?.lastName || !parent?.phone) return campError("Missing parent info");
+      if (!children.length) return campError("At least one child required");
+      if (!body.waiverAccepted) return campError("Waiver must be accepted");
+
+      const sessionMap: Record<string, string> = {
+        morning: "Morning Session (9:00 AM - 11:30 AM)",
+        afternoon: "Afternoon Session (12:00 PM - 2:30 PM)",
+      };
+
+      const childNames: string[] = [];
+      const sessionLabels: string[] = [];
+      const registrationIds: string[] = [];
+
+      for (const child of children) {
+        const session = sessionMap[child.trialSession] || child.trialSession;
+        const id = await ctx.runMutation(api.camp.createTrialDayRegistration, {
+          programId: body.programSlug || "trial-day-2026",
+          session,
+          childFirstName: child.firstName,
+          childLastName: child.lastName,
+          dateOfBirth: child.birthDate,
+          age: child.age,
+          gender: child.gender,
+          parentFirstName: parent.firstName,
+          parentLastName: parent.lastName,
+          email: parent.email,
+          phone: parent.phone,
+          emergencyContactName: body.emergencyContact?.name || `${parent.firstName} ${parent.lastName}`,
+          emergencyContactPhone: body.emergencyContact?.phone || parent.phone,
+          medicalNotes: child.allergies,
+          waiverAccepted: Boolean(body.waiverAccepted),
+        });
+        registrationIds.push(String(id));
+        childNames.push(child.firstName);
+        sessionLabels.push(session);
+      }
+
+      await sendMiniCampConfirmationSMS(parent.phone, childNames, sessionLabels);
+
+      try {
+        await ctx.runMutation(api.families.upsertFamily, {
+          parentFirstName: parent.firstName,
+          parentLastName: parent.lastName,
+          email: parent.email,
+          phone: parent.phone,
+        });
+      } catch (e) {
+        console.error("[CRM] Trial family upsert error:", e);
+      }
+
+      const availability = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
+      return campJson({ success: true, registrationIds, availability });
+    } catch (error) {
+      const rawMessage = error instanceof Error ? error.message : "Registration failed";
+      const message = rawMessage.replace(/^Uncaught Error:\s*/, "").split("\n")[0] || "Registration failed";
+      const availability = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
+      const status = message.includes("already has a May 17") || message.includes("session is full") ? 409 : 400;
+      return campJson({ error: message, availability }, status);
+    }
   }),
 });
 
@@ -1060,10 +1178,23 @@ http.route({
         waiverAccepted: Boolean(body.waiverAccepted),
       });
 
+      await sendMiniCampConfirmationSMS(body.phone, [body.childFirstName], [body.session]);
+
+      try {
+        await ctx.runMutation(api.families.upsertFamily, {
+          parentFirstName: body.parentFirstName,
+          parentLastName: body.parentLastName,
+          email: body.email,
+          phone: body.phone,
+        });
+      } catch (e) {
+        console.error("[CRM] Trial family upsert error:", e);
+      }
+
       const availability = await ctx.runQuery(api.camp.getTrialDayAvailability, {});
       return campJson({
         success: true,
-        message: "Spot reserved! You are confirmed for the selected May 3 Brookside session. We will follow up with final details.",
+        message: "Spot reserved! You are confirmed for the selected May 17 mini camp session. We will follow up with final details.",
         availability,
       });
     } catch (error) {

@@ -94,10 +94,10 @@ const CAMP_WEEK_BLUEPRINTS = [
   },
 ] as const;
 
-const MAY3_TRIAL_DAY_PROGRAM_ID = "camp-free-trial-day-may-3-2026";
-const MAY3_TRIAL_DAY_EVENT_DATE = "2026-05-03";
-const MAY3_TRIAL_DAY_SESSION_CAPACITY = 40;
-const MAY3_TRIAL_DAY_SESSIONS = [
+const MAY17_MINI_CAMP_PROGRAM_ID = "trial-day-2026";
+const MAY17_MINI_CAMP_EVENT_DATE = "2026-05-17";
+const MAY17_MINI_CAMP_SESSION_CAPACITY = 30;
+const MAY17_MINI_CAMP_SESSIONS = [
   "Morning Session (9:00 AM - 11:30 AM)",
   "Afternoon Session (12:00 PM - 2:30 PM)",
 ] as const;
@@ -429,15 +429,17 @@ export const getTrialDayAvailability = query({
   args: {},
   handler: async (ctx) => {
     const registrations = await ctx.db.query("campTrialDayRegistrations").collect();
-    const activeRegistrations = registrations.filter((registration) => registration.status !== "cancelled");
+    const activeRegistrations = registrations.filter((registration) => registration.status !== "cancelled"
+      && registration.programId === MAY17_MINI_CAMP_PROGRAM_ID
+      && registration.eventDate === MAY17_MINI_CAMP_EVENT_DATE);
 
-    return MAY3_TRIAL_DAY_SESSIONS.map((session) => {
+    return MAY17_MINI_CAMP_SESSIONS.map((session) => {
       const reserved = activeRegistrations.filter((registration) => registration.session === session).length;
-      const remaining = Math.max(MAY3_TRIAL_DAY_SESSION_CAPACITY - reserved, 0);
+      const remaining = Math.max(MAY17_MINI_CAMP_SESSION_CAPACITY - reserved, 0);
 
       return {
         session,
-        capacity: MAY3_TRIAL_DAY_SESSION_CAPACITY,
+        capacity: MAY17_MINI_CAMP_SESSION_CAPACITY,
         reserved,
         remaining,
         isFull: remaining === 0,
@@ -466,11 +468,11 @@ export const createTrialDayRegistration = mutation({
   },
   handler: async (ctx, args) => {
     const normalizedSession = args.session.trim();
-    if (!MAY3_TRIAL_DAY_SESSIONS.includes(normalizedSession as (typeof MAY3_TRIAL_DAY_SESSIONS)[number])) {
-      throw new Error("Please choose one of the May 3 sessions.");
+    if (!MAY17_MINI_CAMP_SESSIONS.includes(normalizedSession as (typeof MAY17_MINI_CAMP_SESSIONS)[number])) {
+      throw new Error("Please choose one of the May 17 sessions.");
     }
 
-    if (args.programId !== MAY3_TRIAL_DAY_PROGRAM_ID) {
+    if (args.programId !== MAY17_MINI_CAMP_PROGRAM_ID) {
       throw new Error("Invalid trial day program.");
     }
 
@@ -493,12 +495,14 @@ export const createTrialDayRegistration = mutation({
 
     const duplicate = existingForEmail.find((registration) => {
       return registration.status !== "cancelled"
+        && registration.programId === MAY17_MINI_CAMP_PROGRAM_ID
+        && registration.eventDate === MAY17_MINI_CAMP_EVENT_DATE
         && registration.childFirstName.trim().toLowerCase() === normalizedChildFirstName
         && registration.childLastName.trim().toLowerCase() === normalizedChildLastName;
     });
 
     if (duplicate) {
-      throw new Error("This player already has a May 3 trial reservation. Please keep one session only.");
+      throw new Error("This player already has a May 17 mini camp reservation. Please keep one session only.");
     }
 
     const sessionRegistrations = await ctx.db
@@ -506,14 +510,16 @@ export const createTrialDayRegistration = mutation({
       .withIndex("by_session", (q) => q.eq("session", normalizedSession))
       .collect();
 
-    const reservedCount = sessionRegistrations.filter((registration) => registration.status !== "cancelled").length;
-    if (reservedCount >= MAY3_TRIAL_DAY_SESSION_CAPACITY) {
+    const reservedCount = sessionRegistrations.filter((registration) => registration.status !== "cancelled"
+      && registration.programId === MAY17_MINI_CAMP_PROGRAM_ID
+      && registration.eventDate === MAY17_MINI_CAMP_EVENT_DATE).length;
+    if (reservedCount >= MAY17_MINI_CAMP_SESSION_CAPACITY) {
       throw new Error("That session is full. Please choose the other option if spots remain.");
     }
 
     return ctx.db.insert("campTrialDayRegistrations", {
-      programId: MAY3_TRIAL_DAY_PROGRAM_ID,
-      eventDate: MAY3_TRIAL_DAY_EVENT_DATE,
+      programId: MAY17_MINI_CAMP_PROGRAM_ID,
+      eventDate: MAY17_MINI_CAMP_EVENT_DATE,
       region: "agoura",
       session: normalizedSession,
       childFirstName: args.childFirstName.trim(),
@@ -536,6 +542,15 @@ export const createTrialDayRegistration = mutation({
 });
 
 // ─── Registrations ────────────────────────────────────────────────────────
+
+
+export const cancelTrialDayRegistration = mutation({
+  args: { registrationId: v.id("campTrialDayRegistrations") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.registrationId, { status: "cancelled" });
+    return { success: true };
+  },
+});
 
 export const createRegistration = mutation({
   args: {
