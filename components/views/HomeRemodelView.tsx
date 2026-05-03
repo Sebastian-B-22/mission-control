@@ -198,7 +198,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
   {
     id: "declutter",
     title: "Declutter",
-    description: "Clear inherited furniture, books, junk, and overgrowth so the house becomes a true blank canvas.",
+    description: "May-June: clear Roma’s room/closets, move dental cabinets, prep estate sale, and remove what does not sell.",
     cardClass: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
     titleClass: "text-cyan-100",
     textClass: "text-cyan-200/80",
@@ -207,7 +207,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
   {
     id: "decisions",
     title: "Lock the big decisions",
-    description: "Choose bathroom order, room priorities, and the kitchen refresh path so the project has a real backbone.",
+    description: "July: start kitchen cabinet work, decide counters, measure stained glass panels, and lock the next renovation sequence.",
     cardClass: "border-amber-400/30 bg-gradient-to-br from-amber-500/24 via-orange-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(251,191,36,0.08)]",
     titleClass: "text-amber-100",
     textClass: "text-amber-200/80",
@@ -216,7 +216,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
   {
     id: "source",
     title: "Source, quote, fund",
-    description: "Measure, compare options, get roof/window/bath quotes, and decide how to fund the must-do work.",
+    description: "August-October: master bath, front bath, window pricing, clear-glass panel replacement, and funding decisions.",
     cardClass: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/24 via-teal-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
     titleClass: "text-emerald-100",
     textClass: "text-emerald-200/80",
@@ -225,7 +225,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
   {
     id: "pack",
     title: "Pack + move",
-    description: "Finish the house, pack the current house, and make the January move feel clean instead of chaotic.",
+    description: "November-January: clear shed and sunroom, slow transition, personal touches, and final artwork placement.",
     cardClass: "border-violet-400/30 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(167,139,250,0.08)]",
     titleClass: "text-violet-100",
     textClass: "text-violet-200/80",
@@ -247,9 +247,9 @@ function inferMilestoneStage(milestone: { stage?: string; targetDate: string }):
     return milestone.stage as MoveInStageId;
   }
 
-  if (milestone.targetDate <= "2026-04-24") return "declutter";
-  if (milestone.targetDate <= "2026-05-31") return "decisions";
-  if (milestone.targetDate <= "2026-11-30") return "source";
+  if (milestone.targetDate <= "2026-06-30") return "declutter";
+  if (milestone.targetDate <= "2026-07-31") return "decisions";
+  if (milestone.targetDate <= "2026-10-31") return "source";
   return "pack";
 }
 
@@ -813,7 +813,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                 Move-In Objectives
               </CardTitle>
               <p className="text-xs text-zinc-300 mt-1">
-                Four phases to move from clean-out to move-in.
+                8-month roadmap from May decluttering to the January move-in.
               </p>
             </div>
             <Button size="sm" variant="outline" className="border-white/10 bg-black/20 text-zinc-100 hover:bg-white/5" onClick={() => openMilestoneDialog("declutter")}>
@@ -828,8 +828,11 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className={`text-sm font-semibold ${objective.titleClass}`}>{objective.title}</div>
+                  <p className={`mt-1.5 text-xs leading-snug ${objective.textClass}`}>
+                    {objective.description}
+                  </p>
                   {objective.targetDate ? (
-                    <div className="mt-1 text-[11px] uppercase tracking-wide text-zinc-300/70">
+                    <div className="mt-2 text-[11px] uppercase tracking-wide text-zinc-300/70">
                       Target by {formatShortDate(objective.targetDate)}
                     </div>
                   ) : null}
@@ -938,25 +941,25 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                   Remodel game plan
                 </CardTitle>
                 <p className="text-sm text-sky-200/80">
-                  Blank canvas first, then priority renovations, then sourcing and polish.
+                  May to December execution plan from decluttering to bathrooms, kitchen, windows, and move-in polish.
                 </p>
               </CardHeader>
               <CardContent className="grid gap-2 sm:grid-cols-2">
                 <div className="rounded-xl border border-orange-500/20 bg-black/20 p-3">
-                  <div className="text-sm font-semibold text-orange-100">1. Blank canvas first</div>
-                  <p className="mt-1.5 text-sm text-zinc-300">Clear inherited items, junk, books, and blockers.</p>
+                  <div className="text-sm font-semibold text-orange-100">1. May room prep</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Scrape ceilings, clear closets, box dishes/photos, move cabinets, and prep the estate sale.</p>
                 </div>
                 <div className="rounded-xl border border-amber-500/20 bg-black/20 p-3">
-                  <div className="text-sm font-semibold text-amber-100">2. Priority projects</div>
-                  <p className="mt-1.5 text-sm text-zinc-300">Bathrooms, kitchen, windows, roof, yard, shed-to-gym.</p>
+                  <div className="text-sm font-semibold text-amber-100">2. July-Oct renovations</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Kitchen core in July, master bath in August, front bath September-October, patio overhang in October.</p>
                 </div>
                 <div className="rounded-xl border border-emerald-500/20 bg-black/20 p-3">
-                  <div className="text-sm font-semibold text-emerald-100">3. Source smart</div>
-                  <p className="mt-1.5 text-sm text-zinc-300">Measure first, then compare vendors and quotes.</p>
+                  <div className="text-sm font-semibold text-emerald-100">3. Windows + sourcing</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Measure four kitchen stained glass panels, price two bathroom windows, and research photo digitization.</p>
                 </div>
                 <div className="rounded-xl border border-fuchsia-500/20 bg-black/20 p-3">
-                  <div className="text-sm font-semibold text-fuchsia-100">4. Family logistics</div>
-                  <p className="mt-1.5 text-sm text-zinc-300">Use deadlines to force pickup, ship, sell, or donate decisions.</p>
+                  <div className="text-sm font-semibold text-fuchsia-100">4. Liquidation + move logistics</div>
+                  <p className="mt-1.5 text-sm text-zinc-300">Estate sale by end of June, dumpster unsold items, slow-roll debris weekly, clear shed/sunroom in November.</p>
                 </div>
               </CardContent>
             </Card>

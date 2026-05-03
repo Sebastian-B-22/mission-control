@@ -27,35 +27,32 @@ export function AspireCampsView({ userId }: AspireCampsViewProps) {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Camps</h1>
-        <p className="text-muted-foreground mt-1">
-          Camp ops should be broken down by actual location lanes. Agoura and Pali should not blur into one generic camp bucket.
-        </p>
       </div>
 
-      <Card>
+      <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(52,211,153,0.05)]">
         <CardContent className="p-4">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-3">
-              <div className="text-xs uppercase tracking-wide text-emerald-300/90">Paid camp families</div>
-              <div className="text-2xl font-bold mt-1">{campStats?.totalFamilies ?? 0}</div>
+            <div className="rounded-xl border border-emerald-400/35 bg-gradient-to-br from-emerald-500/30 via-teal-500/14 to-slate-950 p-3 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]">
+              <div className="text-xs uppercase tracking-wide text-emerald-100/90">Paid camp families</div>
+              <div className="text-2xl font-bold mt-1 text-white">{campStats?.totalFamilies ?? 0}</div>
             </div>
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.05] p-3">
-              <div className="text-xs uppercase tracking-wide text-amber-300/90">Pending registrations</div>
-              <div className="text-2xl font-bold mt-1">{campStats?.pendingCount ?? 0}</div>
+            <div className="rounded-xl border border-amber-400/35 bg-gradient-to-br from-amber-500/30 via-orange-500/14 to-slate-950 p-3 shadow-[0_0_0_1px_rgba(251,191,36,0.08)]">
+              <div className="text-xs uppercase tracking-wide text-amber-100/90">Pending registrations</div>
+              <div className="text-2xl font-bold mt-1 text-white">{campStats?.pendingCount ?? 0}</div>
             </div>
-            <div className="rounded-xl border border-sky-500/20 bg-sky-500/[0.05] p-3">
-              <div className="text-xs uppercase tracking-wide text-sky-300/90">Configured weeks</div>
-              <div className="text-2xl font-bold mt-1">{campStats?.totalConfiguredWeeks ?? 0}</div>
-              <div className="text-xs text-muted-foreground mt-1">of {campStats?.plannedWeekCount ?? 0} planned camp weeks</div>
+            <div className="rounded-xl border border-cyan-400/35 bg-gradient-to-br from-cyan-500/28 via-sky-500/14 to-slate-950 p-3 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]">
+              <div className="text-xs uppercase tracking-wide text-cyan-100/90">Configured weeks</div>
+              <div className="text-2xl font-bold mt-1 text-white">{campStats?.totalConfiguredWeeks ?? 0}</div>
+              <div className="text-xs text-cyan-100/65 mt-1">of {campStats?.plannedWeekCount ?? 0} planned camp weeks</div>
             </div>
-            <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.05] p-3">
-              <div className="text-xs uppercase tracking-wide text-purple-300/90">Revenue</div>
-              <div className="text-2xl font-bold mt-1">${campStats?.totalRevenue ?? 0}</div>
+            <div className="rounded-xl border border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/28 via-violet-500/14 to-slate-950 p-3 shadow-[0_0_0_1px_rgba(217,70,239,0.08)]">
+              <div className="text-xs uppercase tracking-wide text-fuchsia-100/90">Revenue</div>
+              <div className="text-2xl font-bold mt-1 text-white">${campStats?.totalRevenue ?? 0}</div>
             </div>
-            <div className="rounded-xl border border-orange-500/20 bg-orange-500/[0.05] p-3">
-              <div className="text-xs uppercase tracking-wide text-orange-300/90">Mini Camp May 17</div>
-              <div className="text-2xl font-bold mt-1">{miniCampReserved}</div>
-              <div className="text-xs text-muted-foreground mt-1">free trial reservations</div>
+            <div className="rounded-xl border border-rose-400/35 bg-gradient-to-br from-rose-500/30 via-orange-500/14 to-slate-950 p-3 shadow-[0_0_0_1px_rgba(251,113,133,0.08)]">
+              <div className="text-xs uppercase tracking-wide text-rose-100/90">Mini Camp May 17</div>
+              <div className="text-2xl font-bold mt-1 text-white">{miniCampReserved}</div>
+              <div className="text-xs text-rose-100/65 mt-1">free trial reservations</div>
             </div>
           </div>
         </CardContent>
@@ -124,11 +121,11 @@ export function AspireCampsView({ userId }: AspireCampsViewProps) {
         {regions.map((region: any) => {
           const isAgoura = region.regionKey === "agoura";
           const tone = isAgoura
-            ? "border-red-500/20 bg-red-500/[0.05]"
-            : "border-amber-500/20 bg-amber-500/[0.05]";
+            ? "border-rose-400/30 bg-gradient-to-br from-rose-500/22 via-red-500/10 to-slate-950 shadow-[0_0_0_1px_rgba(251,113,133,0.08)]"
+            : "border-amber-400/30 bg-gradient-to-br from-amber-500/24 via-orange-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(251,191,36,0.08)]";
           const badgeTone = isAgoura
-            ? "bg-red-500/10 text-red-300 border-red-500/20"
-            : "bg-amber-500/10 text-amber-300 border-amber-500/20";
+            ? "bg-rose-500/18 text-rose-100 border-rose-400/30"
+            : "bg-amber-500/18 text-amber-100 border-amber-400/30";
 
           return (
             <Card key={region.regionKey} className={tone}>
