@@ -136,7 +136,7 @@ export function MonthlyFocus({ mode = "page" }: { mode?: MonthlyFocusMode }) {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5 text-yellow-500" />
-            <CardTitle>April Focus</CardTitle>
+            <CardTitle>May Focus</CardTitle>
           </div>
           <CardDescription>
             Organized by theme so the month feels like a plan, not a wall of bullets.
@@ -164,9 +164,9 @@ export function MonthlyFocus({ mode = "page" }: { mode?: MonthlyFocusMode }) {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <ArrowRight className="h-5 w-5 text-blue-500" />
-            <CardTitle className="text-base">Up Next (May)</CardTitle>
+            <CardTitle className="text-base">Up Next (June)</CardTitle>
           </div>
-          <CardDescription>Queued ideas once April’s main lanes feel settled.</CardDescription>
+          <CardDescription>Queued ideas once May’s main lanes feel settled.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:grid-cols-3">
