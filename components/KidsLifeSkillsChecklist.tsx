@@ -56,6 +56,30 @@ const badgeByCategory: Record<string, string> = {
   "Outdoor + Tool Skills": "Survival Scout",
 };
 
+const categoryStyles: Record<string, { emoji: string; accent: string; soft: string; ring: string; bar: string }> = {
+  "Feed Yourself": { emoji: "🥞", accent: "text-orange-200", soft: "from-orange-500/20 via-amber-500/10 to-zinc-950", ring: "border-orange-400/30", bar: "from-orange-400 to-amber-300" },
+  "Body + Health": { emoji: "💪", accent: "text-emerald-200", soft: "from-emerald-500/20 via-teal-500/10 to-zinc-950", ring: "border-emerald-400/30", bar: "from-emerald-400 to-teal-300" },
+  "Run a Home": { emoji: "🏡", accent: "text-sky-200", soft: "from-sky-500/20 via-blue-500/10 to-zinc-950", ring: "border-sky-400/30", bar: "from-sky-400 to-blue-300" },
+  "Car + Practical Mechanics": { emoji: "🔧", accent: "text-slate-200", soft: "from-slate-400/20 via-cyan-500/10 to-zinc-950", ring: "border-cyan-300/30", bar: "from-slate-300 to-cyan-300" },
+  "Clothing + Presentation": { emoji: "👔", accent: "text-violet-200", soft: "from-violet-500/20 via-fuchsia-500/10 to-zinc-950", ring: "border-violet-400/30", bar: "from-violet-400 to-fuchsia-300" },
+  "Money Smarts": { emoji: "💵", accent: "text-lime-200", soft: "from-lime-500/20 via-green-500/10 to-zinc-950", ring: "border-lime-400/30", bar: "from-lime-400 to-green-300" },
+  "Digital + AI Smarts": { emoji: "🤖", accent: "text-cyan-200", soft: "from-cyan-500/20 via-blue-500/10 to-zinc-950", ring: "border-cyan-400/30", bar: "from-cyan-400 to-blue-300" },
+  Communication: { emoji: "💬", accent: "text-pink-200", soft: "from-pink-500/20 via-rose-500/10 to-zinc-950", ring: "border-pink-400/30", bar: "from-pink-400 to-rose-300" },
+  "Hospitality + Hosting": { emoji: "🎁", accent: "text-rose-200", soft: "from-rose-500/20 via-orange-500/10 to-zinc-950", ring: "border-rose-400/30", bar: "from-rose-400 to-orange-300" },
+  "Time + Responsibility": { emoji: "⏱️", accent: "text-yellow-200", soft: "from-yellow-500/20 via-amber-500/10 to-zinc-950", ring: "border-yellow-400/30", bar: "from-yellow-400 to-amber-300" },
+  "Safety + Navigation": { emoji: "🧭", accent: "text-red-200", soft: "from-red-500/20 via-orange-500/10 to-zinc-950", ring: "border-red-400/30", bar: "from-red-400 to-orange-300" },
+  "Travel Independence": { emoji: "✈️", accent: "text-indigo-200", soft: "from-indigo-500/20 via-sky-500/10 to-zinc-950", ring: "border-indigo-400/30", bar: "from-indigo-400 to-sky-300" },
+  "Outdoor + Tool Skills": { emoji: "🏕️", accent: "text-green-200", soft: "from-green-500/20 via-emerald-500/10 to-zinc-950", ring: "border-green-400/30", bar: "from-green-400 to-emerald-300" },
+};
+
+const statusStyles: Record<Status, string> = {
+  "not-started": "border-zinc-700 bg-zinc-900/70 text-zinc-400 hover:bg-zinc-800",
+  learned: "border-sky-400/50 bg-sky-500/15 text-sky-100 hover:bg-sky-500/25",
+  practiced: "border-violet-400/50 bg-violet-500/15 text-violet-100 hover:bg-violet-500/25",
+  owned: "border-emerald-400/50 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25",
+  taught: "border-amber-400/50 bg-amber-500/15 text-amber-100 hover:bg-amber-500/25",
+};
+
 const skills: LifeSkill[] = [
   { id: "pancakes", category: "Feed Yourself", skill: "Make pancakes or waffles", starter: true },
   { id: "smoothie", category: "Feed Yourself", skill: "Make a balanced smoothie", starter: true },
@@ -154,16 +178,16 @@ function nextStatus(current: Status): Status {
 
 function LifeSkillsTab({ kid }: { kid: Kid }) {
   const storageKey = `mission-control-life-skills-${kid}`;
-  const [progress, setProgress] = useState<Record<string, Status>>({});
-
-  useEffect(() => {
+  const [progress, setProgress] = useState<Record<string, Status>>(() => {
+    if (typeof window === "undefined") return {};
     try {
       const saved = window.localStorage.getItem(storageKey);
-      if (saved) setProgress(JSON.parse(saved));
+      return saved ? JSON.parse(saved) : {};
     } catch {
       // Ignore localStorage issues and keep the checklist usable.
+      return {};
     }
-  }, [storageKey]);
+  });
 
   useEffect(() => {
     try {
@@ -281,14 +305,16 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {categoryProgress.map((category) => (
-            <div key={category.category} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-3">
+            <div key={category.category} className={`rounded-xl border bg-gradient-to-br p-3 ${categoryStyles[category.category].ring} ${categoryStyles[category.category].soft}`}>
               <div className="flex items-center justify-between gap-2 text-sm">
-                <span className="font-medium text-zinc-100">{badgeByCategory[category.category]}</span>
+                <span className={`font-medium ${categoryStyles[category.category].accent}`}>
+                  {categoryStyles[category.category].emoji} {badgeByCategory[category.category]}
+                </span>
                 <span className="text-xs text-muted-foreground">{category.completed}/{category.total}</span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{category.category}</p>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full rounded-full bg-green-400" style={{ width: `${category.percent}%` }} />
+                <div className={`h-full rounded-full bg-gradient-to-r ${categoryStyles[category.category].bar}`} style={{ width: `${category.percent}%` }} />
               </div>
             </div>
           ))}
@@ -300,10 +326,26 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
         <p className="text-sm">Learned · Practiced · Owned · Taught</p>
       </div>
 
-      {Object.entries(groupedSkills).map(([category, categorySkills]) => (
-        <Card key={category} className="print:break-inside-avoid print:border-zinc-300 print:bg-white print:text-black">
+      {Object.entries(groupedSkills).map(([category, categorySkills]) => {
+        const categoryDone = categorySkills.filter((skill) => ["owned", "taught"].includes(progress[skill.id] || "not-started")).length;
+        const categoryPercent = Math.round((categoryDone / categorySkills.length) * 100);
+        const style = categoryStyles[category];
+
+        return (
+        <Card key={category} className={`overflow-hidden border bg-gradient-to-br ${style.ring} ${style.soft} print:break-inside-avoid print:border-zinc-300 print:bg-white print:text-black`}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">{category}</CardTitle>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <CardTitle className={`text-base ${style.accent}`}>
+                  <span className="mr-2 text-lg">{style.emoji}</span>{category}
+                </CardTitle>
+                <CardDescription className="mt-1 print:hidden">{badgeByCategory[category]} badge • {categoryDone}/{categorySkills.length} owned or taught</CardDescription>
+              </div>
+              <Badge className="border-white/10 bg-white/10 text-white print:hidden">{categoryPercent}%</Badge>
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-900/80 print:hidden">
+              <div className={`h-full rounded-full bg-gradient-to-r ${style.bar}`} style={{ width: `${categoryPercent}%` }} />
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {categorySkills.map((skill) => {
@@ -313,7 +355,7 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
               return (
                 <div
                   key={skill.id}
-                  className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-3 print:border-zinc-300 print:bg-white"
+                  className={`flex items-start gap-3 rounded-lg border p-3 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 print:border-zinc-300 print:bg-white ${done ? "border-emerald-400/40 bg-emerald-500/10" : "border-white/10 bg-zinc-950/45"}`}
                 >
                   <button
                     type="button"
@@ -327,7 +369,7 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm text-zinc-100 print:text-black">{skill.skill}</p>
-                      {skill.starter && <Badge variant="secondary" className="print:hidden">Starter</Badge>}
+                      {skill.starter && <Badge className="border-amber-300/30 bg-amber-400/15 text-amber-100 print:hidden">Starter quest</Badge>}
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1 print:hidden">
                       {statusOrder.map((option) => (
@@ -335,8 +377,8 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
                           key={option}
                           type="button"
                           size="sm"
-                          variant={status === option ? "default" : "outline"}
-                          className="h-7 px-2 text-xs"
+                          variant="outline"
+                          className={`h-7 px-2 text-xs ${status === option ? statusStyles[option] : "border-zinc-700/70 bg-zinc-950/50 text-zinc-400 hover:bg-zinc-800/80"}`}
                           onClick={() => setSkillStatus(skill.id, option)}
                         >
                           {statusLabels[option]}
@@ -350,7 +392,8 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
             })}
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -370,10 +413,10 @@ export function KidsLifeSkillsChecklist() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 text-sm text-muted-foreground md:grid-cols-4">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"><strong className="text-zinc-100">Learned</strong><br />I understand it.</div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"><strong className="text-zinc-100">Practiced</strong><br />I did it with help.</div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"><strong className="text-zinc-100">Owned</strong><br />I can do it independently.</div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"><strong className="text-zinc-100">Taught</strong><br />I can teach someone else.</div>
+            <div className="rounded-xl border border-sky-400/30 bg-sky-500/10 p-3"><strong className="text-sky-100">Learned</strong><br />I understand it.</div>
+            <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-3"><strong className="text-violet-100">Practiced</strong><br />I did it with help.</div>
+            <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3"><strong className="text-emerald-100">Owned</strong><br />I can do it independently.</div>
+            <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-3"><strong className="text-amber-100">Taught</strong><br />I can teach someone else.</div>
           </div>
         </CardContent>
       </Card>
