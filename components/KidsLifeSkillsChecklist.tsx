@@ -233,8 +233,8 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
         <div>
           <h2 className={`text-lg font-semibold ${kids[kid].color}`}>{kids[kid].name}&apos;s Life XP</h2>
           <p className="text-xs text-muted-foreground">
@@ -248,12 +248,14 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
 
       <div className="grid gap-2 md:grid-cols-3 print:hidden">
         <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2 text-amber-300">
-              <Star className="h-4 w-4" />
-              <span className="text-sm font-semibold">Level {level}</span>
+          <CardContent className="p-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-amber-300">
+                <Star className="h-4 w-4" />
+                <span className="text-sm font-semibold">Level {level}</span>
+              </div>
+              <span className="text-base font-bold text-white">{xp} XP</span>
             </div>
-            <div className="mt-1 text-xl font-bold text-white">{xp} XP</div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
               <div className="h-full rounded-full bg-amber-400" style={{ width: `${levelProgress}%` }} />
             </div>
@@ -262,13 +264,15 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
         </Card>
 
         <Card className="border-green-500/30 bg-green-500/5">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2 text-green-300">
-              <Trophy className="h-4 w-4" />
-              <span className="text-sm font-semibold">Badges</span>
+          <CardContent className="p-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-green-300">
+                <Trophy className="h-4 w-4" />
+                <span className="text-sm font-semibold">Badges</span>
+              </div>
+              <span className="text-base font-bold text-white">{earnedBadges.length}/{categoryProgress.length}</span>
             </div>
-            <div className="mt-1 text-xl font-bold text-white">{earnedBadges.length}/{categoryProgress.length}</div>
-            <div className="mt-2 flex flex-wrap gap-1">
+            <div className="mt-1 flex flex-wrap gap-1">
               {earnedBadges.length > 0 ? earnedBadges.slice(0, 3).map((badge) => (
                 <Badge key={badge.category} className="bg-green-500/20 text-green-200">{badgeByCategory[badge.category]}</Badge>
               )) : <p className="text-xs text-muted-foreground">Complete a category to earn the first badge.</p>}
@@ -277,13 +281,13 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
         </Card>
 
         <Card className="border-blue-500/30 bg-blue-500/5">
-          <CardContent className="p-3">
+          <CardContent className="p-2.5">
             <div className="flex items-center gap-2 text-blue-300">
               <Medal className="h-4 w-4" />
               <span className="text-sm font-semibold">Active Quests</span>
             </div>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {activeQuests.length > 0 ? activeQuests.map((quest) => (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {activeQuests.length > 0 ? activeQuests.slice(0, 3).map((quest) => (
                 <button
                   key={quest.id}
                   type="button"
@@ -299,9 +303,11 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
       </div>
 
       <Card className="print:hidden">
-        <CardHeader className="py-3">
-          <CardTitle className="text-sm">Badge Progress</CardTitle>
-          <CardDescription className="text-xs">Complete every skill in a category to unlock its badge.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 py-2">
+          <div>
+            <CardTitle className="text-sm">Badge Progress</CardTitle>
+            <CardDescription className="text-xs">Complete a category to unlock its badge.</CardDescription>
+          </div>
         </CardHeader>
         <CardContent className="grid gap-2 pt-0 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {categoryProgress.map((category) => (
@@ -399,36 +405,24 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
 
 export function KidsLifeSkillsChecklist() {
   return (
-    <div className="space-y-4">
-      <Card className="print:hidden">
-        <CardHeader className="py-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-amber-400" />
-            <CardTitle className="text-base">Life Skills Checklist</CardTitle>
-          </div>
-          <CardDescription className="text-xs">
-            Draft checklist for building capable, independent humans. Anthony and Roma can move at their own pace.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-lg border border-sky-400/30 bg-sky-500/10 px-3 py-2"><strong className="text-sky-100">Learned</strong> - I understand it.</div>
-            <div className="rounded-lg border border-violet-400/30 bg-violet-500/10 px-3 py-2"><strong className="text-violet-100">Practiced</strong> - I did it with help.</div>
-            <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2"><strong className="text-emerald-100">Owned</strong> - I can do it independently.</div>
-            <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2"><strong className="text-amber-100">Taught</strong> - I can teach someone else.</div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground print:hidden">
+        <span className="mr-1 flex items-center gap-1 font-medium text-zinc-200"><Sparkles className="h-3.5 w-3.5 text-amber-400" />Life Skills:</span>
+        <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-2 py-1"><strong className="text-sky-100">Learned</strong> = understand</span>
+        <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2 py-1"><strong className="text-violet-100">Practiced</strong> = with help</span>
+        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-1"><strong className="text-emerald-100">Owned</strong> = independent</span>
+        <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-1"><strong className="text-amber-100">Taught</strong> = teach it</span>
+      </div>
 
       <Tabs defaultValue="anthony" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 print:hidden">
+        <TabsList className="grid h-9 w-full grid-cols-2 print:hidden">
           <TabsTrigger value="anthony">Anthony</TabsTrigger>
           <TabsTrigger value="roma">Roma</TabsTrigger>
         </TabsList>
-        <TabsContent value="anthony" className="mt-4">
+        <TabsContent value="anthony" className="mt-3">
           <LifeSkillsTab kid="anthony" />
         </TabsContent>
-        <TabsContent value="roma" className="mt-4">
+        <TabsContent value="roma" className="mt-3">
           <LifeSkillsTab kid="roma" />
         </TabsContent>
       </Tabs>
