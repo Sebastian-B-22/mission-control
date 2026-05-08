@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Circle, Printer, Sparkles } from "lucide-react";
+import { CheckCircle2, Circle, Medal, Printer, Sparkles, Star, Trophy } from "lucide-react";
 
 type Kid = "anthony" | "roma";
 type Status = "not-started" | "learned" | "practiced" | "owned" | "taught";
@@ -31,6 +31,30 @@ const statusLabels: Record<Status, string> = {
 };
 
 const statusOrder: Status[] = ["not-started", "learned", "practiced", "owned", "taught"];
+
+const xpByStatus: Record<Status, number> = {
+  "not-started": 0,
+  learned: 10,
+  practiced: 25,
+  owned: 50,
+  taught: 75,
+};
+
+const badgeByCategory: Record<string, string> = {
+  "Feed Yourself": "Kitchen Captain",
+  "Body + Health": "Body Boss",
+  "Run a Home": "Home Hero",
+  "Car + Practical Mechanics": "Garage Guide",
+  "Clothing + Presentation": "Sharp Dresser",
+  "Money Smarts": "Money Boss",
+  "Digital + AI Smarts": "Digital Detective",
+  Communication: "Polite Pro",
+  "Hospitality + Hosting": "Host With the Most",
+  "Time + Responsibility": "Time Ninja",
+  "Safety + Navigation": "Crisis Capable",
+  "Travel Independence": "Trip Captain",
+  "Outdoor + Tool Skills": "Survival Scout",
+};
 
 const skills: LifeSkill[] = [
   { id: "pancakes", category: "Feed Yourself", skill: "Make pancakes or waffles", starter: true },
@@ -154,6 +178,32 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
     [progress]
   );
 
+  const xp = useMemo(
+    () => skills.reduce((sum, skill) => sum + xpByStatus[progress[skill.id] || "not-started"], 0),
+    [progress]
+  );
+
+  const level = Math.floor(xp / 250) + 1;
+  const nextLevelXp = level * 250;
+  const currentLevelFloor = (level - 1) * 250;
+  const levelProgress = Math.round(((xp - currentLevelFloor) / (nextLevelXp - currentLevelFloor)) * 100);
+
+  const categoryProgress = useMemo(
+    () => Object.entries(groupedSkills).map(([category, categorySkills]) => {
+      const completed = categorySkills.filter((skill) => ["owned", "taught"].includes(progress[skill.id] || "not-started")).length;
+      return {
+        category,
+        completed,
+        total: categorySkills.length,
+        percent: Math.round((completed / categorySkills.length) * 100),
+      };
+    }),
+    [progress]
+  );
+
+  const earnedBadges = categoryProgress.filter((category) => category.completed === category.total);
+  const activeQuests = skills.filter((skill) => skill.starter && !["owned", "taught"].includes(progress[skill.id] || "not-started")).slice(0, 5);
+
   const setSkillStatus = (skillId: string, status: Status) => {
     setProgress((prev) => ({ ...prev, [skillId]: status }));
   };
@@ -171,6 +221,79 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
           <Printer className="mr-2 h-4 w-4" /> Print
         </Button>
       </div>
+
+      <div className="grid gap-3 md:grid-cols-3 print:hidden">
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-amber-300">
+              <Star className="h-5 w-5" />
+              <span className="text-sm font-semibold">Level {level}</span>
+            </div>
+            <div className="mt-2 text-2xl font-bold text-white">{xp} XP</div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-800">
+              <div className="h-full rounded-full bg-amber-400" style={{ width: `${levelProgress}%` }} />
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">{nextLevelXp - xp} XP to Level {level + 1}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-green-500/30 bg-green-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-green-300">
+              <Trophy className="h-5 w-5" />
+              <span className="text-sm font-semibold">Badges</span>
+            </div>
+            <div className="mt-2 text-2xl font-bold text-white">{earnedBadges.length}/{categoryProgress.length}</div>
+            <div className="mt-3 flex flex-wrap gap-1">
+              {earnedBadges.length > 0 ? earnedBadges.slice(0, 3).map((badge) => (
+                <Badge key={badge.category} className="bg-green-500/20 text-green-200">{badgeByCategory[badge.category]}</Badge>
+              )) : <p className="text-xs text-muted-foreground">Complete a category to earn the first badge.</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-blue-500/30 bg-blue-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-blue-300">
+              <Medal className="h-5 w-5" />
+              <span className="text-sm font-semibold">Active Quests</span>
+            </div>
+            <div className="mt-3 space-y-1">
+              {activeQuests.length > 0 ? activeQuests.map((quest) => (
+                <button
+                  key={quest.id}
+                  type="button"
+                  onClick={() => setSkillStatus(quest.id, nextStatus(progress[quest.id] || "not-started"))}
+                  className="block w-full rounded-md bg-zinc-950/60 px-2 py-1 text-left text-xs text-zinc-200 hover:bg-zinc-800"
+                >
+                  + {quest.skill}
+                </button>
+              )) : <p className="text-xs text-muted-foreground">Starter quests complete. Pick a new adventure.</p>}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="print:hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Badge Progress</CardTitle>
+          <CardDescription>Complete every skill in a category to unlock its badge.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {categoryProgress.map((category) => (
+            <div key={category.category} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-3">
+              <div className="flex items-center justify-between gap-2 text-sm">
+                <span className="font-medium text-zinc-100">{badgeByCategory[category.category]}</span>
+                <span className="text-xs text-muted-foreground">{category.completed}/{category.total}</span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{category.category}</p>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
+                <div className="h-full rounded-full bg-green-400" style={{ width: `${category.percent}%` }} />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
       <div className="hidden print:block">
         <h2 className="text-2xl font-bold">{kids[kid].name}&apos;s Life Skills Checklist</h2>
