@@ -40,6 +40,8 @@ const skills: LifeSkill[] = [
   { id: "grocery-shop", category: "Feed Yourself", skill: "Grocery shop from a list and stay within a budget" },
   { id: "recipe", category: "Feed Yourself", skill: "Read and follow a simple recipe" },
   { id: "kitchen-clean", category: "Feed Yourself", skill: "Clean as you cook and reset the kitchen" },
+  { id: "load-dishwasher", category: "Feed Yourself", skill: "Load the dishwasher correctly" },
+  { id: "hand-wash-dishes", category: "Feed Yourself", skill: "Hand wash dishes, pans, knives, and cutting boards safely" },
   { id: "nutrition-label", category: "Feed Yourself", skill: "Read a nutrition label and compare two snacks" },
 
   { id: "water-bottle", category: "Body + Health", skill: "Bring water bottle to and from sports/activity successfully 3x in a row", starter: true },
@@ -48,6 +50,7 @@ const skills: LifeSkill[] = [
   { id: "calm-reset", category: "Body + Health", skill: "Use a calm-down reset: breathing, walk, stretch, or pause" },
 
   { id: "laundry", category: "Run a Home", skill: "Do one full laundry cycle", starter: true },
+  { id: "manage-clean-laundry", category: "Run a Home", skill: "Manage clean laundry: fold, hang, sort, and put away" },
   { id: "sheets", category: "Run a Home", skill: "Change sheets and make the bed" },
   { id: "bathroom-sink", category: "Run a Home", skill: "Clean bathroom sink and mirror", starter: true },
   { id: "vacuum", category: "Run a Home", skill: "Vacuum or sweep a room" },
@@ -66,6 +69,7 @@ const skills: LifeSkill[] = [
 
   { id: "iron-shirt", category: "Clothing + Presentation", skill: "Iron a dress shirt" },
   { id: "iron-slacks", category: "Clothing + Presentation", skill: "Iron slacks or dress pants" },
+  { id: "tie-necktie", category: "Clothing + Presentation", skill: "Tie a necktie" },
   { id: "polish-shoes", category: "Clothing + Presentation", skill: "Polish dress shoes" },
   { id: "sew-button", category: "Clothing + Presentation", skill: "Sew on a button" },
   { id: "remove-stain", category: "Clothing + Presentation", skill: "Treat a basic clothing stain" },
@@ -85,6 +89,10 @@ const skills: LifeSkill[] = [
   { id: "phone-call", category: "Communication", skill: "Make a polite phone call or leave a voicemail", starter: true },
   { id: "adult-text", category: "Communication", skill: "Write a polite text/email to a coach, teacher, or adult" },
   { id: "apology", category: "Communication", skill: "Apologize well: own it, repair it, move forward" },
+  { id: "wrap-present", category: "Hospitality + Hosting", skill: "Wrap a present neatly" },
+  { id: "host-guest", category: "Hospitality + Hosting", skill: "Host a guest: greet, offer water/snack, include them, and help reset" },
+  { id: "set-table", category: "Hospitality + Hosting", skill: "Set the table and help serve a family meal" },
+  { id: "thank-host", category: "Hospitality + Hosting", skill: "Be a good guest: thank the host and help clean up" },
 
   { id: "calendar", category: "Time + Responsibility", skill: "Use a calendar or planner for practices, activities, and deadlines" },
   { id: "night-before", category: "Time + Responsibility", skill: "Pack the night before" },
@@ -92,9 +100,19 @@ const skills: LifeSkill[] = [
   { id: "teach-sibling", category: "Time + Responsibility", skill: "Teach one life skill to your sibling", starter: true },
 
   { id: "emergency", category: "Safety + Navigation", skill: "Memorize parent phone numbers and home address" },
+  { id: "crisis-basics", category: "Safety + Navigation", skill: "Crisis-capable basics: stay calm, assess, get safe, contact help, and communicate clearly" },
   { id: "lost", category: "Safety + Navigation", skill: "Know what to do if lost or separated" },
   { id: "map", category: "Safety + Navigation", skill: "Read a map and identify landmarks" },
   { id: "unsafe", category: "Safety + Navigation", skill: "Say clearly: I need help / I don’t feel safe / call my parent" },
+
+  { id: "plan-trip", category: "Travel Independence", skill: "Plan and execute a trip: budget, book, pack, navigate, and practice hospitality" },
+  { id: "packing-list", category: "Travel Independence", skill: "Create and use a packing list for a trip" },
+  { id: "travel-budget", category: "Travel Independence", skill: "Build a simple travel budget: transport, food, activities, and buffer" },
+  { id: "navigation", category: "Travel Independence", skill: "Navigate with maps, landmarks, timing, and backup routes" },
+
+  { id: "basic-knots", category: "Outdoor + Tool Skills", skill: "Tie basic knots: square knot, bowline, two half hitches" },
+  { id: "build-fire", category: "Outdoor + Tool Skills", skill: "Build and safely extinguish a fire" },
+  { id: "swiss-army-knife", category: "Outdoor + Tool Skills", skill: "Use a Swiss Army knife safely and responsibly" },
 ];
 
 const groupedSkills = skills.reduce<Record<string, LifeSkill[]>>((groups, skill) => {
