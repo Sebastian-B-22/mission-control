@@ -34,12 +34,15 @@ const statusOrder: Status[] = ["not-started", "learned", "practiced", "owned", "
 
 const skills: LifeSkill[] = [
   { id: "pancakes", category: "Feed Yourself", skill: "Make pancakes or waffles", starter: true },
-  { id: "smoothie", category: "Feed Yourself", skill: "Make a balanced smoothie or lunch", starter: true },
+  { id: "smoothie", category: "Feed Yourself", skill: "Make a balanced smoothie", starter: true },
+  { id: "lunch", category: "Feed Yourself", skill: "Make and pack a balanced lunch", starter: true },
+  { id: "family-dinner", category: "Feed Yourself", skill: "Plan and make family dinner" },
+  { id: "grocery-shop", category: "Feed Yourself", skill: "Grocery shop from a list and stay within a budget" },
   { id: "recipe", category: "Feed Yourself", skill: "Read and follow a simple recipe" },
   { id: "kitchen-clean", category: "Feed Yourself", skill: "Clean as you cook and reset the kitchen" },
   { id: "nutrition-label", category: "Feed Yourself", skill: "Read a nutrition label and compare two snacks" },
 
-  { id: "activity-bag", category: "Body + Health", skill: "Pack your own sports/activity bag", starter: true },
+  { id: "water-bottle", category: "Body + Health", skill: "Bring water bottle to and from sports/activity successfully 3x in a row", starter: true },
   { id: "first-aid", category: "Body + Health", skill: "Handle basic first aid for cuts, scrapes, burns, and sprains" },
   { id: "sleep-energy", category: "Body + Health", skill: "Track sleep, mood, energy, and hydration for one week" },
   { id: "calm-reset", category: "Body + Health", skill: "Use a calm-down reset: breathing, walk, stretch, or pause" },
@@ -48,7 +51,24 @@ const skills: LifeSkill[] = [
   { id: "sheets", category: "Run a Home", skill: "Change sheets and make the bed" },
   { id: "bathroom-sink", category: "Run a Home", skill: "Clean bathroom sink and mirror", starter: true },
   { id: "vacuum", category: "Run a Home", skill: "Vacuum or sweep a room" },
-  { id: "basic-tools", category: "Run a Home", skill: "Use a screwdriver, hammer, measuring tape, and Allen key safely" },
+  { id: "picture-frame", category: "Run a Home", skill: "Hang a picture frame straight and securely" },
+  { id: "plunge-toilet", category: "Run a Home", skill: "Plunge and unclog a toilet safely" },
+  { id: "paint-room", category: "Run a Home", skill: "Prep and paint a room or wall section" },
+  { id: "assemble-furniture", category: "Run a Home", skill: "Build or assemble furniture from instructions" },
+  { id: "mow-lawn", category: "Run a Home", skill: "Mow the lawn or complete an outdoor maintenance task safely" },
+  { id: "basic-tools", category: "Run a Home", skill: "Use a screwdriver, hammer, measuring tape, level, and Allen key safely" },
+
+  { id: "wash-car", category: "Car + Practical Mechanics", skill: "Wash and detail the car" },
+  { id: "gas", category: "Car + Practical Mechanics", skill: "Get gas and reset/track the trip meter if needed" },
+  { id: "check-oil", category: "Car + Practical Mechanics", skill: "Check the oil" },
+  { id: "tire-pressure", category: "Car + Practical Mechanics", skill: "Check tire pressure and understand the recommended PSI" },
+  { id: "change-tire", category: "Car + Practical Mechanics", skill: "Change a tire or walk through the full tire-change process safely" },
+
+  { id: "iron-shirt", category: "Clothing + Presentation", skill: "Iron a dress shirt" },
+  { id: "iron-slacks", category: "Clothing + Presentation", skill: "Iron slacks or dress pants" },
+  { id: "polish-shoes", category: "Clothing + Presentation", skill: "Polish dress shoes" },
+  { id: "sew-button", category: "Clothing + Presentation", skill: "Sew on a button" },
+  { id: "remove-stain", category: "Clothing + Presentation", skill: "Treat a basic clothing stain" },
 
   { id: "spending", category: "Money Smarts", skill: "Track spending or allowance for two weeks", starter: true },
   { id: "budget", category: "Money Smarts", skill: "Split money into spend/save/give/invest" },
