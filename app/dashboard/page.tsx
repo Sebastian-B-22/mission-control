@@ -58,6 +58,7 @@ import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesV
 import {
   HomeschoolScheduleView,
   HomeschoolFocusView,
+  HomeschoolLifeSkillsView,
   HomeschoolProjectsView,
   HomeschoolReadAloudView,
   HomeschoolLibraryView,
@@ -710,6 +711,8 @@ export default function DashboardPage() {
         return <HomeschoolScheduleView userId={convexUser._id} />;
       case "homeschool-focus":
         return <HomeschoolFocusView userId={convexUser._id} />;
+      case "homeschool-life-skills":
+        return <HomeschoolLifeSkillsView userId={convexUser._id} />;
       case "homeschool-projects":
         return <HomeschoolProjectsView userId={convexUser._id} />;
       case "homeschool-readaloud":

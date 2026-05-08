@@ -11,6 +11,7 @@ import { TripsOnHorizon } from "@/components/TripsOnHorizon";
 import { FieldTripList } from "@/components/FieldTripList";
 import { BookLibraryVisual } from "@/components/BookLibraryVisual";
 import { GameLibraryVisual } from "@/components/GameLibraryVisual";
+import { KidsLifeSkillsChecklist } from "@/components/KidsLifeSkillsChecklist";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -162,6 +163,19 @@ export function HomeschoolFocusView({ userId }: HomeschoolSubViewProps) {
         <p className="text-muted-foreground mt-1">Current & upcoming learning themes</p>
       </div>
       <MonthlyFocus mode="page" />
+    </div>
+  );
+}
+
+export function HomeschoolLifeSkillsView({ userId }: HomeschoolSubViewProps) {
+  void userId;
+  return (
+    <div className="space-y-6">
+      <div className="print:hidden">
+        <h1 className="text-3xl font-bold">Life Skills</h1>
+        <p className="text-muted-foreground mt-1">Real-world independence checklist for Anthony & Roma</p>
+      </div>
+      <KidsLifeSkillsChecklist />
     </div>
   );
 }

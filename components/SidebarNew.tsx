@@ -180,6 +180,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Daily", view: "homeschool-daily" },
         { name: "Weekly", view: "homeschool-schedule" },
         { name: "Monthly", view: "homeschool-focus" },
+        { name: "Life Skills", view: "homeschool-life-skills" },
         { name: "Projects", view: "homeschool-projects" },
         { name: "Read Aloud List", view: "homeschool-readaloud" },
         { name: "Book Library", view: "homeschool-library" },
