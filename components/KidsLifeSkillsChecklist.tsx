@@ -58,18 +58,18 @@ const badgeByCategory: Record<string, string> = {
 
 const categoryStyles: Record<string, { emoji: string; accent: string; soft: string; ring: string; bar: string }> = {
   "Feed Yourself": { emoji: "🥞", accent: "text-orange-200", soft: "from-orange-500/20 via-amber-500/10 to-zinc-950", ring: "border-orange-400/30", bar: "from-orange-400 to-amber-300" },
-  "Body + Health": { emoji: "💪", accent: "text-emerald-200", soft: "from-emerald-500/20 via-teal-500/10 to-zinc-950", ring: "border-emerald-400/30", bar: "from-emerald-400 to-teal-300" },
-  "Run a Home": { emoji: "🏡", accent: "text-sky-200", soft: "from-sky-500/20 via-blue-500/10 to-zinc-950", ring: "border-sky-400/30", bar: "from-sky-400 to-blue-300" },
-  "Car + Practical Mechanics": { emoji: "🔧", accent: "text-slate-200", soft: "from-slate-400/20 via-cyan-500/10 to-zinc-950", ring: "border-cyan-300/30", bar: "from-slate-300 to-cyan-300" },
+  "Body + Health": { emoji: "💪", accent: "text-emerald-200", soft: "from-emerald-500/25 via-green-500/10 to-zinc-950", ring: "border-emerald-400/35", bar: "from-emerald-400 to-green-300" },
+  "Run a Home": { emoji: "🏡", accent: "text-sky-200", soft: "from-sky-500/25 via-blue-500/10 to-zinc-950", ring: "border-sky-400/35", bar: "from-sky-400 to-blue-300" },
+  "Car + Practical Mechanics": { emoji: "🔧", accent: "text-stone-200", soft: "from-stone-500/25 via-yellow-500/10 to-zinc-950", ring: "border-stone-300/35", bar: "from-stone-300 to-yellow-300" },
   "Clothing + Presentation": { emoji: "👔", accent: "text-violet-200", soft: "from-violet-500/20 via-fuchsia-500/10 to-zinc-950", ring: "border-violet-400/30", bar: "from-violet-400 to-fuchsia-300" },
   "Money Smarts": { emoji: "💵", accent: "text-lime-200", soft: "from-lime-500/20 via-green-500/10 to-zinc-950", ring: "border-lime-400/30", bar: "from-lime-400 to-green-300" },
-  "Digital + AI Smarts": { emoji: "🤖", accent: "text-cyan-200", soft: "from-cyan-500/20 via-blue-500/10 to-zinc-950", ring: "border-cyan-400/30", bar: "from-cyan-400 to-blue-300" },
+  "Digital + AI Smarts": { emoji: "🤖", accent: "text-cyan-200", soft: "from-cyan-500/25 via-indigo-500/10 to-zinc-950", ring: "border-cyan-400/35", bar: "from-cyan-300 to-indigo-300" },
   Communication: { emoji: "💬", accent: "text-pink-200", soft: "from-pink-500/20 via-rose-500/10 to-zinc-950", ring: "border-pink-400/30", bar: "from-pink-400 to-rose-300" },
-  "Hospitality + Hosting": { emoji: "🎁", accent: "text-rose-200", soft: "from-rose-500/20 via-orange-500/10 to-zinc-950", ring: "border-rose-400/30", bar: "from-rose-400 to-orange-300" },
+  "Hospitality + Hosting": { emoji: "🎁", accent: "text-orange-200", soft: "from-orange-500/25 via-red-500/10 to-zinc-950", ring: "border-orange-400/35", bar: "from-orange-400 to-red-300" },
   "Time + Responsibility": { emoji: "⏱️", accent: "text-yellow-200", soft: "from-yellow-500/20 via-amber-500/10 to-zinc-950", ring: "border-yellow-400/30", bar: "from-yellow-400 to-amber-300" },
-  "Safety + Navigation": { emoji: "🧭", accent: "text-red-200", soft: "from-red-500/20 via-orange-500/10 to-zinc-950", ring: "border-red-400/30", bar: "from-red-400 to-orange-300" },
+  "Safety + Navigation": { emoji: "🧭", accent: "text-red-200", soft: "from-red-500/25 via-rose-500/10 to-zinc-950", ring: "border-red-400/35", bar: "from-red-400 to-rose-300" },
   "Travel Independence": { emoji: "✈️", accent: "text-indigo-200", soft: "from-indigo-500/20 via-sky-500/10 to-zinc-950", ring: "border-indigo-400/30", bar: "from-indigo-400 to-sky-300" },
-  "Outdoor + Tool Skills": { emoji: "🏕️", accent: "text-green-200", soft: "from-green-500/20 via-emerald-500/10 to-zinc-950", ring: "border-green-400/30", bar: "from-green-400 to-emerald-300" },
+  "Outdoor + Tool Skills": { emoji: "🏕️", accent: "text-teal-200", soft: "from-teal-500/25 via-lime-500/10 to-zinc-950", ring: "border-teal-400/35", bar: "from-teal-400 to-lime-300" },
 };
 
 const statusStyles: Record<Status, string> = {
@@ -236,8 +236,8 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div>
-          <h2 className={`text-xl font-semibold ${kids[kid].color}`}>{kids[kid].name}&apos;s Life XP</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className={`text-lg font-semibold ${kids[kid].color}`}>{kids[kid].name}&apos;s Life XP</h2>
+          <p className="text-xs text-muted-foreground">
             {completedCount}/{skills.length} owned or taught. Tap a skill to move it forward.
           </p>
         </div>
@@ -246,29 +246,29 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
         </Button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3 print:hidden">
+      <div className="grid gap-2 md:grid-cols-3 print:hidden">
         <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 text-amber-300">
-              <Star className="h-5 w-5" />
+              <Star className="h-4 w-4" />
               <span className="text-sm font-semibold">Level {level}</span>
             </div>
-            <div className="mt-2 text-2xl font-bold text-white">{xp} XP</div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-800">
+            <div className="mt-1 text-xl font-bold text-white">{xp} XP</div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
               <div className="h-full rounded-full bg-amber-400" style={{ width: `${levelProgress}%` }} />
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">{nextLevelXp - xp} XP to Level {level + 1}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{nextLevelXp - xp} XP to Level {level + 1}</p>
           </CardContent>
         </Card>
 
         <Card className="border-green-500/30 bg-green-500/5">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 text-green-300">
-              <Trophy className="h-5 w-5" />
+              <Trophy className="h-4 w-4" />
               <span className="text-sm font-semibold">Badges</span>
             </div>
-            <div className="mt-2 text-2xl font-bold text-white">{earnedBadges.length}/{categoryProgress.length}</div>
-            <div className="mt-3 flex flex-wrap gap-1">
+            <div className="mt-1 text-xl font-bold text-white">{earnedBadges.length}/{categoryProgress.length}</div>
+            <div className="mt-2 flex flex-wrap gap-1">
               {earnedBadges.length > 0 ? earnedBadges.slice(0, 3).map((badge) => (
                 <Badge key={badge.category} className="bg-green-500/20 text-green-200">{badgeByCategory[badge.category]}</Badge>
               )) : <p className="text-xs text-muted-foreground">Complete a category to earn the first badge.</p>}
@@ -277,18 +277,18 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
         </Card>
 
         <Card className="border-blue-500/30 bg-blue-500/5">
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-2 text-blue-300">
-              <Medal className="h-5 w-5" />
+              <Medal className="h-4 w-4" />
               <span className="text-sm font-semibold">Active Quests</span>
             </div>
-            <div className="mt-3 space-y-1">
+            <div className="mt-2 flex flex-wrap gap-1">
               {activeQuests.length > 0 ? activeQuests.map((quest) => (
                 <button
                   key={quest.id}
                   type="button"
                   onClick={() => setSkillStatus(quest.id, nextStatus(progress[quest.id] || "not-started"))}
-                  className="block w-full rounded-md bg-zinc-950/60 px-2 py-1 text-left text-xs text-zinc-200 hover:bg-zinc-800"
+                  className="rounded-full bg-zinc-950/60 px-2 py-1 text-left text-xs text-zinc-200 hover:bg-zinc-800"
                 >
                   + {quest.skill}
                 </button>
@@ -299,21 +299,20 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
       </div>
 
       <Card className="print:hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Badge Progress</CardTitle>
-          <CardDescription>Complete every skill in a category to unlock its badge.</CardDescription>
+        <CardHeader className="py-3">
+          <CardTitle className="text-sm">Badge Progress</CardTitle>
+          <CardDescription className="text-xs">Complete every skill in a category to unlock its badge.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <CardContent className="grid gap-2 pt-0 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {categoryProgress.map((category) => (
-            <div key={category.category} className={`rounded-xl border bg-gradient-to-br p-3 ${categoryStyles[category.category].ring} ${categoryStyles[category.category].soft}`}>
-              <div className="flex items-center justify-between gap-2 text-sm">
-                <span className={`font-medium ${categoryStyles[category.category].accent}`}>
+            <div key={category.category} className={`rounded-lg border bg-gradient-to-br p-2 ${categoryStyles[category.category].ring} ${categoryStyles[category.category].soft}`}>
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className={`truncate font-medium ${categoryStyles[category.category].accent}`}>
                   {categoryStyles[category.category].emoji} {badgeByCategory[category.category]}
                 </span>
                 <span className="text-xs text-muted-foreground">{category.completed}/{category.total}</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{category.category}</p>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-zinc-800">
                 <div className={`h-full rounded-full bg-gradient-to-r ${categoryStyles[category.category].bar}`} style={{ width: `${category.percent}%` }} />
               </div>
             </div>
@@ -400,23 +399,23 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
 
 export function KidsLifeSkillsChecklist() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card className="print:hidden">
-        <CardHeader>
+        <CardHeader className="py-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-amber-400" />
-            <CardTitle>Life Skills Checklist</CardTitle>
+            <Sparkles className="h-4 w-4 text-amber-400" />
+            <CardTitle className="text-base">Life Skills Checklist</CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-xs">
             Draft checklist for building capable, independent humans. Anthony and Roma can move at their own pace.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 text-sm text-muted-foreground md:grid-cols-4">
-            <div className="rounded-xl border border-sky-400/30 bg-sky-500/10 p-3"><strong className="text-sky-100">Learned</strong><br />I understand it.</div>
-            <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-3"><strong className="text-violet-100">Practiced</strong><br />I did it with help.</div>
-            <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3"><strong className="text-emerald-100">Owned</strong><br />I can do it independently.</div>
-            <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-3"><strong className="text-amber-100">Taught</strong><br />I can teach someone else.</div>
+        <CardContent className="pt-0">
+          <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-lg border border-sky-400/30 bg-sky-500/10 px-3 py-2"><strong className="text-sky-100">Learned</strong> - I understand it.</div>
+            <div className="rounded-lg border border-violet-400/30 bg-violet-500/10 px-3 py-2"><strong className="text-violet-100">Practiced</strong> - I did it with help.</div>
+            <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2"><strong className="text-emerald-100">Owned</strong> - I can do it independently.</div>
+            <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2"><strong className="text-amber-100">Taught</strong> - I can teach someone else.</div>
           </div>
         </CardContent>
       </Card>
