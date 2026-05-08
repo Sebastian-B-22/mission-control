@@ -111,8 +111,11 @@ const skills: LifeSkill[] = [
   { id: "navigation", category: "Travel Independence", skill: "Navigate with maps, landmarks, timing, and backup routes" },
 
   { id: "basic-knots", category: "Outdoor + Tool Skills", skill: "Tie basic knots: square knot, bowline, two half hitches" },
-  { id: "build-fire", category: "Outdoor + Tool Skills", skill: "Build and safely extinguish a fire" },
+  { id: "catch-fish", category: "Outdoor + Tool Skills", skill: "Catch, handle, and clean a fish safely" },
+  { id: "build-fire", category: "Outdoor + Tool Skills", skill: "Build, maintain, and safely extinguish a fire" },
   { id: "swiss-army-knife", category: "Outdoor + Tool Skills", skill: "Use a Swiss Army knife safely and responsibly" },
+  { id: "firearm-safety", category: "Outdoor + Tool Skills", skill: "Learn firearm safety rules and handle a firearm only with qualified adult supervision" },
+  { id: "supervised-firearm", category: "Outdoor + Tool Skills", skill: "Shoot a firearm safely at a supervised range or lesson" },
 ];
 
 const groupedSkills = skills.reduce<Record<string, LifeSkill[]>>((groups, skill) => {
