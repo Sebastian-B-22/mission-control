@@ -342,9 +342,9 @@ function LifeSkillsTab({ kid }: { kid: Kid }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <CardTitle className={`text-base ${style.accent}`}>
-                  <span className="mr-2 text-lg">{style.emoji}</span>{category}
+                  <span className="mr-2 text-lg">{style.emoji}</span>{badgeByCategory[category]}
                 </CardTitle>
-                <CardDescription className="mt-1 print:hidden">{badgeByCategory[category]} badge • {categoryDone}/{categorySkills.length} owned or taught</CardDescription>
+                <CardDescription className="mt-1 print:hidden">{category} • {categoryDone}/{categorySkills.length} owned or taught</CardDescription>
               </div>
               <Badge className="border-white/10 bg-white/10 text-white print:hidden">{categoryPercent}%</Badge>
             </div>
