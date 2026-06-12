@@ -38,7 +38,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0a0a0a",
+  themeColor: "#101117",
 };
 
 export default function RootLayout({
@@ -48,7 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} ${inter.variable} ${geistMono.variable} bg-black`}>
+      <body className={`${inter.className} ${inter.variable} ${geistMono.variable} bg-background`}>
         <ClientErrorTrap />
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>

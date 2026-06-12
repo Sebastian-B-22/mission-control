@@ -745,7 +745,7 @@ export default function DashboardPage() {
         onViewChange={setCurrentView} 
       />
 
-      <div className="lg:pl-64 min-h-screen bg-black">
+      <div className="lg:pl-64 min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           {!standaloneSurfaceViews.has(currentView) ? (
             <div className="mb-8">
