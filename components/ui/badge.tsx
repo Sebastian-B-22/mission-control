@@ -22,6 +22,8 @@ const badgeVariants = cva(
           "border-danger/30 bg-danger/15 text-danger",
         info:
           "border-info/30 bg-info/15 text-info",
+        accent:
+          "border-violet-400/30 bg-violet-500/15 text-violet-200",
         outline: "text-foreground",
       },
     },

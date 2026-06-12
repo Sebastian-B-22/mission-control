@@ -22,9 +22,7 @@ type NavCard = {
   view: string;
   buttonLabel: string;
   stats?: string[];
-  tone: string;
-  badgeTone: string;
-  statTone: string;
+  badgeVariant: "success" | "warning" | "danger" | "info" | "accent";
   eyebrow: string;
 };
 
@@ -160,9 +158,7 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-families",
       buttonLabel: "Open Family CRM",
       eyebrow: "People system",
-      tone: "border-fuchsia-400/30 bg-gradient-to-br from-fuchsia-500/24 via-violet-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(217,70,239,0.08)]",
-      badgeTone: "border-fuchsia-400/30 bg-fuchsia-500/18 text-fuchsia-100",
-      statTone: "border-fuchsia-400/20 bg-zinc-950/40 text-fuchsia-50",
+      badgeVariant: "accent",
       stats: familyStats
         ? [
             `${familyStats.totalFamilies} total families`,
@@ -178,9 +174,7 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-spring",
       buttonLabel: "Open Spring Ops",
       eyebrow: "Live roster pressure",
-      tone: "border-rose-400/30 bg-gradient-to-br from-rose-500/26 via-orange-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(251,113,133,0.08)]",
-      badgeTone: "border-rose-400/30 bg-rose-500/18 text-rose-100",
-      statTone: "border-rose-400/20 bg-zinc-950/40 text-rose-50",
+      badgeVariant: "danger",
       stats: [
         `${agouraSpringCount} Agoura ${agouraSpringCountIsStale ? "live" : "registration"} count`,
         `${paliSpringCount} Pali ${paliSpringCountIsStale ? "live" : "registration"} count`,
@@ -192,9 +186,7 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-coach-hub",
       buttonLabel: "Open Coach Staffing",
       eyebrow: "Coverage + compliance",
-      tone: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
-      badgeTone: "border-cyan-400/30 bg-cyan-500/18 text-cyan-100",
-      statTone: "border-cyan-400/20 bg-zinc-950/40 text-cyan-50",
+      badgeVariant: "info",
       stats: [
         `${springTaskCount} spring-linked tasks`,
         `${campTaskCount} camp-linked tasks`,
@@ -206,9 +198,7 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-camps",
       buttonLabel: "Open Camps + Mini Camp",
       eyebrow: "Week-by-week delivery",
-      tone: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/26 via-teal-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
-      badgeTone: "border-emerald-400/30 bg-emerald-500/18 text-emerald-100",
-      statTone: "border-emerald-400/20 bg-zinc-950/40 text-emerald-50",
+      badgeVariant: "success",
       stats: campLaneStats.length
         ? campLaneStats.map(
             (region) => `${region.regionLabel}: ${region.configuredWeekCount}/${region.weekCount} weeks, ${region.totalRegistered} registered`
@@ -296,22 +286,22 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {navCards.map((card) => (
-          <Card key={card.title} className={`h-full rounded-2xl ${card.tone}`}>
+          <Card key={card.title} className="h-full rounded-xl border-line bg-card shadow-none">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-zinc-300/75 mb-2">{card.eyebrow}</div>
-                  <CardTitle className="text-white">{card.title}</CardTitle>
-                  <CardDescription className="mt-1 text-zinc-300">{card.description}</CardDescription>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-faint">{card.eyebrow}</div>
+                  <CardTitle className="text-ink">{card.title}</CardTitle>
+                  <CardDescription className="mt-1 text-ink-soft">{card.description}</CardDescription>
                 </div>
-                <Badge variant="outline" className={card.badgeTone}>Lane</Badge>
+                <Badge variant={card.badgeVariant}>Lane</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {card.stats && card.stats.length > 0 && (
                 <div className="grid gap-2 sm:grid-cols-2">
                   {card.stats.map((stat) => (
-                    <div key={stat} className={`rounded-lg border px-3 py-2 text-sm ${card.statTone}`}>
+                    <div key={stat} className="rounded-md border border-line bg-surface-2/70 px-3 py-2 text-sm text-ink-soft">
                       {stat}
                     </div>
                   ))}
