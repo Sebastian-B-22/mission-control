@@ -27,7 +27,7 @@ const platformConfig: Record<string, { icon: React.ReactNode; color: string; lab
   },
   "rosetta-stone": {
     icon: <Globe className="h-4 w-4" />,
-    color: "bg-green-500",
+    color: "bg-emerald-500",
     label: "Rosetta Stone",
   },
   "synthesis": {
@@ -89,12 +89,12 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
   const allDone = completedCount === totalPlatforms && totalPlatforms > 0;
   
   return (
-    <Card className={allDone ? "border-green-500 border-2" : ""}>
+    <Card className={allDone ? "border-emerald-500 border-2" : ""}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             {studentName}
-            {allDone && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+            {allDone && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
           </CardTitle>
           <Badge variant={allDone ? "default" : "secondary"}>
             {completedCount}/{totalPlatforms} done
@@ -115,7 +115,7 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
                 key={p.platform}
                 className={`flex items-center justify-between p-3 rounded-lg border ${
                   p.todayCompleted 
-                    ? "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800" 
+                    ? "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800" 
                     : "bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
                 }`}
               >

@@ -54,14 +54,14 @@ const ROOM_STATUS_BG: Record<string, string> = {
   "not-started": "bg-zinc-950 border-zinc-800 text-zinc-100",
   "planning": "bg-blue-950/50 border-blue-700/40 text-blue-100",
   "in-progress": "bg-amber-950/40 border-amber-700/40 text-amber-100",
-  "done": "bg-green-950/40 border-green-700/40 text-green-100",
+  "done": "bg-emerald-950/40 border-emerald-700/40 text-emerald-100",
 };
 
 const ROOM_STATUS_BADGE: Record<string, string> = {
   "not-started": "bg-zinc-600 text-white",
   "planning": "bg-blue-600 text-white",
   "in-progress": "bg-amber-500 text-white",
-  "done": "bg-green-600 text-white",
+  "done": "bg-emerald-600 text-white",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -77,7 +77,7 @@ const TASK_STATUS_COLORS: Record<string, string> = {
   "idea": "bg-purple-950/40 text-purple-100 border-purple-700/40",
   "planned": "bg-blue-950/40 text-blue-100 border-blue-700/40",
   "in-progress": "bg-amber-950/40 text-amber-100 border-amber-700/40",
-  "done": "bg-green-950/40 text-green-100 border-green-700/40",
+  "done": "bg-emerald-950/40 text-emerald-100 border-emerald-700/40",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -837,7 +837,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </div>
                   ) : null}
                 </div>
-                <Badge className={objective.isComplete ? "bg-green-600 text-white" : "bg-black/30 text-zinc-100 border border-white/10"}>
+                <Badge className={objective.isComplete ? "bg-emerald-600 text-white" : "bg-black/30 text-zinc-100 border border-white/10"}>
                   {objective.completedCount}/{objective.totalCount}
                 </Badge>
               </div>
@@ -859,7 +859,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       key={milestone._id}
                       className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-sm transition-all ${
                         milestone.completed
-                          ? "border-green-700/40 bg-green-950/40 text-green-100"
+                          ? "border-emerald-700/40 bg-emerald-950/40 text-emerald-100"
                           : isPast
                           ? "border-red-700/40 bg-red-950/40 text-red-100"
                           : `bg-black/28 text-zinc-100 ${objective.buttonClass}`

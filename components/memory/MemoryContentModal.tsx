@@ -231,7 +231,7 @@ export function MemoryContentModal({ filePath, onClose }: MemoryContentModalProp
                   onClick={handleCopy}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                     copied
-                      ? "bg-green-50 text-green-700 border-green-200"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
                   }`}
                   title="Copy raw markdown"

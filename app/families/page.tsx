@@ -120,8 +120,8 @@ export default function FamiliesPage() {
 
                   {/* Account Credit */}
                   {familyCredit && familyCredit.balance > 0 && (
-                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded">
-                      <div className="font-semibold text-green-800">
+                    <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded">
+                      <div className="font-semibold text-emerald-800">
                         Account Credit: ${(familyCredit.balance / 100).toFixed(2)}
                       </div>
                     </div>
@@ -202,7 +202,7 @@ export default function FamiliesPage() {
                               {new Date(txn.createdAt).toLocaleDateString()}
                             </div>
                           </div>
-                          <div className={txn.amount > 0 ? "text-green-600" : "text-red-600"}>
+                          <div className={txn.amount > 0 ? "text-emerald-600" : "text-red-600"}>
                             {txn.amount > 0 ? "+" : ""}${(txn.amount / 100).toFixed(2)}
                           </div>
                         </div>
@@ -218,7 +218,7 @@ export default function FamiliesPage() {
                     <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                       Add Note
                     </button>
-                    <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    <button className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">
                       Add Credit
                     </button>
                     {selectedFamily.stripeCustomerId && (

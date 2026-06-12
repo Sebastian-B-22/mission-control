@@ -47,7 +47,7 @@ interface HealthDashboardProps {
 function getScoreColor(score: number): string {
   if (score === 100) return "#f59e0b"; // gold/amber for perfect
   if (score >= 85) return "#ec4899"; // bright pink for 85+
-  if (score >= 70) return "#22c55e"; // green for 70-84
+  if (score >= 70) return "#10b981"; // emerald for 70-84
   if (score >= 50) return "#3b82f6"; // blue for 50-70
   return "#71717a"; // zinc-500 for <50
 }
@@ -56,7 +56,7 @@ function getScoreColor(score: number): string {
 function getScoreTextClass(score: number): string {
   if (score === 100) return "text-amber-500";
   if (score >= 85) return "text-pink-500";
-  if (score >= 70) return "text-purple-400";
+  if (score >= 70) return "text-emerald-400";
   if (score >= 50) return "text-blue-500";
   return "text-zinc-500";
 }
