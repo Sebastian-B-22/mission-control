@@ -152,7 +152,7 @@ function RangeBar({ value, optimal, normal }: { value: number; optimal: [number,
       />
       {/* Value marker */}
       <div 
-        className="absolute w-1 h-full bg-slate-900 rounded"
+        className="absolute w-1 h-full bg-zinc-900 rounded"
         style={{ left: `${Math.max(0, Math.min(99, valuePos))}%` }}
       />
     </div>
@@ -312,7 +312,7 @@ export function BioMapView({ userId }: { userId: Id<"users"> }) {
                           </div>
                         </div>
                         <RangeBar value={marker.value} optimal={range?.optimal || [0, 100]} normal={range?.normal || [0, 100]} />
-                        <div className="flex justify-between text-[10px] text-slate-500">
+                        <div className="flex justify-between text-[10px] text-zinc-500">
                           <span>Optimal: {range?.optimal[0]}-{range?.optimal[1]}</span>
                           <span>Normal: {range?.normal[0]}-{range?.normal[1]}</span>
                         </div>
