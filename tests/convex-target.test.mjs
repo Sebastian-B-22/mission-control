@@ -19,6 +19,12 @@ describe("Convex deployment targeting", () => {
     );
   });
 
+  it("maps Vercel preview builds to dev and production builds to prod", () => {
+    assert.equal(getConvexDeploymentTarget(env({ VERCEL_ENV: "preview" })), "dev");
+    assert.equal(getConvexDeploymentTarget(env({ VERCEL_ENV: "development" })), "dev");
+    assert.equal(getConvexDeploymentTarget(env({ VERCEL_ENV: "production" })), "prod");
+  });
+
   it("returns the production cloud URL only when prod is explicit", () => {
     assert.equal(
       getConvexUrl({ env: env({ MISSION_CONTROL_CONVEX_TARGET: "prod" }), kind: "cloud" }),
