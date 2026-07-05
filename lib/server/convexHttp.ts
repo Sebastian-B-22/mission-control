@@ -19,13 +19,17 @@ let cachedUrl: string | null = null;
 export function getConvexDeploymentTarget(): ConvexTarget {
   const target = process.env.MISSION_CONTROL_CONVEX_TARGET || process.env.CONVEX_TARGET;
 
-  if (target !== "prod" && target !== "dev") {
-    throw new Error(
-      'Missing explicit Convex target. Set MISSION_CONTROL_CONVEX_TARGET to exactly "prod" or "dev".',
-    );
+  if (target === "prod" || target === "dev") {
+    return target;
   }
 
-  return target;
+  if (process.env.VERCEL_ENV) {
+    return process.env.VERCEL_ENV === "production" ? "prod" : "dev";
+  }
+
+  throw new Error(
+    'Missing explicit Convex target. Set MISSION_CONTROL_CONVEX_TARGET to exactly "prod" or "dev".',
+  );
 }
 
 export function getConvexUrl(kind: "cloud" | "site" = "cloud") {

@@ -22,6 +22,11 @@ export function getConvexDeploymentTarget(env = process.env) {
     .map((name) => [name, env[name]])
     .filter(([, value]) => value !== undefined && value !== "");
 
+  if (provided.length === 0 && env.VERCEL_ENV) {
+    const vercelTarget = env.VERCEL_ENV === "production" ? "prod" : "dev";
+    provided.push(["VERCEL_ENV", vercelTarget]);
+  }
+
   if (provided.length === 0) {
     throw new Error(
       'Missing explicit Convex target. Set MISSION_CONTROL_CONVEX_TARGET to exactly "prod" or "dev" before running Mission Control scripts.',
