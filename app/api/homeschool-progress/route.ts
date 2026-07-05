@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
+import { getConvexHttpClient } from "@/lib/server/convexHttp";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -13,13 +13,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-  if (!convexUrl) {
-    return NextResponse.json({ error: "Missing NEXT_PUBLIC_CONVEX_URL" }, { status: 500 });
-  }
-
   try {
-    const convex = new ConvexHttpClient(convexUrl);
+    const convex = getConvexHttpClient();
     const progress = await convex.query(api.homeschoolProgress.getAllProgress, {});
 
     return NextResponse.json(progress, {

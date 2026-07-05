@@ -3,19 +3,14 @@
  * Nightly import: Daily Recap -> Homeschool Progress activities
  *
  * Usage:
- *   NEXT_PUBLIC_CONVEX_URL=... MISSION_CONTROL_USER_ID=... node scripts/import-recap-to-progress.mjs
+ *   MISSION_CONTROL_CONVEX_TARGET=prod MISSION_CONTROL_USER_ID=... node scripts/import-recap-to-progress.mjs
  */
 
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
+import { createConvexHttpClient } from "./convex-target.mjs";
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 const userId = process.env.MISSION_CONTROL_USER_ID;
 
-if (!convexUrl) {
-  console.error("Missing NEXT_PUBLIC_CONVEX_URL");
-  process.exit(2);
-}
 if (!userId) {
   console.error("Missing MISSION_CONTROL_USER_ID");
   process.exit(2);
@@ -29,7 +24,7 @@ const dateKey = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
 }).format(new Date());
 
-const client = new ConvexHttpClient(convexUrl);
+const client = createConvexHttpClient();
 
 const res = await client.mutation(api.recapImport.importRecapToProgress, {
   userId,
