@@ -105,8 +105,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     }
 
     return active
-      ? "text-amber-400 bg-zinc-800 font-medium"
-      : "text-zinc-400 hover:bg-zinc-800";
+      ? "text-brand bg-surface-2 font-medium"
+      : "text-ink-soft hover:bg-surface-2";
   };
 
   const agentOpsViews = new Set([
@@ -314,7 +314,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
 
       {/* Sidebar - always visible on desktop, collapsible on mobile */}
       <div
-        className={`fixed top-0 left-0 h-full bg-zinc-950 border-r border-zinc-800 shadow-lg z-40 transition-transform duration-300 w-64 overflow-y-auto
+        className={`fixed top-0 left-0 h-full bg-surface-0 border-r border-line shadow-lg z-40 transition-transform duration-300 w-64 overflow-y-auto
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="p-6 pt-16 lg:pt-6">
@@ -344,8 +344,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                     }}
                     className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                       isItemActive(item)
-                        ? "bg-zinc-800 text-amber-400 font-medium"
-                        : "text-zinc-300 hover:bg-zinc-800"
+                        ? "bg-surface-2 text-brand font-medium"
+                        : "text-zinc-300 hover:bg-surface-2"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -363,7 +363,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                   {item.expandable && item.section && (
                     <button
                       onClick={() => toggleSection(item.section!)}
-                      className="p-2 hover:bg-zinc-800 rounded"
+                      className="p-2 hover:bg-surface-2 rounded"
                     >
                       {isExpanded(item.section) ? (
                         <ChevronDown className="h-3 w-3 text-zinc-500" />
@@ -376,7 +376,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
 
                 {/* Sub-navigation */}
                 {item.expandable && item.section && isExpanded(item.section) && item.children && item.children.length > 0 && (
-                  <div className="ml-4 mt-1 space-y-1 border-l-2 border-zinc-800 pl-2">
+                  <div className="ml-4 mt-1 space-y-1 border-l-2 border-line pl-2">
                     {item.children.map((child: any) => (
                       child.type === "label" ? (
                         <div
@@ -417,7 +417,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
           </nav>
 
           {/* Agent Status Card */}
-          <Card className="mt-6 p-4 bg-zinc-800 border-zinc-800">
+          <Card className="mt-6 p-4 bg-surface-1 border-line">
             <h3 className="text-sm font-semibold mb-3 text-zinc-200">Agent Squad</h3>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
@@ -428,7 +428,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 <span className="text-green-600 font-medium">● Active</span>
               </div>
               <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-zinc-800 rounded px-1 -mx-1"
+                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
                 onClick={() => onViewChange("agent-scout")}
               >
                 <div className="flex flex-col">
@@ -438,7 +438,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 <span className="text-green-600 font-medium">● Live</span>
               </div>
               <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-zinc-800 rounded px-1 -mx-1"
+                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
                 onClick={() => onViewChange("agent-maven")}
               >
                 <div className="flex flex-col">
@@ -448,7 +448,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 <span className="text-green-600 font-medium">● Live</span>
               </div>
               <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-zinc-800 rounded px-1 -mx-1"
+                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
                 onClick={() => onViewChange("agent-compass")}
               >
                 <div className="flex flex-col">
@@ -458,7 +458,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                 <span className="text-green-600 font-medium">● Live</span>
               </div>
               <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-zinc-800 rounded px-1 -mx-1"
+                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
                 onClick={() => onViewChange("agent-james")}
               >
                 <div className="flex flex-col">

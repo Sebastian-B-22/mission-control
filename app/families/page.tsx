@@ -52,7 +52,7 @@ export default function FamiliesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-zinc-50 p-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Family CRM</h1>
 
@@ -63,7 +63,7 @@ export default function FamiliesPage() {
             placeholder="Search by name, email, phone, or child name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -78,15 +78,15 @@ export default function FamiliesPage() {
                 <button
                   key={family._id}
                   onClick={() => setSelectedFamily(family)}
-                  className={`w-full text-left p-4 border-b hover:bg-gray-50 transition ${
+                  className={`w-full text-left p-4 border-b hover:bg-zinc-50 transition ${
                     selectedFamily?._id === family._id ? "bg-blue-50" : ""
                   }`}
                 >
                   <div className="font-semibold">
                     {family.parentFirstName} {family.parentLastName}
                   </div>
-                  <div className="text-sm text-gray-600">{family.email}</div>
-                  <div className="text-sm text-gray-500">{family.phone}</div>
+                  <div className="text-sm text-zinc-600">{family.email}</div>
+                  <div className="text-sm text-zinc-500">{family.phone}</div>
                 </button>
               ))}
             </div>
@@ -103,16 +103,16 @@ export default function FamiliesPage() {
                   </h2>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-sm text-gray-600">Email</div>
+                      <div className="text-sm text-zinc-600">Email</div>
                       <div>{selectedFamily.email}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">Phone</div>
+                      <div className="text-sm text-zinc-600">Phone</div>
                       <div>{selectedFamily.phone}</div>
                     </div>
                     {selectedFamily.address && (
                       <div className="col-span-2">
-                        <div className="text-sm text-gray-600">Address</div>
+                        <div className="text-sm text-zinc-600">Address</div>
                         <div>{selectedFamily.address}</div>
                       </div>
                     )}
@@ -120,8 +120,8 @@ export default function FamiliesPage() {
 
                   {/* Account Credit */}
                   {familyCredit && familyCredit.balance > 0 && (
-                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded">
-                      <div className="font-semibold text-green-800">
+                    <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded">
+                      <div className="font-semibold text-emerald-800">
                         Account Credit: ${(familyCredit.balance / 100).toFixed(2)}
                       </div>
                     </div>
@@ -130,15 +130,15 @@ export default function FamiliesPage() {
                   {/* Notes */}
                   {selectedFamily.notes && (
                     <div className="mt-4">
-                      <div className="text-sm text-gray-600">Notes</div>
-                      <div className="mt-1 p-3 bg-gray-50 rounded">{selectedFamily.notes}</div>
+                      <div className="text-sm text-zinc-600">Notes</div>
+                      <div className="mt-1 p-3 bg-zinc-50 rounded">{selectedFamily.notes}</div>
                     </div>
                   )}
 
                   {/* Tags */}
                   {selectedFamily.tags && selectedFamily.tags.length > 0 && (
                     <div className="mt-4">
-                      <div className="text-sm text-gray-600 mb-2">Tags</div>
+                      <div className="text-sm text-zinc-600 mb-2">Tags</div>
                       <div className="flex flex-wrap gap-2">
                         {selectedFamily.tags.map((tag: string, idx: number) => (
                           <span
@@ -165,8 +165,8 @@ export default function FamiliesPage() {
                               <div className="font-semibold">
                                 {reg.playerFirstName} {reg.playerLastName}
                               </div>
-                              <div className="text-sm text-gray-600">{reg.programSlug}</div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-zinc-600">{reg.programSlug}</div>
+                              <div className="text-sm text-zinc-500">
                                 Status: {reg.status}
                               </div>
                             </div>
@@ -174,7 +174,7 @@ export default function FamiliesPage() {
                               <div className="font-semibold">
                                 ${(reg.amountPaid / 100).toFixed(2)}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-zinc-500">
                                 {new Date(reg.createdAt).toLocaleDateString()}
                               </div>
                             </div>
@@ -183,7 +183,7 @@ export default function FamiliesPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-gray-500 text-center py-4">
+                    <div className="text-zinc-500 text-center py-4">
                       No registrations found
                     </div>
                   )}
@@ -198,11 +198,11 @@ export default function FamiliesPage() {
                         <div key={idx} className="flex justify-between items-center p-3 border-b">
                           <div>
                             <div className="font-medium">{txn.description}</div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-zinc-500">
                               {new Date(txn.createdAt).toLocaleDateString()}
                             </div>
                           </div>
-                          <div className={txn.amount > 0 ? "text-green-600" : "text-red-600"}>
+                          <div className={txn.amount > 0 ? "text-emerald-600" : "text-red-600"}>
                             {txn.amount > 0 ? "+" : ""}${(txn.amount / 100).toFixed(2)}
                           </div>
                         </div>
@@ -218,7 +218,7 @@ export default function FamiliesPage() {
                     <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                       Add Note
                     </button>
-                    <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    <button className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">
                       Add Credit
                     </button>
                     {selectedFamily.stripeCustomerId && (
@@ -235,7 +235,7 @@ export default function FamiliesPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow p-12 text-center text-gray-500">
+              <div className="bg-white rounded-lg shadow p-12 text-center text-zinc-500">
                 Select a family to view details
               </div>
             )}

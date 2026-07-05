@@ -3,17 +3,10 @@
  * Run: npx tsx scripts/seed-registration-counts.ts
  */
 
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-
-if (!convexUrl) {
-  console.error("❌ NEXT_PUBLIC_CONVEX_URL not set in environment");
-  process.exit(1);
-}
-
-const convex = new ConvexHttpClient(convexUrl);
+const { createConvexHttpClient } = await import("./convex-target.mjs");
+const convex = createConvexHttpClient();
 
 const seedCounts = [
   { program: "spring-pali", count: 0 },

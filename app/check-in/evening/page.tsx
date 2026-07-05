@@ -176,7 +176,7 @@ export default function EveningCheckInPage() {
                           "flex-1 py-3 px-2 rounded-lg border-2 transition-all font-semibold",
                           habitScores[habit.name] === score
                             ? "border-amber-500 bg-amber-50 text-amber-900"
-                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                            : "border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50"
                         )}
                       >
                         {score}

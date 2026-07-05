@@ -1,6 +1,6 @@
-import { ConvexHttpClient } from "convex/browser";
+import { createConvexHttpClient } from "./scripts/convex-target.mjs";
 
-const client = new ConvexHttpClient("https://harmless-salamander-44.convex.cloud");
+const client = createConvexHttpClient();
 
 // Get all users
 const users = await client.query('admin:getAllUsers', {});
