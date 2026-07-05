@@ -6,10 +6,9 @@
  * Reports findings but doesn't auto-delete (requires human approval).
  */
 
-import { ConvexHttpClient } from "convex/browser";
+import { createConvexHttpClient } from "./convex-target.mjs";
 
-const CONVEX_URL = "https://harmless-salamander-44.convex.cloud";
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = createConvexHttpClient();
 
 console.log("🏥 Mission Control Schedule Health Check");
 console.log("=" .repeat(50));

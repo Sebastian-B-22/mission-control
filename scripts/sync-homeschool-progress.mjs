@@ -4,10 +4,9 @@
  * Run via: node scripts/sync-homeschool-progress.mjs
  */
 
-import { ConvexHttpClient } from "convex/browser";
+import { createConvexHttpClient } from "./convex-target.mjs";
 
-const CONVEX_URL = process.env.CONVEX_URL || "https://harmless-salamander-44.convex.site";
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = createConvexHttpClient();
 
 // Credentials (from environment or config)
 const CREDENTIALS = {

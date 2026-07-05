@@ -1,9 +1,9 @@
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexCloudUrl } from "./scripts/convex-target.mjs";
 
-const client = new ConvexHttpClient("https://harmless-salamander-44.convex.cloud");
+const convexCloudUrl = getConvexCloudUrl();
 
 // Try raw HTTP to list all weeklySchedule items
-const result = await fetch('https://harmless-salamander-44.convex.cloud/api/query', {
+const result = await fetch(`${convexCloudUrl}/api/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -19,7 +19,7 @@ if (data.status === 'error') {
     console.log('\nLet me try a different approach - listing users first...\n');
     
     // Try to list all entries directly via the admin endpoint
-    const adminResult = await fetch('https://harmless-salamander-44.convex.cloud/api/query', {
+    const adminResult = await fetch(`${convexCloudUrl}/api/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,6 @@
-import { ConvexHttpClient } from "convex/browser";
+import { createConvexHttpClient } from "./convex-target.mjs";
 
-const client = new ConvexHttpClient("https://harmless-salamander-44.convex.cloud");
+const client = createConvexHttpClient();
 const userId = "kx77km204g5c9m51b0280eegh1821dne";
 
 // Books to delete - titles from the screenshots with X marks

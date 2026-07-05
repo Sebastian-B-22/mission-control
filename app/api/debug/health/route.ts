@@ -1,18 +1,10 @@
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
+import { getConvexHttpClient, getConvexUrl } from "@/lib/server/convexHttp";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-  
-  if (!convexUrl) {
-    return NextResponse.json({
-      success: false,
-      error: "NEXT_PUBLIC_CONVEX_URL not set",
-    });
-  }
-  
-  const convex = new ConvexHttpClient(convexUrl);
+  const convexUrl = getConvexUrl("cloud");
+  const convex = getConvexHttpClient();
   
   try {
     // First get all users to find Corinne's actual ID

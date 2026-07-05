@@ -1,6 +1,7 @@
-import { ConvexHttpClient } from "convex/browser";
+import { createConvexHttpClient, getConvexCloudUrl } from "./scripts/convex-target.mjs";
 
-const client = new ConvexHttpClient("https://harmless-salamander-44.convex.cloud");
+const convexCloudUrl = getConvexCloudUrl();
+const client = createConvexHttpClient();
 
 console.log('🔍 Fetching schedule data...\n');
 
@@ -20,7 +21,7 @@ try {
   console.log('\n💡 Let me try using the Convex HTTP API directly...\n');
   
   // Try direct HTTP approach
-  const response = await fetch('https://harmless-salamander-44.convex.cloud/api/query', {
+  const response = await fetch(`${convexCloudUrl}/api/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -36,7 +37,7 @@ try {
     console.log('\n🔧 The user ID is wrong for this deployment.');
     console.log('I need to access the Convex dashboard to find the correct user ID.');
     console.log('\nAlternative: Run the resetSchedule function which finds the user automatically:');
-    console.log('cd /Users/sebastian/.openclaw/workspace/mission-control && CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run weeklySchedule:resetSchedule');
+    console.log('cd /Users/sebastian/.openclaw/workspace/mission-control && MISSION_CONTROL_CONVEX_TARGET=prod npx convex run --prod weeklySchedule:resetSchedule');
     process.exit(1);
   }
   
