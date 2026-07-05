@@ -23,6 +23,17 @@ export function getConvexDeploymentTarget(): ConvexTarget {
     return target;
   }
 
+  const override = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+  if (override) {
+    const normalized = override.replace(/\/$/, "");
+    if (normalized === CONVEX_DEPLOYMENTS.prod.cloudUrl || normalized === CONVEX_DEPLOYMENTS.prod.siteUrl) {
+      return "prod";
+    }
+    if (normalized === CONVEX_DEPLOYMENTS.dev.cloudUrl || normalized === CONVEX_DEPLOYMENTS.dev.siteUrl) {
+      return "dev";
+    }
+  }
+
   if (process.env.VERCEL_ENV) {
     return process.env.VERCEL_ENV === "production" ? "prod" : "dev";
   }
