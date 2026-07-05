@@ -98,7 +98,7 @@ const CATEGORIES = {
       "Drawing",
     ],
     icon: "🏃",
-    color: "bg-emerald-500",
+    color: "bg-green-500",
   },
 };
 
@@ -291,16 +291,16 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-emerald-50 dark:bg-emerald-900/30">
+        <Card className="bg-green-50 dark:bg-green-900/30">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Today</p>
-                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {stats?.today.completed || 0}/{stats?.today.total || 0}
                 </p>
               </div>
-              <CheckCircle2 className="h-8 w-8 text-emerald-500 opacity-50" />
+              <CheckCircle2 className="h-8 w-8 text-green-500 opacity-50" />
             </div>
           </CardContent>
         </Card>
@@ -438,9 +438,9 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
             </div>
 
             {/* Rosetta Stone */}
-            <div className="p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/20">
+            <div className="p-4 rounded-lg border bg-green-50/50 dark:bg-green-900/20">
               <div className="flex items-center gap-2 mb-2">
-                <Globe className="h-4 w-4 text-emerald-500" />
+                <Globe className="h-4 w-4 text-green-500" />
                 <span className="font-medium">Rosetta Stone</span>
               </div>
               {resolvedAutoProgress?.Family?.["rosetta-stone"] && (
@@ -547,7 +547,7 @@ export function HomeschoolProgressViewNew({ userId }: HomeschoolProgressViewNewP
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuickLog(key, activity)}
-                        className="hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                        className="hover:bg-green-100 dark:hover:bg-green-900/30"
                       >
                         {activity}
                       </Button>

@@ -117,12 +117,12 @@ function inlineMarkdown(text: string): string {
 function PathBreadcrumb({ filePath }: { filePath: string }) {
   const parts = filePath.split("/").filter(Boolean);
   return (
-    <div className="flex items-center gap-1 text-xs text-zinc-400 flex-wrap">
-      <span className="text-zinc-300">workspace</span>
+    <div className="flex items-center gap-1 text-xs text-gray-400 flex-wrap">
+      <span className="text-gray-300">workspace</span>
       {parts.map((part, i) => (
         <span key={i} className="flex items-center gap-1">
-          <span className="text-zinc-300">/</span>
-          <span className={i === parts.length - 1 ? "text-zinc-600 font-medium" : "text-zinc-400"}>
+          <span className="text-gray-300">/</span>
+          <span className={i === parts.length - 1 ? "text-gray-600 font-medium" : "text-gray-400"}>
             {part}
           </span>
         </span>
@@ -208,18 +208,18 @@ export function MemoryContentModal({ filePath, onClose }: MemoryContentModalProp
       >
         {/* Modal */}
         <div
-          className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[88vh] flex flex-col border border-zinc-200"
+          className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[88vh] flex flex-col border border-gray-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-start justify-between p-5 border-b border-zinc-100">
+          <div className="flex items-start justify-between p-5 border-b border-gray-100">
             <div className="flex-1 min-w-0 mr-4">
               {/* Filename */}
-              <h2 className="text-base font-semibold text-zinc-900 mb-1 truncate">{filename}</h2>
+              <h2 className="text-base font-semibold text-gray-900 mb-1 truncate">{filename}</h2>
               {/* Breadcrumb */}
               <PathBreadcrumb filePath={filePath} />
               {modifiedDate && (
-                <p className="text-xs text-zinc-400 mt-1">Modified {modifiedDate}</p>
+                <p className="text-xs text-gray-400 mt-1">Modified {modifiedDate}</p>
               )}
             </div>
 
@@ -231,8 +231,8 @@ export function MemoryContentModal({ filePath, onClose }: MemoryContentModalProp
                   onClick={handleCopy}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                     copied
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                      : "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
                   }`}
                   title="Copy raw markdown"
                 >
@@ -253,7 +253,7 @@ export function MemoryContentModal({ filePath, onClose }: MemoryContentModalProp
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
+                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -271,7 +271,7 @@ export function MemoryContentModal({ filePath, onClose }: MemoryContentModalProp
               <div className="text-center py-16">
                 <div className="text-4xl mb-3">⚠️</div>
                 <p className="text-sm text-red-600 font-medium">{error}</p>
-                <p className="text-xs text-zinc-400 mt-2">
+                <p className="text-xs text-gray-400 mt-2">
                   Make sure the Memory API server is running on the Mac mini.
                 </p>
               </div>
@@ -284,13 +284,13 @@ export function MemoryContentModal({ filePath, onClose }: MemoryContentModalProp
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-100 bg-zinc-50 rounded-b-2xl">
-            <span className="text-xs text-zinc-400 truncate max-w-xs" title={filePath}>
+          <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+            <span className="text-xs text-gray-400 truncate max-w-xs" title={filePath}>
               {filePath}
             </span>
             <button
               onClick={onClose}
-              className="px-4 py-1.5 bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
             >
               Close
             </button>

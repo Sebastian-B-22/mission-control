@@ -3,17 +3,24 @@
  * Run: node scripts/seed-registration-counts.mjs
  */
 
+import { ConvexHttpClient } from "convex/browser";
 import { config } from "dotenv";
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { createConvexHttpClient } from "./convex-target.mjs";
 
 // Load .env.local
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 config({ path: join(__dirname, '../.env.local') });
 
-const convex = createConvexHttpClient();
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+if (!convexUrl) {
+  console.error("❌ NEXT_PUBLIC_CONVEX_URL not set in .env.local");
+  process.exit(1);
+}
+
+const convex = new ConvexHttpClient(convexUrl);
 
 const seedCounts = [
   { program: "spring-pali", count: 0 },

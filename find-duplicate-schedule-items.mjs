@@ -1,6 +1,6 @@
-import { createConvexHttpClient } from "./scripts/convex-target.mjs";
+import { ConvexHttpClient } from "convex/browser";
 
-const client = createConvexHttpClient();
+const client = new ConvexHttpClient("https://harmless-salamander-44.convex.cloud");
 
 // Get all schedule template items
 const items = await client.query('homeschool:getScheduleTemplate');

@@ -27,7 +27,7 @@ const platformConfig: Record<string, { icon: React.ReactNode; color: string; lab
   },
   "rosetta-stone": {
     icon: <Globe className="h-4 w-4" />,
-    color: "bg-emerald-500",
+    color: "bg-green-500",
     label: "Rosetta Stone",
   },
   "synthesis": {
@@ -89,12 +89,12 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
   const allDone = completedCount === totalPlatforms && totalPlatforms > 0;
   
   return (
-    <Card className={allDone ? "border-emerald-500 border-2" : ""}>
+    <Card className={allDone ? "border-green-500 border-2" : ""}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             {studentName}
-            {allDone && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+            {allDone && <CheckCircle2 className="h-5 w-5 text-green-500" />}
           </CardTitle>
           <Badge variant={allDone ? "default" : "secondary"}>
             {completedCount}/{totalPlatforms} done
@@ -106,7 +106,7 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
           {platforms.map((p) => {
             const config = platformConfig[p.platform] || {
               icon: <BookOpen className="h-4 w-4" />,
-              color: "bg-zinc-500",
+              color: "bg-gray-500",
               label: p.platform,
             };
             
@@ -115,8 +115,8 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
                 key={p.platform}
                 className={`flex items-center justify-between p-3 rounded-lg border ${
                   p.todayCompleted 
-                    ? "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800" 
-                    : "bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
+                    ? "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800" 
+                    : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -124,8 +124,8 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
                     {config.icon}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-sm text-zinc-900 dark:text-white">{config.label || p.platform}</div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                    <div className="font-bold text-sm text-gray-900 dark:text-white">{config.label || p.platform}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {p.level || "No progress yet"}
                     </div>
                   </div>
@@ -136,7 +136,7 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
                     <div className="text-sm font-medium">
                       {formatMinutes(p.weeklyMinutes)} this week
                     </div>
-                    <div className="text-xs text-zinc-500">
+                    <div className="text-xs text-gray-500">
                       {formatRelativeTime(p.lastActivity)}
                     </div>
                   </div>
@@ -146,7 +146,7 @@ function StudentProgressCard({ studentName, platforms }: ProgressCardProps) {
           })}
           
           {platforms.length === 0 && (
-            <div className="text-center text-zinc-500 py-8">
+            <div className="text-center text-gray-500 py-8">
               <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No progress data yet</p>
               <p className="text-sm">Run the scraper to sync data</p>
@@ -201,7 +201,7 @@ export default function HomeschoolProgressView() {
   if (!allProgress) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-6 w-6 animate-spin text-zinc-400" />
+        <RefreshCw className="h-6 w-6 animate-spin text-gray-400" />
       </div>
     );
   }
@@ -213,7 +213,7 @@ export default function HomeschoolProgressView() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Homeschool Progress</h1>
-          <p className="text-zinc-500">Daily completion tracking across all platforms</p>
+          <p className="text-gray-500">Daily completion tracking across all platforms</p>
         </div>
         <Button variant="outline" className="gap-2">
           <RefreshCw className="h-4 w-4" />
@@ -255,7 +255,7 @@ export default function HomeschoolProgressView() {
               
               return Object.entries(studentProgress).map(([platform, data]: [string, any]) => (
                 <div key={`${student}-${platform}`}>
-                  <div className="text-xs text-zinc-500 mb-1">{student}</div>
+                  <div className="text-xs text-gray-500 mb-1">{student}</div>
                   <PlatformDetailsCard platform={platform} details={data.details} />
                 </div>
               ));

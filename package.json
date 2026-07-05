@@ -6,10 +6,9 @@
     "dev": "next dev",
     "build": "npm run build:next",
     "build:next": "next build",
-    "deploy:full": "MISSION_CONTROL_CONVEX_TARGET=prod node scripts/convex-target.mjs assert prod && CONVEX_DEPLOYMENT=$(MISSION_CONTROL_CONVEX_TARGET=prod node scripts/convex-target.mjs deployment) npx convex deploy --yes && npm run build:next",
+    "deploy:full": "npx convex deploy --yes && npm run build:next",
     "start": "next start",
-    "lint": "eslint",
-    "test:convex-target": "node --test tests/convex-target.test.mjs tests/script-convex-target-audit.test.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.3",

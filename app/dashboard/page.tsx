@@ -94,6 +94,9 @@ export default function DashboardPage() {
     user?.id ? { clerkId: user.id } : "skip"
   );
   
+  // Debug logging
+  console.log('[Dashboard] Clerk user.id:', user?.id);
+  console.log('[Dashboard] convexUser:', convexUser);
   const createUser = useMutation(api.users.createUser);
 
   // Check user setup
@@ -742,7 +745,7 @@ export default function DashboardPage() {
         onViewChange={setCurrentView} 
       />
 
-      <div className="lg:pl-64 min-h-screen bg-background">
+      <div className="lg:pl-64 min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
           {!standaloneSurfaceViews.has(currentView) ? (
             <div className="mb-8">

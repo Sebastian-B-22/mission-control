@@ -115,13 +115,13 @@ function getStatus(value: number, range: { optimal: [number, number]; normal: [n
 }
 
 function getStatusColor(status: string) {
-  if (status === "optimal") return { bg: "bg-emerald-500", light: "bg-emerald-100", text: "text-emerald-700", border: "border-emerald-400" };
+  if (status === "optimal") return { bg: "bg-green-500", light: "bg-green-100", text: "text-green-700", border: "border-green-400" };
   if (status === "normal") return { bg: "bg-yellow-500", light: "bg-yellow-100", text: "text-yellow-700", border: "border-yellow-400" };
   return { bg: "bg-red-500", light: "bg-red-100", text: "text-red-700", border: "border-red-400" };
 }
 
 function StatusIcon({ status }: { status: string }) {
-  if (status === "optimal") return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+  if (status === "optimal") return <CheckCircle2 className="h-4 w-4 text-green-500" />;
   if (status === "normal") return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
   return <AlertCircle className="h-4 w-4 text-red-500" />;
 }
@@ -147,12 +147,12 @@ function RangeBar({ value, optimal, normal }: { value: number; optimal: [number,
       />
       {/* Optimal range (green) */}
       <div 
-        className="absolute h-full bg-emerald-400"
+        className="absolute h-full bg-green-400"
         style={{ left: `${optimalLeft}%`, width: `${optimalWidth}%` }}
       />
       {/* Value marker */}
       <div 
-        className="absolute w-1 h-full bg-zinc-900 rounded"
+        className="absolute w-1 h-full bg-slate-900 rounded"
         style={{ left: `${Math.max(0, Math.min(99, valuePos))}%` }}
       />
     </div>
@@ -246,12 +246,12 @@ export function BioMapView({ userId }: { userId: Id<"users"> }) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="bg-emerald-900/30 border-emerald-700">
+        <Card className="bg-green-900/30 border-green-700">
           <CardContent className="pt-4 flex items-center gap-3">
-            <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+            <CheckCircle2 className="h-8 w-8 text-green-400" />
             <div>
-              <div className="text-3xl font-bold text-emerald-400">{statusCounts.optimal}</div>
-              <p className="text-sm text-emerald-300">Optimal</p>
+              <div className="text-3xl font-bold text-green-400">{statusCounts.optimal}</div>
+              <p className="text-sm text-green-300">Optimal</p>
             </div>
           </CardContent>
         </Card>
@@ -286,12 +286,12 @@ export function BioMapView({ userId }: { userId: Id<"users"> }) {
             const concernCount = markers.filter(m => m.status === "concern").length;
             
             return (
-              <Card key={cat.id} className={`${cat.lightBg} border-2 ${concernCount > 0 ? "border-red-400" : optimalCount === markers.length ? "border-emerald-400" : "border-yellow-400"}`}>
+              <Card key={cat.id} className={`${cat.lightBg} border-2 ${concernCount > 0 ? "border-red-400" : optimalCount === markers.length ? "border-green-400" : "border-yellow-400"}`}>
                 <CardHeader className="pb-2">
                   <CardTitle className={`text-base flex items-center gap-2 ${cat.text}`}>
                     <cat.Icon className="h-5 w-5" />
                     {cat.name}
-                    <Badge className={`ml-auto ${optimalCount === markers.length ? "bg-emerald-500" : concernCount > 0 ? "bg-red-500" : "bg-yellow-500"} text-white`}>
+                    <Badge className={`ml-auto ${optimalCount === markers.length ? "bg-green-500" : concernCount > 0 ? "bg-red-500" : "bg-yellow-500"} text-white`}>
                       {optimalCount}/{markers.length}
                     </Badge>
                   </CardTitle>
@@ -312,7 +312,7 @@ export function BioMapView({ userId }: { userId: Id<"users"> }) {
                           </div>
                         </div>
                         <RangeBar value={marker.value} optimal={range?.optimal || [0, 100]} normal={range?.normal || [0, 100]} />
-                        <div className="flex justify-between text-[10px] text-zinc-500">
+                        <div className="flex justify-between text-[10px] text-slate-500">
                           <span>Optimal: {range?.optimal[0]}-{range?.optimal[1]}</span>
                           <span>Normal: {range?.normal[0]}-{range?.normal[1]}</span>
                         </div>

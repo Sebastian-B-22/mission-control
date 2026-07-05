@@ -16,7 +16,7 @@ const typeIcons: Record<string, React.ReactNode> = {
 };
 
 const typeColors: Record<string, string> = {
-  book: "text-emerald-500 bg-emerald-500/10",
+  book: "text-green-500 bg-green-500/10",
   game: "text-purple-500 bg-purple-500/10",
   kit: "text-yellow-500 bg-yellow-500/10",
   digital: "text-blue-500 bg-blue-500/10",
@@ -28,7 +28,7 @@ const typeColors: Record<string, string> = {
 // Category definitions with icons and colors
 const categories = [
   { id: "math", name: "Math", icon: Calculator, color: "bg-blue-500", description: "Math games, manipulatives & curriculum" },
-  { id: "reading", name: "Reading", icon: BookOpen, color: "bg-emerald-500", description: "Books, graphic novels & reading materials" },
+  { id: "reading", name: "Reading", icon: BookOpen, color: "bg-green-500", description: "Books, graphic novels & reading materials" },
   { id: "writing", name: "Writing", icon: PenLine, color: "bg-emerald-600", description: "Writing curriculum, spelling & composition" },
   { id: "science", name: "Science", icon: Microscope, color: "bg-yellow-500", description: "Experiments, kits & nature study" },
   { id: "history", name: "History", icon: Globe, color: "bg-amber-600", description: "History curriculum, books & timelines" },

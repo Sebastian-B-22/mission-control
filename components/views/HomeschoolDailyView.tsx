@@ -295,7 +295,7 @@ const typeIcons: Record<string, React.ReactNode> = {
 
 const subjectColors: Record<string, string> = {
   math: "bg-blue-600 text-white",
-  reading: "bg-emerald-600 text-white",
+  reading: "bg-green-600 text-white",
   writing: "bg-emerald-600 text-white",
   vocabulary: "bg-cyan-600 text-white",
   science: "bg-yellow-500 text-black",
@@ -312,7 +312,7 @@ const subjectColors: Record<string, string> = {
   magic: "bg-indigo-500 text-white",
   health: "bg-red-600 text-white",
   nutrition: "bg-lime-600 text-black",
-  italian: "bg-emerald-500 text-white",
+  italian: "bg-green-500 text-white",
   economics: "bg-emerald-500 text-white",
 };
 
@@ -932,7 +932,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
                 <p className="text-xs text-zinc-300">{rescuePlan.mathGame}</p>
               </div>
               <div className="bg-zinc-800 rounded-lg p-2.5 border border-zinc-800">
-                <div className="flex items-center gap-2 text-emerald-500 font-medium text-xs mb-1">
+                <div className="flex items-center gap-2 text-green-500 font-medium text-xs mb-1">
                   <Dices className="w-3 h-3" />
                   Vocab Game
                 </div>
@@ -1078,7 +1078,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
                             {s.topic}
                           </div>
                           <div className="flex items-center gap-2 text-xs text-zinc-300">
-                            <BookOpen className={`w-3 h-3 flex-shrink-0 ${s.isMonthlyFocus ? 'text-purple-400' : 'text-emerald-500'}`} />
+                            <BookOpen className={`w-3 h-3 flex-shrink-0 ${s.isMonthlyFocus ? 'text-purple-400' : 'text-green-500'}`} />
                             <span>{s.resource}</span>
                           </div>
                           {s.activity && (
@@ -1110,7 +1110,7 @@ export function HomeschoolDailyView({ userId }: HomeschoolDailyViewProps) {
               <span className="text-xs text-amber-500">Saving...</span>
             )}
             {existingRecap && !recapSaving && (
-              <span className="text-xs text-emerald-500">✓ Saved</span>
+              <span className="text-xs text-green-500">✓ Saved</span>
             )}
           </div>
           <textarea 
