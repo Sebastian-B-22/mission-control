@@ -1,6 +1,6 @@
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexCloudUrl } from "./scripts/convex-target.mjs";
 
-const client = new ConvexHttpClient("https://harmless-salamander-44.convex.cloud");
+const convexCloudUrl = getConvexCloudUrl();
 
 // Get this week's date range
 const monday = new Date('2026-04-06T00:00:00-07:00');
@@ -13,7 +13,7 @@ console.log('  End:', nextMonday.toISOString(), '(', nextMonday.getTime(), ')');
 // Try to query all calendar events (no user filter)
 try {
     // First, check the schema to see available queries
-    const result = await fetch('https://harmless-salamander-44.convex.cloud/api/query', {
+    const result = await fetch(`${convexCloudUrl}/api/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
