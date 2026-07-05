@@ -22,6 +22,17 @@ export function getConvexDeploymentTarget(env = process.env) {
     .map((name) => [name, env[name]])
     .filter(([, value]) => value !== undefined && value !== "");
 
+  if (provided.length === 0) {
+    const explicitUrl = URL_ENV_NAMES.map((name) => env[name]).find((value) => value !== undefined && value !== "");
+    const normalizedUrl = explicitUrl ? String(explicitUrl).trim().replace(/\/$/, "") : "";
+    for (const [targetName, deployment] of Object.entries(CONVEX_DEPLOYMENTS)) {
+      if (normalizedUrl === deployment.cloudUrl || normalizedUrl === deployment.siteUrl) {
+        provided.push(["CONVEX_URL", targetName]);
+        break;
+      }
+    }
+  }
+
   if (provided.length === 0 && env.VERCEL_ENV) {
     const vercelTarget = env.VERCEL_ENV === "production" ? "prod" : "dev";
     provided.push(["VERCEL_ENV", vercelTarget]);

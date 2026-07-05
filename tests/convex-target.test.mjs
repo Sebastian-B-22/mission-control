@@ -19,6 +19,17 @@ describe("Convex deployment targeting", () => {
     );
   });
 
+  it("treats a known Convex URL as an explicit target when CI provides URL env", () => {
+    assert.equal(
+      getConvexDeploymentTarget(env({ NEXT_PUBLIC_CONVEX_URL: "https://harmless-salamander-44.convex.cloud" })),
+      "prod",
+    );
+    assert.equal(
+      getConvexDeploymentTarget(env({ NEXT_PUBLIC_CONVEX_URL: "https://healthy-flamingo-415.convex.site" })),
+      "dev",
+    );
+  });
+
   it("maps Vercel preview builds to dev and production builds to prod", () => {
     assert.equal(getConvexDeploymentTarget(env({ VERCEL_ENV: "preview" })), "dev");
     assert.equal(getConvexDeploymentTarget(env({ VERCEL_ENV: "development" })), "dev");
