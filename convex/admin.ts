@@ -306,14 +306,17 @@ export const manuallyInitializeUser = mutation({
 
     if (!existingHabits) {
       const defaultHabits = [
-        { name: "Morning light", icon: "☀️", order: 0 },
-        { name: "Redlight/meditation", icon: "🧘", order: 1 },
-        { name: "Workout before 8am", icon: "💪", order: 2 },
-        { name: "Take all supplements", icon: "💊", order: 3 },
-        { name: "Ice bath", icon: "🧊", order: 4 },
-        { name: "Sauna", icon: "🔥", order: 5 },
-        { name: "Screens off by 9:30 pm", icon: "📱", order: 6 },
-        { name: "Sleep 7.5 hours", icon: "😴", order: 7 },
+        { name: "Sleep 7.5 hours", icon: "😴", order: 0 },
+        { name: "Morning light", icon: "☀️", order: 1 },
+        { name: "Redlight/meditation", icon: "🧘", order: 2 },
+        { name: "Rebounder and vibration plate", icon: "🦶", order: 3 },
+        { name: "Breath work", icon: "🌬️", order: 4 },
+        { name: "Ice bath", icon: "🧊", order: 5 },
+        { name: "Workout", icon: "💪", order: 6 },
+        { name: "Take all supplements", icon: "💊", order: 7 },
+        { name: "Eat a salad", icon: "🥗", order: 8 },
+        { name: "Sauna", icon: "🔥", order: 9 },
+        { name: "Screens off by 9:30 pm", icon: "📱", order: 10 },
       ];
 
       for (const habit of defaultHabits) {
@@ -358,8 +361,8 @@ export const reimportSchedule = mutation({
       { dayOfWeek: "monday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
       { dayOfWeek: "monday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
       { dayOfWeek: "monday", startTime: "09:30", endTime: "10:00", activity: "Writing with Skill" },
-      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "Anthony: Synthesis Teams / Roma: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
-      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Roma: Synthesis Teams / Anthony: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "1:1 Learning Block with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Anthony + Roma: Synthesis Teams", notes: "Both kids attend Synthesis Teams at the same time" },
       { dayOfWeek: "monday", startTime: "12:00", endTime: "14:00", activity: "Passion Projects + Mom Work Block", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design", color: "mom-work" },
       { dayOfWeek: "monday", startTime: "14:00", endTime: "14:30", activity: "Rosetta Stone Italian + Life Skills", notes: "Family session - Italian OR How to Be a Person / Manners book" },
       { dayOfWeek: "monday", startTime: "14:30", endTime: "15:00", activity: "Free Time / Transition" },
@@ -507,8 +510,8 @@ export const importWeeklySchedule = mutation({
       { dayOfWeek: "monday", startTime: "08:00", endTime: "08:30", activity: "Chores" },
       { dayOfWeek: "monday", startTime: "08:30", endTime: "09:30", activity: "Sprinting Program + Juggling" },
       { dayOfWeek: "monday", startTime: "09:30", endTime: "10:00", activity: "Writing with Skill" },
-      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "Anthony: Synthesis Teams / Roma: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
-      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Roma: Synthesis Teams / Anthony: 1:1 with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "10:00", endTime: "11:00", activity: "1:1 Learning Block with Mom", notes: "Math Academy review, Writing with Skill review, Socratic discussions" },
+      { dayOfWeek: "monday", startTime: "11:00", endTime: "12:00", activity: "Anthony + Roma: Synthesis Teams", notes: "Both kids attend Synthesis Teams at the same time" },
       { dayOfWeek: "monday", startTime: "12:00", endTime: "14:00", activity: "Passion Projects + Mom Work Block", notes: "Options: 3D Printing, Magic, DJ, Stop Motion, Game Design", color: "mom-work" },
       { dayOfWeek: "monday", startTime: "14:00", endTime: "14:30", activity: "Rosetta Stone Italian + Life Skills", notes: "Family session - Italian OR How to Be a Person / Manners book" },
       { dayOfWeek: "monday", startTime: "14:30", endTime: "15:00", activity: "Free time / transition" },

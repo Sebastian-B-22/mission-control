@@ -37,20 +37,27 @@ export const syncRange = mutation({
         startMs: v.number(),
         endMs: v.number(),
         allDay: v.boolean(),
+        responseStatus: v.optional(v.union(
+          v.literal("accepted"),
+          v.literal("declined"),
+          v.literal("tentative"),
+          v.literal("needsAction")
+        )),
       })
     ),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
 
-    // Delete existing events that overlap this range for this user
+    // Delete synced events that overlap this range for this user. Manual Daily
+    // entries use the same read path, but should survive Google sync refreshes.
     const existing = await ctx.db
       .query("calendarEvents")
       .withIndex("by_user_start", (q) => q.eq("userId", args.userId))
       .collect();
 
     for (const e of existing) {
-      if (e.startMs < args.endMs && e.endMs > args.startMs) {
+      if (e.source !== "manual" && e.startMs < args.endMs && e.endMs > args.startMs) {
         await ctx.db.delete(e._id);
       }
     }
@@ -65,6 +72,49 @@ export const syncRange = mutation({
     }
 
     return { inserted: args.events.length, startMs: args.startMs, endMs: args.endMs };
+  },
+});
+
+export const createManualEvent = mutation({
+  args: {
+    userId: v.id("users"),
+    title: v.string(),
+    location: v.optional(v.string()),
+    startMs: v.number(),
+    endMs: v.number(),
+    allDay: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    return await ctx.db.insert("calendarEvents", {
+      userId: args.userId,
+      source: "manual",
+      account: "mission-control",
+      calendarId: "daily-manual",
+      externalId: `manual:${args.userId}:${now}`,
+      title: args.title.trim(),
+      location: args.location?.trim() || undefined,
+      startMs: args.startMs,
+      endMs: args.endMs,
+      allDay: args.allDay,
+      responseStatus: "accepted",
+      updatedAt: now,
+    });
+  },
+});
+
+export const deleteManualEvent = mutation({
+  args: {
+    eventId: v.id("calendarEvents"),
+  },
+  handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
+    if (!event || event.source !== "manual") {
+      throw new Error("Only manual calendar entries can be deleted here.");
+    }
+
+    await ctx.db.delete(args.eventId);
+    return { deleted: true };
   },
 });
 

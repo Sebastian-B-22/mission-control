@@ -40,10 +40,14 @@ export const listAll = query({
   args: {
     type: v.optional(CONTENT_TYPE),
     createdBy: v.optional(v.string()),
+    includeInactive: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     let items = await ctx.db.query("contentPipeline").collect();
 
+    if (!args.includeInactive) {
+      items = items.filter((i) => ["idea", "review", "approved", "published"].includes(i.stage));
+    }
     if (args.type) {
       items = items.filter((i) => i.type === args.type);
     }

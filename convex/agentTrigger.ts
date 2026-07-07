@@ -20,7 +20,7 @@ export const CHANNEL_ROUTING: Record<string, string[]> = {
   "joy-support": ["sebastian"],
 };
 
-const ALL_AGENTS = ["sebastian", "scout", "maven", "compass", "james", "corinne", "joy"];
+const ALL_AGENTS = ["sebastian", "scout", "maven", "hermes", "compass", "james", "corinne", "joy"];
 const HUMAN_OR_EXTERNAL_INITIATORS = new Set(["corinne", "joy"]);
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
