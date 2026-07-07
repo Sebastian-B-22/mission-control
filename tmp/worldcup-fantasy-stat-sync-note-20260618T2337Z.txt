@@ -1,0 +1,8 @@
+HTA World Cup Fantasy Five stat sync note
+Run time: 2026-06-18T23:37Z / 2026-06-18 16:37 America/Los_Angeles
+
+Completed/recent window since prior 2026-06-18T21:37Z sync note: Canada 4-0 Qatar (FT). Public cross-check: Guardian live report/search result reported Canada 4-0 Qatar with goals by Cyle Larin, Jonathan David twice, and Nathan Saliba, plus a Canada clean sheet; Outlook live text reported Cyle Larin 16' and Jonathan David 29' before halftime; ESPN public schedule/search had Canada vs Qatar as the 3:00 PM PT Group B match. FIFA match centre URL: https://www.fifa.com/en/match-centre/match/17/285023/289273/400021450. Guardian: https://www.theguardian.com/football/live/2026/jun/18/fifa-world-cup-2026-live-canada-v-qatar-updates-can-vs-qat-group-b-match-score-latest. Outlook: https://www.outlookindia.com/sports/football/canada-vs-qatar-live-score-fifa-world-cup-2026-group-b-can-vs-qat-updates-bc-place-vancouver-highlights.
+
+Fantasy Five selected-player normalization from production worldCup:listEntries plus public/worldcup/index.html found no currently selected Canada or Qatar Fantasy Five player with a source-backed goals/assists/cleanSheets stat. Alphonso Davies and Akram Afif exist in the local catalog but were not currently selected on the production Fantasy Five entries. Canada scorers Larin, David, and Saliba are not in the local Fantasy Five catalog/selected entries. No Fantasy Five stat writes made.
+
+Production Convex check completed with grep CONVEX .env.production. Leaderboard verification completed with npx convex run --prod worldCup:listLeaderboard and output saved under tmp/worldcup-leaderboard-cron-20260618T2338Z.json.

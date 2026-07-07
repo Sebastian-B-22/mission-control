@@ -6,9 +6,10 @@ import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Eraser, Expand, Minimize2, Pencil, RotateCcw, Trash2, X } from "lucide-react";
+import { Eraser, Expand, Minimize2, Pencil, RotateCcw, Trash2, Type, X } from "lucide-react";
 
 type Tool = "pen" | "eraser";
 
@@ -37,6 +38,7 @@ type RawStroke = {
 };
 
 const PAD_KIND = "time-blocks";
+const TYPED_NOTE_KIND = "typed-notes";
 const DEFAULT_STROKES: Stroke[] = [];
 const LEGACY_REFERENCE_HEIGHT = 440;
 
@@ -264,25 +266,36 @@ function SketchSurface({
 
 export function DailyHandwritingPad({ userId, date }: { userId: Id<"users">; date: string }) {
   const note = useQuery(api.daily.getDailyCanvasNote, { userId, date, kind: PAD_KIND });
+  const typedNote = useQuery(api.daily.getDailyCanvasNote, { userId, date, kind: TYPED_NOTE_KIND });
   const saveNote = useMutation(api.daily.saveDailyCanvasNote);
   const deleteNote = useMutation(api.daily.deleteDailyCanvasNote);
 
   const serverStrokes = useMemo(() => parseStrokes(note?.data), [note?.data]);
   const serverSerialized = useMemo(() => JSON.stringify(serverStrokes), [serverStrokes]);
+  const serverTypedText = typedNote?.data ?? "";
 
   const [localStrokes, setLocalStrokes] = useState<Stroke[] | null>(null);
+  const [localTypedText, setLocalTypedText] = useState<string | null>(null);
   const [tool, setTool] = useState<Tool>("pen");
   const [strokeWidth, setStrokeWidth] = useState<number>(0.006);
   const [expanded, setExpanded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const [isTypedSaving, setIsTypedSaving] = useState(false);
+  const [typedSaveError, setTypedSaveError] = useState(false);
   const lastSavedJsonRef = useRef<string | null>(null);
+  const lastSavedTypedRef = useRef<string | null>(null);
 
   const strokes = localStrokes ?? serverStrokes;
+  const typedText = localTypedText ?? serverTypedText;
   const serializedStrokes = useMemo(() => JSON.stringify(strokes), [strokes]);
 
   if (note !== undefined && localStrokes === null && lastSavedJsonRef.current !== serverSerialized) {
     lastSavedJsonRef.current = serverSerialized;
+  }
+
+  if (typedNote !== undefined && localTypedText === null && lastSavedTypedRef.current !== serverTypedText) {
+    lastSavedTypedRef.current = serverTypedText;
   }
 
   useEffect(() => {
@@ -311,6 +324,32 @@ export function DailyHandwritingPad({ userId, date }: { userId: Id<"users">; dat
     return () => window.clearTimeout(timeoutId);
   }, [date, deleteNote, note, saveNote, serializedStrokes, strokes.length, userId]);
 
+  useEffect(() => {
+    if (typedNote === undefined) return;
+    if (typedText === lastSavedTypedRef.current) return;
+
+    const timeoutId = window.setTimeout(async () => {
+      setIsTypedSaving(true);
+      setTypedSaveError(false);
+      try {
+        if (typedText.trim().length === 0) {
+          await deleteNote({ userId, date, kind: TYPED_NOTE_KIND });
+          lastSavedTypedRef.current = "";
+        } else {
+          await saveNote({ userId, date, kind: TYPED_NOTE_KIND, data: typedText });
+          lastSavedTypedRef.current = typedText;
+        }
+      } catch (error) {
+        console.error("Failed to save typed notes", error);
+        setTypedSaveError(true);
+      } finally {
+        setIsTypedSaving(false);
+      }
+    }, 600);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [date, deleteNote, saveNote, typedNote, typedText, userId]);
+
   const addStroke = useCallback((stroke: Stroke) => {
     setLocalStrokes((current) => [...(current ?? serverStrokes), stroke]);
   }, [serverStrokes]);
@@ -333,6 +372,15 @@ export function DailyHandwritingPad({ userId, date }: { userId: Id<"users">; dat
       : isSaving
         ? "Saving…"
         : saveError
+          ? "Save failed"
+          : "Saved";
+
+  const typedSaveLabel =
+    typedNote === undefined
+      ? "Loading…"
+      : isTypedSaving
+        ? "Saving…"
+        : typedSaveError
           ? "Save failed"
           : "Saved";
 
@@ -428,11 +476,28 @@ export function DailyHandwritingPad({ userId, date }: { userId: Id<"users">; dat
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <CardTitle className="text-slate-950">Handwritten Notes</CardTitle>
+              <CardTitle className="text-slate-950">Daily Notes</CardTitle>
+              <p className="mt-1 text-sm text-slate-600">Type when you do not have the Apple Pencil, or write below when you do.</p>
             </div>
-            <div className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-800">
-              {saveLabel}
+            <div className="flex flex-wrap gap-2">
+              <div className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-800">
+                Typed: {typedSaveLabel}
+              </div>
+              <div className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-800">
+                Handwriting: {saveLabel}
+              </div>
             </div>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+            <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-800">
+              <Type className="h-4 w-4" /> Typed notes
+            </div>
+            <Textarea
+              value={typedText}
+              onChange={(event) => setLocalTypedText(event.target.value)}
+              placeholder="Type notes here if you do not have the Apple Pencil..."
+              className="min-h-40 border-slate-300 bg-white text-slate-950 placeholder:text-slate-400 focus-visible:ring-slate-400"
+            />
           </div>
           {renderControls()}
         </CardHeader>

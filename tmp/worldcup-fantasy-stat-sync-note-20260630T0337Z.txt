@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-30T03:37Z
+
+Current time checked first: Mon Jun 29 20:37:35 PDT 2026 / 2026-06-30T03:37Z. Prior local stat-sync note found: tmp/worldcup-fantasy-stat-sync-note-20260629T2338Z.txt.
+
+Completed/recent match window: ESPN public scoreboard showed Morocco-Netherlands (event 760488, 2026-06-30T01:00Z kickoff) still in progress at 120'+1', Netherlands 1-1 Morocco. No completed match after the prior sync note was available to stat-sync yet. June 30 ESPN scoreboard only showed future scheduled fixtures.
+
+Production Convex was checked with grep CONVEX .env.production before database reads. No upsertFantasyPlayerStats writes were made.

@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T18:40Z
+
+Current time check: Thu Jun 25 11:40:23 PDT 2026 / 2026-06-25T18:40Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260625T1610Z.txt: no newly completed World Cup matches. ESPN public World Cup scoreboard snapshot tmp/espn-scoreboard-20260625-cron-1840Z.json showed the June 25 slate still scheduled/pre-match, with first kickoff at 2026-06-25T20:00Z (Ivory Coast at Curacao and Germany at Ecuador).
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were needed. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows.

@@ -187,6 +187,7 @@ const AGENT_CONFIG: Record<string, { emoji: string; label: string; color: string
   sebastian: { emoji: "⚡", label: "Sebastian", color: "text-amber-400", bgColor: "bg-amber-950/50" },
   scout: { emoji: "🔍", label: "Scout", color: "text-blue-400", bgColor: "bg-blue-950/50" },
   maven: { emoji: "📣", label: "Maven", color: "text-green-400", bgColor: "bg-green-950/50" },
+  hermes: { emoji: "🧪", label: "Hermes", color: "text-cyan-300", bgColor: "bg-cyan-950/40" },
   compass: { emoji: "🧭", label: "Compass", color: "text-cyan-400", bgColor: "bg-cyan-950/50" },
   james: { emoji: "🎮", label: "James", color: "text-purple-400", bgColor: "bg-purple-950/50" },
   corinne: { emoji: "👑", label: "Corinne", color: "text-pink-400", bgColor: "bg-pink-950/50" },

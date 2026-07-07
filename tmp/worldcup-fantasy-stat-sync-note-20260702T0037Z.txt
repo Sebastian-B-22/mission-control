@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync note - 2026-07-02T00:37Z
+
+Current time checked first: Wed Jul 1 17:37:18 PDT 2026 / 2026-07-02T00:37Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260701T2107Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public scoreboard for 2026-07-01 showed Belgium 3-2 Senegal final after extra time (event 760493). England 2-1 DR Congo had already been covered in the 2026-07-01T21:07Z note. United States-Bosnia-Herzegovina was in progress at sync time and was not synced.
+
+Sources checked: ESPN public scoreboard API for 2026-07-01, ESPN public summary API for event 760493, production worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for Fantasy Five selected-player normalization.
+
+ESPN event 760493 scoring details credit Senegal goals to Habib Diarra at 25' and Ismaila Sarr at 51' assisted by Moussa Niakhate; Belgium goals to Romelu Lukaku at 86' assisted by Thomas Meunier, Youri Tielemans at 89' assisted by Leandro Trossard, and Youri Tielemans penalty at 120'+5'. No clean sheet because both teams conceded.
+
+Fantasy Five selected-player normalization found no current selected Fantasy Five players from Belgium or Senegal in the production leaderboard rows. Public roster candidates including Kevin De Bruyne, Romelu Lukaku, Jeremy Doku, Leandro Trossard, and Sadio Mane were not present in current selected rows.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update in this completed window.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -56,6 +56,20 @@ function summarizeText(value?: string, maxLength = 140) {
   return `${normalized.slice(0, maxLength - 1)}…`;
 }
 
+function getProjectEmoji(project?: string) {
+  const emojis: Record<string, string> = {
+    hta: "🏠",
+    aspire: "⚽",
+    homeschool: "📚",
+  };
+
+  return emojis[project || ""] || "📁";
+}
+
+function normalizeStatus(status?: string) {
+  return (status || "").replace(/_/g, "-");
+}
+
 function getCategoryEmoji(category?: string) {
   const emojis: Record<string, string> = {
     infrastructure: "🔧",
@@ -215,6 +229,8 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
   const proposedLearnings = useQuery(api.agentLearnings.list, { status: "proposed", limit: 10 }) || [];
   const priorityIdeas = useQuery(api.agentIdeas.list, { status: "priority", limit: 10 }) || [];
   const newIdeas = useQuery(api.agentIdeas.list, { status: "new", limit: 10 }) || [];
+  const projectTasks = useQuery(api.projectTasks.getOpenTasks, { userId, limit: 18 }) || [];
+  const approvalItems = useQuery(api.approvalsQueue.list, { status: "pending", limit: 8 }) || [];
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -228,6 +244,11 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
     if (task.status !== "done" || !task.completedAt) return false;
     return new Date(task.completedAt).toDateString() === new Date().toDateString();
   });
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const activeProjectTasks = projectTasks.filter((task: any) =>
+    task.status === "in_progress" || task.priority === "high" || (task.dueDate && task.dueDate <= todayIso)
+  );
 
   const needsCorinne = [
     ...tasks.filter((task: any) => (task.status === "todo" || task.status === "in-progress") && task.assignedTo === "corinne"),
@@ -254,6 +275,12 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
       details: summarizeText(task.description),
       badges: ["high priority", task.category, task.assignedTo ? `owner: ${task.assignedTo}` : "unassigned"],
     })),
+    ...activeProjectTasks.map((task: any) => ({
+      id: `project-${task._id}`,
+      title: `${getProjectEmoji(task.project)} ${task.title}`,
+      details: summarizeText([task.subProject, task.description].filter(Boolean).join(" - ")),
+      badges: ["project", normalizeStatus(task.status), task.priority, task.dueDate ? `due ${task.dueDate}` : task.project],
+    })),
     ...sebastianPending.map((item: any) => ({
       id: `pending-${item._id}`,
       title: item.title,
@@ -261,6 +288,13 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
       badges: ["pending", `owner: ${item.owner}`, item.source],
     })),
   ].slice(0, 8);
+
+  const projectDrive: QueueItem[] = projectTasks.slice(0, 8).map((task: any) => ({
+    id: `project-drive-${task._id}`,
+    title: `${getProjectEmoji(task.project)} ${task.title}`,
+    details: summarizeText([task.subProject, task.description].filter(Boolean).join(" - ")),
+    badges: [task.project, normalizeStatus(task.status), task.priority, task.dueDate ? `due ${task.dueDate}` : "no due date"],
+  }));
 
   const inboxAndPending: QueueItem[] = [
     ...overnightItems.map((item: any) => ({
@@ -295,6 +329,12 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
       title: item.title,
       details: summarizeText(item.summary),
       badges: ["new idea", item.sourceAgent],
+    })),
+    ...approvalItems.map((item: any) => ({
+      id: `approval-${item._id}`,
+      title: item.title,
+      details: summarizeText(item.details),
+      badges: ["approval queue", item.requestedBy ? `from ${item.requestedBy}` : "pending"],
     })),
   ].slice(0, 8);
 
@@ -359,7 +399,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
             Queue focus
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {today}. Work the list from left to right: act now, triage inbox, then clear review items.
+            {today}. Daily work is pulled from the queue plus open project tasks, then narrowed to what matters now.
           </p>
         </div>
 
@@ -374,7 +414,7 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
       <div className="grid gap-4 lg:grid-cols-3">
         <QueueListCard
           title={`Action now (${actionNow.length})`}
-          subtitle="Active tasks, urgent project work, and Sebastian-owned pending items."
+          subtitle="Active queue items, high-priority project work, and Sebastian-owned pending items."
           icon={<TrendingUp className="h-5 w-5 text-amber-400" />}
           items={actionNow}
           emptyMessage="Nothing urgent is queued right now."
@@ -437,15 +477,18 @@ export function SebastianDailyView({ userId }: SebastianDailyViewProps) {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <QueueListCard
-          title={`Daily rhythm (${dailyTasks.length})`}
-          subtitle="Live recurring jobs from Cron that shape the day."
+          title={`Daily tasks + projects (${dailyTasks.length + projectDrive.length})`}
+          subtitle="Recurring jobs plus the project backlog Sebastian can work from."
           icon={<Clock className="h-5 w-5 text-zinc-300" />}
-          items={dailyTasks.map((task) => ({
-            id: task.id,
-            title: task.title,
-            details: task.details,
-            badges: ["scheduled"],
-          }))}
+          items={[
+            ...dailyTasks.map((task) => ({
+              id: task.id,
+              title: task.title,
+              details: task.details,
+              badges: ["scheduled"],
+            })),
+            ...projectDrive,
+          ].slice(0, 8)}
           emptyMessage="No active recurring jobs found."
           accentClass="border-l-4 border-l-zinc-600 bg-zinc-800/40"
           itemClass="bg-zinc-900/80"

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-24T04:09Z
+
+Current time check: Tue Jun 23 21:09:46 PDT 2026 / 2026-06-24 04:09 UTC.
+
+Completed/recent match window since prior sync note: Colombia 1-0 Congo DR, ESPN event 760459, FT. Portugal 5-0 Uzbekistan, England 0-0 Ghana, and Panama 0-1 Croatia were already reviewed/synced in earlier 2026-06-23/2026-06-24 UTC notes.
+
+Sources checked: ESPN public FIFA World Cup scoreboard API for 2026-06-23 and ESPN public match summary event 760459. ESPN credited Colombia's goal to Daniel Munoz at 76' with assist by Juan Fernando Quintero. Public ESPN match link: https://www.espn.com/soccer/match/_/gameId/760459.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found Linda Caicedo currently selected from Colombia, but no selected Colombia scorer/assist player was found. No selected Colombia defender/keeper clean-sheet beneficiary was found. No Congo DR roster was present in public/worldcup/fantasy-rosters.js for matching, and Congo DR did not score.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -52,6 +52,21 @@ export function SebastianAgentView() {
       lastActivity: "Recently",
     },
     {
+      name: "Hermes",
+      emoji: "🧪",
+      role: "Standalone Audit/R&D Layer",
+      status: "live",
+      model: "nous-hermes + codex auth",
+      color: "teal",
+      responsibilities: [
+        "Independent ops audits",
+        "R&D and workflow critique",
+        "Kanban-backed deep work",
+        "Reports back through Sebastian",
+      ],
+      lastActivity: "Connected",
+    },
+    {
       name: "Compass",
       emoji: "🧭",
       role: "Anthony's Companion",

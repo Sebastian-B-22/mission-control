@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-22T23:08Z
+
+Current time checked: Mon Jun 22 16:08:57 PDT 2026 / 2026-06-22T23:08Z.
+
+Completed/recent match window since prior sync note: none. ESPN public scoreboard for 2026-06-22 shows Argentina 2-0 Austria as FT and already reviewed/synced at 2026-06-22T21:08Z; France 1-0 Iraq delayed at 45'+3'; Norway vs Senegal and Jordan vs Algeria still scheduled/pre-match.
+
+Production Convex values were checked with grep CONVEX .env.production before any database work. No upsertFantasyPlayerStats writes were needed.

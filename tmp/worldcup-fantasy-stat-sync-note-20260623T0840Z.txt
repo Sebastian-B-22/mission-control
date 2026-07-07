@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-23T08:40Z
+
+Current time check: Tue Jun 23 01:39:24 PDT 2026 / 2026-06-23 08:39 UTC.
+
+Completed/recent window since prior local sync note: Algeria 2-1 Jordan, ESPN event 760455, FT. The earlier June 22 completed matches Argentina 2-0 Austria, France 3-0 Iraq, and Norway 3-2 Senegal were already reviewed/synced in prior 2026-06-23 UTC notes.
+
+Sources checked: FIFA match report / match centre and ESPN public scoreboard/summary for 2026-06-22. FIFA and ESPN list Jordan 1-2 Algeria. Source-backed scorers: Nizar Al-Rashdan 36' for Jordan; Nadhir Benbouali 69' and Amine Gouiri 82' for Algeria. No clean sheet applied because both teams conceded. No assists were written because no selected Fantasy Five assist was source-backed clearly enough from the available public data.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Jordan or Algeria player in the production Fantasy Five rows.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No stat writes were needed because no selected Fantasy Five player had source-backed goals, assists, or clean sheets from the newly completed match.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

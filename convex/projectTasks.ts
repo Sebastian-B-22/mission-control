@@ -133,3 +133,37 @@ export const getTasksByAssignee = query({
       .collect();
   },
 });
+
+export const getOpenTasks = query({
+  args: {
+    userId: v.id("users"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 20;
+    const tasks = await ctx.db
+      .query("projectTasks")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .filter((q) => q.neq(q.field("status"), "done"))
+      .collect();
+
+    const priorityRank: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    const statusRank: Record<string, number> = { in_progress: 0, todo: 1 };
+
+    return tasks
+      .sort((a, b) => {
+        const statusDelta = (statusRank[a.status] ?? 9) - (statusRank[b.status] ?? 9);
+        if (statusDelta !== 0) return statusDelta;
+
+        const priorityDelta = (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9);
+        if (priorityDelta !== 0) return priorityDelta;
+
+        const aDue = a.dueDate ?? "9999-12-31";
+        const bDue = b.dueDate ?? "9999-12-31";
+        if (aDue !== bDue) return aDue.localeCompare(bDue);
+
+        return a.order - b.order;
+      })
+      .slice(0, limit);
+  },
+});

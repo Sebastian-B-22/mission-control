@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-16T00:41Z
+
+Checked current time and production Convex env (.env.production = harmless-salamander-44).
+Completed/recent window since prior sync: Saudi Arabia 1-1 Uruguay (ESPN event 760429, FT). Scoring: Abdulelah Al-Amri 41' following a corner; Maxi Araujo 80'. No source-backed goals/assists/clean sheets for currently selected Fantasy Five players from Saudi Arabia or Uruguay, so no Convex stat writes were needed.
+Already synced before this run: Spain 0-0 Cape Verde clean-sheet roster stats; Belgium 1-1 Egypt Salah assist and Courtois no-clean-sheet state.
+Leaderboard HTTP verification succeeded: 39 rows, 5 fantasy-five rows.
+Sources checked: ESPN scoreboard/summary API event 760429; Guardian Saudi Arabia 1-1 Uruguay match report; FOX listing for 647630.

@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T03:07Z
+
+Current time checked first: Sun Jul 5 20:07:30 PDT 2026 / 2026-07-06T03:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260706T0237Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public scoreboard for 2026-07-05 showed Brazil 1-2 Norway already processed in prior notes, and Mexico 2-3 England, event 760505, newly STATUS_FULL_TIME / completed=true at 90'+12'.
+
+Source-backed scoring from ESPN public summary/keyEvents for event 760505: Jude Bellingham goals at 36' and 38' assisted by Bukayo Saka and Harry Kane; Julian Quinones goal at 42' with no assist listed; Harry Kane penalty goal at 60'; Raul Jimenez penalty goal at 69'. No clean sheet.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure for Harry Kane. Bellingham, Saka, Quinones, and Jimenez were not present in current production Fantasy Five selected-player summaries, so they were not written.
+
+Production Convex was checked with grep CONVEX .env.production before database work. An initial no---prod run hit the non-production deployment and failed; production writes then completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- kane / Harry Kane / England / goals=6 / assists=1 / cleanSheets=0. Returned id j97qe6pcf0s4xm10k8e0cxwcd989tf31.
+- official:england:star:kane / KANE / England / goals=6 / assists=1 / cleanSheets=0. Returned id j97sd19jxg3z1tdcah67wzh02989tra1.
+- official:england:goalGetter:kane / KANE / England / goals=6 / assists=1 / cleanSheets=0. Returned id j97y84pzkkgvqx355xj2pa9gms89vwcb.
+
+Verification: production leaderboard query and https://harmless-salamander-44.convex.site/worldcup/leaderboard load check were run after the writes.

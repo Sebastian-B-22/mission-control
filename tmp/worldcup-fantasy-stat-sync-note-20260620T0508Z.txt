@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-20T05:08Z
+
+Current time checked first: Fri Jun 19 22:07:52 PDT 2026 / 2026-06-20T05:07Z. Prior stat-sync note was 2026-06-20T03:08Z.
+
+Completed/recent window since prior sync: Türkiye 0-1 Paraguay (ESPN event 760443, kickoff 2026-06-20T03:00Z, FT). ESPN public scoreboard/summary reported Matias Galarza goal at 2' with Julio Enciso listed in the scoring-play participants; Guardian live report cross-check also reported Galarza opened scoring. Paraguay clean sheet is source-backed by the 0-1 FT score.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current selected Fantasy Five player from Paraguay or Türkiye. Paraguay roster catalog includes Julio Enciso, Miguel Almiron, and defender/keeper options, but none are present in the current production Fantasy Five rows. No selected Paraguay defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

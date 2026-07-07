@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T12:08Z
+
+Cron window checked at Thu Jun 18 05:07 PDT / 2026-06-18 12:07 UTC.
+
+No completed World Cup match window was found since the prior 2026-06-18T09:07Z sync note. ESPN public scoreboard showed June 18 matches still scheduled at this run time, with the first match South Africa vs Czechia starting at 2026-06-18T16:00Z.
+
+No Convex production stat writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned production leaderboard rows including Fantasy Five entries.
+
+Sources checked:
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260618
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260617

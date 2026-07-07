@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 // API key for Health Auto Export app
-const HEALTH_EXPORT_API_KEY = process.env.HEALTH_EXPORT_API_KEY || "hae-corinne-2026";
+const HEALTH_EXPORT_API_KEY = (process.env.HEALTH_EXPORT_API_KEY || "hae-corinne-2026").trim();
 
 interface HealthMetricEntry {
   qty?: number;
@@ -79,6 +79,21 @@ function metricKind(metricName: string): "steps" | "sleep" | "calories" | "weigh
   return null;
 }
 
+function aggregateHealthQuantity(entries: HealthMetricEntry[]): number {
+  const quantities = entries
+    .map((entry) => entry.qty || 0)
+    .filter((qty) => Number.isFinite(qty) && qty > 0);
+
+  if (quantities.length === 0) return 0;
+  const total = quantities.reduce((sum, qty) => sum + qty, 0);
+  const max = Math.max(...quantities);
+
+  // Health Auto Export may provide one daily total per source/device. Summing
+  // those duplicates doubles steps, so keep the best daily total in that case.
+  if (quantities.length <= 4 && max / total >= 0.45) return max;
+  return total;
+}
+
 function toSleepHours(entry: HealthMetricEntry, units: string | undefined): number | undefined {
   const normalizedUnits = (units || "").toLowerCase();
   let value = entry.totalSleep ?? entry.asleep;
@@ -118,9 +133,9 @@ function toSleepHours(entry: HealthMetricEntry, units: string | undefined): numb
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("Authorization");
-    const apiKey = authHeader?.replace("Bearer ", "") ||
+    const apiKey = (authHeader?.replace("Bearer ", "") ||
       request.headers.get("X-API-Key") ||
-      new URL(request.url).searchParams.get("key");
+      new URL(request.url).searchParams.get("key") || "").trim();
 
     if (apiKey !== HEALTH_EXPORT_API_KEY) {
       console.error("Invalid API key for Health Auto Export");
@@ -140,18 +155,30 @@ export async function POST(request: Request) {
       const kind = metricKind(metric.name);
       if (!kind) continue;
 
+      if (kind === "steps") {
+        const entriesByDate: Record<string, HealthMetricEntry[]> = {};
+        for (const entry of metric.data) {
+          const dateStr = extractDateKey(entry.date, entry.endDate, entry.startDate);
+          if (!dateStr) continue;
+          entriesByDate[dateStr] = [...(entriesByDate[dateStr] || []), entry];
+        }
+
+        for (const [dateStr, entries] of Object.entries(entriesByDate)) {
+          if (!dataByDate[dateStr]) dataByDate[dateStr] = {};
+          dataByDate[dateStr].steps = Math.max(
+            dataByDate[dateStr].steps || 0,
+            aggregateHealthQuantity(entries),
+          );
+        }
+        continue;
+      }
+
       for (const entry of metric.data) {
         const dateStr = extractDateKey(entry.date, entry.endDate, entry.startDate, entry.sleepEnd, entry.sleepStart);
         if (!dateStr) continue;
 
         if (!dataByDate[dateStr]) {
           dataByDate[dateStr] = {};
-        }
-
-        if (kind === "steps") {
-          const currentSteps = dataByDate[dateStr].steps || 0;
-          dataByDate[dateStr].steps = currentSteps + (entry.qty || 0);
-          continue;
         }
 
         if (kind === "sleep") {
@@ -257,7 +284,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const apiKey = new URL(request.url).searchParams.get("key");
+  const apiKey = (new URL(request.url).searchParams.get("key") || "").trim();
 
   if (apiKey !== HEALTH_EXPORT_API_KEY) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T00:37Z
+
+Current time checked first: Sun Jul 5 17:37:33 PDT 2026 / 2026-07-06T00:37Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260705T2137Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public scoreboard/API showed Brazil 1-2 Norway, event 760504, as Full Time after the 2026-07-05 4 p.m. ET kickoff. Mexico-England, event 760505, was still scheduled/pre-match at this sync time, so it was not processed.
+
+Sources checked: ESPN public scoreboard API for 2026-07-05 and ESPN public summary/commentary for event 760504. ESPN credited Erling Haaland with Norway goals at 79' and 90'. ESPN commentary credited Andreas Schjelderup assists on both Haaland goals, but Schjelderup is not a current selected Fantasy Five player. Neymar scored Brazil's penalty at 90'+10'; no clean sheet was available.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure for Erling Haaland (id haaland). Vinicius Junior is in the local catalog but is not present in the current production Fantasy Five selections. No selected Brazil/Norway defender/keeper clean-sheet beneficiary had a clean sheet.
+
+Production Convex was checked with grep CONVEX .env.production before database work. First run without --prod hit the non-production deployment and failed because worldCup:upsertFantasyPlayerStats was not deployed there; the production write then succeeded with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for haaland / Erling Haaland / Norway / goals=7 / assists=0 / cleanSheets=0. Returned id j97sjn6qyjxy8ee3p439mkgtt589vaxp.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded after the write and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

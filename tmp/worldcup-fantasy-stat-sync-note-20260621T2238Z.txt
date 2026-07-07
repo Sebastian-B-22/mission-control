@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T22:38Z
+
+Current time checked first: Sun Jun 21 15:38:16 PDT 2026 / 2026-06-21T22:38Z.
+
+Completed/recent window since prior 2026-06-21T21:08Z sync note: Belgium 0-0 Iran (ESPN event 760451, FT) completed after the prior note. Uruguay vs Cape Verde was in first half; New Zealand vs Egypt was scheduled.
+
+Source-backed scoring for Belgium 0-0 Iran: ESPN public FIFA World Cup scoreboard and summary APIs show Full Time, Belgium 0 - Iran 0, with no scoring plays. This supports clean sheets only for defender/keeper picks from Belgium or Iran.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Belgium or Iran player. No source-backed goals/assists/clean-sheet stats for currently selected Fantasy Five players, so no Convex stat writes were needed.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- ESPN public FIFA World Cup summary API for event 760451: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760451
+
+Production Convex was checked with grep CONVEX .env.production before database work. No database updates were needed.

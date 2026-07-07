@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-23T05:39Z
+
+Current time checked: Mon Jun 22 22:39:12 PDT 2026 / 2026-06-23T05:39Z.
+
+Completed/recent match window since prior sync note: Norway 3-2 Senegal completed after the 2026-06-23T01:08Z sync; Jordan vs Algeria kicked off at 20:00 PDT and was in/near the post-match window, but current production Fantasy Five rows have no selected Algeria or Jordan player.
+
+Source-backed scoring: FIFA match centre for Norway vs Senegal was available as the official match page. Guardian and New York Post public reports cross-checked Norway 3-2 Senegal and Erling Haaland scoring twice. No source-backed Haaland assists or clean sheet.
+
+Fantasy Five selected-player normalization from production listLeaderboard plus public/worldcup/index.html found Erling Haaland selected with stable catalog id haaland.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for haaland / Erling Haaland / Norway / goals=4 / assists=0 / cleanSheets=0. Returned id j97m2518k45qp43v11r2t5r6bx88t1n7. Total includes the prior two Norway-Iraq goals from the 2026-06-17 sync plus two Norway-Senegal goals.
+
+No Jordan/Algeria stats were written: Riyad Mahrez exists in the local catalog, but no current production Fantasy Five row selected him, and no other selected Algeria/Jordan player was found.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

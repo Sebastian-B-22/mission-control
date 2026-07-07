@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-26T20:45Z
+
+Current time check: Fri Jun 26 13:42:22 PDT 2026 / 2026-06-26T20:42Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260626T1813Z.txt: Group I 19:00Z matches completed. Public sources checked: ESPN FIFA World Cup scoreboard for 2026-06-26, ESPN match pages, Guardian live reports/search snippets, and FOX boxscore snippets where available.
+
+Source-backed stat updates:
+- France 3-1 Norway: ESPN scoreboard and Guardian live report credited Ousmane Dembele goals at 7, 20, and 32. Updated official:france:star:dembele and official:france:goalGetter:dembele to cumulative goals=4, assists=1, cleanSheets=0, retaining the prior sourced assist line.
+- Senegal 3-0 Iraq: ESPN scoreboard credited H. Diarra 4, I. Sarr 56, and P. Gueye 59. Updated official:senegal:playmaker:h-diarra to goals=1, assists=0, cleanSheets=0. Updated existing Sarr alias rows official:senegal:defenderKeeper:sarr and official:senegal:wildcard:sarr from goals=2 to goals=3, assists=0, cleanSheets=0, following the prior alias mapping used for Senegal Sarr goals. P. Gueye was not found in the public/worldcup/fantasy-rosters.js Senegal fantasy roster, so no P. Gueye row was written.
+
+Skipped:
+- Assists for the 2026-06-26 Group I matches were not written because no official/source-backed assist list was available in this pass.
+- Senegal clean-sheet player credits were not added because the available public snippets did not provide a clear official lineup/appearance basis for the fantasy defender/keeper rows, and the existing Sarr alias appears to track attacker I. Sarr goals rather than a defender clean sheet.
+- Norway/France selected stars Haaland and Mbappe received no goal/assist update from the source-backed score events.
+
+Production Convex was checked with grep CONVEX .env.production before database work. The exact no---prod command still does not resolve deployed worldCup functions, matching prior notes; production writes succeeded with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats. Returned ids: official:france:star:dembele j97pzsthjjgkmpd12ef1p96yq9896q1m; official:france:goalGetter:dembele j97gzp62mjrg21esmt6abeqj0n896ae3; official:senegal:playmaker:h-diarra j97wc18atyn2wpnnzsk2fnmpbx89dc7n; official:senegal:defenderKeeper:sarr j97w0wnbzazaen4fjqrkfng52s8974f1; official:senegal:wildcard:sarr j97k6v529ef41fqnc1edyv1xh1897bbw.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

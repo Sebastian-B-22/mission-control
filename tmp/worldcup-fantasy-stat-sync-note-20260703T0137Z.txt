@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-03T01:37Z
+
+Current time checked first: Thu Jul 2 18:37:52 PDT 2026 / 2026-07-03T01:37Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260703T0007Z.txt.
+
+Completed/recent match window since prior sync: ESPN public scoreboard for 2026-07-02 showed Portugal 2-1 Croatia, event 760496, as Full Time after the 2026-07-02T23:00Z kickoff. Spain 3-0 Austria had already been reviewed in the prior sync note. Switzerland-Algeria was still scheduled for 2026-07-03T03:00Z and was not eligible.
+
+Sources checked: ESPN public scoreboard API for 2026-07-02 saved at tmp/espn-scoreboard-20260702-cron-0137Z.json; ESPN public summary API for event 760496 saved at tmp/espn-summary-760496-20260703.json; production Fantasy Five leaderboard via worldCup:listLeaderboard saved at tmp/worldcup-leaderboard-cron-20260703T0137Z.json; public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed Portugal-Croatia scoring: ESPN event 760496 credited Croatia's goal to Ivan Perisic at 53', Portugal's goals to Cristiano Ronaldo at 68' on a penalty and Goncalo Ramos at 90'+4' assisted by Rafael Leao. No clean sheet.
+
+Fantasy Five selected-player normalization found current selected exposure in this completed window for Cristiano Ronaldo/Portugal and Bruno Fernandes/Portugal. Ronaldo was already at 2 total goals from prior Portugal-Uzbekistan sync notes and was updated to 3 total goals after ESPN credited his 68' penalty. Bruno Fernandes had no source-backed goal or assist in this match. No currently selected Croatia scorer/assistant or Portugal/Croatia clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Production writes:
+- ronaldo / Cristiano Ronaldo / Portugal / goals=3 / assists=0 / cleanSheets=0 / returned id j97kkb7945q3he2j202rdn7zmn896xhx
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded after the write and returned 39 rows including Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

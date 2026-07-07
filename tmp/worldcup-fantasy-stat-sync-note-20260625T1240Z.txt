@@ -1,0 +1,14 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T12:40Z
+
+Current time check: Thu Jun 25 05:40:09 PDT 2026. Last local stat-sync note found: tmp/worldcup-fantasy-stat-sync-note-20260624T0709Z.txt.
+
+Completed/recent match window since last sync: Wednesday, June 24 World Cup matches are complete. Public source cross-checks used:
+- ESPN schedule/search result: Switzerland 2-1 Canada, Bosnia-Herzegovina 3-1 Qatar, Scotland 0-3 Brazil, Morocco 4-2 Haiti, Mexico 3-0 Czechia, South Africa 1-0 South Korea.
+- RG live recap updated 2026-06-25 03:38 ET: Mexico 3-0 Czechia, South Africa 1-0 South Korea, Switzerland 2-1 Canada, Bosnia-Herzegovina 3-1 Qatar, Brazil 3-0 Scotland, Morocco 4-2 Haiti.
+- DK Network June 24 live page corroborated the six-match slate and Bosnia-Herzegovina 3-1 Qatar with scorers Kerim Alajbegovic, Qatar own goal, and Ermin Mahmic. Guardian snippets corroborated Morocco 4-2 Haiti and Mexico 3-0 Czechia.
+
+Fantasy Five selected-player normalization from production listLeaderboard and convex/worldCup.ts catalog found current selected player IDs/countries: turner/united-states, haaland/norway, pulisic/united-states, messi/argentina, custom O'Reilly/Nico O'Reilly, ronaldo/portugal, adams/united-states, vandijk/netherlands, kane/england, bruno/portugal, mbappe/france, custom Ousmane Dembele/France, yamal/spain, valencia/ecuador, caicedo/colombia.
+
+No current selected Fantasy Five player was on a June 24 completed-match team. Available but not currently selected players from June 24 scoring/clean-sheet teams include dzeko/Bosnia and Herzegovina, afif/Qatar, davies/Canada, hakimi/Morocco, vinicius/Brazil, ochoa/Mexico, cech/Czechia, son/South Korea. Because no selected player had source-backed goals, assists, or defender/keeper clean sheets in the completed window, no Convex stat writes were made.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

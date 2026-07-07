@@ -1,0 +1,30 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-04T03:37Z
+
+Current time checked first: Fri Jul 3 20:37:16 PDT 2026 / 2026-07-04T03:37Z.
+
+Completed/recent match window since prior sync note tmp/worldcup-fantasy-stat-sync-note-20260704T0137Z.txt:
+- Ghana 0-1 Colombia, ESPN event 760501, FT. Earlier Egypt-Australia and Argentina-Cabo Verde were already reviewed in the 2026-07-04T01:37Z note.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Sources checked:
+- ESPN public scoreboard for 2026-07-03.
+- ESPN public summary saved at tmp/espn-summary-760501-20260704T0337Z.json.
+- Public web cross-check search found Guardian/BeninWebTV/GOAL snippets consistent with Colombia 1-0 Ghana, Jhon Arias 14' goal, Luis Suarez assist.
+- Production Fantasy Five entries saved at tmp/worldcup-entries-cron-20260704T0337Z.json, plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed scoring:
+- 760501: Jhon Arias goal 14', assisted by Luis Suarez. Colombia kept a clean sheet.
+
+Fantasy Five selected-player normalization:
+- No current production Fantasy Five row selected Jhon Arias or Luis Suarez.
+- Linda Caicedo / caicedo was selected for Colombia, but she did not have a source-backed goal or assist in this match.
+- No current production Fantasy Five row selected a Colombia defenderKeeper roster ID, so no clean-sheet stat was written.
+- Ghana had no supported scoring stat in the 0-1 loss.
+
+Production Convex updates:
+- No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update.
+
+Verification:
+- https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.
+- Production worldCup:listLeaderboard with limit 5 succeeded and saved tmp/worldcup-leaderboard-cron-20260704T0337Z-after.json.

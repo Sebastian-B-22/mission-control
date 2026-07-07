@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-26T00:40Z
+
+Current time check: Thu Jun 25 17:40:31 PDT 2026. Last local stat-sync note found: tmp/worldcup-fantasy-stat-sync-note-20260625T1610Z.txt.
+
+Completed/recent match window since last sync: two June 25 Group E matches are complete per ESPN public scoreboard snapshot tmp/espn-scoreboard-20260625-cron-0040Z.json: Curacao 0-2 Cote d'Ivoire and Ecuador 2-1 Germany. Two 23:00Z matches, Japan-Sweden and Tunisia-Netherlands, were still in progress and were not synced.
+
+Sources checked: official FIFA match report https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/curacao-cote-divoire-match-report-highlights and ESPN match page/API https://www.espn.com/soccer/match/_/gameId/760473/ivory-coast-curacao support Curacao 0-2 Cote d'Ivoire with Nicolas Pepe scoring both goals and Cote d'Ivoire clean sheet. ESPN public scoreboard/match API https://www.espn.com/soccer/match/_/gameId/760468/germany-ecuador and public reports from beIN/FotMob support Ecuador 2-1 Germany with Leroy Sane, Nilson Angulo, and Gonzalo Plata goals. No source-backed assists were clear enough to write.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected players: Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Lamine Yamal, Enner Valencia, and Linda Caicedo. Enner Valencia is selected for Ecuador but did not have a source-backed goal or assist in Ecuador-Germany. No selected Germany/Cote d'Ivoire/Curacao scorers were found, and no selected Cote d'Ivoire defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed/recent matches.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

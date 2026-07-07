@@ -1,0 +1,20 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-02T02:38Z
+
+Current time checked first: Wed Jul 1 19:37:20 PDT 2026 / 2026-07-02T02:37Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260630T2307Z.txt.
+
+Completed/recent match window since prior local sync note: England 2-1 Congo DR (ESPN event 760495, FT), Belgium 3-2 Senegal AET (ESPN event 760493, final after extra time), and United States 2-0 Bosnia-Herzegovina (ESPN event 760494, FT).
+
+Public sources checked: ESPN public FIFA World Cup scoreboard for 2026-07-01 and ESPN public match summary/keyEvents JSON for events 760495, 760493, and 760494.
+
+Source-backed scoring: England goals by Harry Kane at 75' and 86', both assisted by Anthony Gordon; Congo DR goal by Brian Cipenga, assisted by Chancel Mbemba. Belgium-Senegal goals by Habib Diarra, Ismaila Sarr assisted by Moussa Niakhate, Romelu Lukaku assisted by Thomas Meunier, and Youri Tielemans twice with one Leandro Trossard assist. USA goals by Folarin Balogun and Malik Tillman. USA kept a clean sheet, but Matt Freese was the source-backed goalkeeper in match events; selected Matt Turner was not credited.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure in this completed window for Harry Kane/England, Turner/Pulisic/Adams/USA, and no current selected Belgium/Senegal/Congo DR/Bosnia-Herzegovina player with a source-backed supported stat. Kane was already at 3 goals and was updated to 5 total goals after ESPN event 760495 credited him with both England goals. USA selected players had no supported source-backed stat to write: Turner did not play, Pulisic had no scoring event, and Adams had no scoring event.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production writes made with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- kane / Harry Kane / England / goals=5 / assists=0 / cleanSheets=0 / returned id j97rgmrfz0h4ey70vgmjgfpnhs88tbyf
+- official:england:goalGetter:kane / KANE / England / goals=5 / assists=0 / cleanSheets=0 / returned id j97q7nhpc6jdxgvf7wxmdmdpw588wyym
+- official:england:star:kane / KANE / England / goals=5 / assists=0 / cleanSheets=0 / returned id j97sxqj6hs2c2rkq8hzskpb0c588xrsa
+
+Note: running the same commands without --prod hit the non-production deployment/function list and failed before the successful production writes above. Production writes succeeded.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded after the write and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

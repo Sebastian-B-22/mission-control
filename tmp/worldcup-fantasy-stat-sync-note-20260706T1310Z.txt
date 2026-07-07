@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T13:10Z
+
+Current time checked first: Mon Jul 6 06:07:31 PDT 2026 / 2026-07-06T13:07Z.
+
+Completed/recent match window since prior local sync notes: ESPN public scoreboard for 2026-07-05 showed Brazil 1-2 Norway and Mexico 2-3 England already full time. Local notes from 2026-07-06T0007Z/0037Z had already synced Brazil-Norway, and 2026-07-06T0307Z had already synced Mexico-England.
+
+Production Convex was checked with grep CONVEX .env.production before database work. During this recheck, haaland was briefly overwritten to goals=6 based on an older prior-total assumption; immediately corrected back to the source-backed local total goals=7 from the 2026-07-06T0007Z/0037Z notes. Production upsert returned id j97sjn6qyjxy8ee3p439mkgtt589vaxp.
+
+No new stat writes were needed for Mexico-England because the 2026-07-06T0307Z sync already updated kane / Harry Kane / England to goals=6, assists=1, cleanSheets=0 from ESPN event 760505.
+
+Sources checked: ESPN public scoreboard API for 2026-07-05; ESPN public summaries for events 760504 and 760505; existing local sync notes. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and showed the Fantasy Five leaderboard with Haaland rows restored to their prior scores. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

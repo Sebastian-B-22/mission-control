@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-22T21:08Z
+
+Current time checked: Mon Jun 22 14:08:51 PDT 2026 / 2026-06-22T21:08Z.
+
+Completed/recent window since prior sync note: Argentina 2-0 Austria was full time after the 1pm ET kickoff. France vs Iraq, Norway vs Senegal, and Jordan vs Algeria were not completed at this run time.
+
+Sources checked: FIFA match centre surfaced for Argentina v Austria; Al Jazeera live result https://www.aljazeera.com/sports/liveblog/2026/6/22/argentina-vs-austria-live-world-cup-2026; ESPN recap/search result; Guardian report/search result. Public sources agreed Argentina won 2-0 and Lionel Messi scored both goals at 38' and 95'. Prior Argentina 3-0 Algeria Messi hat-trick was already source-backed and synced on 2026-06-17.
+
+Source-backed Fantasy Five stats: Lionel Messi cumulative goals updated from 3 to 5. Assists were skipped because public sources did not agree clearly enough for selected Fantasy Five players. Argentina clean sheet was not applied to any selected player because current Fantasy Five leaderboard rows did not show a selected Argentina defender/keeper.
+
+Production Convex was checked with grep CONVEX .env.production before database work. The exact no---prod command still does not resolve deployed worldCup functions, matching prior notes; production write succeeded with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats.
+
+Update applied:
+- messi / Lionel Messi / Argentina / goals=5 / assists=0 / cleanSheets=0 / returned id j97tdn0s0htcq05vhwy3vcqx1588v3yx.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

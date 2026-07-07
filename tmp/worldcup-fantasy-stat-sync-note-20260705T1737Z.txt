@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-05T17:37Z
+
+Current time checked first: Sun Jul 5 10:37:29 PDT 2026 / 2026-07-05T17:37Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260705T1607Z.txt.
+
+Completed/recent match window since prior local sync note: none. ESPN public scoreboard for 2026-07-05 showed Brazil-Norway at 2026-07-05T20:00Z and Mexico-England at 2026-07-06T00:00Z, both still scheduled/pre-match at this sync time.
+
+Production Convex was checked with grep CONVEX .env.production before any possible database work. No production Convex writes were needed, so worldCup:upsertFantasyPlayerStats was not run.

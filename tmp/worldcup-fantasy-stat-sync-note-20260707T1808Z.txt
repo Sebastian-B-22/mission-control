@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-07T18:08Z
+
+Current time checked first: Tue Jul 7 11:08:30 PDT 2026 / 2026-07-07T18:08Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260707T1708Z.txt.
+
+Completed/recent match window since prior sync: ESPN public scoreboard for 2026-07-07 showed Egypt at Argentina (event 760509, 16:00Z) had moved from halftime at the prior sync to Full Time, Argentina 3-2 Egypt. Colombia at Switzerland (event 760508, 20:00Z) was still scheduled and not eligible.
+
+Sources checked: ESPN public scoreboard API for 2026-07-07, Al Jazeera live Argentina vs Egypt page/search result, production worldCup:listEntries/worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed scoring reviewed: Al Jazeera listed Argentina goals by Cristian Romero 79, Lionel Messi 83, and Enzo Fernandez 92; Egypt goals by Yasser Ibrahim 15 and Mostafa Zico 67. ESPN public scoreboard confirmed Argentina 3-2 Egypt at Full Time. Assists were not source-backed clearly enough from the checked public sources, so assists were not changed. No clean sheet applied because both teams conceded.
+
+Fantasy Five selected-player normalization from production entries/leaderboard found current relevant selected exposure to Lionel Messi / Argentina only. Mohamed Salah is in the static catalog but was not selected in current production Fantasy Five entries. Romero, Fernandez, Ibrahim, and Zico were not current selected catalog players.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production updates completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- messi / Lionel Messi / Argentina / goals=8 / assists=0 / cleanSheets=0 / returned id j97gcm8mz5dv7f5z2mezn6eq0s89tqat.
+- official:argentina:star:messi / MESSI / Argentina / goals=8 / assists=0 / cleanSheets=0 / returned id j97s7rq3f47rg8rs583nfjgv8h89t8sx.
+- official:argentina:goalGetter:messi / MESSI / Argentina / goals=8 / assists=0 / cleanSheets=0 / returned id j97kj3k5z1dt8ba7yh2j0rqf8589vm3x.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded after the writes and returned Fantasy Five rows; https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

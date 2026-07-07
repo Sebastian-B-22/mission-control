@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T13:38Z
+
+Current time check: Wed Jun 17 06:38:16 PDT 2026 / 2026-06-17T13:38Z. Last local stat-sync note was 2026-06-17T03:08Z.
+
+Completed/recent window since prior sync: Austria 3-1 Jordan, FIFA listed kickoff 2026-06-17 04:00 PDT and public reports show FT. Later June 17 fixtures (Portugal vs DR Congo, Ghana vs Panama, England vs Croatia, Uzbekistan vs Colombia) had not completed at this run time.
+
+Sources checked: FIFA scores/fixtures https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures ; Guardian live/report https://www.theguardian.com/football/live/2026/jun/17/fifa-world-cup-2026-live-austria-v-jordan-updates-aut-vs-jor-group-j-match-score-latest ; ESPN schedule https://www.espn.com/soccer/story/_/id/48939282/2026-fifa-world-cup-fixtures-results-match-schedule-group-stage-knockout-rounds-bracket .
+
+Source-backed scoring found: Romano Schmid goal for Austria, Yazan Al-Arab own goal for Austria, Marko Arnautovic penalty goal for Austria, Ali Olwan goal for Jordan. No clean sheet.
+
+Fantasy Five selected-player normalization: public/worldcup/index.html fantasyPlayers includes David Alaba for Austria, but he had no source-backed scoring and Austria did not keep a clean sheet. Current production Fantasy Five leaderboard rows list Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Enner Valencia, Lamine Yamal, and Linda Caicedo; no Austria or Jordan scorers/assist/clean-sheet beneficiaries are currently selected. Official roster IDs for Austria/Jordan scorers exist in public/worldcup/fantasy-rosters.js, but none appear selected on the production Fantasy Five leaderboard.
+
+Convex production: .env.production CONVEX values were checked before database work. No stat writes were needed because no selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed match.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 and included 5 Fantasy Five rows.

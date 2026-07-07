@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T20:40Z
+
+Current time check: Thu Jun 25 13:40 PDT / 2026-06-25T20:40Z. Production Convex env checked with grep CONVEX .env.production before database work.
+
+Completed/recent match window since prior sync note 2026-06-24T07:09Z: ESPN public FIFA World Cup scoreboard shows 2026-06-24 matches completed: Bosnia-Herzegovina 3-1 Qatar, Switzerland 2-1 Canada, Morocco 4-2 Haiti, Scotland 0-3 Brazil, Czechia 0-3 Mexico, South Africa 1-0 South Korea. 2026-06-25 20:00Z matches were still in progress at sync time; later matches were scheduled.
+
+Fantasy Five selected-player normalization from production listLeaderboard/listEntries plus public/worldcup/index.html found selected Fantasy Five players: Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Lamine Yamal, Enner Valencia, Linda Caicedo. None played in the completed 2026-06-24 match set; Enner Valencia's Ecuador match was in progress and not eligible for stat sync yet.
+
+No Fantasy Five stat writes were made. No source-backed selected-player goals/assists/clean sheets from completed matches were available to update.
+
+Verification: production listLeaderboard succeeded and https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -1,0 +1,107 @@
+{
+  "changes": [
+    {
+      "child": "Roma Test",
+      "days": [
+        "2026-08-10",
+        "2026-08-12"
+      ],
+      "from": "old Week 2 / Aug 10-14",
+      "id": "n172rta9bb7k6xx7390gjcgvzd87bfrr",
+      "parentEmail": "Corinnebriers@gmail.com",
+      "status": "pending",
+      "to": "new Week 3 / Aug 10-14"
+    },
+    {
+      "child": "Mia Hovanesian",
+      "days": [
+        "2026-08-03",
+        "2026-08-04",
+        "2026-08-05",
+        "2026-08-06",
+        "2026-08-07"
+      ],
+      "from": "old Week 1 / Aug 3-7",
+      "id": "n17236ptbay8xdetx516yxzqy187cz7x",
+      "parentEmail": "jessa.m.baker@gmail.com",
+      "status": "paid",
+      "to": "new Week 2 / Aug 3-7"
+    },
+    {
+      "child": "Alexandra Cordoves",
+      "days": [
+        "2026-08-10",
+        "2026-08-11",
+        "2026-08-12",
+        "2026-08-13",
+        "2026-08-14"
+      ],
+      "from": "old Week 2 / Aug 10-14",
+      "id": "n171canxe8ywqnzb74qfge5adx87h9sh",
+      "parentEmail": "nino.cordoves@gmail.com",
+      "status": "paid",
+      "to": "new Week 3 / Aug 10-14"
+    },
+    {
+      "child": "Josephine Cordoves",
+      "days": [
+        "2026-08-10",
+        "2026-08-11",
+        "2026-08-12",
+        "2026-08-13",
+        "2026-08-14"
+      ],
+      "from": "old Week 2 / Aug 10-14",
+      "id": "n171canxe8ywqnzb74qfge5adx87h9sh",
+      "parentEmail": "nino.cordoves@gmail.com",
+      "status": "paid",
+      "to": "new Week 3 / Aug 10-14"
+    },
+    {
+      "child": "Kasra Yermian",
+      "days": [
+        "2026-08-03",
+        "2026-08-05",
+        "2026-08-07",
+        "2026-08-04",
+        "2026-08-06"
+      ],
+      "from": "old Week 1 / Aug 3-7",
+      "id": "n177z3pf126dgy8h4mx3m3kkdx87t7nv",
+      "parentEmail": "shadigolshani@yahoo.com",
+      "status": "pending",
+      "to": "new Week 2 / Aug 3-7"
+    },
+    {
+      "child": "Kasra Yermian",
+      "days": [
+        "2026-08-03",
+        "2026-08-05",
+        "2026-08-07"
+      ],
+      "from": "old Week 1 / Aug 3-7",
+      "id": "n17cpxnk086750a29m4gzsy85d87tecg",
+      "parentEmail": "shadigolshani@yahoo.com",
+      "status": "paid",
+      "to": "new Week 2 / Aug 3-7"
+    },
+    {
+      "child": "Hal Brody",
+      "days": [
+        "2026-08-03",
+        "2026-08-04",
+        "2026-08-05",
+        "2026-08-06",
+        "2026-08-07"
+      ],
+      "from": "old Week 1 / Aug 3-7",
+      "id": "n17bsta5wbehhnzq1pcnz12dj587zew9",
+      "parentEmail": "suesmith.online@gmail.com",
+      "status": "pending",
+      "to": "new Week 2 / Aug 3-7"
+    }
+  ],
+  "childrenChanged": 7,
+  "dryRun": true,
+  "registrationsChanged": 6
+}

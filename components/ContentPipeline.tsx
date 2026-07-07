@@ -128,6 +128,7 @@ const CREATOR_CONFIG: Record<string, { emoji: string; badgeClass: string }> = {
 };
 
 const STAGE_ORDER: ContentStage[] = ["idea", "review", "approved", "published"];
+const REVIEW_DISPLAY_LIMIT = 9;
 
 function getNextStage(current: ContentStage): ContentStage | null {
   const idx = STAGE_ORDER.indexOf(current);
@@ -1070,9 +1071,11 @@ function KanbanColumn({
   onRequestChanges,
   onAdvance,
   onDelete,
+  totalItems = items.length,
 }: {
   stage: typeof STAGES[number];
   items: ContentItem[];
+  totalItems?: number;
   onCardClick: (item: ContentItem) => void;
   onApprove: (id: Id<"contentPipeline">) => void;
   onRequestChanges: (item: ContentItem) => void;
@@ -1080,6 +1083,7 @@ function KanbanColumn({
   onDelete: (id: Id<"contentPipeline">) => void;
 }) {
   const isReviewCol = stage.value === "review";
+  const hiddenCount = Math.max(0, totalItems - items.length);
 
   return (
     <div className="flex-1 min-w-[280px]">
@@ -1098,8 +1102,13 @@ function KanbanColumn({
             </div>
             <div className="flex shrink-0 flex-col items-end gap-2">
               <Badge variant="outline" className="border-zinc-700 bg-zinc-950 text-zinc-300">
-                {items.length} items
+                {hiddenCount > 0 ? `${items.length}/${totalItems} items` : `${items.length} items`}
               </Badge>
+              {isReviewCol && hiddenCount > 0 && (
+                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-300">
+                  Top {items.length} shown
+                </span>
+              )}
               {isReviewCol && items.length > 0 && (
                 <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-300 animate-pulse">
                   Needs review
@@ -1394,6 +1403,10 @@ export function ContentPipeline() {
 
   // Group by stage
   const byStage = (stage: ContentStage) => allItems.filter((i) => i.stage === stage);
+  const visibleByStage = (stage: ContentStage) => {
+    const stageItems = byStage(stage);
+    return stage === "review" ? stageItems.slice(0, REVIEW_DISPLAY_LIMIT) : stageItems;
+  };
 
   // Stats
   const reviewCount = byStage("review").length;
@@ -1549,7 +1562,7 @@ export function ContentPipeline() {
             <span className="text-xs text-zinc-500">{totalCount} total</span>
             {reviewCount > 0 && (
               <span className="animate-pulse text-xs font-medium text-amber-400">
-                👀 {reviewCount} waiting for review
+                👀 {Math.min(reviewCount, REVIEW_DISPLAY_LIMIT)} shown for review{reviewCount > REVIEW_DISPLAY_LIMIT ? ` (${reviewCount - REVIEW_DISPLAY_LIMIT} parked)` : ""}
               </span>
             )}
             {feedbackStats && feedbackStats.total > 0 && (
@@ -1649,7 +1662,8 @@ export function ContentPipeline() {
               <KanbanColumn
                 key={stage.value}
                 stage={stage}
-                items={byStage(stage.value)}
+                items={visibleByStage(stage.value)}
+                totalItems={byStage(stage.value).length}
                 onCardClick={setSelectedItem}
                 onApprove={handleApprove}
                 onRequestChanges={handleRequestChanges}

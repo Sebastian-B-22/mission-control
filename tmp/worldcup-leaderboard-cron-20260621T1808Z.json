@@ -1,0 +1,906 @@
+{
+  "group": null,
+  "rows": [
+    {
+      "champion": "Kylian Mbappe",
+      "createdAt": 1781229564566,
+      "displayName": "Rinky-dink Shinx",
+      "familyName": "Rinky-dink Shinx",
+      "fantasySummary": {
+        "captain": "Kylian Mbappe",
+        "players": [
+          "Virgil Van Dijk",
+          "Harry Kane",
+          "Bruno Fernandes",
+          "Kylian Mbappe",
+          "Ousmane DembéLé"
+        ]
+      },
+      "id": "hd7qv7ynm2wfh2rwtnxe66nzh588gbhf",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 1,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 74,
+        "semifinalistBonus": 0,
+        "total": 74,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Lionel Messi",
+      "createdAt": 1780962344683,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "fantasySummary": {
+        "captain": "Lionel Messi",
+        "players": [
+          "Turner",
+          "Erling Haaland",
+          "Christian Pulisic",
+          "Lionel Messi",
+          "O'Reilly"
+        ]
+      },
+      "id": "hd7v6ewvb79m44j891kce70kpd888nk8",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 2,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 59,
+        "semifinalistBonus": 0,
+        "total": 59,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "France",
+      "createdAt": 1781235186000,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7m6thhpzbstv4p1ayzgrevch88g755",
+      "mode": "full-family",
+      "participantDisplayName": "JamesAintFrench",
+      "participantName": "James 2",
+      "rank": 3,
+      "score": {
+        "advancingPoints": 24,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 10,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 55,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781063405518,
+      "displayName": "Lambros",
+      "familyName": "Lambros",
+      "id": "hd7x5nrv02vd1dyp3t05ww1j3188cfb6",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 4,
+      "score": {
+        "advancingPoints": 25,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 8,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 54,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "13+",
+      "champion": "France",
+      "createdAt": 1781235977336,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7qr8gda4y77kbpy2dq34se9588h9kw",
+      "mode": "full-family",
+      "participantName": "Jack",
+      "rank": 5,
+      "score": {
+        "advancingPoints": 25,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 8,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 54,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781144070328,
+      "displayName": "Thou art crusty",
+      "familyName": "Thou art crusty",
+      "id": "hd7mftawmchn518exn1r8p911d88e893",
+      "mode": "full-family",
+      "participantDisplayName": "angwns",
+      "participantName": "Angie Winslow",
+      "rank": 6,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 24,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 53,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Portugal",
+      "createdAt": 1781223258877,
+      "displayName": "Family Team",
+      "familyName": "Family Team",
+      "id": "hd7p7a09ec3nc5w85c06k3d1rh88hewx",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 7,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 8,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 52,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "France",
+      "createdAt": 1781235593150,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7pxecwchf9sv9s04q570x47s88hr7m",
+      "mode": "full-family",
+      "participantDisplayName": "JamesLovesDogs",
+      "participantName": "James",
+      "rank": 8,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 8,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 52,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781118625408,
+      "displayName": "Rinky-dink Shinx",
+      "familyName": "Rinky-dink Shinx",
+      "id": "hd7gmk5jaa9j13rpd5hb8py7n188daye",
+      "mode": "full-family",
+      "participantName": "Chris Nguyen",
+      "rank": 9,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 10,
+        "groupWinnerPoints": 18,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 51,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "Portugal",
+      "createdAt": 1781148405704,
+      "displayName": "Lightning Birds",
+      "familyName": "Lightning Birds",
+      "id": "hd7r810g675hjp8rwytwba8dhs88ex72",
+      "mode": "full-family",
+      "participantDisplayName": "Soccer Boy 10",
+      "participantName": "Aiden",
+      "rank": 10,
+      "score": {
+        "advancingPoints": 22,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 8,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 51,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Brazil",
+      "createdAt": 1781220887268,
+      "displayName": "The Uncle Pickers 11",
+      "familyName": "The Uncle Pickers #11",
+      "id": "hd7hdmwxn3s7v2p5ssyrd8rhns88fm4b",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 11,
+      "score": {
+        "advancingPoints": 24,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 51,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Argentina",
+      "createdAt": 1781238176937,
+      "displayName": "Gluckman Guys",
+      "familyName": "Gluckman Guys",
+      "id": "hd7q87pbkn9ykb2j52j8a6jy7h88httb",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 12,
+      "score": {
+        "advancingPoints": 24,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 51,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Brazil",
+      "createdAt": 1781239020551,
+      "displayName": "Erster",
+      "familyName": "Erster",
+      "id": "hd7x54md9gxvey3ad4j7r0pa0h88h772",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 13,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 10,
+        "groupWinnerPoints": 18,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 51,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "South Korea",
+      "createdAt": 1781284115590,
+      "displayName": "The Cool Family",
+      "familyName": "The Cool Family",
+      "id": "hd7knt70038f2vzbpgfhhcqa0d88gpcd",
+      "mode": "full-family",
+      "participantDisplayName": "Cool Papa",
+      "participantName": "Neel",
+      "rank": 14,
+      "score": {
+        "advancingPoints": 21,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 24,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 51,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781234734707,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7qrtpyr38ffraq1xpysx1dpx88gxen",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 15,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 50,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Spain",
+      "createdAt": 1781303578663,
+      "displayName": "Soccer Squirrels",
+      "familyName": "Soccer Squirrels",
+      "id": "hd7teah6hx639k6z86379zqpc988hx33",
+      "mode": "full-family",
+      "participantDisplayName": "Mr Grumpy",
+      "participantName": "Vic",
+      "rank": 16,
+      "score": {
+        "advancingPoints": 26,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 18,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 50,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Brazil",
+      "createdAt": 1781303822814,
+      "displayName": "Soccer Squirrels",
+      "familyName": "Soccer Squirrels",
+      "id": "hd7p4zjhcx7atyd6rpfdb9r9z188gh66",
+      "mode": "full-family",
+      "participantDisplayName": "MamaLlama",
+      "participantName": "Allison",
+      "rank": 17,
+      "score": {
+        "advancingPoints": 25,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 4,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 50,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Japan",
+      "createdAt": 1781302947599,
+      "displayName": "Soccer Squirrels",
+      "familyName": "Soccer Squirrels",
+      "id": "hd7v95k2eaw2cskb6784hryb0s88gz7k",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 18,
+      "score": {
+        "advancingPoints": 24,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 4,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 49,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781221427407,
+      "displayName": "GOOLEES",
+      "familyName": "GOOLEES",
+      "id": "hd7nx7mke9jac9p4zp39aq9gw588eb4r",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 19,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 4,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 48,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "Uruguay",
+      "createdAt": 1781302431988,
+      "displayName": "Soccer Squirrels",
+      "familyName": "Soccer Squirrels",
+      "id": "hd7th8bcxknt841yprk8gg9anx88hbp2",
+      "mode": "full-family",
+      "participantDisplayName": "CAT",
+      "participantName": "Evie",
+      "rank": 20,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 4,
+        "groupWinnerPoints": 21,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 48,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Bruno Fernandes",
+      "createdAt": 1781144070161,
+      "displayName": "Thou art crusty",
+      "familyName": "Thou art crusty",
+      "fantasySummary": {
+        "captain": "Bruno Fernandes",
+        "players": [
+          "Virgil Van Dijk",
+          "Erling Haaland",
+          "Bruno Fernandes",
+          "Lamine Yamal",
+          "Nico O’Reilly"
+        ]
+      },
+      "id": "hd7gnkmk41eqb1x59s2010hdes88fwfa",
+      "mode": "fantasy-five",
+      "participantDisplayName": "angwns",
+      "participantName": "Angie Winslow",
+      "rank": 21,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 47,
+        "semifinalistBonus": 0,
+        "total": 47,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "13+",
+      "champion": "Japan",
+      "createdAt": 1781276909352,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7jnybhhn5ma5g0fa2mpe605n88ht76",
+      "mode": "full-family",
+      "participantName": "Isla",
+      "rank": 22,
+      "score": {
+        "advancingPoints": 22,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 18,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 46,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "Lionel Messi",
+      "createdAt": 1780962617781,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "fantasySummary": {
+        "captain": "Lionel Messi",
+        "players": [
+          "Turner",
+          "Cristiano Ronaldo",
+          "Adams",
+          "Lionel Messi",
+          "O'Reilly"
+        ]
+      },
+      "id": "hd7hdxt5c0taf4zww2v4h9r3an8899yq",
+      "mode": "fantasy-five",
+      "participantDisplayName": "Expired Milk",
+      "participantName": "Anthony",
+      "rank": 23,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 44,
+        "semifinalistBonus": 0,
+        "total": 44,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "England",
+      "createdAt": 1780975039772,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "id": "hd7wxb0314cg1ash17ne22npqd88aybz",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 24,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 2,
+        "groupWinnerPoints": 18,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 43,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781277743359,
+      "displayName": "The Cool Family",
+      "familyName": "The Cool Family",
+      "id": "hd7yt0fmhpj56858r2w60aga0d88hvt1",
+      "mode": "full-family",
+      "participantDisplayName": "Cool Mom",
+      "participantName": "Kelsey",
+      "rank": 25,
+      "score": {
+        "advancingPoints": 23,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 2,
+        "groupWinnerPoints": 18,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 43,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Portugal",
+      "createdAt": 1781149270395,
+      "displayName": "Lightning Birds",
+      "familyName": "Lightning Birds",
+      "id": "hd7zbvvc94wchrf3b7hj6933v188fk5e",
+      "mode": "full-family",
+      "participantDisplayName": "Soccer Mom 10",
+      "participantName": "Alison",
+      "rank": 26,
+      "score": {
+        "advancingPoints": 21,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 6,
+        "groupWinnerPoints": 15,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 42,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Lamine Yamal",
+      "createdAt": 1781277667497,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "fantasySummary": {
+        "captain": "Lamine Yamal",
+        "players": [
+          "Virgil Van Dijk",
+          "Enner Valencia",
+          "Lamine Yamal",
+          "Lionel Messi",
+          "Linda Caicedo"
+        ]
+      },
+      "id": "hd7x0fgxqqbvfk6vm1d857t4xx88g78m",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 27,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 38,
+        "semifinalistBonus": 0,
+        "total": 38,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "United States",
+      "createdAt": 1781277743202,
+      "displayName": "The Cool Family",
+      "familyName": "The Cool Family",
+      "id": "hd7rrhxhzjkwzdk21xmmbasvf188hpvq",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 28,
+      "score": {
+        "advancingPoints": 22,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 2,
+        "groupWinnerPoints": 12,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 36,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "New Zealand",
+      "createdAt": 1781277743344,
+      "displayName": "The Cool Family",
+      "familyName": "The Cool Family",
+      "id": "hd7yxkzr3578jyemsjf2k57j3n88hpk7",
+      "mode": "full-family",
+      "participantDisplayName": "Meatloaf Cuddler",
+      "participantName": "Genevieve",
+      "rank": 29,
+      "score": {
+        "advancingPoints": 22,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 2,
+        "groupWinnerPoints": 12,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 36,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "United States",
+      "createdAt": 1780968193523,
+      "displayName": "Expired Milk - Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "id": "hd7t9jw48n6mph9h521z05e08d88ba7f",
+      "mode": "quick-kids",
+      "participantDisplayName": "Expired Milk",
+      "participantName": "Anthony",
+      "rank": 30,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 6,
+        "underdogPoints": 6
+      }
+    },
+    {
+      "champion": "England",
+      "createdAt": 1781144070140,
+      "displayName": "angwns - Thou art crusty",
+      "familyName": "Thou art crusty",
+      "id": "hd7va3gxt3fzjz8tmc843a3mfx88eqra",
+      "mode": "quick-kids",
+      "participantDisplayName": "angwns",
+      "participantName": "Angie Winslow",
+      "rank": 31,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 6,
+        "underdogPoints": 6
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "France",
+      "createdAt": 1781144070370,
+      "displayName": "Zoenotwitha y - Thou art crusty",
+      "familyName": "Thou art crusty",
+      "id": "hd7rtwhr4pem218s8wxv3v79nd88ff0h",
+      "mode": "quick-kids",
+      "participantDisplayName": "Zoenotwitha y!",
+      "participantName": "Zoe Klein",
+      "rank": 32,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 6,
+        "underdogPoints": 6
+      }
+    },
+    {
+      "ageRange": "6-8",
+      "champion": "Argentina",
+      "createdAt": 1781151574595,
+      "displayName": "Shinx - Rinky-dink Shinx",
+      "familyName": "Rinky-dink Shinx",
+      "id": "hd7xkrvphhvbkdbg9nydhdhy8x88f7td",
+      "mode": "quick-kids",
+      "participantDisplayName": "Shinx",
+      "participantName": "Catherine",
+      "rank": 33,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 6,
+        "underdogPoints": 6
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781277298894,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7mffz1f8064e6papnxqmxn0d88htdd",
+      "mode": "quick-kids",
+      "participantName": "Family Bracket",
+      "rank": 34,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 6,
+        "underdogPoints": 6
+      }
+    },
+    {
+      "ageRange": "6-8",
+      "champion": "Japan",
+      "createdAt": 1781301470075,
+      "displayName": "Sabertooth Squrrel - Soccer Squirrels",
+      "familyName": "Soccer Squirrels",
+      "id": "hd7jf4a18j285x5wvdxr5knfp988hb11",
+      "mode": "quick-kids",
+      "participantDisplayName": "Sabertooth Squ!rrel",
+      "participantName": "Chris",
+      "rank": 35,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 6,
+        "underdogPoints": 6
+      }
+    },
+    {
+      "champion": "Côte d'Ivoire",
+      "createdAt": 1781149546429,
+      "displayName": "Lightning Birds",
+      "familyName": "Lightning Birds",
+      "id": "hd7w7trbgc4jktt1jn9gbwewtn88fpnq",
+      "mode": "quick-kids",
+      "participantName": "Family Bracket",
+      "rank": 36,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 4,
+        "underdogPoints": 4
+      }
+    },
+    {
+      "champion": "England",
+      "createdAt": 1780959448879,
+      "displayName": "Kickin' It Crew",
+      "familyName": "Kickin' It Crew",
+      "id": "hd7rnewtgacj52frh5y2v3b04d8893ew",
+      "mode": "quick-kids",
+      "participantName": "Test",
+      "rank": 37,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 0,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "England",
+      "createdAt": 1780961093979,
+      "displayName": "Kickin' It Crew",
+      "familyName": "Kickin' It Crew",
+      "id": "hd7s7zf59cfr5jjgas8eyhcr29889bd8",
+      "mode": "quick-kids",
+      "participantName": "Roma",
+      "rank": 38,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 0,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "6-8",
+      "champion": "England",
+      "createdAt": 1780962344670,
+      "displayName": "Winner - Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "id": "hd7qt975h0rnkt4e4smfv83jds889hyr",
+      "mode": "quick-kids",
+      "participantDisplayName": "Winner",
+      "participantName": "Test",
+      "rank": 39,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 0,
+        "underdogPoints": 0
+      }
+    }
+  ]
+}

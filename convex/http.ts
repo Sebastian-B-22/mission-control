@@ -67,6 +67,33 @@ function errorResponse(message: string, status = 400) {
   });
 }
 
+const WORLD_CUP_FULL_BRACKET_LOCK_AT = Date.UTC(2026, 5, 13, 1, 0, 0);
+const WORLD_CUP_QUICK_KIDS_LOCK_AT = Date.UTC(2026, 5, 19, 19, 0, 0);
+
+function normalizeWorldCupGroupCode(value: unknown) {
+  return String(value || "")
+    .replace(/[^a-z0-9]/gi, "")
+    .toUpperCase()
+    .slice(0, 12);
+}
+
+function randomWorldCupGroupCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i += 1) {
+    code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return code;
+}
+
+function randomWorldCupAccessToken() {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+const WORLD_CUP_ACCESS_LINK_EXPIRES_AT = Date.UTC(2036, 0, 1);
+
 // ─── OPTIONS (CORS preflight) ──────────────────────────────────────────────
 
 http.route({
@@ -628,13 +655,121 @@ function isAdmin(req: Request) {
   return req.headers.get("x-admin-password") === ADMIN_PASSWORD;
 }
 
+const SPRING_PROGRAMS: Record<string, { price: number; name: string; seasonDates: string; location: string; region: "agoura" | "pali"; kitTagName?: string }> = {
+  "spring-agoura-2026": {
+    price: 299,
+    name: "Aspire Spring League - Agoura",
+    seasonDates: "March 14 - May 30, 2026",
+    location: "Brookside Elementary, Agoura Hills",
+    region: "agoura",
+    kitTagName: "Spring League Agoura 2026",
+  },
+  "spring-pali-2026": {
+    price: 299,
+    name: "Aspire Spring League - Pacific Palisades",
+    seasonDates: "March 14 - May 30, 2026",
+    location: "Palisades Recreation Center",
+    region: "pali",
+    kitTagName: "Spring League Pali 2026",
+  },
+  "spring-agoura-2027": {
+    price: 299,
+    name: "Aspire Spring League - Agoura",
+    seasonDates: "Spring 2027 dates TBD",
+    location: "Brookside Elementary, Agoura Hills",
+    region: "agoura",
+    kitTagName: "Spring League Agoura 2027",
+  },
+  "spring-pali-2027": {
+    price: 299,
+    name: "Aspire Spring League - Pacific Palisades",
+    seasonDates: "Spring 2027 dates TBD",
+    location: "Palisades Recreation Center",
+    region: "pali",
+    kitTagName: "Spring League Pali 2027",
+  },
+  "pdp-fall-agoura-2026": {
+    price: 249,
+    name: "Fall PDP - Agoura",
+    seasonDates: "Fridays Aug 21-Oct 30, 2026; Sunday scrimmages Aug 30, Sep 27, and Oct 18",
+    location: "Brookside Elementary School, Agoura Hills",
+    region: "agoura",
+    kitTagName: "Fall PDP Agoura 2026",
+  },
+  "pdp-fall-pali-2026": {
+    price: 0,
+    name: "Fall PDP - Pacific Palisades",
+    seasonDates: "Fall 2026 dates TBD",
+    location: "Pali location TBD",
+    region: "pali",
+    kitTagName: "Fall PDP Pali 2026",
+  },
+};
+
+function isSpringProgram(programType?: string, slug?: string) {
+  return programType === "spring" || programType === "pdp" || !!(slug && SPRING_PROGRAMS[slug]);
+}
+
+function getSpringProgram(slug?: string) {
+  return slug ? SPRING_PROGRAMS[slug] : undefined;
+}
+
+type CampProgramConfig = {
+  slug: string;
+  name: string;
+  smsName: string;
+  dayPrice: number;
+  fullWeekPrice?: number;
+  location: string;
+  time: string;
+  region: "agoura" | "pali";
+  lineId: string;
+  bring: string;
+  kitTagId?: number;
+};
+
+const CAMP_PROGRAMS: Record<string, CampProgramConfig> = {
+  "summer-camps-2026": {
+    slug: "summer-camps-2026",
+    name: "AYSO Region 4 Summer Soccer Camp",
+    smsName: "AYSO Region 4 Summer Soccer Camp",
+    dayPrice: 65,
+    fullWeekPrice: 299,
+    location: "Brookside Elementary (enter via Conifer St)",
+    time: "8am-1pm daily",
+    region: "agoura",
+    lineId: "PN2La7sbgD",
+    bring: "Water, lunch, snack, sunscreen, soccer attire, cleats or sneakers",
+    kitTagId: 18708374,
+  },
+  "pali-camps-2026": {
+    slug: "pali-camps-2026",
+    name: "Pali AYSO Summer Soccer Camp",
+    smsName: "AYSO Region 69 Summer Soccer Camp",
+    dayPrice: 75,
+    location: "Palisades High School",
+    time: "9am-2pm daily",
+    region: "pali",
+    lineId: "PNALsl2U3G",
+    bring: "Water, lunch, snack, sunscreen, soccer attire, cleats or sneakers",
+    kitTagId: 20210364,
+  },
+};
+
+function getCampProgram(slug?: string, weekNumbers: string[] = []): CampProgramConfig {
+  if (slug && CAMP_PROGRAMS[slug]) return CAMP_PROGRAMS[slug];
+  if (weekNumbers.some((week) => week === "5" || week === "6" || week === "7")) return CAMP_PROGRAMS["pali-camps-2026"];
+  return CAMP_PROGRAMS["summer-camps-2026"];
+}
+
 // Stripe: create payment intent via REST
 async function createStripePaymentIntent(amount: number, metadata: Record<string, string>) {
-  console.log("[Stripe] Creating payment intent for amount:", amount, "cents:", amount * 100);
+  const amountInCents = Math.round(amount * 100);
+  console.log("[Stripe] Creating payment intent for amount:", amount, "cents:", amountInCents);
   console.log("[Stripe] Secret key present:", !!STRIPE_SECRET_KEY, "length:", STRIPE_SECRET_KEY?.length);
   
   const params = new URLSearchParams({
-    amount: String(amount * 100),
+    amount: String(amountInCents),
     currency: "usd",
     "automatic_payment_methods[enabled]": "true",
     ...Object.fromEntries(Object.entries(metadata).map(([k, v]) => [`metadata[${k}]`, v])),
@@ -655,6 +790,44 @@ async function createStripePaymentIntent(amount: number, metadata: Record<string
   }
   
   return data as { id: string; client_secret: string };
+}
+
+async function createStripeCheckoutSession(args: {
+  amount: number;
+  customerEmail: string;
+  description: string;
+  successUrl: string;
+  cancelUrl: string;
+  metadata: Record<string, string>;
+}) {
+  const amountInCents = Math.round(args.amount * 100);
+  const params = new URLSearchParams({
+    mode: "payment",
+    customer_email: args.customerEmail,
+    client_reference_id: args.metadata.registrationId || "",
+    success_url: args.successUrl,
+    cancel_url: args.cancelUrl,
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][unit_amount]": String(amountInCents),
+    "line_items[0][price_data][product_data][name]": args.description,
+    ...Object.fromEntries(Object.entries(args.metadata).map(([k, v]) => [`metadata[${k}]`, v])),
+    ...Object.fromEntries(Object.entries(args.metadata).map(([k, v]) => [`payment_intent_data[metadata][${k}]`, v])),
+  });
+
+  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(`Stripe Checkout error: ${JSON.stringify(data)}`);
+  }
+  return data as { id: string; url: string | null };
 }
 
 // Stripe: verify webhook signature
@@ -720,10 +893,146 @@ async function tagConvertKit(email: string, firstName: string, weekNumbers: stri
 // OpenPhone SMS confirmation
 const OPENPHONE_API_KEY = "k4LxAv80VW7q5nEfzPb0aopWOzA4AbM2";
 const OPENPHONE_AGOURA_LINE = "PN2La7sbgD"; // +18052227212
+const OPENPHONE_PALI_LINE = "PNALsl2U3G"; // +18052227202
+const OPENPHONE_HTA_LINE = "PNyk8oS02n"; // +18052227442
+const QUO_CONTACT_SOURCE = "aspire-registration";
+
+function normalizePhone(phone: string) {
+  let normalized = phone.replace(/[^0-9]/g, "");
+  if (normalized.length === 10) normalized = "1" + normalized;
+  if (!normalized.startsWith("+")) normalized = "+" + normalized;
+  return normalized;
+}
+
+function formatQuoParentChildName(parent: { firstName: string; lastName: string }, children: Array<{ firstName: string }>) {
+  const childNames = [...new Set(children.map((child) => child.firstName.trim()).filter(Boolean))];
+  const childLabel = childNames.length ? ` (${childNames.join("/")})` : "";
+  return {
+    firstName: `${parent.firstName.trim()}${childLabel}`.trim(),
+    lastName: parent.lastName.trim(),
+  };
+}
+
+function getKitProgramTagId(tagName?: string) {
+  if (!tagName) return undefined;
+  try {
+    const raw = process.env.CONVERTKIT_PROGRAM_TAG_IDS || "{}";
+    const mapping = JSON.parse(raw) as Record<string, number | string | undefined>;
+    const tagId = mapping[tagName];
+    return tagId ? Number(tagId) : undefined;
+  } catch (e) {
+    console.error("[ConvertKit] Invalid CONVERTKIT_PROGRAM_TAG_IDS JSON:", e);
+    return undefined;
+  }
+}
+
+async function tagConvertKitByTagId(email: string, firstName: string, tagId: number, label: string) {
+  if (!CONVERTKIT_API_KEY) return;
+  try {
+    const subscriberRes = await fetch("https://api.kit.com/v4/subscribers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
+      body: JSON.stringify({
+        email_address: email.trim().toLowerCase(),
+        first_name: firstName,
+        state: "active",
+      }),
+    });
+    const subscriberPayload = await subscriberRes.json();
+    if (!subscriberRes.ok) {
+      throw new Error(`Kit subscriber upsert failed (${subscriberRes.status}): ${JSON.stringify(subscriberPayload)}`);
+    }
+    const subscriberId = subscriberPayload?.subscriber?.id;
+    if (!subscriberId) throw new Error("Kit subscriber upsert succeeded but returned no subscriber id");
+
+    const tagRes = await fetch(`https://api.kit.com/v4/tags/${tagId}/subscribers/${subscriberId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Kit-Api-Key": CONVERTKIT_API_KEY },
+      body: JSON.stringify({}),
+    });
+    if (!tagRes.ok) throw new Error(`Kit tag request failed (${tagRes.status}): ${await tagRes.text()}`);
+    console.log("[ConvertKit] Tagged subscriber for:", email, "tag:", label);
+  } catch (e) {
+    console.error("[ConvertKit] Program tag error:", e);
+  }
+}
+
+async function tagProgramInConvertKit(email: string, firstName: string, program?: { kitTagName?: string }) {
+  const tagId = getKitProgramTagId(program?.kitTagName);
+  if (!tagId) {
+    console.log("[ConvertKit] No program tag ID configured for:", program?.kitTagName || "unknown program");
+    return;
+  }
+  await tagConvertKitByTagId(email, firstName, tagId, program?.kitTagName || String(tagId));
+}
+
+async function upsertQuoContactForRegistration(args: {
+  familyExternalId: string;
+  parent: { firstName: string; lastName: string; email: string; phone: string };
+  children: Array<{ firstName: string; lastName?: string; division?: string; practiceDay?: string }>;
+}) {
+  if (!OPENPHONE_API_KEY) return;
+  try {
+    const externalId = args.familyExternalId.slice(0, 75);
+    const normalizedPhone = normalizePhone(args.parent.phone);
+    const displayName = formatQuoParentChildName(args.parent, args.children);
+    const childSummary = args.children
+      .map((child) => [child.firstName, child.lastName].filter(Boolean).join(" ").trim())
+      .filter(Boolean)
+      .join(" / ");
+
+    const params = new URLSearchParams();
+    params.append("externalIds", externalId);
+    params.append("sources", QUO_CONTACT_SOURCE);
+    params.append("maxResults", "1");
+    const listRes = await fetch(`https://api.openphone.com/v1/contacts?${params.toString()}`, {
+      headers: { "Authorization": OPENPHONE_API_KEY },
+    });
+    const listPayload = listRes.ok ? await listRes.json() : { data: [] };
+    const existing = listPayload?.data?.[0];
+
+    const payload = {
+      defaultFields: {
+        firstName: displayName.firstName,
+        lastName: displayName.lastName,
+        emails: [{ name: "parent email", value: args.parent.email.trim().toLowerCase() }],
+        phoneNumbers: [{ name: childSummary ? `Parent of ${childSummary}` : "parent phone", value: normalizedPhone }],
+      },
+      externalId,
+      source: QUO_CONTACT_SOURCE,
+    };
+
+    const res = await fetch(existing?.id ? `https://api.openphone.com/v1/contacts/${existing.id}` : "https://api.openphone.com/v1/contacts", {
+      method: existing?.id ? "PATCH" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": OPENPHONE_API_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`Quo contact upsert failed (${res.status}): ${await res.text()}`);
+    console.log("[Quo] Upserted contact:", `${displayName.firstName} ${displayName.lastName}`.trim());
+  } catch (e) {
+    console.error("[Quo] Contact upsert error:", e);
+  }
+}
 
 interface CampSession {
   type: string;
   selectedDays?: string[];
+}
+
+function getSelectedCampWeekNumbers(children: Array<{ sessions?: Record<string, { type?: string; selectedDays?: string[] }> }>) {
+  const weekNumbers: string[] = [];
+  for (const child of children) {
+    const sessions = child.sessions || {};
+    for (const [weekId, session] of Object.entries(sessions)) {
+      if (session.type === "full" || (session.selectedDays?.length ?? 0) > 0) {
+        weekNumbers.push(weekId.replace("week", ""));
+      }
+    }
+  }
+  return [...new Set(weekNumbers)];
 }
 
 function formatCampSmsDate(dateString: string) {
@@ -740,6 +1049,8 @@ function expandCampWeekDates(weekNumber: string) {
     "2": ["2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10"],
     "3": ["2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24"],
     "4": ["2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31"],
+    "5": ["2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07"],
+    "6": ["2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14"],
   };
 
   return weekDates[weekNumber] ?? [];
@@ -750,9 +1061,11 @@ async function sendCampConfirmationSMS(
   childNames: string[], 
   weekNumbers: string[],
   pricing: { subtotal: number; discount: number; total: number },
-  childSessions: Array<{ firstName: string; sessions: Record<string, CampSession> }>
+  childSessions: Array<{ firstName: string; sessions: Record<string, CampSession> }>,
+  program?: CampProgramConfig
 ) {
   try {
+    const campProgram = program || getCampProgram(undefined, weekNumbers);
     // Normalize phone to E.164 format
     let normalized = phone.replace(/[^0-9]/g, "");
     if (normalized.length === 10) normalized = "1" + normalized;
@@ -787,11 +1100,11 @@ async function sendCampConfirmationSMS(
     }
     
     // Build message - no emojis
-    let message = `CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for AYSO Region 4 Summer Soccer Camp!\n\n`;
-    message += `Days: ${sessionDetails}\n`;
+    let message = `CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for ${campProgram.smsName}!\n\n`;
+    message += `Dates: ${sessionDetails}\n`;
     message += `Total Paid: $${pricing.total}\n\n`;
-    message += `Location: Brookside Elementary (enter via Conifer St)\n`;
-    message += `Time: 8am-1pm daily\n\n`;
+    message += `Location: ${campProgram.location}\n`;
+    message += `Time: ${campProgram.time}\n\n`;
     message += `Bring: Water, lunch, snack, sunscreen\n\n`;
     message += `Questions? Just reply to this text!\n\n-Coach Corinne`;
     
@@ -802,7 +1115,7 @@ async function sendCampConfirmationSMS(
         "Authorization": OPENPHONE_API_KEY,
       },
       body: JSON.stringify({
-        from: OPENPHONE_AGOURA_LINE,
+        from: campProgram.lineId,
         to: [normalized],
         content: message,
       }),
@@ -810,6 +1123,57 @@ async function sendCampConfirmationSMS(
     console.log("[OpenPhone] Sent SMS to:", normalized);
   } catch (e) {
     console.error("[OpenPhone] SMS Error:", e);
+  }
+}
+
+async function tagCampInConvertKit(email: string, firstName: string, program: CampProgramConfig, weekNumbers: string[]) {
+  if (program.kitTagId) {
+    await tagConvertKitByTagId(email, firstName, program.kitTagId, program.name);
+    return;
+  }
+  console.log("[ConvertKit] No camp tag configured for:", program.slug, "weeks:", weekNumbers.join(",") || "none");
+}
+
+async function sendSpringConfirmationSMS(
+  phone: string,
+  childNames: string[],
+  practiceDays: string[],
+  pricing: { subtotal: number; discount: number; total: number },
+  program?: { name: string; seasonDates: string; location: string; region: "agoura" | "pali" }
+) {
+  try {
+    let normalized = phone.replace(/[^0-9]/g, "");
+    if (normalized.length === 10) normalized = "1" + normalized;
+    if (!normalized.startsWith("+")) normalized = "+" + normalized;
+
+    const names = childNames.join(" & ");
+    const practices = [...new Set(practiceDays.filter(Boolean).map((day) => day[0].toUpperCase() + day.slice(1)))].join("; ") || "TBD";
+    const programName = program?.name || "Aspire Spring League";
+    const seasonDates = program?.seasonDates || "Spring season";
+    const location = program?.location || "Aspire Soccer field";
+
+    let message = `CONFIRMED! ${names} ${childNames.length > 1 ? "are" : "is"} registered for ${programName}.\n\n`;
+    message += `Practice Day: ${practices}\n`;
+    message += `Season: ${seasonDates}\n`;
+    message += `Location: ${location}\n`;
+    message += `Total Paid: $${pricing.total}\n\n`;
+    message += `Questions? Just reply to this text!\n\n-Coach Corinne`;
+
+    await fetch("https://api.openphone.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": OPENPHONE_API_KEY,
+      },
+      body: JSON.stringify({
+        from: program?.region === "pali" ? OPENPHONE_PALI_LINE : OPENPHONE_AGOURA_LINE,
+        to: [normalized],
+        content: message,
+      }),
+    });
+    console.log("[OpenPhone] Sent spring SMS to:", normalized);
+  } catch (e) {
+    console.error("[OpenPhone] Spring SMS Error:", e);
   }
 }
 
@@ -854,7 +1218,95 @@ async function sendMiniCampConfirmationSMS(
   }
 }
 
+async function sendWorldCupConfirmationSMS(phone: string, groupCodes: string[]) {
+  try {
+    const normalized = normalizePhone(phone);
+    const firstGroupCode = groupCodes[0];
+    let message = "Saved - your HTA World Cup bracket is in!\n\n";
+    message += "Your challenge page:\n";
+    message += "https://www.hometeamacademy.com/worldcup/\n\n";
+    message += "Leaderboard:\n";
+    message += "https://www.hometeamacademy.com/worldcup/leaderboard/\n\n";
+    if (firstGroupCode) {
+      message += "Group leaderboard:\n";
+      message += `https://www.hometeamacademy.com/worldcup/leaderboard?group=${encodeURIComponent(firstGroupCode)}\n\n`;
+    }
+    message += "Questions? Just reply here.\n\n-Coach Corinne";
+
+    const res = await fetch("https://api.openphone.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": OPENPHONE_API_KEY,
+      },
+      body: JSON.stringify({
+        from: OPENPHONE_HTA_LINE,
+        to: [normalized],
+        content: message,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`OpenPhone ${res.status}: ${await res.text()}`);
+    }
+    console.log("[OpenPhone] Sent World Cup SMS to:", normalized);
+    return true;
+  } catch (e) {
+    console.error("[OpenPhone] World Cup SMS Error:", e);
+    return false;
+  }
+}
+
+async function sendWorldCupAccessLinkSMS(phone: string, token: string) {
+  try {
+    const normalized = normalizePhone(phone);
+    const accessUrl = `https://www.hometeamacademy.com/worldcup/?access=${encodeURIComponent(token)}`;
+    let message = "Open your HTA World Cup challenge page here:\n";
+    message += `${accessUrl}\n\n`;
+    message += "This link lets you reopen your saved bracket, groups, and leaderboard whenever you need it.\n\n";
+    message += "Questions? Just reply here.\n\n-Coach Corinne";
+
+    const res = await fetch("https://api.openphone.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": OPENPHONE_API_KEY,
+      },
+      body: JSON.stringify({
+        from: OPENPHONE_HTA_LINE,
+        to: [normalized],
+        content: message,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`OpenPhone ${res.status}: ${await res.text()}`);
+    }
+    console.log("[OpenPhone] Sent World Cup access link to:", normalized);
+    return true;
+  } catch (e) {
+    console.error("[OpenPhone] World Cup access link SMS Error:", e);
+    return false;
+  }
+}
+
 // ─── Health Data Ingest (from Health Auto Export app) ─────────────────────────
+
+function aggregateHealthQuantity(dataPoints: Array<{ qty?: number }>): number {
+  const quantities = dataPoints
+    .map((d) => d.qty || 0)
+    .filter((qty) => Number.isFinite(qty) && qty > 0);
+
+  if (quantities.length === 0) return 0;
+  const total = quantities.reduce((sum, qty) => sum + qty, 0);
+  const max = Math.max(...quantities);
+
+  // Health Auto Export can send one daily total per source/device. If we add
+  // those together, steps double-count. When one value is already most of the
+  // total, treat the points as duplicate daily totals and keep the best one.
+  if (quantities.length <= 4 && max / total >= 0.45) return max;
+  return total;
+}
 
 // CORS preflight for health endpoint
 http.route({
@@ -919,8 +1371,7 @@ http.route({
             if (metricName.includes("step")) {
               const dataPoints = m.data || [];
               if (dataPoints.length > 0) {
-                // If summarized, use qty directly; else sum
-                const total = dataPoints.reduce((sum: number, d: { qty?: number }) => sum + (d.qty || 0), 0);
+                const total = aggregateHealthQuantity(dataPoints);
                 metrics.steps = total;
                 console.log("[Health Ingest] Steps:", total);
               }
@@ -966,25 +1417,25 @@ http.route({
         });
       }
       
-      // Calculate Don't Die score (reverse-engineered)
-      // Sleep: 7+ hours = 33 pts, scaled below
-      // Steps: 7000+ = 33 pts, scaled below  
-      // Active Calories: 300+ = 33 pts, scaled below
+      // Calculate Don't Die score.
+      // Corinne's screenshot shows the score is sleep + steps only:
+      // 6h03m / 7h sleep + 12.9k / 3.5k steps = 93, even with 0 active calories.
+      // Active calories are tracked for display but do not reduce the daily score.
       const sleepTarget = 7;
-      const stepsTarget = 7000;
+      const stepsTarget = 3500;
       const caloriesTarget = 300;
       
       const sleepScore = metrics.sleepHours 
-        ? Math.min(33, Math.round((metrics.sleepHours / sleepTarget) * 33))
+        ? Math.min(50, Math.round((metrics.sleepHours / sleepTarget) * 50))
         : 0;
       const stepsScore = metrics.steps
-        ? Math.min(33, Math.round((metrics.steps / stepsTarget) * 33))
+        ? Math.min(50, Math.round((metrics.steps / stepsTarget) * 50))
         : 0;
       const caloriesScore = metrics.activeCalories
         ? Math.min(34, Math.round((metrics.activeCalories / caloriesTarget) * 34))
         : 0;
       
-      const totalScore = sleepScore + stepsScore + caloriesScore;
+      const totalScore = sleepScore + stepsScore;
       
       // Find Corinne's user by email
       const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId: "user_39OvUeL8WpfRGbmQRP5UFiurhNe" });
@@ -1035,6 +1486,7 @@ http.route({
 // CORS preflight for all camp routes
 ["/camp/availability", "/camp/trial-day/availability", "/camp/validate-promo", "/camp/register", "/camp/register-free", "/camp/register-trial", "/camp/trial-day/register", "/camp/stripe-webhook",
  "/camp/admin/stats", "/camp/admin/registrations", "/camp/admin/checkin", "/camp/admin/promo-codes",
+ "/camp/admin/trial-day/registrations", "/camp/admin/trial-day/cancel",
  "/api/family/credit", "/api/family/credit/add", "/api/family/credit/apply"].forEach((path) => {
   http.route({
     path, method: "OPTIONS",
@@ -1228,13 +1680,29 @@ http.route({
     let body: Record<string, unknown>;
     try { body = await req.json(); } catch { return campError("Invalid JSON"); }
 
-    const { parent, children, emergencyContact, waiverAccepted, promoCode, season } = body as {
+    const { parent, children, emergencyContact, waiverAccepted, promoCode, season, programSlug, programType, checkoutSuccessUrl, checkoutCancelUrl } = body as {
       parent: { firstName: string; lastName: string; email: string; phone: string };
-      children: Array<{ firstName: string; lastName: string; age?: number; gender?: string; allergies?: string; sessions: Record<string, { type: string; selectedDays?: string[] }> }>;
+      children: Array<{
+        firstName: string;
+        lastName: string;
+        age?: number;
+        birthDate?: string;
+        birthYear?: string;
+        division?: string;
+        practiceDay?: string;
+        ageGroup?: string;
+        gender?: string;
+        allergies?: string;
+        sessions?: Record<string, { type: string; selectedDays?: string[] }>;
+      }>;
       emergencyContact: { name: string; phone: string };
       waiverAccepted: boolean;
       promoCode?: string;
       season?: string;
+      programSlug?: string;
+      programType?: string;
+      checkoutSuccessUrl?: string;
+      checkoutCancelUrl?: string;
     };
 
     console.log("[register] Received:", JSON.stringify({ parent: parent?.email, childCount: children?.length, waiver: waiverAccepted }));
@@ -1245,12 +1713,32 @@ http.route({
 
     console.log("[register] Validation passed, calculating pricing...");
     
-    // Server-side pricing
+    const slug = programSlug || season || "summer-camps-2026";
+    const springProgram = getSpringProgram(slug);
+    const springLike = isSpringProgram(programType, slug);
+    const selectedCampWeeks = springLike ? [] : getSelectedCampWeekNumbers(children);
+    const campProgram = springLike ? undefined : getCampProgram(slug, selectedCampWeeks);
+
+    // Server-side pricing - never trust client totals.
     let subtotal = 0;
-    for (const child of children) {
-      for (const session of Object.values(child.sessions || {})) {
-        if (session.type === "full") subtotal += 299;
-        else if (session.type === "days") subtotal += (session.selectedDays?.length || 0) * 65;
+    if (springLike) {
+      if (!springProgram) return campError("Unknown Spring League program");
+      for (const child of children) {
+        if (!child.birthDate) return campError("Missing player birthdate");
+        if (!child.division && !child.ageGroup) return campError("Missing player division");
+        if (!child.practiceDay) return campError("Missing practice day");
+      }
+      subtotal = children.length * springProgram.price;
+    } else {
+      for (const child of children) {
+        for (const session of Object.values(child.sessions || {})) {
+          if (session.type === "full") {
+            if (!campProgram?.fullWeekPrice) return campError("Full-week pricing is not available for this camp");
+            subtotal += campProgram.fullWeekPrice;
+          } else if (session.type === "days") {
+            subtotal += (session.selectedDays?.length || 0) * (campProgram?.dayPrice ?? 65);
+          }
+        }
       }
     }
 
@@ -1277,7 +1765,25 @@ http.route({
         const promo = await ctx.runQuery(api.camp.validatePromo, { code: promoCode });
         if (promo.valid && "type" in promo) {
           validPromoCode = promo.code as string;
-          if (promo.type === "free_days") discount = (promo.value as number) * 65;
+          if (validPromoCode === "FRIEND" || validPromoCode === "SPRING") {
+            const friendEligibility = await ctx.runQuery(api.camp.validateFriendPromoEligibility, {
+              code: validPromoCode,
+              parent: {
+                email: parent.email,
+                phone: parent.phone,
+              },
+              children: children.map((child) => ({
+                firstName: child.firstName,
+                lastName: child.lastName,
+                birthDate: child.birthDate,
+                birthYear: child.birthYear,
+              })),
+            });
+            if (!friendEligibility.eligible) {
+              return campError(friendEligibility.error || `${validPromoCode} is only for campers new to Aspire camps.`);
+            }
+          }
+          if (promo.type === "free_days") discount = (promo.value as number) * (campProgram?.dayPrice ?? 65);
           else if (promo.type === "percent_off" || promo.type === "percent") discount = Math.round(subtotal * (promo.value as number) / 100);
           else if (promo.type === "dollar_off" || promo.type === "dollar") discount = promo.value as number;
           discount = Math.min(discount, subtotal);
@@ -1285,8 +1791,40 @@ http.route({
       }
     }
 
-    const total = Math.max(0, subtotal - discount);
-    console.log("[register] Pricing:", { subtotal, discount, total });
+    const promoTotal = Math.max(0, subtotal - discount);
+    const creditBalance = await ctx.runQuery(api.families.getCreditBalance, { email: parent.email });
+    const accountCreditApplied = Math.min(
+      Math.max(0, (creditBalance.balance || 0) / 100),
+      promoTotal
+    );
+    const total = Math.max(0, promoTotal - accountCreditApplied);
+    const pricing = { subtotal, discount, accountCreditApplied, total };
+    console.log("[register] Pricing:", pricing);
+
+    if (total <= 0) {
+      const freePaymentIntentId = `credit_${Date.now()}`;
+      const regId = await ctx.runMutation(api.camp.createRegistration, {
+        season: slug,
+        parent,
+        children,
+        emergencyContact,
+        waiverAccepted,
+        promoCode: validPromoCode,
+        pricing,
+        stripePaymentIntentId: freePaymentIntentId,
+      });
+
+      await ctx.runMutation(internal.camp.markPaid, {
+        stripePaymentIntentId: freePaymentIntentId,
+      });
+
+      return campJson({
+        registrationId: regId,
+        paidNoPayment: true,
+        amount: 0,
+        pricing,
+      });
+    }
 
     // Create Stripe PaymentIntent
     console.log("[register] Creating Stripe PaymentIntent...");
@@ -1294,28 +1832,48 @@ http.route({
       parentEmail: parent.email,
       parentName: `${parent.firstName} ${parent.lastName}`,
       childCount: String(children.length),
-      season: (season as string) || "summer-2026",
+      season: slug,
+      programType: programType || (springLike ? "spring" : "camp"),
     });
 
     // Save to Convex
-    await ctx.runMutation(api.camp.createRegistration, {
-      season: (season as string) || "summer-2026",
+    const regId = await ctx.runMutation(api.camp.createRegistration, {
+      season: slug,
       parent,
       children,
       emergencyContact,
       waiverAccepted,
       promoCode: validPromoCode,
-      pricing: { subtotal, discount, total },
+      pricing,
       stripePaymentIntentId: pi.id,
+    });
+
+    const checkout = await createStripeCheckoutSession({
+      amount: total,
+      customerEmail: parent.email,
+      description: springLike ? springProgram?.name || "Aspire registration" : campProgram?.name || "Aspire camp registration",
+      successUrl: checkoutSuccessUrl || "https://register.aspiresoccercoaching.com/success?checkout=1",
+      cancelUrl: checkoutCancelUrl || "https://register.aspiresoccercoaching.com/camp/summer-2026?payment=cancelled",
+      metadata: {
+        registrationId: String(regId),
+        parentEmail: parent.email,
+        parentName: `${parent.firstName} ${parent.lastName}`,
+        childCount: String(children.length),
+        season: slug,
+        programType: programType || (springLike ? "spring" : "camp"),
+        fallbackForPaymentIntent: pi.id,
+      },
     });
 
     const pubKey = STRIPE_PUBLISHABLE_KEY || "pk_live_51QEymGGOalwnslJx5edOTSBfcpscpbd95K9tJQqDxcCczz6zg60D9jlOcPw4tNvVyAXQhOXXFWCaWnk11aQZzuMZ00VE1T8rLM";
     
     return campJson({
+      registrationId: regId,
       clientSecret: pi.client_secret,
       publishableKey: pubKey,
+      checkoutUrl: checkout.url || undefined,
       amount: total,
-      pricing: { subtotal, discount, total },
+      pricing,
     });
     } catch (error) {
       console.error("[register] Error:", error);
@@ -1331,31 +1889,71 @@ http.route({
     try {
       const body = await req.json() as {
         season: string;
+        programSlug?: string;
+        programType?: string;
         parent: { firstName: string; lastName: string; email: string; phone: string };
-        children: Array<{ firstName: string; lastName: string; birthDate?: string; gender?: string; allergies?: string; sessions: Record<string, unknown> }>;
+        children: Array<{
+          firstName: string;
+          lastName: string;
+          birthDate?: string;
+          birthYear?: string;
+          division?: string;
+          practiceDay?: string;
+          ageGroup?: string;
+          gender?: string;
+          allergies?: string;
+          sessions?: Record<string, unknown>;
+        }>;
         emergencyContact: { name: string; phone: string };
         waiverAccepted: boolean;
         promoCode?: string;
         pricing: { subtotal: number; discount: number; total: number };
       };
       
-      const { parent, children, emergencyContact, waiverAccepted, promoCode, pricing, season } = body;
+      const { parent, children, emergencyContact, waiverAccepted, promoCode, pricing, season, programSlug, programType } = body;
+      const slug = programSlug || season || "summer-2026";
+      const springProgram = getSpringProgram(slug);
+      const springLike = isSpringProgram(programType, slug);
+      const selectedCampWeeks = springLike ? [] : getSelectedCampWeekNumbers(children as Array<{ sessions?: Record<string, { type?: string; selectedDays?: string[] }> }>);
+      const campProgram = springLike ? undefined : getCampProgram(slug, selectedCampWeeks);
       
       if (!parent?.email || !parent?.firstName) return campError("Missing parent info");
       if (!children?.length) return campError("At least one child required");
       if (!waiverAccepted) return campError("Waiver must be accepted");
       if (pricing.total > 0) return campError("This endpoint is only for $0 registrations");
+      if (springLike && !springProgram) return campError("Unknown Spring League program");
+      const validPromoCode = promoCode?.trim().toUpperCase();
+      if (validPromoCode === "FRIEND" || validPromoCode === "SPRING") {
+        const friendPromo = await ctx.runQuery(api.camp.validatePromo, { code: validPromoCode });
+        if (!friendPromo.valid) return campError(friendPromo.error || "Invalid or expired promo code");
+        const friendEligibility = await ctx.runQuery(api.camp.validateFriendPromoEligibility, {
+          code: validPromoCode,
+          parent: {
+            email: parent.email,
+            phone: parent.phone,
+          },
+          children: children.map((child) => ({
+            firstName: child.firstName,
+            lastName: child.lastName,
+            birthDate: child.birthDate,
+            birthYear: child.birthYear,
+          })),
+        });
+        if (!friendEligibility.eligible) {
+          return campError(friendEligibility.error || `${validPromoCode} is only for campers new to Aspire camps.`);
+        }
+      }
       
       const freePaymentIntentId = `free_${Date.now()}`;
 
       // Create registration directly as paid (no Stripe needed)
       const regId = await ctx.runMutation(api.camp.createRegistration, {
-        season: season || "summer-2026",
+        season: slug,
         parent,
         children,
         emergencyContact,
         waiverAccepted,
-        promoCode: promoCode || undefined,
+        promoCode: validPromoCode || undefined,
         pricing,
         stripePaymentIntentId: freePaymentIntentId,
       });
@@ -1365,15 +1963,12 @@ http.route({
         stripePaymentIntentId: freePaymentIntentId,
       });
       
-      // Get the registration to trigger confirmations
-      const reg = { parent, children, pricing };
-      
-      // Collect child names and weeks for SMS
+      // Collect child names and sessions for confirmations
       const childNames: string[] = [];
       const weekNumbers: string[] = [];
       for (const child of children) {
         childNames.push(child.firstName);
-        const sessions = child.sessions as Record<string, { type?: string; selectedDays?: string[] }>;
+        const sessions = child.sessions as Record<string, { type?: string; selectedDays?: string[] }> | undefined;
         for (const [wk, sess] of Object.entries(sessions || {})) {
           if (sess.selectedDays && sess.selectedDays.length > 0) {
             weekNumbers.push(wk.replace("week", ""));
@@ -1382,12 +1977,29 @@ http.route({
       }
       const uniqueWeeks = [...new Set(weekNumbers)];
       
-      // Tag in ConvertKit + trigger email
-      await tagConvertKit(parent.email, parent.firstName, uniqueWeeks);
-      
-      // Send SMS confirmation
-      const childSessionData = children.map(c => ({ firstName: c.firstName, sessions: c.sessions as Record<string, CampSession> }));
-      await sendCampConfirmationSMS(parent.phone, childNames, uniqueWeeks, pricing, childSessionData);
+      if (springLike) {
+        await sendSpringConfirmationSMS(
+          parent.phone,
+          childNames,
+          children.map((c) => c.practiceDay || ""),
+          pricing,
+          springProgram
+        );
+        await tagProgramInConvertKit(parent.email, parent.firstName, springProgram);
+      } else {
+        // Tag in ConvertKit + trigger email
+        await tagCampInConvertKit(parent.email, parent.firstName, campProgram!, uniqueWeeks);
+        
+        // Send SMS confirmation
+        const childSessionData = children.map(c => ({ firstName: c.firstName, sessions: (c.sessions || {}) as Record<string, CampSession> }));
+        await sendCampConfirmationSMS(parent.phone, childNames, uniqueWeeks, pricing, childSessionData, campProgram);
+      }
+
+      await upsertQuoContactForRegistration({
+        familyExternalId: parent.email.trim().toLowerCase(),
+        parent,
+        children,
+      });
       
       // Upsert family in CRM
       try {
@@ -1445,43 +2057,87 @@ http.route({
       if (!valid) return new Response("Webhook signature failed", { status: 400 });
     }
 
-    let event: { type: string; data: { object: { id: string; metadata?: Record<string, string> } } };
+    let event: { type: string; data: { object: { id: string; payment_intent?: string; metadata?: Record<string, string> } } };
     try { event = JSON.parse(rawBody); } catch { return new Response("Invalid JSON", { status: 400 }); }
 
+    let stripePaymentIntentId: string | undefined;
     if (event.type === "payment_intent.succeeded") {
       const pi = event.data.object;
-      const reg = await ctx.runMutation(internal.camp.markPaid, { stripePaymentIntentId: pi.id });
+      const registrationId = pi.metadata?.registrationId;
+      if (registrationId) {
+        await ctx.runMutation(internal.camp.setPaymentIntentForRegistration, {
+          registrationId: registrationId as Id<"campRegistrations">,
+          stripePaymentIntentId: pi.id,
+        });
+      }
+      stripePaymentIntentId = pi.id;
+    } else if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const registrationId = session.metadata?.registrationId;
+      if (registrationId && session.payment_intent) {
+        await ctx.runMutation(internal.camp.setPaymentIntentForRegistration, {
+          registrationId: registrationId as Id<"campRegistrations">,
+          stripePaymentIntentId: session.payment_intent,
+        });
+        stripePaymentIntentId = session.payment_intent;
+      }
+    }
+
+    if (stripePaymentIntentId) {
+      const reg = await ctx.runMutation(internal.camp.markPaid, { stripePaymentIntentId });
 
       if (reg) {
+        const springProgram = getSpringProgram(reg.season);
+        const springLike = !!springProgram;
+
         // Collect week numbers and child names
         const weekNumbers: string[] = [];
         const childNames: string[] = [];
         for (const child of reg.children) {
           childNames.push(child.firstName);
-          const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }>;
-          for (const [wk, sess] of Object.entries(sessions)) {
+          const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }> | undefined;
+          for (const [wk, sess] of Object.entries(sessions || {})) {
             if (sess.type === "full" || (sess.selectedDays?.length ?? 0) > 0) {
               weekNumbers.push(wk.replace("week", ""));
             }
           }
         }
         const uniqueWeeks = [...new Set(weekNumbers)];
-        
-        // 1. Tag in ConvertKit + trigger email automation
-        await tagConvertKit(reg.parent.email, reg.parent.firstName, uniqueWeeks);
-        
-        // 2. Send SMS confirmation via OpenPhone
-        const childSessionData = reg.children.map((c: { firstName: string; sessions: Record<string, CampSession> }) => ({
-          firstName: c.firstName,
-          sessions: c.sessions,
-        }));
-        await sendCampConfirmationSMS(
-          reg.parent.phone, 
-          childNames, 
-          uniqueWeeks,
-          reg.pricing,
-          childSessionData
-        );
+
+        if (springLike) {
+          await sendSpringConfirmationSMS(
+            reg.parent.phone,
+            childNames,
+            reg.children.map((c: { practiceDay?: string }) => c.practiceDay || ""),
+            reg.pricing,
+            springProgram
+          );
+          await tagProgramInConvertKit(reg.parent.email, reg.parent.firstName, springProgram);
+        } else {
+          // 1. Tag in ConvertKit + trigger email automation
+          const campProgram = getCampProgram(reg.season, uniqueWeeks);
+          await tagCampInConvertKit(reg.parent.email, reg.parent.firstName, campProgram, uniqueWeeks);
+          
+          // 2. Send SMS confirmation via OpenPhone
+          const childSessionData = reg.children.map((c: { firstName: string; sessions?: Record<string, CampSession> }) => ({
+            firstName: c.firstName,
+            sessions: c.sessions || {},
+          }));
+          await sendCampConfirmationSMS(
+            reg.parent.phone, 
+            childNames, 
+            uniqueWeeks,
+            reg.pricing,
+            childSessionData,
+            campProgram
+          );
+        }
+
+        await upsertQuoContactForRegistration({
+          familyExternalId: reg.parent.email.trim().toLowerCase(),
+          parent: reg.parent,
+          children: reg.children,
+        });
         
         // 3. Upsert family in CRM
         try {
@@ -1631,6 +2287,40 @@ http.route({
       return campJson(result);
     } catch (e) {
       return campError(e instanceof Error ? e.message : "Failed", 404);
+    }
+  }),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Trial Day (Mini Camp) Admin
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /camp/admin/trial-day/registrations
+http.route({
+  path: "/camp/admin/trial-day/registrations", method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    const registrations = await ctx.runQuery(api.camp.listTrialDayRegistrations, {});
+    return campJson({ registrations });
+  }),
+});
+
+// POST /camp/admin/trial-day/cancel
+// Body: { registrationId: string }
+http.route({
+  path: "/camp/admin/trial-day/cancel", method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!isAdmin(req)) return campError("Unauthorized", 401);
+    let body: { registrationId?: string };
+    try { body = await req.json(); } catch { return campError("Invalid JSON"); }
+    if (!body.registrationId) return campError("registrationId required");
+    try {
+      await ctx.runMutation(api.camp.cancelTrialDayRegistration, {
+        registrationId: body.registrationId as any,
+      });
+      return campJson({ success: true });
+    } catch (e) {
+      return campError(e instanceof Error ? e.message : "Failed to cancel", 500);
     }
   }),
 });
@@ -1962,13 +2652,14 @@ http.route({
       replyTo?: string;
       missionId?: string;
       startMission?: boolean;
+      skipTrigger?: boolean;
     };
     
     if (!body.agent || !body.message) {
       return jsonResponse({ error: "Missing required fields: agent, message" }, 400);
     }
     
-    const validAgents = ["sebastian", "scout", "maven", "compass", "james", "corinne", "joy"];
+    const validAgents = ["sebastian", "scout", "maven", "hermes", "compass", "james", "corinne", "joy"];
     if (!validAgents.includes(body.agent.toLowerCase())) {
       return jsonResponse({ error: `Invalid agent. Must be one of: ${validAgents.join(", ")}` }, 400);
     }
@@ -2006,6 +2697,7 @@ http.route({
       missionId: body.missionId as Id<"agentHuddleMissions"> | undefined,
       mentions: body.mentions,
       replyTo: body.replyTo as Id<"agentHuddle"> | undefined,
+      skipTrigger: body.skipTrigger,
     });
     
     return jsonResponse({ success: true, messageId, channel, missionId: body.missionId });
@@ -2351,6 +3043,360 @@ http.route({
   }),
 });
 
+// ─── HTA World Cup Public Entry Capture ───────────────────────────────────
+// POST /worldcup/submit
+// Public endpoint for the HTA World Cup prototype.
+// Body: family/parent fields, participant metadata, mode, and entryData.
+http.route({
+  path: "/worldcup/leaderboard",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/leaderboard",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const url = new URL(request.url);
+    const groupCode = normalizeWorldCupGroupCode(url.searchParams.get("group"));
+    const result = await ctx.runQuery(api.worldCup.listLeaderboard, {
+      limit: 100,
+      publicOnly: true,
+      groupCode: groupCode || undefined,
+    });
+    return jsonResponse({ ...result, updatedAt: Date.now() });
+  }),
+});
+
+http.route({
+  path: "/worldcup/group",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const url = new URL(request.url);
+    const joinCode = normalizeWorldCupGroupCode(url.searchParams.get("code"));
+    if (!joinCode) return errorResponse("Missing group code");
+    const group = await ctx.runQuery(api.worldCup.getPublicGroupByCode, { joinCode });
+    if (!group) return errorResponse("Group not found", 404);
+    return jsonResponse({ group });
+  }),
+});
+
+http.route({
+  path: "/worldcup/group-create",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/group-create",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const family = (body.family && typeof body.family === "object" ? body.family : {}) as Record<string, unknown>;
+    const name = String(body.name || "").trim().slice(0, 80);
+    const requestedType = String(body.type || "family").toLowerCase();
+    const type = requestedType === "group" ? "region" : requestedType;
+    if (!name || name.length < 3) return errorResponse("Group name is required");
+    if (!["family", "team", "region"].includes(type)) return errorResponse("Invalid group type");
+
+    let id = null;
+    let joinCode = "";
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      joinCode = randomWorldCupGroupCode();
+      try {
+        id = await ctx.runMutation(internal.worldCup.createGroupInternal, {
+          name,
+          joinCode,
+          type: type as "family" | "team" | "region",
+          adminName: family.parentName ? String(family.parentName).trim().slice(0, 120) : undefined,
+          adminEmail: family.parentEmail ? String(family.parentEmail).trim().slice(0, 180) : undefined,
+          adminPhone: family.parentPhone ? String(family.parentPhone).trim().slice(0, 40) : undefined,
+          regionTag: body.regionTag ? String(body.regionTag).trim().slice(0, 40) : undefined,
+        });
+        break;
+      } catch {}
+    }
+    if (!id) return errorResponse("Could not create a unique group code", 500);
+
+    return jsonResponse({
+      ok: true,
+      group: { id, name, joinCode, type },
+      shareUrl: `https://www.hometeamacademy.com/worldcup?join=${joinCode}&groups=1#groups`,
+      leaderboardUrl: `https://www.hometeamacademy.com/worldcup/leaderboard?group=${joinCode}`,
+    }, 201);
+  }),
+});
+
+http.route({
+  path: "/worldcup/results-sync",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/results-sync",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+    const result = await ctx.runAction(internal.worldCup.syncWorldCupResultsInternal, {});
+    return jsonResponse(result);
+  }),
+});
+
+http.route({
+  path: "/worldcup/submit",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/submit",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const family = (body.family && typeof body.family === "object" ? body.family : {}) as Record<string, unknown>;
+    const entry = (body.entry && typeof body.entry === "object" ? body.entry : {}) as Record<string, unknown>;
+    const mode = String(body.mode || "").trim();
+    if (!["quick-kids", "full-family", "fantasy-five", "second-chance", "launch-list"].includes(mode)) {
+      return errorResponse("Invalid mode");
+    }
+    if (mode === "full-family" && Date.now() >= WORLD_CUP_FULL_BRACKET_LOCK_AT) {
+      return errorResponse("Full Family Bracket entries locked at the US kickoff on June 12, 2026.", 423);
+    }
+    if (mode === "quick-kids" && Date.now() >= WORLD_CUP_QUICK_KIDS_LOCK_AT) {
+      return errorResponse("Quick Kids entries locked when teams began their second group matches.", 423);
+    }
+
+    const familyName = String(family.familyName || "Family Team").slice(0, 120);
+    const parentEmail = family.parentEmail ? String(family.parentEmail).trim().slice(0, 180) : undefined;
+    const rawParentPhone = family.parentPhone ? String(family.parentPhone).trim().slice(0, 40) : undefined;
+    const parentPhone = rawParentPhone ? normalizePhone(rawParentPhone) : undefined;
+    const participantName = body.participantName ? String(body.participantName).trim().slice(0, 80) : undefined;
+    const participantDisplayName = body.participantDisplayName ? String(body.participantDisplayName).trim().slice(0, 80) : undefined;
+    const participantType = body.participantType ? String(body.participantType).trim().slice(0, 20) : undefined;
+    const ageRange = body.ageRange ? String(body.ageRange).trim().slice(0, 20) : undefined;
+    const rawGroupCodes = Array.isArray(family.groupCodes) ? family.groupCodes : Array.isArray(body.groupCodes) ? body.groupCodes : [];
+    const groupCodes = Array.from(new Set(rawGroupCodes.map(normalizeWorldCupGroupCode).filter(Boolean))).slice(0, 10);
+
+    if (mode !== "launch-list" && !participantName) {
+      return errorResponse("Missing participantName");
+    }
+    if (!parentPhone) {
+      return errorResponse("Parent mobile number is required");
+    }
+    if (parentPhone.replace(/[^0-9]/g, "").length < 10) {
+      return errorResponse("Enter a valid mobile number");
+    }
+
+    const shouldSendConfirmationText =
+      Boolean(body.sendConfirmationText) &&
+      Boolean(family.textOptIn) &&
+      mode !== "launch-list";
+    const existingPhoneEntries = shouldSendConfirmationText
+      ? await ctx.runQuery(internal.worldCup.listEntriesForPhoneInternal, { parentPhone })
+      : [];
+    const alreadySentConfirmationText = existingPhoneEntries.some((entry) =>
+      entry.mode !== "launch-list" && Boolean(entry.confirmationTextSentAt)
+    );
+
+    const id = await ctx.runMutation(internal.worldCup.submitEntryInternal, {
+      familyName,
+      parentName: family.parentName ? String(family.parentName).trim().slice(0, 120) : undefined,
+      parentEmail,
+      parentPhone,
+      textOptIn: Boolean(family.textOptIn),
+      htaLaunchOptIn: false,
+      participantName,
+      participantDisplayName,
+      participantType,
+      ageRange,
+      mode: mode as "quick-kids" | "full-family" | "fantasy-five" | "second-chance" | "launch-list",
+      groupCodes,
+      entryData: entry,
+      source: body.source ? String(body.source).slice(0, 80) : "worldcup-page",
+      userAgent: request.headers.get("user-agent")?.slice(0, 300) || undefined,
+    });
+
+    const confirmationTextSent = shouldSendConfirmationText && !alreadySentConfirmationText
+      ? await sendWorldCupConfirmationSMS(parentPhone, groupCodes)
+      : false;
+    if (confirmationTextSent) {
+      await ctx.runMutation(internal.worldCup.markEntryConfirmationTextInternal, {
+        id,
+        sentAt: Date.now(),
+      });
+    }
+
+    return jsonResponse({
+      ok: true,
+      id,
+      confirmationTextSent,
+      confirmationTextAlreadySent: shouldSendConfirmationText && alreadySentConfirmationText,
+    }, 201);
+  }),
+});
+
+http.route({
+  path: "/worldcup/access-request",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/access-request",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const rawParentPhone = body.parentPhone ? String(body.parentPhone).trim().slice(0, 40) : "";
+    const parentPhone = rawParentPhone ? normalizePhone(rawParentPhone) : "";
+    if (!parentPhone) return errorResponse("Parent mobile number is required");
+    if (parentPhone.replace(/[^0-9]/g, "").length < 10) return errorResponse("Enter a valid mobile number");
+
+    const entries = await ctx.runQuery(internal.worldCup.listEntriesForPhoneInternal, { parentPhone });
+    const found = entries.length > 0;
+    if (found) {
+      const token = randomWorldCupAccessToken();
+      await ctx.runMutation(internal.worldCup.createAccessTokenInternal, {
+        token,
+        parentPhone,
+        expiresAt: WORLD_CUP_ACCESS_LINK_EXPIRES_AT,
+      });
+      await sendWorldCupAccessLinkSMS(parentPhone, token);
+    }
+
+    return jsonResponse({ ok: true, found });
+  }),
+});
+
+http.route({
+  path: "/worldcup/access",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/access",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const token = new URL(request.url).searchParams.get("token") || "";
+    if (!token || token.length > 128) return errorResponse("Invalid access link", 401);
+    const bundle = await ctx.runQuery(internal.worldCup.getAccessBundleInternal, { token });
+    if (!bundle) return errorResponse("Access link invalid", 401);
+
+    const entries = bundle.entries.map((entry) => ({
+      id: entry._id,
+      familyName: entry.familyName,
+      parentName: entry.parentName,
+      parentPhone: entry.parentPhone,
+      textOptIn: entry.textOptIn,
+      htaLaunchOptIn: entry.htaLaunchOptIn,
+      participantName: entry.participantName,
+      participantDisplayName: entry.participantDisplayName,
+      participantType: entry.participantType,
+      ageRange: entry.ageRange,
+      mode: entry.mode,
+      groupCodes: entry.groupCodes || [],
+      entryData: entry.entryData,
+      createdAt: entry.createdAt,
+    }));
+    const groups = bundle.groups.map((group) => ({
+      name: group.name,
+      joinCode: group.joinCode,
+      type: group.type,
+    }));
+
+    return jsonResponse({ ok: true, parentPhone: bundle.parentPhone, entries, groups });
+  }),
+});
+
+http.route({
+  path: "/worldcup/mission-submit",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/worldcup/mission-submit",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    let form: FormData;
+    try {
+      form = await request.formData();
+    } catch {
+      return errorResponse("Invalid mission submission");
+    }
+
+    const get = (key: string, max = 200) => {
+      const value = form.get(key);
+      return typeof value === "string" ? value.trim().slice(0, max) : "";
+    };
+
+    const parentEmail = get("parentEmail", 180);
+    const parentPhone = get("parentPhone", 40);
+    const familyName = get("familyName", 120) || "Family Team";
+    const challengeKey = get("challengeKey", 80) || "weekly-family-mission";
+    const challengeTitle = get("challengeTitle", 160) || "Weekly Family Mission";
+    const marketingPermission = get("marketingPermission", 10) === "yes";
+    const repostPermission = get("repostPermission", 10) === "yes";
+
+    if (!parentEmail && !parentPhone) return errorResponse("Parent email or phone is required");
+    if (!marketingPermission) return errorResponse("Parent permission checkbox is required");
+
+    const upload = form.get("media");
+    let mediaStorageId: Id<"_storage"> | undefined;
+    let mediaName: string | undefined;
+    let mediaType: string | undefined;
+    let mediaSize: number | undefined;
+    if (upload instanceof File && upload.size > 0) {
+      if (upload.size > 25 * 1024 * 1024) return errorResponse("File is too large. Please upload a file under 25MB.");
+      mediaStorageId = await ctx.storage.store(upload);
+      mediaName = upload.name.slice(0, 160);
+      mediaType = upload.type.slice(0, 120);
+      mediaSize = upload.size;
+    }
+
+    const id = await ctx.runMutation(internal.worldCup.submitMissionInternal, {
+      familyName,
+      parentName: get("parentName", 120) || undefined,
+      parentEmail: parentEmail || undefined,
+      parentPhone: parentPhone || undefined,
+      childFirstName: get("childFirstName", 80) || undefined,
+      challengeKey,
+      challengeTitle,
+      caption: get("caption", 1200) || undefined,
+      socialPostUrl: get("socialPostUrl", 400) || undefined,
+      mediaStorageId,
+      mediaName,
+      mediaType,
+      mediaSize,
+      marketingPermission,
+      repostPermission,
+      source: get("source", 80) || "worldcup-mission-page",
+      userAgent: request.headers.get("user-agent")?.slice(0, 300) || undefined,
+    });
+
+    return jsonResponse({ ok: true, id }, 201);
+  }),
+});
+
 // ─── POST /pending-items/create - Create a Pending / Next Up item ─────────
 //
 // Body (JSON):
@@ -2578,6 +3624,78 @@ http.route({
   }),
 });
 
+// ─── Knowledge & Files Ingest ────────────────────────────────────────────
+// POST /knowledge/files/ingest
+// Body:
+//   clerkId (required)
+//   artifactKey, title, area, docType (required)
+//   project, collection, status, decisionSummary, tags, sourceThreadId,
+//   sourceMessageIds, promote (optional)
+//   version (required): { fileName, fileKind, sourceKind, ... }
+http.route({
+  path: "/knowledge/files/ingest",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders() })),
+});
+
+http.route({
+  path: "/knowledge/files/ingest",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    if (!validateApiKey(request)) return errorResponse("Unauthorized", 401);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse("Invalid JSON body");
+    }
+
+    const clerkId = String(body.clerkId || "").trim();
+    if (!clerkId) return errorResponse("Missing required field: clerkId");
+
+    const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId });
+    if (!user) return errorResponse("User not found for clerkId: " + clerkId, 404);
+
+    const version = body.version as Record<string, unknown> | undefined;
+    if (!version || typeof version !== "object") {
+      return errorResponse("Missing required field: version");
+    }
+
+    const result = await ctx.runMutation(api.knowledgeFiles.upsertWithVersion, {
+      userId: user._id,
+      artifactKey: String(body.artifactKey || ""),
+      title: String(body.title || ""),
+      area: body.area as any,
+      project: body.project ? String(body.project) : undefined,
+      collection: body.collection ? String(body.collection) : undefined,
+      docType: body.docType as any,
+      status: body.status as any,
+      decisionSummary: body.decisionSummary ? String(body.decisionSummary) : undefined,
+      tags: Array.isArray(body.tags) ? body.tags.map(String) : undefined,
+      sourceThreadId: body.sourceThreadId ? String(body.sourceThreadId) : undefined,
+      sourceMessageIds: Array.isArray(body.sourceMessageIds) ? body.sourceMessageIds.map(String) : undefined,
+      promote: Boolean(body.promote),
+      version: {
+        label: version.label ? String(version.label) : undefined,
+        fileName: String(version.fileName || ""),
+        fileKind: version.fileKind as any,
+        mimeType: version.mimeType ? String(version.mimeType) : undefined,
+        fileUrl: version.fileUrl ? String(version.fileUrl) : undefined,
+        localPath: version.localPath ? String(version.localPath) : undefined,
+        telegramFileId: version.telegramFileId ? String(version.telegramFileId) : undefined,
+        telegramMessageId: version.telegramMessageId ? String(version.telegramMessageId) : undefined,
+        sourceKind: version.sourceKind as any,
+        sourceNote: version.sourceNote ? String(version.sourceNote) : undefined,
+        summary: version.summary ? String(version.summary) : undefined,
+        versionStatus: version.versionStatus as any,
+      },
+    });
+
+    return jsonResponse({ ok: true, ...result }, 201);
+  }),
+});
+
 // ─── Host Health Runs Ingest ─────────────────────────────────────────────
 // POST /health/runs/ingest
 // Body (JSON):
@@ -2684,8 +3802,11 @@ http.route({
       return errorResponse("Missing data.metrics array");
     }
 
-    // Corinne's user ID (hardcoded for now)
-    const userId = "kx77km204g5c9m51b0280eegh1821dne" as Id<"users">;
+    const user = await ctx.runQuery(api.users.getUserByClerkId, {
+      clerkId: "user_39OvUeL8WpfRGbmQRP5UFiurhNe",
+    });
+    if (!user) return errorResponse("Corinne user not found", 404);
+    const userId = user._id;
 
     // Extract relevant metrics
     let steps: number | undefined;

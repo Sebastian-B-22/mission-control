@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-19T02:37Z
+
+Current time check: Thu Jun 18 19:37 PDT / 2026-06-19 02:37 UTC.
+
+Completed/recent window since prior local sync note: Canada 6-0 Qatar (ESPN event 760440, FT). Mexico 1-0 South Korea was only 77' on ESPN scoreboard during this run, so it was not processed as final.
+
+Sources checked: ESPN public scoreboard API for 2026-06-18 and event 760440. Source-backed Canada scoring: Cyle Larin 16', Jonathan David 29', Jonathan David 45'+3, Nathan Saliba 64', Qatar own goal by Mohamed Manai 75', Jonathan David 90'+2. Canada clean sheet confirmed by final score.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html found no currently selected Canada or Qatar Fantasy Five players. Alphonso Davies and Akram Afif exist in the local catalog, but neither appears in current production Fantasy Five selections.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No stat writes were needed because no currently selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed Canada-Qatar match.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200, and CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned production leaderboard rows including Fantasy Five entries.

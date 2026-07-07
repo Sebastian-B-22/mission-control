@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T06:38Z
+
+Current time check: Tue Jun 16 23:38:18 PDT 2026 / 2026-06-17T06:38Z. Production Convex env checked in .env.production: harmless-salamander-44.
+
+Completed/recent window since prior sync: Austria 3-1 Jordan, Group J, ESPN event 760431, FT. Prior local notes already handled France 3-1 Senegal, Iraq 1-4 Norway, and Argentina 3-0 Algeria.
+
+Sources checked: FIFA match centre https://www.fifa.com/en/match-centre/match/17/285023/289273/400021498 ; ESPN match page https://www.espn.com/soccer/match/_/gameId/760431/jordan-austria ; FOX boxscore https://www.foxsports.com/soccer/fifa-world-cup-men-austria-vs-jordan-jun-17-2026-game-boxscore-647632 ; ABC score centre https://www.abc.net.au/news/sport/score-centre/fifa-world-cup/2026-06-17/austria-jordan/2608260.
+
+Stats found: Romano Schmid 21', Yazan Al-Arab own goal 76', Marko Arnautovic penalty 90'+12'; Jordan goal Ali Olwan 50'. No clean sheet.
+
+Fantasy Five selected-player normalization from public/worldcup/index.html and the production leaderboard found no currently selected Austria/Jordan Fantasy Five players with source-backed goals/assists/clean-sheet credit. David Alaba is in the local catalog but is not selected in the current production Fantasy Five rows. No Convex stat writes were needed.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 after the check.

@@ -1,0 +1,326 @@
+[
+  {
+    "playerId": "official:morocco:star:saibari",
+    "playerName": "SAIBARI",
+    "country": "Morocco",
+    "goals": 3,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:playmaker:saibari",
+    "playerName": "SAIBARI",
+    "country": "Morocco",
+    "goals": 3,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:star:ouahi",
+    "playerName": "OUAHI",
+    "country": "Morocco",
+    "goals": 2,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:playmaker:ouahi",
+    "playerName": "OUAHI",
+    "country": "Morocco",
+    "goals": 2,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:star:rahimi",
+    "playerName": "RAHIMI",
+    "country": "Morocco",
+    "goals": 2,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:goalGetter:rahimi",
+    "playerName": "RAHIMI",
+    "country": "Morocco",
+    "goals": 2,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:defenderKeeper:hakimi",
+    "playerName": "HAKIMI",
+    "country": "Morocco",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:wildcard:hakimi",
+    "playerName": "HAKIMI",
+    "country": "Morocco",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "hakimi",
+    "playerName": "Achraf Hakimi",
+    "country": "Morocco",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:defenderKeeper:bono",
+    "playerName": "BONO",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:defenderKeeper:mazraoui",
+    "playerName": "MAZRAOUI",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:defenderKeeper:aguerd",
+    "playerName": "AGUERD",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:defenderKeeper:el-kajoui",
+    "playerName": "EL KAJOUI",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:defenderKeeper:el-ouahdi",
+    "playerName": "EL OUAHDI",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:wildcard:bono",
+    "playerName": "BONO",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:wildcard:mazraoui",
+    "playerName": "MAZRAOUI",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:morocco:wildcard:aguerd",
+    "playerName": "AGUERD",
+    "country": "Morocco",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:star:larin",
+    "playerName": "LARIN",
+    "country": "Canada",
+    "goals": 2,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:goalGetter:larin",
+    "playerName": "LARIN",
+    "country": "Canada",
+    "goals": 2,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:star:j-david",
+    "playerName": "J. DAVID",
+    "country": "Canada",
+    "goals": 3,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:goalGetter:j-david",
+    "playerName": "J. DAVID",
+    "country": "Canada",
+    "goals": 3,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:goalGetter:promise",
+    "playerName": "PROMISE",
+    "country": "Canada",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:star:eustaquio",
+    "playerName": "EUSTAQUIO",
+    "country": "Canada",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:playmaker:eustaquio",
+    "playerName": "EUSTAQUIO",
+    "country": "Canada",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:defenderKeeper:st-clair",
+    "playerName": "ST CLAIR",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:defenderKeeper:johnston",
+    "playerName": "JOHNSTON",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:defenderKeeper:jones",
+    "playerName": "JONES",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:defenderKeeper:de-fougerolles",
+    "playerName": "DE FOUGEROLLES",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:defenderKeeper:waterman",
+    "playerName": "WATERMAN",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:defenderKeeper:cornelius",
+    "playerName": "CORNELIUS",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:wildcard:st-clair",
+    "playerName": "ST CLAIR",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:wildcard:johnston",
+    "playerName": "JOHNSTON",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:wildcard:jones",
+    "playerName": "JONES",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:wildcard:de-fougerolles",
+    "playerName": "DE FOUGEROLLES",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "official:canada:wildcard:waterman",
+    "playerName": "WATERMAN",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  },
+  {
+    "playerId": "davies",
+    "playerName": "Alphonso Davies",
+    "country": "Canada",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 2,
+    "notes": "ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260704&limit=200; checked 2026-07-04T20:37Z; assists skipped (not source-backed)."
+  }
+]

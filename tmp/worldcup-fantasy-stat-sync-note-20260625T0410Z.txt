@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T04:10Z
+
+Current time checked: Wed Jun 24 21:10:02 PDT 2026 / 2026-06-25T04:10Z.
+
+Completed/recent window since prior 2026-06-24T21:11Z note: ESPN public scoreboard API for 2026-06-24 returned six completed matches: Bosnia-Herzegovina 3-1 Qatar (event 760462), Switzerland 2-1 Canada (760463), Morocco 4-2 Haiti (760464), Brazil 3-0 Scotland (760465), Mexico 3-0 Czechia (760467), and South Africa 1-0 South Korea (760466).
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html found no selected Fantasy Five players requiring a source-backed stat update from those completed matches. Relevant catalog players were not selected in current Fantasy Five rows, or were not clean-sheet eligible for the completed match window: Alphonso Davies/Akram Afif already checked earlier; Achraf Hakimi, Vinicius Junior, Guillermo Ochoa, Petr Cech, and Son Heung-min are not present in current production Fantasy Five selections. Linda Caicedo is selected, but Colombia did not appear in the ESPN 2026-06-24 completed window returned at this run time and no source-backed Colombia stat was written.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no selected Fantasy Five player had a source-backed goals, assists, or cleanSheets stat in the completed/recent window.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

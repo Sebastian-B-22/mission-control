@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-24T21:11Z
+
+Checked current time first: Wed Jun 24 14:10:03 PDT 2026 / 2026-06-24T21:10Z. Prior local sync note was 2026-06-24T08:39Z.
+
+Completed/recent match window since prior sync: Bosnia-Herzegovina 3-1 Qatar and Switzerland 2-1 Canada are full time. Morocco-Haiti, Scotland-Brazil, Czechia-Mexico, and South Africa-South Korea were still scheduled/not completed at check time.
+
+Sources used: ESPN public scoreboard for 2026-06-24 confirmed both completed matches and upcoming scheduled matches. ESPN public summary APIs confirmed key events:
+- Bosnia-Herzegovina 3-1 Qatar (event 760462): Kerim Alajbegovic goal assisted by Ivan Basic; Mahmoud Abunada own goal; Hassan Al-Haydos goal assisted by Edmilson Junior; Ermin Mahmic goal assisted by Dennis Hadzikadunic.
+- Switzerland 2-1 Canada (event 760463): Ruben Vargas goal assisted by Johan Manzambi; Johan Manzambi goal assisted by Breel Embolo; Promise David goal assisted by Nathan Saliba.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html found no selected Fantasy Five players from Bosnia-Herzegovina, Qatar, Switzerland, or Canada. Public roster candidates like Akram Afif and Alphonso Davies were not present in current production Fantasy Five selections.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no selected Fantasy Five player had a source-backed goals, assists, or cleanSheets stat in the completed/recent window.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' was run to verify Fantasy Five leaderboard data loads.

@@ -7,9 +7,18 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  AGENT_PROFILES,
+  AgentActivity,
+  findLastAgentActivity,
+  formatRelativeActivity,
+  getActivityTone,
+} from "@/lib/agentOps";
+import { cn } from "@/lib/utils";
+import {
   Menu,
   X,
   Calendar,
+  Clock3,
   Target,
   Home,
   Briefcase,
@@ -21,6 +30,7 @@ import {
   Users,
   DollarSign,
   Hammer,
+  Ticket,
 } from "lucide-react";
 import { SoccerBall } from "@/components/icons/SoccerBall";
 
@@ -31,8 +41,9 @@ interface SidebarProps {
 }
 
 export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  const [expandedChildGroups, setExpandedChildGroups] = useState<string[]>([]);
 
   useEffect(() => {
     const activeSection = ["health", "homeschool", "family", "personal", "professional", "aspire", "hta", "agents"].find((section) =>
@@ -52,6 +63,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
   // Get content pipeline review count for badge
   const pipelineReview = useQuery(api.contentPipeline.listByStage, { stage: "review" }) || [];
   const reviewCount = pipelineReview.length;
+  const recentAgentMessages = useQuery(api.agentHuddle.getRecent, { limit: 80 }) as AgentActivity[] | undefined;
 
   // Registration counts now shown on pages, not sidebar
 
@@ -69,6 +81,16 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
   };
 
   const isExpanded = (section: string) => expandedSections.includes(section);
+
+  const toggleChildGroup = (group: string) => {
+    setExpandedChildGroups(prev =>
+      prev.includes(group)
+        ? prev.filter(item => item !== group)
+        : [...prev, group]
+    );
+  };
+
+  const isChildGroupExpanded = (group: string) => expandedChildGroups.includes(group);
 
   const htaChildTones: Record<string, { active: string; idle: string; badge: string }> = {
     "hta-gtm": {
@@ -116,8 +138,6 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     "email-drafts",
     "agent-learnings",
     "engagement-habits",
-    "agent-hq",
-    "cost-tracker",
     "agent-huddle-main",
     "agent-huddle-aspire-ops",
     "agent-huddle-hta-launch",
@@ -125,8 +145,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     "agent-huddle-ideas",
     "agent-huddle-overnight",
     "agent-huddle-joy-support",
+    "knowledge-files",
     "memory",
-    "memory-panel",
   ]);
 
   const isItemActive = (item: any) => {
@@ -145,6 +165,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     return currentView === child.view;
   };
 
+  const getChildKey = (child: any) => child.view || child.href || child.name;
+
   const navigation = [
     {
       name: "Daily",
@@ -155,6 +177,16 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Weekly",
       icon: Calendar,
       view: "weekly",
+    },
+    {
+      name: "Monthly",
+      icon: Calendar,
+      view: "monthly",
+    },
+    {
+      name: "Time",
+      icon: Clock3,
+      view: "time",
     },
     {
       name: "Health",
@@ -177,16 +209,38 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       section: "homeschool",
       children: [
         { name: "Progress", view: "homeschool-progress" },
-        { name: "Daily", view: "homeschool-daily" },
-        { name: "Weekly", view: "homeschool-schedule" },
-        { name: "Monthly", view: "homeschool-focus" },
-        { name: "Life Skills", view: "homeschool-life-skills" },
+        {
+          name: "Schedule",
+          view: "homeschool-daily",
+          activeViews: ["homeschool-daily", "homeschool-schedule", "homeschool-focus"],
+          children: [
+            { name: "Daily", view: "homeschool-daily" },
+            { name: "Weekly", view: "homeschool-schedule" },
+            { name: "Monthly", view: "homeschool-focus" },
+          ],
+        },
+        {
+          name: "Resource Library",
+          view: "homeschool-resources",
+          activeViews: ["homeschool-resources", "homeschool-library", "homeschool-games"],
+          children: [
+            { name: "Book Library", view: "homeschool-library" },
+            { name: "Game Library", view: "homeschool-games" },
+            { name: "Typing Game", href: "/kids/typing" },
+          ],
+        },
+        {
+          name: "Life Skills",
+          view: "homeschool-life-skills",
+          activeViews: ["homeschool-life-skills", "homeschool-summer", "homeschool-health"],
+          children: [
+            { name: "Checklist", view: "homeschool-life-skills" },
+            { name: "Summer Goals", view: "homeschool-summer" },
+            { name: "Health Habits", view: "homeschool-health" },
+          ],
+        },
         { name: "Projects", view: "homeschool-projects" },
         { name: "Read Aloud List", view: "homeschool-readaloud" },
-        { name: "Book Library", view: "homeschool-library" },
-        { name: "Game Library", view: "homeschool-games" },
-        { name: "Typing Game", href: "/kids/typing" },
-        { name: "Resource Library", view: "homeschool-resources" },
         { name: "Field Trips", view: "homeschool-fieldtrips" },
         { name: "Travel", view: "homeschool-trips" },
       ]
@@ -211,6 +265,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Finance",
       icon: DollarSign,
       view: "finance",
+    },
+    {
+      name: "Tickets",
+      icon: Ticket,
+      view: "tickets",
     },
     {
       name: "Home Remodel",
@@ -268,6 +327,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "hta",
       children: [
+        { name: "World Cup", view: "hta-worldcup" },
         { name: "GTM Timeline", view: "hta-gtm" },
         { name: "Product Dev", view: "hta-product" },
         { name: "Curriculum Dev", view: "hta-curriculum" },
@@ -292,10 +352,8 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Engagement", view: "engagement-habits" },
         { type: "label", name: "Admin" },
         { name: "Huddle", view: "agent-huddle-main", activeViews: ["agent-huddle-main", "agent-huddle-aspire-ops", "agent-huddle-hta-launch", "agent-huddle-family", "agent-huddle-ideas", "agent-huddle-overnight", "agent-huddle-joy-support"] },
-        { name: "Telegram Bridge", view: "agent-hq" },
-        { name: "AI Costs", view: "cost-tracker" },
+        { name: "Docs", view: "knowledge-files" },
         { name: "Memory Search", view: "memory" },
-        { name: "Memory Panel", view: "memory-panel" },
       ]
     },
   ];
@@ -386,28 +444,59 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
                           {child.name}
                         </div>
                       ) : (
-                        <button
-                          key={child.view}
-                          onClick={() => {
-                            if (child.href) {
-                              window.location.href = child.href;
-                            } else {
-                              onViewChange(child.view);
-                            }
-                            setIsOpen(false);
-                          }}
-                          className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${getChildTone(item.section, child.view, isChildActive(child))}`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <ChevronRight className="h-3 w-3" />
-                            <span>{child.name}</span>
-                          </div>
-                          {(child as any).badge ? (
-                            <span className={`text-xs px-1.5 py-0.5 rounded ${item.section === "hta" ? (htaChildTones[child.view]?.badge || "bg-zinc-800 text-zinc-300") : "bg-zinc-800 text-zinc-300"}`}>
-                              {(child as any).badge}
-                            </span>
+                        <div key={getChildKey(child)} className="space-y-1">
+                          <button
+                            onClick={() => {
+                              const childKey = getChildKey(child);
+                              if (child.href) {
+                                window.location.href = child.href;
+                              } else {
+                                onViewChange(child.view);
+                              }
+                              if (child.children?.length) {
+                                toggleChildGroup(childKey);
+                              } else {
+                                setIsOpen(false);
+                              }
+                            }}
+                            className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded text-xs transition-colors ${getChildTone(item.section, child.view, isChildActive(child))}`}
+                          >
+                            <div className="flex items-center gap-2">
+                              {child.children?.length && isChildGroupExpanded(getChildKey(child)) ? (
+                                <ChevronDown className="h-3 w-3" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3" />
+                              )}
+                              <span>{child.name}</span>
+                            </div>
+                            {(child as any).badge ? (
+                              <span className={`text-xs px-1.5 py-0.5 rounded ${item.section === "hta" ? (htaChildTones[child.view]?.badge || "bg-zinc-800 text-zinc-300") : "bg-zinc-800 text-zinc-300"}`}>
+                                {(child as any).badge}
+                              </span>
+                            ) : null}
+                          </button>
+                          {child.children?.length && isChildGroupExpanded(getChildKey(child)) ? (
+                            <div className="ml-5 space-y-1 border-l border-zinc-800 pl-2">
+                              {child.children.map((grandchild: any) => (
+                                <button
+                                  key={getChildKey(grandchild)}
+                                  onClick={() => {
+                                    if (grandchild.href) {
+                                      window.location.href = grandchild.href;
+                                    } else {
+                                      onViewChange(grandchild.view);
+                                    }
+                                    setIsOpen(false);
+                                  }}
+                                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded text-[11px] transition-colors ${getChildTone(item.section, grandchild.view || grandchild.href, isChildActive(grandchild))}`}
+                                >
+                                  <ChevronRight className="h-3 w-3" />
+                                  <span>{grandchild.name}</span>
+                                </button>
+                              ))}
+                            </div>
                           ) : null}
-                        </button>
+                        </div>
                       )
                     ))}
                   </div>
@@ -417,63 +506,51 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
           </nav>
 
           {/* Agent Status Card */}
-          <Card className="mt-6 p-4 bg-surface-1 border-line">
-            <h3 className="text-sm font-semibold mb-3 text-zinc-200">Agent Squad</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex flex-col">
-                  <span className="text-zinc-300 font-medium">Sebastian</span>
-                  <span className="text-zinc-500 text-[10px]">Chief of Staff</span>
-                </div>
-                <span className="text-green-600 font-medium">● Active</span>
-              </div>
-              <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
-                onClick={() => onViewChange("agent-scout")}
+          <Card className="mt-6 gap-3 bg-surface-1 p-4 border-line">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-zinc-200">Agent Squad</h3>
+              <button
+                type="button"
+                onClick={() => onViewChange("agent-huddle-main")}
+                className="rounded border border-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-400 transition-colors hover:border-amber-500/30 hover:text-amber-300"
               >
-                <div className="flex flex-col">
-                  <span className="text-zinc-300 font-medium">Scout</span>
-                  <span className="text-zinc-500 text-[10px]">Operations</span>
-                </div>
-                <span className="text-green-600 font-medium">● Live</span>
-              </div>
-              <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
-                onClick={() => onViewChange("agent-maven")}
-              >
-                <div className="flex flex-col">
-                  <span className="text-zinc-300 font-medium">Maven</span>
-                  <span className="text-zinc-500 text-[10px]">Marketing</span>
-                </div>
-                <span className="text-green-600 font-medium">● Live</span>
-              </div>
-              <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
-                onClick={() => onViewChange("agent-compass")}
-              >
-                <div className="flex flex-col">
-                  <span className="text-zinc-300 font-medium">Compass</span>
-                  <span className="text-zinc-500 text-[10px]">Anthony&apos;s Bot</span>
-                </div>
-                <span className="text-green-600 font-medium">● Live</span>
-              </div>
-              <div 
-                className="flex items-center justify-between text-xs cursor-pointer hover:bg-surface-2 rounded px-1 -mx-1"
-                onClick={() => onViewChange("agent-james")}
-              >
-                <div className="flex flex-col">
-                  <span className="text-zinc-300 font-medium">James</span>
-                  <span className="text-zinc-500 text-[10px]">Roma&apos;s Bot</span>
-                </div>
-                <span className="text-green-600 font-medium">● Live</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex flex-col">
-                  <span className="text-zinc-300 font-medium">Joy</span>
-                  <span className="text-zinc-500 text-[10px]">Carolyn&apos;s Assistant</span>
-                </div>
-                <span className="text-green-600 font-medium">● Live</span>
-              </div>
+                Huddle
+              </button>
+            </div>
+            <div className="space-y-1.5">
+              {AGENT_PROFILES.map((agent) => {
+                const lastActivity = findLastAgentActivity(recentAgentMessages, agent.id);
+                const status = getActivityTone(lastActivity?.createdAt);
+                const content = (
+                  <>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="truncate text-xs font-medium text-zinc-300">{agent.name}</span>
+                        <span className={cn("h-1.5 w-1.5 rounded-full", status.dotClassName)} />
+                      </div>
+                      <span className="block truncate text-[10px] text-zinc-500">{agent.title}</span>
+                    </div>
+                    <span className="shrink-0 text-[10px] font-medium text-zinc-500">
+                      {formatRelativeActivity(lastActivity?.createdAt)}
+                    </span>
+                  </>
+                );
+
+                return agent.view ? (
+                  <button
+                    key={agent.id}
+                    type="button"
+                    className="flex w-full items-center justify-between gap-2 rounded px-1 py-1 text-left transition-colors hover:bg-surface-2"
+                    onClick={() => onViewChange(agent.view!)}
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div key={agent.id} className="flex items-center justify-between gap-2 rounded px-1 py-1">
+                    {content}
+                  </div>
+                );
+              })}
             </div>
             {(todoCount > 0 || inProgressCount > 0) && (
               <div className="mt-3 pt-3 border-t">

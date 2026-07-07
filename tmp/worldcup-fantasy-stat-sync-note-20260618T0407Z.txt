@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T04:07Z
+
+Cron time check: Wed Jun 17 21:07:15 PDT 2026 / 2026-06-18 04:07 UTC.
+
+Completed/recent match window since prior sync note 2026-06-18T01:39Z: Ghana 1-0 Panama (ESPN event 760434 / Guardian / FOX, FT) and Uzbekistan 1-3 Colombia (ESPN event 760436, FT; Guardian live report was inconsistent at 2-1, so ESPN FT score was treated as the clearer source for result only).
+
+Source-backed scoring checked:
+- Ghana 1-0 Panama: Caleb Yirenkyi 90+5, assisted by Brandon Thomas-Asante (Guardian and FOX). Ghana clean sheet.
+- Uzbekistan 1-3 Colombia: ESPN source-backed FT score only during this run; public reports identified Colombia scoring from Daniel Munoz and Luis Diaz, and Uzbekistan scoring from Abbosbek Fayzullaev, with no selected Fantasy Five scoring stat source-backed for current selections.
+
+Fantasy Five selected-player normalization from production leaderboard and public/worldcup/index.html found current exposure to Linda Caicedo (Colombia), Mohammed Kudus and Eldor Shomurodov available in the local catalog but not currently selected on the production Fantasy Five leaderboard. No current selected Ghana/Panama/Uzbekistan defender-keeper clean-sheet beneficiaries were found. Linda Caicedo had no source-backed goal, assist, or clean sheet in Colombia's completed match.
+
+Convex production: .env.production CONVEX values were checked before database work. No stat writes were needed because no currently selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed/recent matches.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned Fantasy Five leaderboard rows successfully; public https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

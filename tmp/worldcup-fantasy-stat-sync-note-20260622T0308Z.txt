@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-22T03:08Z
+
+Current time checked: Sun Jun 21 20:08:18 PDT 2026 / 2026-06-22T03:08Z.
+
+Completed/recent match window since prior sync: New Zealand 1-3 Egypt, 2026-06-21 FT. ESPN public scoreboard API event 760452 confirmed FT at https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621 and summary at https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760452 checked 2026-06-22T03:08Z.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current Fantasy Five selected players from Egypt or New Zealand. Mohamed Salah exists in the static fantasyPlayers catalog, but is not present in current production Fantasy Five rows. No selected Egypt defender/keeper clean-sheet beneficiary was found; New Zealand conceded, so no clean sheet.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed goal, assist, or clean-sheet stat from the completed/recent match.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

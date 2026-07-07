@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-05T01:37Z
+
+Current check: Sat Jul 4 18:37 PDT / 2026-07-05T01:37Z. ESPN public FIFA World Cup scoreboard for 2026-07-04 showed two completed Round of 16 matches since the prior local sync window: Morocco 3-0 Canada (event 760502) and France 1-0 Paraguay (event 760503).
+
+Sources checked: ESPN public scoreboard API for 2026-07-04, ESPN public summary API for event 760503, production worldCup:listLeaderboard, public/worldcup/index.html, and public/worldcup/fantasy-rosters.js. Production Convex was checked first with grep CONVEX .env.production.
+
+Source-backed stats:
+- Morocco 3-0 Canada: ESPN credited Morocco goals to Azzedine Ounahi (50', 82') and Soufiane Rahimi (90'+8). Morocco clean sheet was source-backed by the FT score, but no current production Fantasy Five selected player was a Morocco defender/keeper. Achraf Hakimi is in the static catalog but not currently selected.
+- France 1-0 Paraguay: ESPN credited Kylian Mbappe with a 70' penalty goal. France clean sheet was source-backed by the FT score, but no current production Fantasy Five selected France defender/keeper was found. Ousmane Dembele remains selected only as a custom wildcard/shared custom id, with no supported stat from this match.
+
+Fantasy Five selected-player normalization found Kylian Mbappe selected with stable catalog id mbappe and mirrored roster IDs official:france:star:mbappe and official:france:goalGetter:mbappe. Prior local note tmp/worldcup-fantasy-stat-sync-note-20260630T2307Z had Mbappe at goals=6, assists=2, cleanSheets=0; +1 source-backed goal from France-Paraguay gives goals=7, assists=2, cleanSheets=0.
+
+Production updates completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for playerIds mbappe, official:france:star:mbappe, and official:france:goalGetter:mbappe. Returned ids: j97kvmv17jj0t45m5t9jbz0w2x89t1be, j97rw5bz6rwpqqxy1qg8vqpyys89v4xt, j97m8n30bcagt4dzbvtsjk4de589tjfk.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded after the writes; Rinky-dink Shinx Fantasy Five loaded at total 218. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

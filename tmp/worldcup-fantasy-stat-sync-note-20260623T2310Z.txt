@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-23T23:10Z
+
+Current time checked with date: Tue Jun 23 16:09:45 PDT 2026.
+
+Completed/recent match window since prior sync note: England 0-0 Ghana reached full time after the 2026-06-23T19:09Z sync. ESPN public search result and England Football match centre reported England 0, Ghana 0, FT. Panama vs Croatia had just kicked off around 16:00 PDT and Colombia vs DR Congo had not reached the completed post-match window.
+
+Sources checked:
+- https://www.englandfootball.com/england/mens-senior-team/fixtures-results/2025-26/World-Cup/england-v-ghana-fifa-world-cup-tuesday-23-june-2026-match-centre
+- https://www.espn.com/soccer/match/_/gameId/760458/ghana-england
+- https://www.espn.com/soccer/scoreboard/_/league/fifa.world
+
+Fantasy Five selected-player normalization from production listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found Harry Kane currently selected from England. No currently selected Ghana player and no selected England/Ghana defender-keeper clean-sheet beneficiary were found. Kane had no source-backed goal or assist in the 0-0 draw, so no Convex stat write was needed.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

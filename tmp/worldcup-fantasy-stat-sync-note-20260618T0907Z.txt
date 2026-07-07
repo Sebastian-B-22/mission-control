@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T09:07Z
+
+Cron window checked at Thu Jun 18 02:07 PDT / 2026-06-18 09:07 UTC.
+
+Since the prior 2026-06-18T01:39Z sync note, the completed/recent public match window included Uzbekistan 1-3 Colombia. Later June 18 matches were not complete yet at this run time.
+
+Selected/player normalization from public/worldcup/index.html and production leaderboard found current Fantasy Five exposure to Linda Caicedo from Colombia. Public reports credited Colombia goals to Daniel Munoz, Luis Diaz, and Jaminton Campaz, with no source-backed Linda Caicedo goal/assist/clean-sheet stat change. Uzbekistan scorers/assists did not affect currently selected Fantasy Five players.
+
+No Convex production stat writes were needed.
+
+Sources:
+https://www.theguardian.com/football/live/2026/jun/18/fifa-world-cup-2026-live-uzbekistan-v-colombia-updates-uzb-vs-col-group-k-match-score-latest
+https://www.foxsports.com/soccer/fifa-world-cup-men-uzbekistan-vs-colombia-jun-17-2026-game-boxscore-647639

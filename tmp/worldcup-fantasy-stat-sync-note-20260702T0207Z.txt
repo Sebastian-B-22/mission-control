@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync note - 2026-07-02T02:07Z
+
+Current time checked first: Wed Jul 1 19:07:18 PDT 2026 / 2026-07-02T02:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260702T0037Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public scoreboard for 2026-07-01 showed United States 2-0 Bosnia-Herzegovina, event 760494, full time after the 2026-07-02T00:00Z kickoff. Earlier completed 2026-07-01 matches were already covered in prior notes.
+
+Sources checked: ESPN public scoreboard API for 2026-07-01, ESPN public summary API for event 760494, production worldCup:listLeaderboard and worldCup:listEntries, plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js for Fantasy Five selected-player normalization.
+
+Source-backed scoring: ESPN event 760494 keyEvents/player stats credited United States goals to Folarin Balogun at 45' and Malik Tillman at 82'. ESPN player stats showed Christian Pulisic and Tyler Adams with 0 goals and 0 assists. United States kept a team clean sheet, but selected Defender/Keeper Matt Turner was listed as a substitute with 0 appearances, so no source-backed Fantasy Five clean-sheet credit was applied to him.
+
+Fantasy Five selected-player normalization found current selected exposure in this completed window for Matt Turner, Christian Pulisic, and Tyler Adams. No selected player had a source-backed supported stat update. Balogun and Tillman were not current selected Fantasy Five players.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update in this completed window.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows.

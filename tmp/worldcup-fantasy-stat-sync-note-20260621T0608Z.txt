@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T06:08Z
+
+Current time checked first: Sat Jun 20 23:08:03 PDT 2026 / 2026-06-21T06:08Z.
+
+Completed/recent window since prior 2026-06-21T04:38Z sync note: ESPN public FIFA World Cup scoreboard for 2026-06-21 shows Tunisia 0-4 Japan (event 760449) as Full Time, completed after the prior note where it was in progress. Later June 21 matches were still scheduled/pre-match at this run time.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- ESPN event summary API: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760449
+- Prior local sync note: tmp/worldcup-fantasy-stat-sync-note-20260621T0438Z.txt
+
+Source-backed scoring from ESPN summary details: Daichi Kamada goal assisted by Keito Nakamura (4'), Ayase Ueda goal assisted by Kou Itakura (31'), Junya Ito goal assisted by Ayase Ueda (69'), Ayase Ueda goal assisted by Kaishu Sano (83'). Japan clean sheet backed by 4-0 final score.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current Fantasy Five selected players from Japan or Tunisia. Static fantasyPlayers contains Kaoru Mitoma for Japan, but no production Fantasy Five leaderboard row currently selected him. No upsertFantasyPlayerStats writes were made.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

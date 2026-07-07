@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Users, Search, RefreshCw, Phone, Mail, MessageCircle, X } from "lucide-react";
+import { WorkSurfacePageHeader } from "@/components/work-surface";
 
 type Program = "all" | "spring_league" | "camp" | "mini_camp" | "pdp";
+type Region = "all" | "pali" | "agoura";
 
 type FamilyWithChildren = {
   _id: Id<"families">;
@@ -22,6 +24,7 @@ type FamilyWithChildren = {
   phone: string;
   lastQuoMessage?: string;
   lastQuoDate?: number;
+  creditBalance?: number;
   createdAt: number;
   updatedAt: number;
   children: Array<{
@@ -84,6 +87,7 @@ function getFamilyTone(family: FamilyWithChildren) {
 
 function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | null; onClose: () => void }) {
   const family = useQuery(api.families.getFamily, familyId ? { id: familyId } : "skip");
+  const creditBalance = family?.creditBalance ?? 0;
 
   return (
     <Dialog open={!!familyId} onOpenChange={(open) => !open && onClose()}>
@@ -120,6 +124,15 @@ function FamilyDetailModal({ familyId, onClose }: { familyId: Id<"families"> | n
                 </div>
               )}
             </div>
+
+            {creditBalance > 0 && (
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4">
+                <h3 className="text-xs font-semibold text-emerald-200 uppercase tracking-wide">Account Credit</h3>
+                <div className="mt-1 text-2xl font-semibold text-emerald-100">
+                  ${(creditBalance / 100).toFixed(2)}
+                </div>
+              </div>
+            )}
 
             <div>
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
@@ -204,6 +217,11 @@ function FamilyCard({ family, onClick }: { family: FamilyWithChildren; onClick: 
             </Badge>
           ))}
           <Badge variant="secondary">{family.enrollmentCount} enrollments</Badge>
+          {(family.creditBalance ?? 0) > 0 && (
+            <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+              ${((family.creditBalance ?? 0) / 100).toFixed(2)} credit
+            </Badge>
+          )}
         </div>
 
         {family.children.length > 0 && (
@@ -242,6 +260,7 @@ function FamilyCard({ family, onClick }: { family: FamilyWithChildren; onClick: 
 export function FamilyCRM() {
   const [search, setSearch] = useState("");
   const [programFilter, setProgramFilter] = useState<Program>("all");
+  const [regionFilter, setRegionFilter] = useState<Region>("all");
   const [selectedFamily, setSelectedFamily] = useState<Id<"families"> | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
@@ -260,9 +279,10 @@ export function FamilyCRM() {
         f.children.some((c: any) => `${c.firstName} ${c.lastName}`.toLowerCase().includes(search.toLowerCase()));
 
       const matchesProgram = programFilter === "all" || f.programs.includes(programFilter);
-      return matchesSearch && matchesProgram;
+      const matchesRegion = regionFilter === "all" || f.regions.includes(regionFilter);
+      return matchesSearch && matchesProgram && matchesRegion;
     });
-  }, [families, programFilter, search]);
+  }, [families, programFilter, regionFilter, search]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -279,20 +299,21 @@ export function FamilyCRM() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-3xl font-bold">Family CRM</h1>
-            <Badge variant="outline" className="border-fuchsia-400/30 bg-fuchsia-500/12 text-fuchsia-100 px-2 py-0.5 text-[11px]">
+      <WorkSurfacePageHeader
+        title="Family CRM"
+        description="Unified Aspire family records across Spring League, Camps, Mini Camp, and PDP."
+        action={(
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="border-fuchsia-400/30 bg-fuchsia-500/12 px-2 py-1 text-[11px] text-fuchsia-100">
               {stats?.totalFamilies ?? filtered.length} families
             </Badge>
+            <Button onClick={handleSync} disabled={syncing} variant="outline" size="sm">
+              <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? "animate-spin" : ""}`} />
+              {syncing ? "Syncing..." : "Refresh CRM"}
+            </Button>
           </div>
-        </div>
-        <Button onClick={handleSync} disabled={syncing} variant="outline" size="sm">
-          <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Syncing..." : "Refresh CRM"}
-        </Button>
-      </div>
+        )}
+      />
 
       {syncResult && (
         <div className="flex items-center justify-between rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-300">
@@ -353,9 +374,18 @@ export function FamilyCRM() {
             </div>
           </div>
 
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Region</span>
+            {(["all", "pali", "agoura"] as Region[]).map((r) => (
+              <Button key={r} size="sm" variant={regionFilter === r ? "default" : "outline"} onClick={() => setRegionFilter(r)}>
+                {r === "all" ? "All Regions" : REGION_CONFIG[r]?.label || r}
+              </Button>
+            ))}
+          </div>
+
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge variant="secondary">{filtered.length} shown</Badge>
-            <span>{search || programFilter !== "all" ? "Filtered family list" : "All families in CRM"}</span>
+            <span>{search || programFilter !== "all" || regionFilter !== "all" ? "Filtered family list" : "All families in CRM"}</span>
           </div>
         </CardContent>
       </Card>

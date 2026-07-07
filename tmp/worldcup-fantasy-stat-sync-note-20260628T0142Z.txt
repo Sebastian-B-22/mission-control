@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-28T01:42Z
+
+Current time checked first: Sat Jun 27 18:42:41 PDT 2026 / 2026-06-28T01:42Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260627T2312Z.txt.
+
+Completed/recent match window since prior local sync note: Colombia 0-0 Portugal (ESPN event 760481, FT) and DR Congo 3-1 Uzbekistan (ESPN event 760482, FT). Algeria vs Austria and Jordan vs Argentina were still scheduled/not complete at sync time.
+
+Public sources checked: ESPN public FIFA World Cup scoreboard for 2026-06-27 and ESPN public match summary/keyEvents JSON for events 760481 and 760482. Local snapshots saved as tmp/espn-scoreboard-20260628T0142Z.json, tmp/espn-summary-760481-20260628T0142Z.json, and tmp/espn-summary-760482-20260628T0142Z.json.
+
+Source-backed scoring: Colombia 0-0 Portugal had no goals or assists and both sides kept clean sheets. DR Congo 3-1 Uzbekistan scoring was Eldor Shomurodov assisted by Akmal Mozgovoy; Yoane Wissa penalty; Fiston Mayele unassisted/fast-break goal; Yoane Wissa assisted by Meschack Elia. DR Congo and Uzbekistan did not keep clean sheets.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure in this completed window for Bruno Fernandes/Portugal, Cristiano Ronaldo/Portugal, and Linda Caicedo/Colombia only. The selected players had no source-backed goals or assists in the 0-0 draw, and none are defender/keeper clean-sheet slots. Eldor Shomurodov, Akmal Mozgovoy, Yoane Wissa, Fiston Mayele, Meschack Elia, Chancel Mbemba, and Colombia/Portugal defender-keeper clean-sheet beneficiaries were not currently selected on the production Fantasy Five leaderboard.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

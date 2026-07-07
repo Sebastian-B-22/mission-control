@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-29T19:07Z
+
+Current time check: Mon Jun 29 12:07:31 PDT 2026 / 2026-06-29 19:07 UTC.
+
+Completed/recent match window: Brazil 2-1 Japan, full time, ESPN event 760487. Key events show goals by Kaishu Sano (Japan), Casemiro assisted by Gabriel Magalhaes (Brazil), and Gabriel Martinelli assisted by Bruno Guimaraes (Brazil). No clean sheet.
+
+Current production Fantasy Five selected players from worldCup:listLeaderboard: Adams, Bruno Fernandes, Christian Pulisic, Cristiano Ronaldo, Enner Valencia, Erling Haaland, Harry Kane, Kylian Mbappe, Lamine Yamal, Linda Caicedo, Lionel Messi, Nico O’Reilly/O’Reilly, Ousmane Dembele, Turner, Virgil Van Dijk.
+
+No current selected Fantasy Five player from Brazil or Japan had a source-backed goal, assist, or clean sheet in the completed match, so no upsertFantasyPlayerStats writes were made.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Source files: tmp/espn-scoreboard-20260629-cron-1907Z.json, tmp/espn-summary-760487-20260629T1907Z.json, tmp/worldcup-leaderboard-cron-20260629T1907Z.json.

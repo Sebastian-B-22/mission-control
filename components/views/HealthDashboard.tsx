@@ -34,6 +34,7 @@ import {
   Dumbbell,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WorkSurfacePageHeader, WorkSurfaceStatCard } from "@/components/work-surface";
 import { BioMapView } from "./BioMapView";
 import { WorkoutTrackerTab } from "./WorkoutTrackerTab";
 
@@ -59,6 +60,20 @@ function getScoreTextClass(score: number): string {
   if (score >= 70) return "text-emerald-400";
   if (score >= 50) return "text-blue-500";
   return "text-zinc-500";
+}
+
+function toLocalDateKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function formatSyncedAt(timestamp?: number): string | null {
+  if (!timestamp) return null;
+  return new Date(timestamp).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 // Score ring component - Don't Die style with score-based colors
@@ -141,7 +156,7 @@ function getRingColorClass(score: number): string {
   if (score === 0) return 'ring-zinc-600';
   if (score === 100) return 'ring-yellow-500';
   if (score >= 85) return 'ring-pink-500';
-  if (score >= 70) return 'ring-green-500';
+  if (score >= 70) return 'ring-emerald-500';
   if (score >= 50) return 'ring-blue-500';
   return 'ring-zinc-500';
 }
@@ -262,10 +277,10 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
   const updateSteps = useMutation(api.health.updateSteps);
 
   // Create health lookup by date
-  const healthByDate: Record<string, { healthScore: number; isPerfectDay: boolean }> = {};
+  const healthByDate: Record<string, { healthScore: number; isPerfectDay: boolean; updatedAt?: number }> = {};
   if (monthHealth) {
     for (const h of monthHealth) {
-      healthByDate[h.date] = { healthScore: h.healthScore, isPerfectDay: h.isPerfectDay };
+      healthByDate[h.date] = { healthScore: h.healthScore, isPerfectDay: h.isPerfectDay, updatedAt: h.updatedAt };
     }
   }
 
@@ -309,10 +324,12 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
   const displaySleep = displayHealth?.sleepHours ?? monthStats?.todaySleep;
   const displaySteps = displayHealth?.steps ?? monthStats?.todaySteps;
   const displayCalories = displayHealth?.activeCalories ?? monthStats?.todayCalories;
+  const displayUpdatedAt = displayHealth?.updatedAt ?? latestHealth?.updatedAt;
   const isShowingLatest = Boolean(displayHealth && displayHealth.date !== today);
   const latestDateLabel = displayHealth
     ? new Date(`${displayHealth.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
     : null;
+  const syncLabel = formatSyncedAt(displayUpdatedAt);
 
   // Calculate progress toward goals
   const sleepProgress = displaySleep
@@ -327,11 +344,12 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
 
   // Goal level progression
   const goalLevels = [
-    { level: 1, target: 20, label: "Starter" },
-    { level: 2, target: 25, label: "Committed" },
-    { level: 3, target: 30, label: "Champion" },
+    { level: 1, target: 15, label: "Starter" },
+    { level: 2, target: 20, label: "Builder" },
+    { level: 3, target: 25, label: "Committed" },
+    { level: 4, target: 30, label: "Champion" },
   ];
-  const currentLevel = goalLevels.find((l) => l.target === (healthGoals?.perfectDaysGoal ?? 20)) || goalLevels[0];
+  const currentLevel = goalLevels.find((l) => l.target === (healthGoals?.perfectDaysGoal ?? 15)) || goalLevels[0];
 
   // Format sleep
   const formatSleep = (hours: number) => {
@@ -348,6 +366,11 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
 
   return (
     <div className="space-y-6">
+      <WorkSurfacePageHeader
+        title="Health"
+        description="Daily score, sleep, movement, and monthly consistency without making the numbers feel like a punishment."
+      />
+
       {/* Header with Tabs */}
       <Tabs
         value={activeTab}
@@ -358,9 +381,9 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
         }}
         className="w-full"
       >
-        <div className="flex items-center justify-between mb-4">
-          <TabsList className="bg-zinc-800">
-            <TabsTrigger value="daily" className="data-[state=active]:bg-purple-600">
+        <div className="mb-4 flex items-center justify-between">
+          <TabsList className="bg-zinc-900 border border-zinc-800">
+            <TabsTrigger value="daily" className="data-[state=active]:bg-pink-600">
               <Heart className="h-4 w-4 mr-2" />
               Daily Health
             </TabsTrigger>
@@ -378,13 +401,30 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
         {/* Daily Health Tab */}
         <TabsContent value="daily">
           {/* Main Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 xl:grid-cols-[minmax(280px,380px)_minmax(0,1fr)]">
         {/* Today's Score + Progress */}
-        <Card className="lg:col-span-1 bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader>
-            <CardTitle className="text-lg text-zinc-100">
-              {isShowingLatest && latestDateLabel ? `Latest (${latestDateLabel})` : "Today"}
-            </CardTitle>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <CardTitle className="text-lg text-zinc-100">
+                  {isShowingLatest && latestDateLabel ? `Latest (${latestDateLabel})` : "Today"}
+                </CardTitle>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Don’t Die-style score: sleep + steps
+                </p>
+              </div>
+              {syncLabel ? (
+                <Badge variant="outline" className="shrink-0 border-zinc-700 text-zinc-400">
+                  Synced {syncLabel}
+                </Badge>
+              ) : null}
+            </div>
+            {isShowingLatest ? (
+              <p className="mt-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                Today has no complete health export yet, so MC is showing the latest available day.
+              </p>
+            ) : null}
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Week Preview */}
@@ -474,7 +514,7 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
         </Card>
 
         {/* Calendar */}
-        <Card className="lg:col-span-2 bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-900 border-zinc-800 min-w-0">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2 text-zinc-100">
@@ -526,10 +566,10 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
                   {date ? (
                     <CalendarDay
                       date={date}
-                      health={healthByDate[date.toISOString().split("T")[0]]}
-                      isToday={date.toISOString().split("T")[0] === today}
+                      health={healthByDate[toLocalDateKey(date)]}
+                      isToday={toLocalDateKey(date) === today}
                       onClick={() => {
-                        const dateStr = date.toISOString().split("T")[0];
+                        const dateStr = toLocalDateKey(date);
                         setSelectedDate(dateStr);
                         const health = monthHealth?.find((h: any) => h.date === dateStr);
                         setStepsInput(health?.steps?.toString() ?? "");
@@ -557,8 +597,8 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
                 <span className="text-zinc-400">Great (85+)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full border-2 border-purple-500 flex items-center justify-center">
-                  <span className="text-purple-400 text-xs">70</span>
+                <div className="w-6 h-6 rounded-full border-2 border-emerald-500 flex items-center justify-center">
+                  <span className="text-emerald-400 text-xs">70</span>
                 </div>
                 <span className="text-zinc-400">Good (70-84)</span>
               </div>
@@ -579,114 +619,72 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
         </Card>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid gap-4 md:grid-cols-4">
-        {/* Perfect Days */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-zinc-400">Perfect Days</p>
-                <p className="text-3xl font-bold text-amber-500">
-                  {monthStats?.perfectDays ?? 0}
-                </p>
-                <p className="text-xs text-zinc-500">
-                  of {healthGoals?.perfectDaysGoal ?? 20} this month
-                </p>
-              </div>
-              <Trophy className="h-8 w-8 text-amber-500/30" />
-            </div>
-            <Progress
-              value={((monthStats?.perfectDays ?? 0) / (healthGoals?.perfectDaysGoal ?? 20)) * 100}
-              className="mt-3 h-2 bg-zinc-800"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Current Streak */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-zinc-400">Current Streak</p>
-                <p className="text-3xl font-bold text-green-400">
-                  {monthStats?.streak ?? 0}
-                </p>
-                <p className="text-xs text-zinc-500">
-                  {(monthStats?.streak ?? 0) === 1 ? "day" : "days"} in a row
-                </p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-zinc-700" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Goal Level */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-zinc-400">Goal Level</p>
-                <p className="text-3xl font-bold text-zinc-100">{currentLevel.label}</p>
-                <p className="text-xs text-zinc-500">
-                  {currentLevel.target} perfect days/month
-                </p>
-              </div>
-              <Target className="h-8 w-8 text-zinc-700" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Days Remaining */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-zinc-400">Days Left</p>
-                <p className="text-3xl font-bold text-zinc-100">
-                  {(monthStats?.daysInMonth ?? 30) - (monthStats?.daysPassed ?? 0)}
-                </p>
-                <p className="text-xs text-zinc-500">
-                  to hit {healthGoals?.perfectDaysGoal ?? 20} perfect days
-                </p>
-              </div>
-              <Calendar className="h-8 w-8 text-zinc-700" />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Month Snapshot */}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <WorkSurfaceStatCard
+          size="compact"
+          tone="warning"
+          label="Perfect Days"
+          value={monthStats?.perfectDays ?? 0}
+          description={`of ${healthGoals?.perfectDaysGoal ?? 15} this month`}
+          icon={<Trophy className="h-5 w-5 text-amber-300" />}
+        />
+        <WorkSurfaceStatCard
+          size="compact"
+          tone="success"
+          label="Current Streak"
+          value={monthStats?.streak ?? 0}
+          description={(monthStats?.streak ?? 0) === 1 ? "day in a row" : "days in a row"}
+          icon={<TrendingUp className="h-5 w-5 text-emerald-300" />}
+        />
+        <WorkSurfaceStatCard
+          size="compact"
+          label="Goal Level"
+          value={currentLevel.label}
+          description={`${currentLevel.target} perfect days/month`}
+          icon={<Target className="h-5 w-5 text-zinc-400" />}
+        />
+        <WorkSurfaceStatCard
+          size="compact"
+          tone="info"
+          label="Days Left"
+          value={(monthStats?.daysInMonth ?? 30) - (monthStats?.daysPassed ?? 0)}
+          description={`to hit ${healthGoals?.perfectDaysGoal ?? 15} perfect days`}
+          icon={<Calendar className="h-5 w-5 text-blue-300" />}
+        />
       </div>
 
       {/* Goal Progression */}
       <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2 text-zinc-100">
             <Target className="h-5 w-5" />
             Goal Progression
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {goalLevels.map((level, i) => (
               <div
                 key={level.level}
-                className={`flex-1 p-4 rounded-lg text-center ${
+                className={`flex-1 rounded-lg border p-4 text-center ${
                   level.level === (healthGoals?.currentLevel ?? 1)
-                    ? "bg-zinc-800 ring-2 ring-purple-500"
+                    ? "border-amber-500/30 bg-amber-500/10"
                     : level.level < (healthGoals?.currentLevel ?? 1)
-                    ? "bg-zinc-800/50"
-                    : "bg-zinc-800/30"
+                    ? "border-emerald-500/20 bg-emerald-500/5"
+                    : "border-zinc-800 bg-zinc-800/30"
                 }`}
               >
                 <p className="font-semibold text-zinc-100">{level.label}</p>
-                <p className="text-2xl font-bold text-purple-400">{level.target}</p>
+                <p className="text-2xl font-bold text-amber-300">{level.target}</p>
                 <p className="text-xs text-zinc-500">perfect days/month</p>
                 {level.level < (healthGoals?.currentLevel ?? 1) && (
-                  <Badge variant="secondary" className="mt-2 bg-green-900 text-green-300">
+                  <Badge variant="secondary" className="mt-2 bg-emerald-900 text-emerald-300">
                     <Check className="h-3 w-3 mr-1" /> Completed
                   </Badge>
                 )}
                 {level.level === (healthGoals?.currentLevel ?? 1) && (
-                  <Badge className="mt-2 bg-purple-600">Current Goal</Badge>
+                  <Badge className="mt-2 bg-amber-500 text-zinc-950">Current Goal</Badge>
                 )}
               </div>
             ))}
@@ -723,7 +721,7 @@ export function HealthDashboard({ userId, initialTab = "daily", onTabChange }: H
             <Button 
               onClick={handleSaveSteps} 
               disabled={!stepsInput}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-pink-600 hover:bg-pink-700"
             >
               Save Steps
             </Button>

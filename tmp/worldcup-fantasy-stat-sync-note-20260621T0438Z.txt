@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T04:38Z
+
+Current time checked first: Sat Jun 20 21:38:04 PDT 2026 / 2026-06-21T04:38Z.
+
+Completed/recent window since prior 2026-06-21T02:38Z sync note: no newly completed World Cup matches found. ESPN public FIFA World Cup scoreboard for 2026-06-21 showed Japan vs Tunisia in progress at 38' (Japan 2-0 Tunisia), not complete, and later June 21 matches still scheduled/pre-match. The prior completed June 20 Ecuador 0-0 Curacao match was already handled by the 2026-06-21T02:38Z note.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- Prior local sync note: tmp/worldcup-fantasy-stat-sync-note-20260621T0238Z.txt
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

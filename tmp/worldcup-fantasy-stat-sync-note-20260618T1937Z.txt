@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T19:37Z
+
+Completed/recent window: England 4-2 Croatia (ESPN event 760437, completed 2026-06-17T22:00Z) and Czechia 1-1 South Africa (ESPN event 760438, completed 2026-06-18T17:58Z). Switzerland vs Bosnia and Herzegovina was not in a completed post-match window at this run time.
+
+Production Convex was checked with grep CONVEX .env.production before writes.
+
+Updated production Fantasy Five stats:
+- kane / Harry Kane / England: goals 2, assists 0, cleanSheets 0. Sources: FIFA match centre https://www.fifa.com/en/match-centre/match/17/285023/289273/400021437; ESPN event 760437; England match centre https://www.englandfootball.com/england/mens-senior-team/fixtures-results/2025-26/World-Cup/england-v-croatia-fifa-world-cup-wednesday-17-june-2026-match-centre
+- bellingham / Jude Bellingham / England: goals 1, assists 0, cleanSheets 0. Sources: same England 4-2 Croatia sources.
+
+Skipped/no write notes: Czechia 1-1 South Africa scorers were Lukas Sadilek and Teboho Mokoena; no source-backed scoring or clean-sheet change for currently selected Fantasy Five players. Croatia goals by Martin Baturina and Petar Musa did not affect current Convex catalog/selected fantasy IDs; no clean sheets in England-Croatia.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned production leaderboard rows including Fantasy Five entries after the upserts.

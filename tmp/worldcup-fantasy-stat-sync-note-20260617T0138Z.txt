@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T01:38Z
+
+Current local time checked: Tue Jun 16 18:38:13 PDT 2026. Last local sync note was 2026-06-16T22:40Z, which covered France 3-1 Senegal.
+
+Completed/recent window since prior sync: Iraq 1-4 Norway, Group I, 2026-06-16 18:00 ET / 22:00 UTC kickoff. Argentina vs Algeria had only just kicked off at the current run time and was not a completed match window.
+
+Sources checked: FIFA match centre https://www.fifa.com/en/match-centre/match/17/285023/289273/400021488; ESPN schedule/result page https://www.espn.com/soccer/story/_/id/48939282/2026-fifa-world-cup-fixtures-results-match-schedule-group-stage-knockout-rounds-bracket; ESPN match page https://africa.espn.com/football/match/_/gameId/760430/norway-iraq; Sky Sports match report https://www.skysports.com/football/iraq-vs-norway/report/549783.
+
+Fantasy Five selected-player normalization found Erling Haaland selected from the local catalog (id haaland). No selected Iraq players were found. Haaland was source-backed for 2 goals. No source-backed assist or clean-sheet stat was credited for him.
+
+Convex production update completed with `CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats`: haaland / Erling Haaland / Norway / goals=2 / assists=0 / cleanSheets=0. Returned id j97m2518k45qp43v11r2t5r6bx88t1n7.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 after the update. Attempted `worldCup:listFantasyPlayerStats` for a direct stats readback, but that query is not deployed; leaderboard verification was used instead.

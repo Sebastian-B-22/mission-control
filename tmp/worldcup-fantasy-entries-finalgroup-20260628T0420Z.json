@@ -1,0 +1,1147 @@
+[
+  {
+    "_creationTime": 1781277667497.6199,
+    "_id": "hd7x0fgxqqbvfk6vm1d857t4xx88g78m",
+    "adminStatus": "active",
+    "createdAt": 1781277667497,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "yamal",
+        "customPicks": {},
+        "picks": {
+          "defenderKeeper": "vandijk",
+          "goalGetter": "valencia",
+          "playmaker": "yamal",
+          "star": "messi",
+          "wildcard": "caicedo"
+        }
+      },
+      "groupPicks": {
+        "A": {
+          "runnerUp": "South Africa",
+          "thirdPlace": "Czechia",
+          "winner": "Mexico"
+        },
+        "B": {
+          "runnerUp": "Canada",
+          "thirdPlace": "Bosnia and Herzegovina",
+          "winner": "Switzerland"
+        },
+        "C": {
+          "runnerUp": "Morocco",
+          "thirdPlace": "Haiti",
+          "winner": "Brazil"
+        },
+        "D": {
+          "runnerUp": "Australia",
+          "thirdPlace": "Türkiye",
+          "winner": "United States"
+        },
+        "E": {
+          "runnerUp": "Ecuador",
+          "thirdPlace": "Curaçao",
+          "winner": "Germany"
+        },
+        "F": {
+          "runnerUp": "Japan",
+          "thirdPlace": "Sweden",
+          "winner": "Netherlands"
+        },
+        "G": {
+          "runnerUp": "Egypt",
+          "thirdPlace": "Iran",
+          "winner": "Belgium"
+        },
+        "H": {
+          "runnerUp": "Uruguay",
+          "thirdPlace": "Saudi Arabia",
+          "winner": "Spain"
+        },
+        "I": {
+          "runnerUp": "Norway",
+          "thirdPlace": "Senegal",
+          "winner": "France"
+        },
+        "J": {
+          "runnerUp": "Algeria",
+          "thirdPlace": "Jordan",
+          "winner": "Argentina"
+        },
+        "K": {
+          "runnerUp": "Colombia",
+          "thirdPlace": "DR Congo",
+          "winner": "Portugal"
+        },
+        "L": {
+          "runnerUp": "Croatia",
+          "thirdPlace": "Ghana",
+          "winner": "England"
+        }
+      },
+      "simplePicks": {
+        "champion": "France",
+        "quarterfinalists": [
+          "Argentina",
+          "Colombia",
+          "Brazil"
+        ]
+      },
+      "wildcards": [
+        "Czechia",
+        "Türkiye",
+        "Sweden",
+        "Ghana",
+        "Saudi Arabia",
+        "Senegal",
+        "Iran",
+        "Haiti"
+      ],
+      "winners": {
+        "final": {
+          "final_0": "France"
+        },
+        "qf": {
+          "qf_0": "Brazil",
+          "qf_1": "Spain",
+          "qf_2": "France",
+          "qf_3": "Uruguay"
+        },
+        "r16": {
+          "r16_0": "Colombia",
+          "r16_1": "Brazil",
+          "r16_2": "Germany",
+          "r16_3": "Spain",
+          "r16_4": "France",
+          "r16_5": "Portugal",
+          "r16_6": "Türkiye (Group D wildcard)",
+          "r16_7": "Uruguay"
+        },
+        "r32": {
+          "r32_0": "Mexico",
+          "r32_1": "Colombia",
+          "r32_10": "Portugal",
+          "r32_11": "England",
+          "r32_12": "Türkiye (Group D wildcard)",
+          "r32_13": "Japan",
+          "r32_14": "Uruguay",
+          "r32_15": "Croatia",
+          "r32_2": "Brazil",
+          "r32_3": "United States",
+          "r32_4": "Germany",
+          "r32_5": "Netherlands",
+          "r32_6": "Belgium",
+          "r32_7": "Spain",
+          "r32_8": "France",
+          "r32_9": "Argentina"
+        },
+        "sf": {
+          "sf_0": "Brazil",
+          "sf_1": "France"
+        }
+      }
+    },
+    "familyName": "The French Fries",
+    "groupCodes": [
+      "KLDV5F"
+    ],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Jay Sachdev",
+    "parentPhone": "+14159990052",
+    "participantName": "Family Bracket",
+    "participantType": "family",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1781277667497,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/149.0.7827.45 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "_creationTime": 1781229564566.5159,
+    "_id": "hd7qv7ynm2wfh2rwtnxe66nzh588gbhf",
+    "adminStatus": "active",
+    "createdAt": 1781229564566,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "mbappe",
+        "customPicks": {
+          "defenderKeeper": {
+            "club": "Real Madrid C. F. (ESP)",
+            "cost": 4,
+            "country": "Belgium",
+            "id": "official:belgium:defenderKeeper:courtois",
+            "name": "Thibaut Courtois",
+            "roles": [
+              "defenderKeeper"
+            ],
+            "tier": "GK • Real Madrid C. F. (ESP)"
+          },
+          "playmaker": {
+            "club": "",
+            "cost": 5,
+            "country": "Spain",
+            "id": "custom:playmaker",
+            "name": "Pedro Lopez (Pedri)",
+            "roles": [
+              "playmaker"
+            ],
+            "tier": "More option"
+          },
+          "wildcard": {
+            "club": "",
+            "cost": 3,
+            "country": "France",
+            "id": "custom:wildcard",
+            "name": "Ousmane Dembélé",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "More option"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "vandijk",
+          "goalGetter": "kane",
+          "playmaker": "bruno",
+          "star": "mbappe",
+          "wildcard": "custom:wildcard"
+        }
+      },
+      "groupPicks": {},
+      "simplePicks": {
+        "champion": "",
+        "quarterfinalists": []
+      },
+      "wildcards": [],
+      "winners": {
+        "final": {},
+        "qf": {},
+        "r16": {},
+        "r32": {},
+        "sf": {}
+      }
+    },
+    "familyName": "Rinky-dink Shinx",
+    "groupCodes": [],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Christopher Nguyen",
+    "parentPhone": "+19495210799",
+    "participantName": "Family Bracket",
+    "participantType": "family",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1781229564566,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+  },
+  {
+    "_creationTime": 1781144070161.5598,
+    "_id": "hd7gnkmk41eqb1x59s2010hdes88fwfa",
+    "adminStatus": "active",
+    "createdAt": 1781144070161,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "bruno",
+        "customPicks": {
+          "wildcard": {
+            "club": "",
+            "cost": 3,
+            "country": "England",
+            "id": "custom:wildcard",
+            "name": "Nico O’Reilly",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "More option"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "vandijk",
+          "goalGetter": "haaland",
+          "playmaker": "bruno",
+          "star": "yamal",
+          "wildcard": "custom:wildcard"
+        }
+      },
+      "groupPicks": {
+        "A": {
+          "runnerUp": "South Korea",
+          "thirdPlace": "South Africa",
+          "winner": "Mexico"
+        },
+        "B": {
+          "runnerUp": "Canada",
+          "thirdPlace": "Qatar",
+          "winner": "Switzerland"
+        },
+        "C": {
+          "runnerUp": "Morocco",
+          "thirdPlace": "Scotland",
+          "winner": "Brazil"
+        },
+        "D": {
+          "runnerUp": "Türkiye",
+          "thirdPlace": "United States",
+          "winner": "Paraguay"
+        },
+        "E": {
+          "runnerUp": "Ecuador",
+          "thirdPlace": "Côte d'Ivoire",
+          "winner": "Germany"
+        },
+        "F": {
+          "runnerUp": "Tunisia",
+          "thirdPlace": "Japan",
+          "winner": "Netherlands"
+        },
+        "G": {
+          "runnerUp": "Egypt",
+          "thirdPlace": "Iran",
+          "winner": "Belgium"
+        },
+        "H": {
+          "runnerUp": "Spain",
+          "thirdPlace": "Saudi Arabia",
+          "winner": "Uruguay"
+        },
+        "I": {
+          "runnerUp": "Norway",
+          "thirdPlace": "Senegal",
+          "winner": "France"
+        },
+        "J": {
+          "runnerUp": "Austria",
+          "thirdPlace": "Algeria",
+          "winner": "Argentina"
+        },
+        "K": {
+          "runnerUp": "Portugal",
+          "thirdPlace": "Uzbekistan",
+          "winner": "Colombia"
+        },
+        "L": {
+          "runnerUp": "Croatia",
+          "thirdPlace": "Ghana",
+          "winner": "England"
+        }
+      },
+      "simplePicks": {
+        "champion": "England",
+        "quarterfinalists": [
+          "France",
+          "Colombia",
+          "Argentina"
+        ]
+      },
+      "wildcards": [
+        "Japan",
+        "Côte d'Ivoire",
+        "South Africa",
+        "Qatar",
+        "Scotland",
+        "United States",
+        "Ghana",
+        "Senegal"
+      ],
+      "winners": {
+        "final": {
+          "final_0": "France"
+        },
+        "qf": {
+          "qf_0": "Brazil",
+          "qf_1": "Uruguay",
+          "qf_2": "France",
+          "qf_3": "Spain"
+        },
+        "r16": {
+          "r16_0": "Portugal",
+          "r16_1": "Brazil",
+          "r16_2": "Germany",
+          "r16_3": "Uruguay",
+          "r16_4": "France",
+          "r16_5": "Colombia",
+          "r16_6": "Türkiye",
+          "r16_7": "Spain"
+        },
+        "r32": {
+          "r32_0": "Mexico",
+          "r32_1": "Portugal",
+          "r32_10": "Colombia",
+          "r32_11": "England",
+          "r32_12": "Côte d'Ivoire (Group E wildcard)",
+          "r32_13": "Türkiye",
+          "r32_14": "Spain",
+          "r32_15": "Croatia",
+          "r32_2": "Brazil",
+          "r32_3": "Paraguay",
+          "r32_4": "Germany",
+          "r32_5": "Netherlands",
+          "r32_6": "Belgium",
+          "r32_7": "Uruguay",
+          "r32_8": "France",
+          "r32_9": "Argentina"
+        },
+        "sf": {
+          "sf_0": "Brazil",
+          "sf_1": "France"
+        }
+      }
+    },
+    "familyName": "Thou art crusty",
+    "groupCodes": [
+      "BDT3C6",
+      "8KTSEV"
+    ],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Angie Winslow",
+    "parentPhone": "+13102957934",
+    "participantDisplayName": "angwns",
+    "participantName": "Angie Winslow",
+    "participantType": "adult",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1781144070161,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "_creationTime": 1781119242899.595,
+    "_id": "hd7pgz9xv1vspbt9a9srnek4yd88d57c",
+    "adminStatus": "active",
+    "createdAt": 1781119242899,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "mbappe",
+        "customPicks": {
+          "defenderKeeper": {
+            "club": "Real Madrid C. F. (ESP)",
+            "cost": 4,
+            "country": "Belgium",
+            "id": "official:belgium:defenderKeeper:courtois",
+            "name": "Thibaut Courtois",
+            "roles": [
+              "defenderKeeper"
+            ],
+            "tier": "GK • Real Madrid C. F. (ESP)"
+          },
+          "playmaker": {
+            "club": "",
+            "cost": 5,
+            "country": "Spain",
+            "id": "custom:playmaker",
+            "name": "Pedro Lopez (Pedri)",
+            "roles": [
+              "playmaker"
+            ],
+            "tier": "More option"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "official:belgium:defenderKeeper:courtois",
+          "goalGetter": "kane",
+          "playmaker": "custom:playmaker",
+          "star": "mbappe",
+          "wildcard": "hakimi"
+        }
+      },
+      "groupPicks": {},
+      "simplePicks": {
+        "champion": "",
+        "quarterfinalists": []
+      },
+      "wildcards": [],
+      "winners": {
+        "final": {},
+        "qf": {},
+        "r16": {},
+        "r32": {},
+        "sf": {}
+      }
+    },
+    "familyName": "Rinky-dink Shinx",
+    "groupCodes": [],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Christopher Nguyen",
+    "parentPhone": "+19495210799",
+    "participantName": "Family Bracket",
+    "participantType": "family",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1781119242899,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+  },
+  {
+    "_creationTime": 1780984061002.2258,
+    "_id": "hd7j68pgx90zadn8zwv3vvxvtn88bcs7",
+    "adminStatus": "active",
+    "createdAt": 1780984061002,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "bruno",
+        "customPicks": {
+          "wildcard": {
+            "club": "",
+            "cost": 3,
+            "country": "England",
+            "id": "custom:wildcard",
+            "name": "Nico O’Reilly",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "More option"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "vandijk",
+          "goalGetter": "haaland",
+          "playmaker": "bruno",
+          "star": "yamal",
+          "wildcard": "custom:wildcard"
+        }
+      },
+      "groupPicks": {
+        "A": {
+          "runnerUp": "South Korea",
+          "thirdPlace": "South Africa",
+          "winner": "Mexico"
+        },
+        "B": {
+          "runnerUp": "Canada",
+          "thirdPlace": "Qatar",
+          "winner": "Switzerland"
+        },
+        "C": {
+          "runnerUp": "Morocco",
+          "thirdPlace": "Scotland",
+          "winner": "Brazil"
+        },
+        "D": {
+          "runnerUp": "Türkiye",
+          "thirdPlace": "United States",
+          "winner": "Paraguay"
+        },
+        "E": {
+          "runnerUp": "Ecuador",
+          "thirdPlace": "Côte d'Ivoire",
+          "winner": "Germany"
+        },
+        "F": {
+          "runnerUp": "Tunisia",
+          "thirdPlace": "Japan",
+          "winner": "Netherlands"
+        },
+        "G": {
+          "runnerUp": "Egypt",
+          "thirdPlace": "Iran",
+          "winner": "Belgium"
+        },
+        "H": {
+          "runnerUp": "Spain",
+          "thirdPlace": "Saudi Arabia",
+          "winner": "Uruguay"
+        },
+        "I": {
+          "runnerUp": "Norway",
+          "thirdPlace": "Senegal",
+          "winner": "France"
+        },
+        "J": {
+          "runnerUp": "Austria",
+          "thirdPlace": "Algeria",
+          "winner": "Argentina"
+        },
+        "K": {
+          "runnerUp": "Portugal",
+          "thirdPlace": "Uzbekistan",
+          "winner": "Colombia"
+        },
+        "L": {
+          "runnerUp": "Croatia",
+          "thirdPlace": "Ghana",
+          "winner": "England"
+        }
+      },
+      "simplePicks": {
+        "champion": "England",
+        "quarterfinalists": [
+          "France",
+          "Colombia",
+          "Argentina"
+        ]
+      },
+      "wildcards": [
+        "Japan",
+        "Côte d'Ivoire",
+        "South Africa",
+        "Qatar",
+        "Scotland",
+        "United States",
+        "Ghana",
+        "Senegal"
+      ],
+      "winners": {
+        "final": {
+          "final_0": "France"
+        },
+        "qf": {
+          "qf_0": "Brazil",
+          "qf_1": "Uruguay",
+          "qf_2": "France",
+          "qf_3": "Spain"
+        },
+        "r16": {
+          "r16_0": "Portugal",
+          "r16_1": "Brazil",
+          "r16_2": "Germany",
+          "r16_3": "Uruguay",
+          "r16_4": "France",
+          "r16_5": "Colombia",
+          "r16_6": "Türkiye",
+          "r16_7": "Spain"
+        },
+        "r32": {
+          "r32_0": "Mexico",
+          "r32_1": "Portugal",
+          "r32_10": "Colombia",
+          "r32_11": "England",
+          "r32_12": "Côte d'Ivoire (Group E wildcard)",
+          "r32_13": "Türkiye",
+          "r32_14": "Spain",
+          "r32_15": "Croatia",
+          "r32_2": "Brazil",
+          "r32_3": "Paraguay",
+          "r32_4": "Germany",
+          "r32_5": "Netherlands",
+          "r32_6": "Belgium",
+          "r32_7": "Uruguay",
+          "r32_8": "France",
+          "r32_9": "Argentina"
+        },
+        "sf": {
+          "sf_0": "Brazil",
+          "sf_1": "France"
+        }
+      }
+    },
+    "familyName": "Thou art crusty",
+    "groupCodes": [
+      "BDT3C6"
+    ],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Angie Winslow",
+    "parentPhone": "+13102957934",
+    "participantDisplayName": "angwns",
+    "participantName": "Angie Winslow",
+    "participantType": "adult",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1780984061002,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "_creationTime": 1780962617781.0774,
+    "_id": "hd7hdxt5c0taf4zww2v4h9r3an8899yq",
+    "adminStatus": "active",
+    "ageRange": "9-12",
+    "createdAt": 1780962617781,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "messi",
+        "customPicks": {
+          "defenderKeeper": {
+            "club": "New England Revolution (USA)",
+            "cost": 4,
+            "country": "United States",
+            "id": "official:united-states:defenderKeeper:turner",
+            "name": "Turner",
+            "roles": [
+              "defenderKeeper"
+            ],
+            "tier": "GK • New England Revolution (USA)"
+          },
+          "playmaker": {
+            "club": "AFC Bournemouth (ENG)",
+            "cost": 5,
+            "country": "United States",
+            "id": "official:united-states:playmaker:adams",
+            "name": "Adams",
+            "roles": [
+              "playmaker"
+            ],
+            "tier": "MF • AFC Bournemouth (ENG)"
+          },
+          "wildcard": {
+            "club": "Manchester City FC (ENG)",
+            "cost": 3,
+            "country": "England",
+            "id": "official:england:wildcard:o-reilly",
+            "name": "O'Reilly",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "DF • Manchester City FC (ENG)"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "official:united-states:defenderKeeper:turner",
+          "goalGetter": "ronaldo",
+          "playmaker": "official:united-states:playmaker:adams",
+          "star": "messi",
+          "wildcard": "official:england:wildcard:o-reilly"
+        }
+      },
+      "groupPicks": {},
+      "simplePicks": {
+        "champion": "United States",
+        "quarterfinalists": [
+          "Argentina",
+          "Brazil",
+          "England"
+        ]
+      },
+      "wildcards": [],
+      "winners": {
+        "final": {},
+        "qf": {},
+        "r16": {},
+        "r32": {},
+        "sf": {}
+      }
+    },
+    "familyName": "Kickin’ It Crew",
+    "groupCodes": [
+      "LSCJCE",
+      "NDPVBL"
+    ],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Corinne",
+    "parentPhone": "+13104240395",
+    "participantDisplayName": "Expired Milk",
+    "participantName": "Anthony",
+    "participantType": "kid",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1780962617781,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "_creationTime": 1780962344683.6445,
+    "_id": "hd7v6ewvb79m44j891kce70kpd888nk8",
+    "adminStatus": "active",
+    "createdAt": 1780962344683,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "messi",
+        "customPicks": {
+          "defenderKeeper": {
+            "club": "New England Revolution (USA)",
+            "cost": 4,
+            "country": "United States",
+            "id": "official:united-states:defenderKeeper:turner",
+            "name": "Turner",
+            "roles": [
+              "defenderKeeper"
+            ],
+            "tier": "GK • New England Revolution (USA)"
+          },
+          "wildcard": {
+            "club": "Manchester City FC (ENG)",
+            "cost": 3,
+            "country": "England",
+            "id": "official:england:wildcard:o-reilly",
+            "name": "O'Reilly",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "DF • Manchester City FC (ENG)"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "official:united-states:defenderKeeper:turner",
+          "goalGetter": "haaland",
+          "playmaker": "pulisic",
+          "star": "messi",
+          "wildcard": "official:england:wildcard:o-reilly"
+        }
+      },
+      "groupPicks": {
+        "A": {
+          "runnerUp": "Mexico",
+          "thirdPlace": "Czechia",
+          "winner": "South Korea"
+        },
+        "B": {
+          "runnerUp": "Canada",
+          "thirdPlace": "Bosnia and Herzegovina",
+          "winner": "Switzerland"
+        },
+        "C": {
+          "runnerUp": "Morocco",
+          "thirdPlace": "Scotland",
+          "winner": "Brazil"
+        },
+        "D": {
+          "runnerUp": "Paraguay",
+          "thirdPlace": "Türkiye",
+          "winner": "United States"
+        },
+        "E": {
+          "runnerUp": "Ecuador",
+          "thirdPlace": "Côte d'Ivoire",
+          "winner": "Germany"
+        },
+        "F": {
+          "runnerUp": "Sweden",
+          "thirdPlace": "Japan",
+          "winner": "Netherlands"
+        },
+        "G": {
+          "runnerUp": "Egypt",
+          "thirdPlace": "Iran",
+          "winner": "Belgium"
+        },
+        "H": {
+          "runnerUp": "Uruguay",
+          "thirdPlace": "Saudi Arabia",
+          "winner": "Spain"
+        },
+        "I": {
+          "runnerUp": "Norway",
+          "thirdPlace": "Senegal",
+          "winner": "France"
+        },
+        "J": {
+          "runnerUp": "Algeria",
+          "thirdPlace": "Austria",
+          "winner": "Argentina"
+        },
+        "K": {
+          "runnerUp": "Colombia",
+          "thirdPlace": "DR Congo",
+          "winner": "Portugal"
+        },
+        "L": {
+          "runnerUp": "Panama",
+          "thirdPlace": "Croatia",
+          "winner": "England"
+        }
+      },
+      "simplePicks": {
+        "champion": "",
+        "quarterfinalists": []
+      },
+      "wildcards": [
+        "Japan",
+        "Bosnia and Herzegovina",
+        "Croatia",
+        "Türkiye",
+        "Scotland",
+        "Iran",
+        "Côte d'Ivoire",
+        "Senegal"
+      ],
+      "winners": {
+        "final": {
+          "final_0": "Brazil"
+        },
+        "qf": {
+          "qf_0": "Brazil",
+          "qf_1": "Spain",
+          "qf_2": "Argentina",
+          "qf_3": "Sweden"
+        },
+        "r16": {
+          "r16_0": "Colombia",
+          "r16_1": "Brazil",
+          "r16_2": "Netherlands",
+          "r16_3": "Spain",
+          "r16_4": "Argentina",
+          "r16_5": "England",
+          "r16_6": "Sweden",
+          "r16_7": "Japan (Group F wildcard)"
+        },
+        "r32": {
+          "r32_0": "South Korea",
+          "r32_1": "Colombia",
+          "r32_10": "Portugal",
+          "r32_11": "England",
+          "r32_12": "Canada",
+          "r32_13": "Sweden",
+          "r32_14": "Japan (Group F wildcard)",
+          "r32_15": "Panama",
+          "r32_2": "Brazil",
+          "r32_3": "United States",
+          "r32_4": "Germany",
+          "r32_5": "Netherlands",
+          "r32_6": "Belgium",
+          "r32_7": "Spain",
+          "r32_8": "France",
+          "r32_9": "Argentina"
+        },
+        "sf": {
+          "sf_0": "Brazil",
+          "sf_1": "Argentina"
+        }
+      }
+    },
+    "familyName": "Kickin’ It Crew",
+    "groupCodes": [
+      "LSCJCE",
+      "NDPVBL"
+    ],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Corinne",
+    "parentPhone": "+13104240395",
+    "participantName": "Family Bracket",
+    "participantType": "family",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1780962344683,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "_creationTime": 1780960082684.2869,
+    "_id": "hd7kaeez73ez5typwgb13rmhrd888137",
+    "adminStatus": "active",
+    "createdAt": 1780960082684,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "messi",
+        "customPicks": {
+          "defenderKeeper": {
+            "club": "New England Revolution (USA)",
+            "cost": 4,
+            "country": "United States",
+            "id": "official:united-states:defenderKeeper:turner",
+            "name": "Turner",
+            "roles": [
+              "defenderKeeper"
+            ],
+            "tier": "GK • New England Revolution (USA)"
+          },
+          "wildcard": {
+            "club": "Manchester City FC (ENG)",
+            "cost": 3,
+            "country": "England",
+            "id": "official:england:wildcard:o-reilly",
+            "name": "O'Reilly",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "DF • Manchester City FC (ENG)"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "official:united-states:defenderKeeper:turner",
+          "goalGetter": "haaland",
+          "playmaker": "pulisic",
+          "star": "messi",
+          "wildcard": "official:england:wildcard:o-reilly"
+        }
+      },
+      "groupPicks": {
+        "A": {
+          "runnerUp": "Mexico",
+          "thirdPlace": "Czechia",
+          "winner": "South Korea"
+        },
+        "B": {
+          "runnerUp": "Canada",
+          "thirdPlace": "Bosnia and Herzegovina",
+          "winner": "Switzerland"
+        },
+        "C": {
+          "runnerUp": "Morocco",
+          "thirdPlace": "Scotland",
+          "winner": "Brazil"
+        },
+        "D": {
+          "runnerUp": "Paraguay",
+          "thirdPlace": "Türkiye",
+          "winner": "United States"
+        },
+        "E": {
+          "runnerUp": "Ecuador",
+          "thirdPlace": "Côte d'Ivoire",
+          "winner": "Germany"
+        },
+        "F": {
+          "runnerUp": "Sweden",
+          "thirdPlace": "Japan",
+          "winner": "Netherlands"
+        },
+        "G": {
+          "runnerUp": "Egypt",
+          "thirdPlace": "Iran",
+          "winner": "Belgium"
+        },
+        "H": {
+          "runnerUp": "Uruguay",
+          "thirdPlace": "Saudi Arabia",
+          "winner": "Spain"
+        },
+        "I": {
+          "runnerUp": "Norway",
+          "thirdPlace": "Senegal",
+          "winner": "France"
+        },
+        "J": {
+          "runnerUp": "Algeria",
+          "thirdPlace": "Austria",
+          "winner": "Argentina"
+        },
+        "K": {
+          "runnerUp": "Colombia",
+          "thirdPlace": "DR Congo",
+          "winner": "Portugal"
+        },
+        "L": {
+          "runnerUp": "Panama",
+          "thirdPlace": "Croatia",
+          "winner": "England"
+        }
+      },
+      "simplePicks": {
+        "champion": "",
+        "quarterfinalists": []
+      },
+      "wildcards": [
+        "Japan",
+        "Bosnia and Herzegovina",
+        "Croatia",
+        "Türkiye",
+        "Scotland",
+        "Iran",
+        "Côte d'Ivoire",
+        "Senegal"
+      ],
+      "winners": {
+        "final": {
+          "final_0": "Brazil"
+        },
+        "qf": {
+          "qf_0": "Brazil",
+          "qf_1": "Spain",
+          "qf_2": "Argentina",
+          "qf_3": "Sweden"
+        },
+        "r16": {
+          "r16_0": "Colombia",
+          "r16_1": "Brazil",
+          "r16_2": "Netherlands",
+          "r16_3": "Spain",
+          "r16_4": "Argentina",
+          "r16_5": "England",
+          "r16_6": "Sweden",
+          "r16_7": "Japan (Group F wildcard)"
+        },
+        "r32": {
+          "r32_0": "South Korea",
+          "r32_1": "Colombia",
+          "r32_10": "Portugal",
+          "r32_11": "England",
+          "r32_12": "Canada",
+          "r32_13": "Sweden",
+          "r32_14": "Japan (Group F wildcard)",
+          "r32_15": "Panama",
+          "r32_2": "Brazil",
+          "r32_3": "United States",
+          "r32_4": "Germany",
+          "r32_5": "Netherlands",
+          "r32_6": "Belgium",
+          "r32_7": "Spain",
+          "r32_8": "France",
+          "r32_9": "Argentina"
+        },
+        "sf": {
+          "sf_0": "Brazil",
+          "sf_1": "Argentina"
+        }
+      }
+    },
+    "familyName": "Kickin’ It Crew",
+    "groupCodes": [
+      "LSCJCE"
+    ],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Corinne",
+    "parentPhone": "+13104240395",
+    "participantName": "Family Bracket",
+    "participantType": "family",
+    "source": "worldcup-leaderboard-local-sync",
+    "textOptIn": false,
+    "updatedAt": 1780960082684,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "_creationTime": 1780952333217.8296,
+    "_id": "hd7yk048564xgz4wdysmrnw6q5888hf1",
+    "adminStatus": "active",
+    "createdAt": 1780952333217,
+    "entryData": {
+      "fantasyFive": {
+        "captain": "messi",
+        "customPicks": {
+          "defenderKeeper": {
+            "club": "New England Revolution (USA)",
+            "cost": 4,
+            "country": "United States",
+            "id": "official:united-states:defenderKeeper:turner",
+            "name": "Turner",
+            "roles": [
+              "defenderKeeper"
+            ],
+            "tier": "GK • New England Revolution (USA)"
+          },
+          "wildcard": {
+            "club": "Manchester City FC (ENG)",
+            "cost": 3,
+            "country": "England",
+            "id": "official:england:wildcard:o-reilly",
+            "name": "O'Reilly",
+            "roles": [
+              "wildcard"
+            ],
+            "tier": "DF • Manchester City FC (ENG)"
+          }
+        },
+        "picks": {
+          "defenderKeeper": "official:united-states:defenderKeeper:turner",
+          "goalGetter": "haaland",
+          "playmaker": "pulisic",
+          "star": "messi",
+          "wildcard": "official:england:wildcard:o-reilly"
+        }
+      },
+      "groupPicks": {},
+      "simplePicks": {
+        "champion": "",
+        "quarterfinalists": []
+      },
+      "wildcards": [],
+      "winners": {
+        "final": {},
+        "qf": {},
+        "r16": {},
+        "r32": {},
+        "sf": {}
+      }
+    },
+    "familyName": "Kickin’ It Crew",
+    "groupCodes": [],
+    "htaLaunchOptIn": false,
+    "mode": "fantasy-five",
+    "parentName": "Corinne",
+    "parentPhone": "+13104240395",
+    "participantName": "Family Bracket",
+    "participantType": "family",
+    "source": "worldcup-page",
+    "textOptIn": true,
+    "updatedAt": 1780952333217,
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+  }
+]

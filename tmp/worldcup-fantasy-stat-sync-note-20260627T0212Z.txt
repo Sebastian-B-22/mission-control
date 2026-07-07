@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-27T02:12Z
+
+Current time check: Fri Jun 26 19:12:27 PDT 2026 / 2026-06-27T02:12Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260626T2212Z.txt: ESPN public scoreboard shows the 2026-06-27T00:00Z matches final as Cabo Verde 0-0 Saudi Arabia (event 760478) and Uruguay 0-1 Spain (event 760479). The 2026-06-27T03:00Z matches Egypt-Iran and New Zealand-Belgium were still scheduled at sync time.
+
+Sources checked: ESPN public scoreboard API for 2026-06-26, ESPN summary/match page for event 760479, production Fantasy Five entries from worldCup:listEntries, production Fantasy Five leaderboard from worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed stats found: Spain 1-0 Uruguay, with Álex Baena goal at 42' assisted by Marcos Llorente. Cabo Verde 0-0 Saudi Arabia had clean sheets for both teams.
+
+Skipped: no current selected Fantasy Five player from Spain, Uruguay, Cabo Verde, or Saudi Arabia had a source-backed goal or assist to write. Lamine Yamal was selected for Spain but did not score or assist the goal, and clean-sheet points only apply to defenderKeeper roles. A custom Spain playmaker/Pedri entry was present in one Fantasy Five row, but ESPN did not credit Pedri with the goal assist and the shared custom:playmaker ID was not written. No selected Cabo Verde or Saudi Arabia defender/keeper row was found for the 0-0 clean sheet.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and returned Fantasy Five rows.

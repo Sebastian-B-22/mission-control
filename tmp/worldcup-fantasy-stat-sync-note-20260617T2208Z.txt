@@ -1,0 +1,19 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T22:08Z
+
+Current time check: Wed Jun 17 15:08:15 PDT 2026 / 2026-06-17T22:08Z.
+
+Completed/recent window since prior sync: Portugal 1-1 DR Congo had already been checked at 2026-06-17T20:08Z with no selected-player stat writes. England 4-2 Croatia completed during this run window. Ghana vs Panama and Uzbekistan vs Colombia were not in completed scope at this run time.
+
+Sources checked: England match centre https://www.englandfootball.com/england/mens-senior-team/fixtures-results/2025-26/World-Cup/england-v-croatia-fifa-world-cup-wednesday-17-june-2026-match-centre ; Guardian report https://www.theguardian.com/football/2026/jun/17/england-croatia-world-cup-2026-group-l-match-report ; Al Jazeera live/result search snippet for in-progress cross-check.
+
+Source-backed scoring found: Harry Kane goals at 12' PEN and 42'; Jude Bellingham goal at 47'; Croatia goals by Martin Baturina and Petar Musa. No clean sheet. Assists were not source-backed for any selected Fantasy Five player; Guardian attributed Kane's second to a Rice corner and Bellingham's goal to an Elliot Anderson long pass, neither selected in the static fantasyPlayers list.
+
+Fantasy Five selected-player normalization: public/worldcup/index.html fantasyPlayers includes Harry Kane and Jude Bellingham for England and Luka Modric for Croatia. Kane and Bellingham were updated. Modric had no source-backed goal, assist, or clean sheet and was skipped.
+
+Convex production: .env.production CONVEX values were checked before database work. The exact no---prod command failed to resolve worldCup:upsertFantasyPlayerStats, matching prior notes; production writes succeeded with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats.
+
+Updates applied:
+- kane / Harry Kane / England / goals=2 / assists=0 / cleanSheets=0 / returned id j97rgmrfz0h4ey70vgmjgfpnhs88tbyf
+- bellingham / Jude Bellingham / England / goals=1 / assists=0 / cleanSheets=0 / returned id j97hvv8m5nckjed7pq9kwhkh9x88thvc
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 after the writes.

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-26T03:40Z
+
+Current time checked: Thu Jun 25 20:40:33 PDT 2026 / 2026-06-26T03:40Z.
+
+Production Convex config was checked with grep CONVEX .env.production before any database work.
+
+Last local sync note found: tmp/worldcup-fantasy-stat-sync-note-20260626T0240Z.txt.
+
+ESPN public FIFA World Cup scoreboard/summary APIs were checked for 2026-06-25 and 2026-06-26. The previously skipped late matches still did not have completed status:
+- Paraguay 0-0 Australia, ESPN event 760469, shown as second half 79', completed=false.
+- Turkiye 2-2 United States, ESPN event 760470, shown as second half 78', completed=false; listed scorers so far were Auston Trusty, Arda Guler, Baris Alper Yilmaz, and Sebastian Berhalter, but the match was not final.
+
+No new completed/recent match window was available beyond the already-reviewed completed matches in the 2026-06-26T02:40Z note. No upsertFantasyPlayerStats writes were made.

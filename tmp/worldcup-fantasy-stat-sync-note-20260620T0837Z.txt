@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-20T08:37Z
+
+Current time checked first: Sat Jun 20 01:37:55 PDT 2026 / 2026-06-20T08:37Z. Prior stat-sync note was 2026-06-20T05:08Z.
+
+Completed/recent window since prior local sync note: no newly completed matches after the 2026-06-20T05:08Z sync. Rechecked the 2026-06-19 slate because Brazil 3-0 Haiti (ESPN event 760444, kickoff 2026-06-20T00:30Z, FT) was completed before the prior note but was not listed there.
+
+Sources checked: ESPN public FIFA World Cup scoreboard and event summary APIs:
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260619
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760444
+
+Source-backed Brazil-Haiti scoring: Brazil 3-0 Haiti; Matheus Cunha goals at 23' and 36', Vinicius Junior goal at 45'+3; Vinicius Junior assist at 36', Lucas Paqueta assist at 45'+3. Brazil clean sheet is source-backed by the 3-0 FT score.
+
+Fantasy Five selected-player normalization from production listEntries/listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current selected Fantasy Five player from Brazil or Haiti. Vinicius Junior is available in the base fantasy catalog but is not present in current production Fantasy Five entries. No selected Brazil defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

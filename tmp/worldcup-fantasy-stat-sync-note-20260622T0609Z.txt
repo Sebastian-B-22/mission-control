@@ -1,0 +1,20 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-22T06:09Z
+
+Current time checked first: Sun Jun 21 23:08:20 PDT 2026 / 2026-06-22T06:08Z.
+
+Completed/recent window since prior 2026-06-21T22:38Z sync note: Uruguay 2-2 Cabo Verde (ESPN event 760450, FT) and New Zealand 1-3 Egypt (ESPN event 760452, FT) completed after the prior note.
+
+Source-backed scoring from ESPN public FIFA World Cup scoreboard API for 2026-06-21:
+- Uruguay 2-2 Cabo Verde: Kevin Pina 21', Maxi Araujo 44', Agustin Canobbio 45+6', Helio Varela 61'. No clean sheets.
+- New Zealand 1-3 Egypt: Finn Surman 15', Mostafa Zico 58', Mohamed Salah 67', Trezeguet 82'. No clean sheets.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Uruguay, Cabo Verde, New Zealand, or Egypt player in Fantasy Five rows. Mohamed Salah, Zico, Trezeguet, and other scorer roster IDs exist in the public roster, but none are currently selected. No source-backed goals/assists/clean-sheet stats for currently selected Fantasy Five players, so no Convex stat writes were needed.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- Production Fantasy Five leaderboard via Convex: worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}'
+- public/worldcup/index.html and public/worldcup/fantasy-rosters.js
+
+Production Convex was checked with grep CONVEX .env.production before database work. No database updates were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

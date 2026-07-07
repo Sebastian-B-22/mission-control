@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T16:37Z
+
+Current time checked first: Mon Jul 6 09:37:32 PDT 2026 / 2026-07-06T16:37Z. Prior completed-match stat sync note found at tmp/worldcup-fantasy-stat-sync-note-20260706T1607Z.txt.
+
+Completed/recent match window since prior sync: none. ESPN public scoreboard for 2026-07-06, saved at tmp/espn-scoreboard-20260706-cron-1637Z.json, shows Spain-Portugal (event 760506, 2026-07-06T19:00Z) and Belgium-United States (event 760507, 2026-07-07T00:00Z) both STATUS_SCHEDULED / completed=false.
+
+Production Convex values were checked with grep CONVEX .env.production before any possible database work. No production Convex writes were needed, so worldCup:upsertFantasyPlayerStats was not run.

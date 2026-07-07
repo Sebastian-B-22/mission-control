@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T03:08Z
+
+Current time check: Tue Jun 16 20:08:14 PDT 2026 / 2026-06-17T03:08Z. Last local stat-sync note was 2026-06-17T01:38Z.
+
+Completed/recent window since prior sync: Argentina 3-0 Algeria, ESPN event 760433, kickoff 2026-06-17T01:00Z, status FT. Prior run already handled Norway 4-1 Iraq; France 3-1 Senegal was handled at 2026-06-16T22:40Z.
+
+Sources checked: FIFA match centre https://www.fifa.com/en/match-centre/match/17/285023/289273/400021496 ; ESPN scoreboard/summary event 760433 https://www.espn.com/soccer/match/_/gameId/760433/algeria-argentina ; Guardian live/report search result. ESPN play-by-play credited Lionel Messi goals at 17', 60', and 76', with assists by Rodrigo De Paul at 17' and Nico Gonzalez at 76'. Guardian corroborated Messi hat-trick. Argentina clean sheet was not credited to Messi because he is not a defender/keeper scoring pick.
+
+Fantasy Five selected-player normalization found Lionel Messi selected from the local catalog (id messi). No selected Algeria players with source-backed goals/assists/clean sheets were found.
+
+Convex production update completed with `CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats`: messi / Lionel Messi / Argentina / goals=3 / assists=0 / cleanSheets=0. The exact payload form without --prod failed to resolve deployed worldCup functions, matching prior runs; --prod succeeded and returned id j97tdn0s0htcq05vhwy3vcqx1588v3yx.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 after the update and included Fantasy Five rows with Lionel Messi.

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync note - 2026-07-01T21:07Z
+
+Current time checked first: Wed Jul 1 14:07:15 PDT 2026 / 2026-07-01T21:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260701T0707Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public scoreboard/search showed England 2-1 DR Congo final on July 1, 2026 (event 760495). Belgium-Senegal was in progress at sync time and United States-Bosnia had not started, so neither was synced.
+
+Sources checked: EnglandFootball match centre/report for England v DR Congo, ESPN public scoreboard/player-stats event 760495, production worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for Fantasy Five selected-player normalization.
+
+Fantasy Five selected-player normalization found current selected exposure to Harry Kane / England from this completed window. EnglandFootball and ESPN both credit Harry Kane with England goals at 75' and 86'. No England clean sheet because DR Congo scored, and no selected assist beneficiary was source-backed for supported scoring.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Updated worldCup:upsertFantasyPlayerStats for kane / Harry Kane / England to cumulative goals=5, assists=0, cleanSheets=0. Prior local note from 2026-06-27T23:12Z had Kane at 3 goals; this adds the source-backed England-DR Congo brace. Returned id j97rgmrfz0h4ey70vgmjgfpnhs88tbyf.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

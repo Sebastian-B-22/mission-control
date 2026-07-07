@@ -1,0 +1,19 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T02:38Z
+
+Current time checked first: Sat Jun 20 19:38:03 PDT 2026 / 2026-06-21T02:38Z.
+
+Completed/recent window since prior 2026-06-21T01:38Z sync note: ESPN public FIFA World Cup scoreboard for 2026-06-20 shows Ecuador 0-0 Curacao/Curaçao (event 760446) as Full Time, completed after the prior note where it was still in progress. 2026-06-21 scoreboard showed upcoming matches still scheduled/pre-match at this run time.
+
+Sources checked:
+- Official FIFA match centre: https://www.fifa.com/en/match-centre/match/17/285023/289273/400021465
+- ESPN scoreboard API: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260620
+- ESPN event summary API: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760446
+- Guardian live report corroborating Ecuador 0-0 Curacao: https://www.theguardian.com/football/live/2026/jun/20/ecuador-v-curacao-world-cup-2026-live
+
+Source-backed scoring: Ecuador 0-0 Curaçao. No goals or assists. ESPN summary/team stats and match commentary back clean sheets for both teams.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected Ecuador exposure to Enner Valencia only. Enner Valencia is a goalGetter/wildcard, not a defender/keeper clean-sheet slot, and had no source-backed goal or assist. No selected Curaçao Fantasy Five player was found. No clean-sheet write was applicable to current selections.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-22T01:38Z
+
+Current time checked first: Sun Jun 21 18:38:16 PDT 2026 / 2026-06-22T01:38Z.
+
+Completed/recent window since prior 2026-06-22T00:39Z sync note: ESPN public FIFA World Cup scoreboard for 2026-06-21 shows Uruguay 2-2 Cape Verde (event 760450, FT) newly completed. New Zealand vs Egypt was still in progress at this run time, so it was skipped.
+
+Source-backed Uruguay-Cape Verde scoring from ESPN public event summary/key events: Kevin Pina 21', Maxi Araujo 44', Agustin Canobbio 45'+6' assisted by Maxi Araujo, and Helio Varela 61'. No clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Uruguay or Cape Verde player in production Fantasy Five entries. Bebe exists in the local catalog for Cape Verde but was not selected in the current production leaderboard output.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- ESPN public FIFA World Cup event summary API for event 760450: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760450
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

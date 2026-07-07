@@ -1,0 +1,34 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-04T01:37Z
+
+Current time checked first: Fri Jul 3 18:37:17 PDT 2026 / 2026-07-04T01:37Z.
+
+Completed/recent match window since prior sync note tmp/worldcup-fantasy-stat-sync-note-20260703T1738Z.txt:
+- Egypt 1-1 Australia, Egypt advanced 4-2 on penalties, ESPN event 760499, FT-Pens.
+- Argentina 3-2 Cabo Verde, ESPN event 760500, AET.
+- Ghana-Colombia was scheduled/in progress window and not completed at sync start, so it was skipped.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Sources checked:
+- ESPN public scoreboard saved at tmp/espn-scoreboard-20260704-cron-0107Z.json.
+- ESPN public summaries saved at tmp/espn-summary-760499-20260704T0137Z.json and tmp/espn-summary-760500-20260704T0137Z.json.
+
+Source-backed scoring:
+- 760499: Emam Ashour goal 13, assisted by Karim Hafez; Australia goal was Mohamed Hany own goal, so no Australia player goal/assist credited. Penalty shootout goals were not counted as Fantasy Five goals.
+- 760500: Lionel Messi goal 29 assisted by Lisandro Martinez; Deroy Duarte goal 59 assisted by Ryan Mendes; Lisandro Martinez goal 92 assisted by Alexis Mac Allister; Sidny Cabral goal 103 assisted by Yannick Semedo; Argentina winner was a Diney Borges own goal, so no Argentina player goal/assist credited for that play.
+- No clean sheets were credited because all completed teams conceded.
+
+Production Convex updates completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- messi / Lionel Messi / Argentina / goals=6 / assists=0 / cleanSheets=0.
+- official:argentina:star:messi / MESSI / Argentina / goals=6 / assists=0 / cleanSheets=0.
+- official:argentina:goalGetter:messi / MESSI / Argentina / goals=6 / assists=0 / cleanSheets=0.
+- official:egypt:star:e-ashour / E. ASHOUR / Egypt / goals=2 / assists=0 / cleanSheets=0.
+- official:egypt:playmaker:e-ashour / E. ASHOUR / Egypt / goals=2 / assists=0 / cleanSheets=0.
+- official:cabo-verde:playmaker:d-duarte / D. DUARTE / Cabo Verde / goals=1 / assists=0 / cleanSheets=0.
+- official:cabo-verde:goalGetter:ryan / RYAN / Cabo Verde / goals=0 / assists=1 / cleanSheets=0.
+- official:argentina:defenderKeeper:mart-nez / MARTINEZ / Argentina / goals=1 / assists=1 / cleanSheets=0.
+- official:argentina:wildcard:mart-nez / MARTINEZ / Argentina / goals=1 / assists=1 / cleanSheets=0.
+
+Verification:
+- https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.
+- Production worldCup:listLeaderboard with limit 5 succeeded and saved tmp/worldcup-leaderboard-cron-20260704T0137Z-after.json.

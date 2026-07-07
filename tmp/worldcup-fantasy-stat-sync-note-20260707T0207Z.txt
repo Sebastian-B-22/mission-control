@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-07T02:07Z
+
+Current time checked first: Mon Jul 6 19:07:35 PDT 2026 / 2026-07-07T02:07Z. Prior completed-match stat sync note found at tmp/worldcup-fantasy-stat-sync-note-20260706T1607Z.txt.
+
+Completed/recent match window since prior sync: ESPN public scoreboard for 2026-07-06 showed Portugal 0-1 Spain (event 760506) and United States 1-4 Belgium (event 760507) as Full Time.
+
+Sources checked: ESPN public scoreboard API for 2026-07-06, ESPN public summary APIs for events 760506 and 760507, AP/search result coverage for Portugal-Spain, production Fantasy Five leaderboard from worldCup:listLeaderboard, and local public/worldcup roster files by existing selected-player naming.
+
+Source-backed scoring reviewed: Portugal 0-1 Spain credited Mikel Merino 90+1, assisted by Ferran Torres. United States 1-4 Belgium credited Charles De Ketelaere goals at 9 and 33, assisted by Nicolas Raskin and Leandro Trossard; Malik Tillman free-kick goal at 31 for USA; Hans Vanaken goal at 57 assisted by De Ketelaere; Romelu Lukaku goal at 90+3 assisted by Vanaken.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard found current relevant selected exposure to Cristiano Ronaldo, Bruno Fernandes, Lamine Yamal, Christian Pulisic, Turner, and Adams. Ronaldo and Bruno had no source-backed goal/assist and Portugal did not keep a clean sheet. Lamine Yamal had no source-backed goal/assist and is not a defender/keeper clean-sheet catalog player. Pulisic and Adams had no source-backed goal/assist; USA conceded four, so no clean-sheet stat applies. No current selected Belgium player was found.
+
+Production Convex was checked with grep CONVEX .env.production before any possible database work. No production Convex writes were needed, so worldCup:upsertFantasyPlayerStats was not run.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

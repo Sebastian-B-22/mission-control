@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-20T23:08Z
+
+Current time checked first: Sat Jun 20 16:08:01 PDT 2026 / 2026-06-20T23:08Z. Prior local stat-sync note was 2026-06-20T19:08Z.
+
+Completed/recent window since prior local sync note: Germany 2-1 Ivory Coast, FT, ESPN event 760448, kickoff 2026-06-20T20:00Z. Ecuador vs Curacao was still pre-match/scheduled at check time.
+
+Sources checked: ESPN public FIFA World Cup scoreboard API for 2026-06-20:
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260620
+
+Source-backed scoring from ESPN: Franck Kessie 30', Deniz Undav 68' and 90'+4'. ESPN team stats show Germany with two goal assists and Ivory Coast with zero, but no currently selected Fantasy Five player is on Germany or Ivory Coast. No clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected players: Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Lamine Yamal, Cristiano Ronaldo, Adams, Enner Valencia, and Linda Caicedo. None are Germany or Ivory Coast players, so no source-backed Fantasy Five stat write was needed.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

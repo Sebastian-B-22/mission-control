@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T21:38Z
+
+Current time checked first: Mon Jul 6 14:37:32 PDT 2026 / 2026-07-06T21:37Z. Prior completed-match stat sync note found at tmp/worldcup-fantasy-stat-sync-note-20260706T2038Z.txt.
+
+Completed/recent match window since prior sync: Portugal 0-1 Spain, ESPN event 760506, became STATUS_FULL_TIME / completed=true at 90'+9'. Belgium vs United States remains scheduled for 2026-07-07T00:00Z and was not processed.
+
+Source-backed scoring: ESPN public scoreboard/summary credited Spain's goal to Mikel Merino at 90'+1' and the play-by-play credited the assist to Ferran Torres. Spain kept a clean sheet.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure to Cristiano Ronaldo, Bruno Fernandes, and Lamine Yamal from this match. Ronaldo and Bruno had no goal/assist; Portugal did not keep a clean sheet. Lamine Yamal had no source-backed goal or assist and is not a defenderKeeper role, so Spain's clean sheet does not apply. No currently selected Spain defenderKeeper row was found.
+
+Production Convex values were checked with grep CONVEX .env.production before any possible database work. No production Convex writes were needed, so worldCup:upsertFantasyPlayerStats was not run.
+
+Sources checked: ESPN public scoreboard API for 2026-07-06; ESPN public summary/play-by-play for event 760506; production Fantasy Five leaderboard from worldCup:listLeaderboard; public/worldcup/index.html and public/worldcup/fantasy-rosters.js for roster ID normalization. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

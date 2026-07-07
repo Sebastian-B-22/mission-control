@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T00:07Z
+
+Current time checked first: Sun Jul 5 17:07:51 PDT 2026 / 2026-07-06T00:07Z.
+
+Completed/recent match window since prior local sync note: ESPN public FIFA World Cup scoreboard for 2026-07-05 showed Brazil 1-2 Norway, event 760504, STATUS_FULL_TIME. Mexico-England was still scheduled/pre-match and was not processed.
+
+Source-backed scoring: ESPN public summary/keyEvents for event 760504 credited Norway goals to Erling Haaland at 79' and 90', both assisted by Andreas Schjelderup, and Brazil's goal to Neymar on a 90'+10 penalty. No clean sheet was credited because both teams conceded.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure to Erling Haaland / Norway. Vinicius Junior is in the local catalog but was not credited with a source-backed supported stat from this match.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production updates completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- haaland / Erling Haaland / Norway / goals=7 / assists=0 / cleanSheets=0. Returned id j97sjn6qyjxy8ee3p439mkgtt589vaxp. Total includes the prior five Haaland goals from Iraq, Senegal, and Ivory Coast plus two Brazil-Norway goals.
+- official:norway:star:braut-haaland / BRAUT HAALAND / Norway / goals=7 / assists=1 / cleanSheets=0. Returned id j97x0r1yx0g4mtwddxtdjjrsx589v3xd. Prior source-backed roster-id assist preserved from the 2026-06-17 AP/FOX note.
+- official:norway:goalGetter:braut-haaland / BRAUT HAALAND / Norway / goals=7 / assists=1 / cleanSheets=0. Returned id j97mj5f9nejr1h070eyj7s31cx89tftx. Prior source-backed roster-id assist preserved from the 2026-06-17 AP/FOX note.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded after the write and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

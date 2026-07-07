@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Cup Family Missions | Home Team Academy</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/hta-favicon-32.png?v=202606071745" />
+  <link rel="shortcut icon" href="/hta-favicon-32.png?v=202606071745" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/hta-apple-icon.png?v=202606071745" />
+  <style>
+    :root {
+      --ink: #123047;
+      --muted: #5d7081;
+      --brand: #25b95f;
+      --sky: #8ed5ff;
+      --orange: #ff9f45;
+      --purple: #8e7dff;
+      --paper: #fffdf7;
+      --line: #d9e5ec;
+      --panel: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(142, 213, 255, 0.26), transparent 28%),
+        linear-gradient(180deg, #f3fbff 0%, var(--paper) 44%, #f6fff9 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .wrap {
+      width: min(1040px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+    }
+
+    .logo {
+      display: block;
+      width: 72px;
+      height: 72px;
+      flex: none;
+      text-decoration: none;
+    }
+
+    .logo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    a {
+      color: #17743c;
+      font-weight: 850;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .back {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 10px 12px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .challenge-nav {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, auto));
+      align-items: start;
+      gap: 6px;
+    }
+
+    .challenge-nav a,
+    .challenge-nav summary {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.05;
+      text-align: center;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .challenge-nav a:hover,
+    .challenge-nav a:focus-visible,
+    .challenge-nav summary:hover,
+    .challenge-nav summary:focus-visible {
+      background: #f3fbff;
+      outline: none;
+    }
+
+    .challenge-nav summary {
+      list-style: none;
+    }
+
+    .challenge-nav summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .nav-menu {
+      position: relative;
+    }
+
+    .nav-menu-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 50;
+      display: grid;
+      gap: 6px;
+      min-width: 158px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 8px;
+      box-shadow: 0 18px 42px rgba(16, 44, 67, 0.16);
+    }
+
+    .challenge-nav .nav-menu-panel a {
+      justify-content: flex-start;
+    }
+
+    .hero,
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: clamp(20px, 4vw, 40px);
+      box-shadow: 0 18px 50px rgba(18, 48, 71, 0.09);
+    }
+
+    .section {
+      margin-top: 16px;
+      box-shadow: 0 10px 28px rgba(18, 48, 71, 0.06);
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border: 1px solid rgba(37, 185, 95, 0.24);
+      border-radius: 999px;
+      background: #e8f9ef;
+      color: #17743c;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(22px, 3vw, 32px);
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    p,
+    li {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.58;
+    }
+
+    .lede {
+      max-width: 760px;
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mission {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 16px;
+    }
+
+    .mission:nth-child(1) { border-top: 4px solid var(--brand); }
+    .mission:nth-child(2) { border-top: 4px solid var(--sky); }
+    .mission:nth-child(3) { border-top: 4px solid var(--orange); }
+    .mission:nth-child(4) { border-top: 4px solid var(--purple); }
+    .mission:nth-child(5) { border-top: 4px solid #ff6f61; }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      background: #f2fbff;
+      color: var(--ink);
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 10px;
+    }
+
+    .mission ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    .copy {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .copy-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdff;
+      padding: 14px;
+    }
+
+    .copy-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .copy-card p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .coming-soon {
+      display: grid;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid rgba(37, 185, 95, 0.26);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(37, 185, 95, 0.09), rgba(142, 213, 255, 0.15)),
+        #ffffff;
+      padding: clamp(18px, 4vw, 30px);
+    }
+
+    .coming-badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      background: #e8f9ef;
+      color: #17743c;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .mission-stack {
+      display: grid;
+      gap: 8px;
+      min-width: min(260px, 100%);
+    }
+
+    .mission-chip {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 10px 12px;
+      color: var(--ink);
+      font-weight: 850;
+      box-shadow: 0 8px 20px rgba(18, 48, 71, 0.06);
+    }
+
+    .mission-chip:nth-child(2) { transform: translateX(12px); }
+    .mission-chip:nth-child(3) { transform: translateX(24px); }
+
+    @media (max-width: 720px) {
+      .coming-soon {
+        grid-template-columns: 1fr;
+      }
+
+      .mission-chip:nth-child(2),
+      .mission-chip:nth-child(3) {
+        transform: none;
+      }
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--brand);
+      color: white;
+      padding: 0 18px;
+      font-weight: 850;
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(37, 185, 95, 0.2);
+    }
+
+    .btn.secondary {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      box-shadow: none;
+    }
+
+    .mission-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mission-form .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mission-form label {
+      display: grid;
+      gap: 6px;
+      color: var(--ink);
+      font-weight: 850;
+    }
+
+    .mission-form input,
+    .mission-form select,
+    .mission-form textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 9px 10px;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .mission-form textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+
+    .mission-form .btn {
+      font-size: 16px;
+      font-weight: 950;
+    }
+
+    .check-row {
+      display: grid !important;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: 9px;
+      font-weight: 700 !important;
+    }
+
+    .check-row input {
+      width: auto;
+      min-height: 0;
+      margin-top: 4px;
+    }
+
+    .small {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 700px) {
+      .top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .challenge-nav {
+        width: 100%;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .challenge-nav a,
+      .challenge-nav summary {
+        min-height: 44px;
+        font-size: 11px;
+        white-space: normal;
+      }
+
+      .mission-form .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .top,
+      .actions {
+        display: none;
+      }
+
+      .wrap {
+        width: 100%;
+        padding: 0;
+      }
+
+      .hero,
+      .section,
+      .mission,
+      .coming-soon,
+      .copy-card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <a class="logo" href="/" aria-label="Home Team Academy home"><img src="/worldcup/hta-logo.svg" alt="Home Team Academy" /></a>
+        <div>Home Team Academy</div>
+      </div>
+      <nav class="challenge-nav" aria-label="Challenge pages">
+        <a href="/worldcup/">Start here</a>
+        <a href="/worldcup/?resume=1">My picks</a>
+        <a href="/worldcup/leaderboard/">Leaderboard</a>
+        <details class="nav-menu">
+          <summary>Menu</summary>
+          <div class="nav-menu-panel">
+            <a href="/worldcup/?pickers=1">Choose picker</a>
+            <a href="/worldcup/?family=1">Family setup</a>
+            <a href="/worldcup/missions/">Missions</a>
+            <a href="/worldcup/rules/">Rules</a>
+          </div>
+        </details>
+      </nav>
+    </div>
+
+    <main class="hero">
+      <div class="eyebrow">World Cup Family Missions</div>
+      <h1>Tiny missions all tournament long.</h1>
+      <p class="lede">Families do not need another huge printable. HTA gives them one simple thing to do: a country to learn, a player to watch, a quick skill to try, and a fun reason to come back for the next match.</p>
+      <div class="actions">
+        <a class="btn" href="/worldcup/">Build a family bracket</a>
+        <a class="btn secondary" href="#missionSubmitPanel">Submit a family mission</a>
+        <a class="btn secondary" href="/worldcup/rules/">Read rules</a>
+      </div>
+    </main>
+
+    <section class="section">
+      <div class="coming-soon">
+        <div>
+          <span class="coming-badge">Coming soon</span>
+          <h2 style="margin-top:12px;">First family mission drops after brackets open.</h2>
+          <p>Families will get simple World Cup-inspired missions throughout the tournament: something to watch, something to try, and something fun to share if they want bonus raffle entries.</p>
+          <div class="actions">
+            <a class="btn" href="#missionSubmitPanel">Submit a family mission</a>
+            <a class="btn secondary" href="/worldcup/rules/">Prize info and rules</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="missionSubmitPanel" class="section">
+      <h2>Submit a family mission</h2>
+      <p>Use this when your family completes an HTA mission prompt during the tournament. Parent-led uploads only.</p>
+      <form id="missionSubmitForm" class="mission-form">
+        <input type="hidden" name="source" value="worldcup-missions-page" />
+        <label>Challenge
+          <select name="challengeKey">
+            <option value="family-mission">Family Mission</option>
+            <option value="kid-drawing">Kid Drawing</option>
+            <option value="family-chant">Family Team Chant or Song</option>
+            <option value="goal-celebration">Goal Celebration</option>
+            <option value="country-snack">Country Snack / Watch Party</option>
+            <option value="backyard-skill">Backyard Skills Mission</option>
+          </select>
+        </label>
+        <input type="hidden" name="challengeTitle" value="Family Mission" />
+        <div class="form-row">
+          <label>Parent name <input name="parentName" autocomplete="name" /></label>
+          <label>Family/team name <input name="familyName" placeholder="Your family or team name" /></label>
+          <label>Mobile number <input name="parentPhone" type="tel" autocomplete="tel" required /></label>
+          <label>Child first name optional <input name="childFirstName" placeholder="First name only" /></label>
+          <label>Social post link optional <input name="socialPostUrl" placeholder="Instagram/TikTok/X link" /></label>
+        </div>
+        <label>Upload photo, drawing, or short video <input name="media" type="file" accept="image/*,video/*" /></label>
+        <label>Caption <textarea name="caption" placeholder="Tell us what your family made or tried."></textarea></label>
+        <label class="check-row">
+          <input name="marketingPermission" value="yes" type="checkbox" required />
+          <span>I am the parent/guardian and give HTA permission to review this mission submission.</span>
+        </label>
+        <label class="check-row">
+          <input name="repostPermission" value="yes" type="checkbox" />
+          <span>I give HTA permission to repost or feature this family mission publicly.</span>
+        </label>
+        <button class="btn" type="submit">Submit Family Mission</button>
+        <p id="missionSubmitStatus" class="small" aria-live="polite"></p>
+      </form>
+    </section>
+  </div>
+  <script>
+    async function submitMissionForm(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const status = document.getElementById("missionSubmitStatus");
+      const formData = new FormData(form);
+      const challengeSelect = form.querySelector('select[name="challengeKey"]');
+      if (challengeSelect) {
+        formData.set("challengeTitle", challengeSelect.options[challengeSelect.selectedIndex].textContent || "Family Mission");
+      }
+      status.textContent = "Uploading mission...";
+      try {
+        const res = await fetch("https://harmless-salamander-44.convex.site/worldcup/mission-submit", {
+          method: "POST",
+          body: formData
+        });
+        if (!res.ok) throw new Error(await res.text());
+        form.reset();
+        status.textContent = "Mission submitted. We will review it before anything is shared publicly.";
+      } catch {
+        status.textContent = "That did not upload. Please check parent contact info, permission checkbox, and file size under 25MB.";
+      }
+    }
+
+    document.getElementById("missionSubmitForm")?.addEventListener("submit", submitMissionForm);
+  </script>
+</body>
+</html>

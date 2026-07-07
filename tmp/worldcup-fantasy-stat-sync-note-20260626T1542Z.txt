@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-26T15:42Z
+
+Current time check: Fri Jun 26 08:42:21 PDT 2026 / 2026-06-26T15:42Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260626T1312Z.txt: none. ESPN public World Cup scoreboard for 2026-06-26 shows only scheduled matches: Norway-France and Senegal-Iraq at 19:00Z; Cape Verde-Saudi Arabia and Uruguay-Spain at 2026-06-27T00:00Z; Egypt-Iran and New Zealand-Belgium at 2026-06-27T03:00Z. No newly completed matches since the prior sync window.
+
+Production Convex was checked with grep CONVEX .env.production. No upsertFantasyPlayerStats writes were needed.

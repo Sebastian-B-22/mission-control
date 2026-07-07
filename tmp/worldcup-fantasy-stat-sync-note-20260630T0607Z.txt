@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-30T06:07Z
+
+Current time checked first: Mon Jun 29 23:07:38 PDT 2026 / 2026-06-30T06:07Z. Prior local stat-sync note found: tmp/worldcup-fantasy-stat-sync-note-20260630T0337Z.txt.
+
+Completed/recent match window since prior local sync: ESPN public scoreboard for 2026-06-29 showed Morocco 1-1 Netherlands, event 760488, Final Score - After Penalties, completed after the prior 03:37Z sync note. Brazil-Japan and Germany-Paraguay were already reviewed in earlier June 29 notes.
+
+Source-backed match stats: ESPN summary/keyEvents credited Netherlands goal to Cody Gakpo, assisted by Crysencio Summerville, and Morocco goal to Issa Diop, assisted by Chemsdine Talbi. Penalty shootout goals were not counted for Fantasy Five goals. No clean sheet applied because the match was 1-1 before penalties.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus prior public/worldcup/index.html and public/worldcup/fantasy-rosters.js normalization showed current relevant exposure only to Virgil Van Dijk from Netherlands. Van Dijk had no source-backed goal or assist and Netherlands did not keep a clean sheet, so no supported stat update was available.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -1,0 +1,82 @@
+[
+  {
+    "playerId": "official:spain:defenderKeeper:m-llorente",
+    "playerName": "M. LLORENTE",
+    "country": "Spain",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:spain:wildcard:m-llorente",
+    "playerName": "M. LLORENTE",
+    "country": "Spain",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:cabo-verde:defenderKeeper:vozinha",
+    "playerName": "VOZINHA",
+    "country": "Cabo Verde",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:cabo-verde:wildcard:vozinha",
+    "playerName": "VOZINHA",
+    "country": "Cabo Verde",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:cabo-verde:defenderKeeper:borges",
+    "playerName": "BORGES",
+    "country": "Cabo Verde",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:cabo-verde:wildcard:borges",
+    "playerName": "BORGES",
+    "country": "Cabo Verde",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:cabo-verde:defenderKeeper:lopes",
+    "playerName": "LOPES",
+    "country": "Cabo Verde",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  },
+  {
+    "playerId": "official:cabo-verde:wildcard:lopes",
+    "playerName": "LOPES",
+    "country": "Cabo Verde",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "ESP 0-0 CPV 2026-06-15. Clean sheet credited only to rostered defender/keeper starters; ESPN rosters and FOX boxscore show 0-0 FT and lineups. Sources: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760428 https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-cape-verde-jun-15-2026-game-boxscore-647628 Synced 2026-06-15T19:11:11Z",
+    "updatedAt": 1781541071000
+  }
+]

@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-23T18:40Z
+
+Current time checked with date: Tue Jun 23 11:39:43 PDT 2026.
+
+Completed/recent match window since prior sync note: Portugal vs Uzbekistan kicked off at 10:00 PDT / 17:00 UTC and was in the post-match window. ESPN public FIFA World Cup scoreboard listed Portugal 3, Uzbekistan 0 with Cristiano Ronaldo goals at 6' and 39' and Nuno Mendes at 17'. FIFA match centre fixture checked at https://www.fifa.com/en/match-centre/match/17/285023/289273/400021503. Guardian live text surfaced a conflicting 4-0 report due to a possible own goal, but that did not affect the selected Fantasy Five scoring player update.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found Cristiano Ronaldo selected with stable catalog id ronaldo. Bruno Fernandes was also selected, but no source-backed assist was available from the public sources checked. No Portugal defender/keeper was currently selected, so no clean-sheet write was needed.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for ronaldo / Cristiano Ronaldo / Portugal / goals=2 / assists=0 / cleanSheets=0. Returned id j97kkb7945q3he2j202rdn7zmn896xhx.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows; Ronaldo selector moved from 70 to 80 total. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

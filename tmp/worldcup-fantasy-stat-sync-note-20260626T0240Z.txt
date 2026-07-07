@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-26T02:40Z
+
+Current time checked: Thu Jun 25 19:40:28 PDT 2026 / 2026-06-26T02:40Z.
+
+Last local sync note found: tmp/worldcup-fantasy-stat-sync-note-20260625T2010Z.txt. Recent completed matches since then were checked through ESPN's public FIFA World Cup scoreboard API for 2026-06-25:
+- Curacao 0-2 Ivory Coast, FT, event 760473. ESPN lists Nicolas Pepe goals at 7' and 64'. Ivory Coast clean sheet.
+- Ecuador 2-1 Germany, FT, event 760468. ESPN lists Leroy Sane 2', Nilson Angulo 9', Gonzalo Plata 77'. No clean sheet.
+- Japan 1-1 Sweden, FT, event 760471. ESPN lists Daizen Maeda 56' and Anthony Elanga 62'. No clean sheet.
+- Tunisia 1-3 Netherlands, FT, event 760472. ESPN lists Ellyes Skhiri 3', Brian Brobbey 7', Hazem Mastouri 54', Jan Paul van Hecke 62'. No clean sheet.
+
+The 2026-06-26T02:00Z Paraguay-Australia and Turkiye-USA matches were still in progress at the sync time, so they were intentionally skipped.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Fantasy Five players with source-backed goal, assist, or clean-sheet changes from the completed recent matches. Virgil Van Dijk is selected, but Netherlands conceded to Tunisia, so no clean sheet was applied; Van Dijk was not an ESPN-listed scorer. Current selections did not include the listed scorers or an Ivory Coast defender/keeper clean-sheet beneficiary.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made because no selected Fantasy Five player had a source-backed scoring-field update.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

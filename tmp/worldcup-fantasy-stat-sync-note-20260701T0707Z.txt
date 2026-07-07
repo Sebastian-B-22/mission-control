@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-01T07:07Z
+
+Current time checked first: Wed Jul 1 00:07:20 PDT 2026 / 2026-07-01T07:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260630T2307Z.txt.
+
+Completed/recent match window since prior sync: ESPN public scoreboard API for 2026-06-30 showed Mexico 2-0 Ecuador, event 760491, STATUS_FULL_TIME. Norway-Ivory Coast and France-Sweden were already processed in earlier 2026-06-30 notes.
+
+Source-backed scoring: ESPN scoreboard and summary/keyEvents for event 760491 credited Mexico goals to Julian Quinones at 22' assisted by Roberto Alvarado and Raul Jimenez at 31' assisted by Julian Quinones. Al Jazeera/AFP and Guardian public reports cross-checked the Mexico 2-0 result and named Julian Quinones and Raul Jimenez as scorers; Al Jazeera also described Quinones setting up Jimenez. Mexico kept a clean sheet.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure to Enner Valencia / Ecuador only from this match window. Valencia did not have a source-backed goal or assist, and Ecuador did not keep a clean sheet. No current selected Mexico player or Mexico defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

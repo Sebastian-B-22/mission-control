@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-01T19:37Z
+
+Completed/recent match window since prior 2026-06-30T23:07Z sync note: England 2-1 Congo DR was FT before this run; Belgium-Senegal and USA-Bosnia were not complete at the 12:37 PDT / 19:37 UTC cron time.
+
+Source-backed scoring checked:
+- ESPN event 760495 match report credited Harry Kane with England goals at 75' and 86' and Brian Cipenga with Congo DR's goal at 7': https://www.espn.com/soccer/report/_/gameId/760495
+- CBS live/AP coverage cross-check also described two late Harry Kane goals for England: https://www.cbssports.com/soccer/news/england-vs-dr-congo-live-updates-world-cup-2026-score-result/live/
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure to Harry Kane / England. Kane was previously tracked at 3 goals, so this match updates him to 5 total goals. Anthony Gordon assists were source-mentioned by CBS/other live coverage, but Gordon is not currently selected in production Fantasy Five rows. England did not keep a clean sheet.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Write performed:
+CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats -- '{"playerId":"kane","playerName":"Harry Kane","country":"England","goals":5,"assists":0,"cleanSheets":0,"notes":"2026-07-01T19:37Z sync: ESPN event 760495 England 2-1 Congo DR credited Harry Kane goals at 75 and 86 after prior total 3; CBS/AP cross-check confirmed two late Kane goals. Sources: https://www.espn.com/soccer/report/_/gameId/760495; https://www.cbssports.com/soccer/news/england-vs-dr-congo-live-updates-world-cup-2026-score-result/live/"}'
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded after the write; Rinky-dink Shinx remained rank 1 with total 180. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

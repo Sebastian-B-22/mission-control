@@ -1,0 +1,20 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T08:09Z
+
+Checked current time (Wed Jun 17 01:08 PDT / 2026-06-17 08:08 UTC) and production Convex env (.env.production = harmless-salamander-44).
+
+Completed/recent match window since prior 2026-06-16T16:38Z sync:
+- France 3-1 Senegal, ESPN fixture/result page match 760432; LA Times Day 6 recap confirms Kylian Mbappe scored.
+- Iraq 1-4 Norway, ESPN match 760430 lists Erling Haaland goals at 29' and 43'; LA Times Day 6 recap confirms Haaland brace.
+- Argentina 3-0 Algeria, ESPN match 760433 lists Lionel Messi goals at 17', 60', and 76'; LA Times Day 6 recap confirms Messi hat trick.
+- Austria 3-1 Jordan completed after the prior sync; no selected Fantasy Five defender/keeper clean sheet available because Jordan scored, and no source-backed selected-player goals/assists were found.
+
+Intended Convex stat writes:
+- messi / Lionel Messi / Argentina: goals 3, assists 0, cleanSheets 0.
+- haaland / Erling Haaland / Norway: goals 2, assists 0, cleanSheets 0.
+- mbappe / Kylian Mbappe / France: goals 1, assists 0, cleanSheets 0.
+
+Assists were not written because no official/source-backed assist table was available during this run. Argentina clean sheet was not written because current selected Fantasy Five catalog has no Argentina defender/keeper pick in the public leaderboard.
+
+Blocker: production Convex does not currently expose worldCup:upsertFantasyPlayerStats. The required command failed with "Could not find function for 'worldCup:upsertFantasyPlayerStats'." worldCup:listEntries also failed the same way, even though the local repo contains convex/worldCup.ts. No stat writes were applied.
+
+Leaderboard HTTP verification succeeded: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 with 39 rows and 5 Fantasy Five rows.

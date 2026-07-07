@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T00:38Z
+
+Run window: after prior note 2026-06-16T00:41Z through 2026-06-18T00:38Z.
+
+Completed ESPN-backed World Cup matches found:
+- 760432 France 3-1 Senegal, FT. Fantasy catalog impact: Kylian Mbappe goals at 66' and 90'+6; no Mbappe assists; no clean sheet.
+- 760430 Iraq 1-4 Norway, FT. Fantasy catalog impact: Erling Haaland goals at 29' and 43'; no Haaland assists; no clean sheet.
+- 760433 Argentina 3-0 Algeria, FT. Fantasy catalog impact: Lionel Messi goals at 17', 60', and 76'; no Messi assists. Argentina clean sheet did not apply to any current defenderKeeper catalog pick. Algeria players no stats.
+- 760431 Austria 3-1 Jordan, FT. Fantasy catalog impact: no supported stats for David Alaba because Austria conceded and Alaba did not score/assist in ESPN key events.
+- 760435 Portugal 1-1 Congo DR, FT. Fantasy catalog impact: no supported stats for Cristiano Ronaldo, Bruno Fernandes, or Chancel Mbemba.
+- 760437 England 4-2 Croatia, FT. Fantasy catalog impact: Harry Kane goals at 12' pen and 42'; Jude Bellingham goal at 47'; no Kane/Bellingham assists; no clean sheets; Luka Modric no supported stat.
+
+Source API: ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260616 and ?dates=20260617; ESPN summary endpoints https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760432 etc.
+
+Blocked: Convex production function worldCup:upsertFantasyPlayerStats is not available on deployment harmless-salamander-44. Exact required command failed with "Could not find function for 'worldCup:upsertFantasyPlayerStats'"; available production functions do not include worldCup:*.

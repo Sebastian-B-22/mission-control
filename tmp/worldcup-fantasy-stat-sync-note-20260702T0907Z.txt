@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-02T09:07Z
+
+Current time checked first: Thu Jul 2 02:07:21 PDT 2026 / 2026-07-02T09:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260701T0707Z.txt.
+
+Completed/recent match window found for Wednesday, July 1, 2026:
+- England 2-1 Congo DR, ESPN public scoreboard API event 760495.
+- Belgium 3-2 Senegal after extra time, ESPN public scoreboard API event 760493.
+- United States 2-0 Bosnia-Herzegovina, ESPN public scoreboard API event 760494.
+
+Sources checked: ESPN public scoreboard API for 2026-07-01, ESPN public summary APIs for events 760495/760493/760494, ESPN pages where available via search snippets, Sky Sports England report/player ratings, CBS Sports USMNT live report, production Fantasy Five leaderboard from worldCup:listLeaderboard, and convex/worldCup.ts plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard found current selected exposure to Harry Kane/England, Christian Pulisic/United States, Turner/United States, and Adams/United States in this completed window. Harry Kane had source-backed goals from England-Congo DR: Sky Sports reported Kane scored both England goals and both were assisted by Anthony Gordon. Kane was already at 3 goals from the prior local note tmp/worldcup-fantasy-stat-sync-note-20260627T2312Z, so production was updated to 5 goals. Pulisic had a disallowed goal and no source-backed supported stat. CBS listed the U.S. XI with Matt Freese in goal, so no clean-sheet write was made for selected "Turner"; Adams is not a defender/keeper clean-sheet catalog player. Belgium/Senegal had no currently selected Fantasy Five player with a supported stat update.
+
+Production Convex was checked with grep CONVEX .env.production before database work. One production write was made:
+CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats -- '{"playerId":"kane","playerName":"Harry Kane","country":"England","goals":5,"assists":0,"cleanSheets":0,"notes":"2026-07-02T09:07Z stat sync. July 1 R32: England 2-1 Congo DR. ESPN scoreboard API event 760495 confirmed FT score; Sky Sports report (https://www.skysports.com/football/news/11095/13559562/england-2-1-dr-congo-player-ratings-harry-kane-and-anthony-gordon-save-the-day-as-djed-spence-struggles-at-right-back) says Harry Kane scored two late goals, both assisted by Anthony Gordon. Prior local note tmp/worldcup-fantasy-stat-sync-note-20260627T2312Z had Kane at 3 goals after England-Croatia; +2 => 5. Current selected Fantasy Five player."}'
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows after the write. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

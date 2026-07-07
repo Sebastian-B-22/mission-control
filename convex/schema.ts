@@ -44,6 +44,7 @@ export default defineSchema({
     date: v.string(), // YYYY-MM-DD format
     completed: v.boolean(),
     completedAt: v.optional(v.number()),
+    workoutTypes: v.optional(v.array(v.string())),
   })
     .index("by_user_and_date", ["userId", "date"])
     .index("by_template", ["habitTemplateId"]),
@@ -486,9 +487,13 @@ export default defineSchema({
       lastName: v.string(),
       age: v.optional(v.number()),
       birthDate: v.optional(v.string()),  // YYYY-MM-DD format
+      birthYear: v.optional(v.string()),
+      division: v.optional(v.string()),
+      practiceDay: v.optional(v.string()),
+      ageGroup: v.optional(v.string()),
       gender: v.optional(v.string()),
       allergies: v.optional(v.string()),
-      sessions: v.any(),
+      sessions: v.optional(v.any()),
     })),
     emergencyContact: v.object({
       name: v.string(),
@@ -499,6 +504,7 @@ export default defineSchema({
     pricing: v.object({
       subtotal: v.number(),
       discount: v.number(),
+      accountCreditApplied: v.optional(v.number()),
       total: v.number(),
     }),
     stripePaymentIntentId: v.string(),
@@ -654,13 +660,19 @@ export default defineSchema({
     season: v.optional(v.string()),
     division: v.optional(v.string()),
     practiceDay: v.optional(v.string()),
+    assignedGroup: v.optional(v.string()),
     status: v.string(),
     notes: v.optional(v.string()),
+    rosterNotes: v.optional(v.string()),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
   })
     .index("by_family", ["familyId"])
     .index("by_child", ["childId"])
-    .index("by_program", ["program"]),
+    .index("by_program", ["program"])
+    .index("by_status", ["status"])
+    .index("by_program_status", ["program", "status"])
+    .index("by_region_status", ["region", "status"]),
 
   // ─── Personal CRM ─────────────────────────────────────────────────────
   // People Corinne wants to maintain relationships with: friends, family, mentors
@@ -910,13 +922,13 @@ export default defineSchema({
     date: v.string(), // YYYY-MM-DD format
     // Sleep data (from Whoop)
     sleepHours: v.optional(v.number()),
-    sleepScore: v.optional(v.number()), // 0-33 points
+    sleepScore: v.optional(v.number()), // 0-50 points
     // Steps data (manual entry for now)
     steps: v.optional(v.number()),
-    stepsScore: v.optional(v.number()), // 0-33 points
+    stepsScore: v.optional(v.number()), // 0-50 points
     // Active calories (from Whoop)
     activeCalories: v.optional(v.number()),
-    caloriesScore: v.optional(v.number()), // 0-34 points
+    caloriesScore: v.optional(v.number()), // tracked for display; not included in Don't Die score
     // Weight (from Withings via Apple Health)
     weight: v.optional(v.number()), // in lbs
     // Overall health score (0-100)
@@ -1407,10 +1419,37 @@ export default defineSchema({
     startMs: v.number(),
     endMs: v.number(),
     allDay: v.boolean(),
+    responseStatus: v.optional(v.union(
+      v.literal("accepted"),
+      v.literal("declined"),
+      v.literal("tentative"),
+      v.literal("needsAction")
+    )),
     updatedAt: v.number(),
   })
     .index("by_user_start", ["userId", "startMs"])
     .index("by_user_end", ["userId", "endMs"]),
+
+  timeBlockRatings: defineTable({
+    userId: v.id("users"),
+    eventKey: v.string(),
+    title: v.string(),
+    startMs: v.number(),
+    endMs: v.number(),
+    categoryId: v.optional(v.id("rpmCategories")),
+    categoryName: v.optional(v.string()),
+    quality: v.optional(v.number()),
+    energy: v.optional(v.union(
+      v.literal("draining"),
+      v.literal("neutral"),
+      v.literal("energizing")
+    )),
+    note: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_event", ["userId", "eventKey"])
+    .index("by_user_start", ["userId", "startMs"]),
 
   weeklyGoals: defineTable({
     userId: v.id("users"),
@@ -1497,6 +1536,92 @@ export default defineSchema({
   })
     .index("by_user_path", ["userId", "path"])
     .index("by_user_updated", ["userId", "updatedAt"]),
+
+  // ─── Knowledge & Files ─────────────────────────────────────────────────
+  // Canonical document records with one promoted current version and collapsed
+  // version history, so Telegram/generated file churn does not become clutter.
+  knowledgeDocuments: defineTable({
+    userId: v.id("users"),
+    artifactKey: v.string(),
+    title: v.string(),
+    area: v.union(
+      v.literal("aspire"),
+      v.literal("hta"),
+      v.literal("homeschool"),
+      v.literal("family"),
+      v.literal("health"),
+      v.literal("operations"),
+      v.literal("personal"),
+      v.literal("other")
+    ),
+    project: v.optional(v.string()),
+    collection: v.optional(v.string()),
+    docType: v.union(
+      v.literal("flyer"),
+      v.literal("form"),
+      v.literal("schedule"),
+      v.literal("export"),
+      v.literal("note"),
+      v.literal("image"),
+      v.literal("audio"),
+      v.literal("other")
+    ),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("current"),
+      v.literal("final"),
+      v.literal("archived")
+    ),
+    decisionSummary: v.optional(v.string()),
+    tags: v.array(v.string()),
+    currentVersionId: v.optional(v.id("knowledgeDocumentVersions")),
+    sourceThreadId: v.optional(v.string()),
+    sourceMessageIds: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_artifact", ["userId", "artifactKey"])
+    .index("by_user_updated", ["userId", "updatedAt"])
+    .index("by_area_updated", ["area", "updatedAt"])
+    .index("by_status_updated", ["status", "updatedAt"]),
+
+  knowledgeDocumentVersions: defineTable({
+    documentId: v.id("knowledgeDocuments"),
+    versionNumber: v.number(),
+    label: v.optional(v.string()),
+    fileName: v.string(),
+    fileKind: v.union(
+      v.literal("pdf"),
+      v.literal("image"),
+      v.literal("audio"),
+      v.literal("doc"),
+      v.literal("text"),
+      v.literal("other")
+    ),
+    mimeType: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
+    fileUrl: v.optional(v.string()),
+    localPath: v.optional(v.string()),
+    telegramFileId: v.optional(v.string()),
+    telegramMessageId: v.optional(v.string()),
+    sourceKind: v.union(
+      v.literal("telegram"),
+      v.literal("generated"),
+      v.literal("manual")
+    ),
+    sourceNote: v.optional(v.string()),
+    summary: v.optional(v.string()),
+    versionStatus: v.union(
+      v.literal("draft"),
+      v.literal("current"),
+      v.literal("final"),
+      v.literal("superseded")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_document", ["documentId", "versionNumber"])
+    .index("by_document_created", ["documentId", "createdAt"])
+    .index("by_telegram_message", ["telegramMessageId"]),
 
   // ─── Kids Typing Game (Wings of Fire themed) ───────────────────────────
   typingProfiles: defineTable({
@@ -1625,6 +1750,253 @@ export default defineSchema({
   })
     .index("by_room", ["roomId"])
     .index("by_user", ["userId"]),
+
+  // ─── Personal Soccer Ticket Lists ───────────────────────────────────────
+  // Lightweight opt-in lists and ticket listings for Corinne's ACFC/LAFC/Galaxy tickets.
+  ticketContacts: defineTable({
+    name: v.string(),
+    phone: v.string(),
+    email: v.optional(v.string()),
+    teams: v.array(v.union(v.literal("acfc"), v.literal("lafc"), v.literal("galaxy"))),
+    source: v.optional(v.string()),
+    optedOut: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_phone", ["phone"])
+    .index("by_updated", ["updatedAt"]),
+
+  ticketListings: defineTable({
+    team: v.union(v.literal("acfc"), v.literal("lafc"), v.literal("galaxy")),
+    eventDate: v.string(), // YYYY-MM-DD or YYYY-MM-DDTHH:mm from form
+    opponent: v.optional(v.string()),
+    seatInfo: v.string(),
+    quantity: v.number(),
+    pricePerTicket: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("available"),
+      v.literal("claimed"),
+      v.literal("sold"),
+      v.literal("archived")
+    ),
+    notifiedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_team", ["team"])
+    .index("by_status", ["status"])
+    .index("by_event_date", ["eventDate"]),
+
+  ticketClaims: defineTable({
+    listingId: v.id("ticketListings"),
+    contactId: v.optional(v.id("ticketContacts")),
+    name: v.string(),
+    phone: v.string(),
+    quantity: v.number(),
+    note: v.optional(v.string()),
+    status: v.union(v.literal("new"), v.literal("confirmed"), v.literal("declined"), v.literal("fulfilled")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_listing", ["listingId"])
+    .index("by_status", ["status"])
+    .index("by_phone", ["phone"]),
+
+  ticketNotificationBatches: defineTable({
+    listingId: v.id("ticketListings"),
+    team: v.union(v.literal("acfc"), v.literal("lafc"), v.literal("galaxy")),
+    recipientCount: v.number(),
+    sentCount: v.number(),
+    failedCount: v.number(),
+    message: v.string(),
+    errors: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+  })
+    .index("by_listing", ["listingId"])
+    .index("by_created", ["createdAt"]),
+
+  // ─── Finance Command Center ─────────────────────────────────────────────
+  financePayrollPayments: defineTable({
+    userId: v.id("users"),
+    period: v.string(), // YYYY-MM
+    coach: v.string(),
+    hours: v.number(),
+    rate: v.number(),
+    amount: v.number(),
+    method: v.string(),
+    paid: v.boolean(),
+    paidAt: v.optional(v.string()), // YYYY-MM-DD
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_period", ["userId", "period"])
+    .index("by_user_period_coach", ["userId", "period", "coach"]),
+
+  financeProgramExpenses: defineTable({
+    userId: v.id("users"),
+    entity: v.string(), // aspire | 7v7 | hta | personal
+    program: v.string(), // spring_league | camps | pdp | etc.
+    season: v.string(), // spring-2026
+    expenseKey: v.string(),
+    label: v.string(),
+    category: v.string(),
+    amount: v.number(),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_program_season", ["userId", "program", "season"])
+    .index("by_user_expense", ["userId", "expenseKey"]),
+
+  // ─── HTA World Cup Family Prediction Challenge ─────────────────────────
+  worldCupEntries: defineTable({
+    familyName: v.string(),
+    parentName: v.optional(v.string()),
+    parentEmail: v.optional(v.string()),
+    parentPhone: v.optional(v.string()),
+    textOptIn: v.boolean(),
+    htaLaunchOptIn: v.boolean(),
+    participantName: v.optional(v.string()),
+    participantDisplayName: v.optional(v.string()),
+    participantType: v.optional(v.string()),
+    ageRange: v.optional(v.string()),
+    mode: v.union(v.literal("quick-kids"), v.literal("full-family"), v.literal("fantasy-five"), v.literal("second-chance"), v.literal("launch-list")),
+    groupCodes: v.optional(v.array(v.string())),
+    entryData: v.any(),
+    source: v.string(),
+    userAgent: v.optional(v.string()),
+    confirmationTextSentAt: v.optional(v.number()),
+    adminStatus: v.optional(v.union(v.literal("active"), v.literal("test"), v.literal("archived"))),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_parent_email", ["parentEmail"])
+    .index("by_parent_phone", ["parentPhone"])
+    .index("by_created", ["createdAt"])
+    .index("by_mode", ["mode"]),
+
+  worldCupGroups: defineTable({
+    name: v.string(),
+    joinCode: v.string(),
+    type: v.union(v.literal("family"), v.literal("team"), v.literal("region")),
+    adminName: v.optional(v.string()),
+    adminEmail: v.optional(v.string()),
+    adminPhone: v.optional(v.string()),
+    regionTag: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_join_code", ["joinCode"])
+    .index("by_created", ["createdAt"])
+    .index("by_type", ["type"]),
+
+  worldCupAccessTokens: defineTable({
+    token: v.string(),
+    parentPhone: v.string(),
+    expiresAt: v.number(),
+    sentAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_parent_phone", ["parentPhone"])
+    .index("by_expires", ["expiresAt"]),
+
+  worldCupGroupStandings: defineTable({
+    groupId: v.string(),
+    teamName: v.string(),
+    position: v.number(),
+    points: v.optional(v.number()),
+    matches: v.optional(v.number()),
+    goalDiff: v.optional(v.number()),
+    goalsFor: v.optional(v.number()),
+    goalsAgainst: v.optional(v.number()),
+    raw: v.any(),
+    source: v.string(),
+    syncedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_group_position", ["groupId", "position"])
+    .index("by_team", ["teamName"])
+    .index("by_synced", ["syncedAt"]),
+
+  worldCupMatchResults: defineTable({
+    sourceMatchId: v.string(),
+    fixtureId: v.optional(v.string()),
+    stage: v.union(v.literal("group"), v.literal("r32"), v.literal("r16"), v.literal("qf"), v.literal("sf"), v.literal("final"), v.literal("other")),
+    groupId: v.optional(v.string()),
+    round: v.optional(v.string()),
+    homeTeam: v.optional(v.string()),
+    awayTeam: v.optional(v.string()),
+    homeScore: v.optional(v.number()),
+    awayScore: v.optional(v.number()),
+    winner: v.optional(v.string()),
+    status: v.string(),
+    kickoffAt: v.optional(v.string()),
+    raw: v.any(),
+    source: v.string(),
+    syncedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_source_match", ["sourceMatchId"])
+    .index("by_stage", ["stage"])
+    .index("by_status", ["status"])
+    .index("by_synced", ["syncedAt"]),
+
+  worldCupFantasyPlayerStats: defineTable({
+    playerId: v.string(),
+    playerName: v.string(),
+    country: v.string(),
+    goals: v.number(),
+    assists: v.number(),
+    cleanSheets: v.number(),
+    notes: v.optional(v.string()),
+    updatedAt: v.number(),
+  })
+    .index("by_player", ["playerId"])
+    .index("by_country", ["country"])
+    .index("by_updated", ["updatedAt"]),
+
+  worldCupResultSyncRuns: defineTable({
+    status: v.union(v.literal("success"), v.literal("missing-key"), v.literal("error")),
+    provider: v.string(),
+    matchesUpserted: v.number(),
+    standingsUpserted: v.number(),
+    message: v.optional(v.string()),
+    startedAt: v.number(),
+    finishedAt: v.number(),
+  })
+    .index("by_started", ["startedAt"])
+    .index("by_status", ["status"]),
+
+  worldCupMissionSubmissions: defineTable({
+    familyName: v.string(),
+    parentName: v.optional(v.string()),
+    parentEmail: v.optional(v.string()),
+    parentPhone: v.optional(v.string()),
+    childFirstName: v.optional(v.string()),
+    challengeKey: v.string(),
+    challengeTitle: v.string(),
+    caption: v.optional(v.string()),
+    socialPostUrl: v.optional(v.string()),
+    mediaStorageId: v.optional(v.id("_storage")),
+    mediaName: v.optional(v.string()),
+    mediaType: v.optional(v.string()),
+    mediaSize: v.optional(v.number()),
+    marketingPermission: v.boolean(),
+    repostPermission: v.optional(v.boolean()),
+    source: v.string(),
+    userAgent: v.optional(v.string()),
+    status: v.union(v.literal("submitted"), v.literal("reviewed"), v.literal("winner"), v.literal("dismissed")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_created", ["createdAt"])
+    .index("by_challenge", ["challengeKey", "createdAt"])
+    .index("by_parent_email", ["parentEmail"]),
 
   // ─── BioMap / Blood Work Tracking ────────────────────────────────────────
   biomarkerResults: defineTable({

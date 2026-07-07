@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T21:08Z
+
+Current time checked first: Sun Jun 21 14:08:13 PDT 2026 / 2026-06-21T21:08Z.
+
+Completed/recent window since prior 2026-06-21T16:08Z sync note: Spain 4-0 Saudi Arabia (ESPN event 760453, FT) completed after the prior note. Uruguay vs Cape Verde and New Zealand vs Egypt were still scheduled.
+
+Source-backed scoring for Spain 4-0 Saudi Arabia: ESPN public scoreboard API credits Lamine Yamal goal at 10', Mikel Oyarzabal goals at 21' and 24', and Hassan Al-Tambakti own goal at 49'. ESPN report confirms Yamal scored the opening goal and says Mikel Oyarzabal assisted it. ESPN team stats and final score support a Spain clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found Lamine Yamal selected in current Fantasy Five rows (id yamal). No currently selected Saudi Arabia player had a source-backed goal/assist/clean-sheet stat. No selected Spain defender/keeper clean-sheet beneficiary was found. Yamal was credited with 1 goal, 0 assists, 0 cleanSheets.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- ESPN public FIFA World Cup report for event 760453: https://www.espn.com/soccer/report/_/gameId/760453
+- ESPN public FIFA World Cup match page for event 760453: https://www.espn.com/soccer/match/_/gameId/760453/spain-saudi-arabia
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for yamal / Lamine Yamal / Spain / goals=1 / assists=0 / cleanSheets=0. Returned id j97ghgn517v41t3kf0afbey0wn893b6g.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

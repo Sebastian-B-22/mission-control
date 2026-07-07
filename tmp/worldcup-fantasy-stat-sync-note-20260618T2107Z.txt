@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T21:07Z
+
+Cron window checked at Thu Jun 18 14:07 PDT / 2026-06-18 21:07 UTC. Last local stat-sync note was 2026-06-18T19:37Z.
+
+Completed/recent window since prior sync: Switzerland 4-1 Bosnia-Herzegovina (ESPN event 760439, FT). Canada vs Qatar and Mexico vs South Korea were still scheduled/pre-match at this run time.
+
+Sources checked: ESPN public scoreboard/summary API for 2026-06-18 and event 760439; public reports from Guardian and ESPN page. Source-backed scoring: Johan Manzambi 74' and 90', Ruben Vargas 84', Ermin Mahmic 90'+3, Granit Xhaka 90'+7 pen. ESPN listed assists/participants for Vargas goal (Breel Embolo) and Manzambi second (Ruben Vargas), but none map to current selected Fantasy Five players. No clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html found no currently selected Switzerland or Bosnia-Herzegovina Fantasy Five players. Edin Dzeko exists in the local catalog but is not currently selected on the production Fantasy Five leaderboard and did not have a source-backed scoring event.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No stat writes were needed because no currently selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed match.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned production leaderboard rows including Fantasy Five entries.

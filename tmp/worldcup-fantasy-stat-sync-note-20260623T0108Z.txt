@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-23T01:08Z
+
+Current time checked: Mon Jun 22 18:08:58 PDT 2026 / 2026-06-23T01:08Z.
+
+Completed/recent match window since prior sync note: France 3-0 Iraq, ESPN event 760457, FT. ESPN public summary/article reported Kylian Mbappe scored twice in France's 3-0 win over Iraq. Guardian live report cross-check listed France goals as Mbappe 14', Mbappe 54', and Ousmane Dembele 66', and reported the Dembele goal was made by Michael Olise.
+
+Fantasy Five selected-player normalization from production listEntries/listLeaderboard plus public/worldcup/index.html found Kylian Mbappe selected with stable catalog id mbappe. Ousmane Dembele is selected only as a custom pick with id custom:wildcard; that id is shared by other unrelated custom wildcard picks such as Nico O'Reilly, so writing Dembele stats to custom:wildcard would incorrectly credit other entries. Dembele's source-backed goal was therefore skipped pending a unique custom-player stat key.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for mbappe / Kylian Mbappe / France / goals=4 / assists=0 / cleanSheets=0. Returned id j97gnxj9jajpeavcde87z4q4b188s0vr. Total includes the prior two France-Senegal goals from the 2026-06-16 sync plus two France-Iraq goals.
+
+No assists were written for selected players. No France defender/keeper clean sheet was written because the selected France players in the current Fantasy Five rows were attackers/custom wildcard, not defenderKeeper picks.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows; Rinky-dink Shinx moved to rank 2 with total 103. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

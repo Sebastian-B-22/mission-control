@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T23:40Z
+
+Current time checked: Thu Jun 25 16:40:30 PDT 2026.
+
+Completed/recent match window since prior 2026-06-25T16:10Z sync note: ESPN public scoreboard for 2026-06-25 showed two newly completed World Cup matches at the 20:00Z window:
+- Curacao 0-2 Ivory Coast, ESPN event 760473, Full Time. ESPN scoring details credited Nicolas Pepe goals at 7' and 64'. Curacao did not score, so Ivory Coast kept a clean sheet.
+- Ecuador 2-1 Germany, ESPN event 760468, Full Time. ESPN scoring/key events credited Leroy Sane 2' assisted by Florian Wirtz, Nilson Angulo 9' assisted by Pedro Vite, and Gonzalo Plata 77' assisted by Kevin Rodriguez. No clean sheet.
+
+Matches Japan-Sweden and Tunisia-Netherlands were still in progress at check time, and Australia-Paraguay and United States-Turkiye were scheduled for 2026-06-26T02:00Z, so they were not synced.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard found current selected players: Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Lamine Yamal, Enner Valencia, and Linda Caicedo.
+
+No current selected Fantasy Five player had source-backed goals, assists, or defender/keeper clean sheets in the completed/recent window. Enner Valencia is selected for Ecuador, but ESPN credited Ecuador goals to Nilson Angulo and Gonzalo Plata and assists to Pedro Vite and Kevin Rodriguez. No Convex stat writes were made.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

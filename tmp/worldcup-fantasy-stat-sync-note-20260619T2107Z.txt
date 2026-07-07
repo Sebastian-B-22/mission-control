@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-19T21:07Z
+
+Current time check: Fri Jun 19 14:07 PDT / 2026-06-19 21:07 UTC.
+
+Completed/recent window since prior local sync note: USA 2-0 Australia (ESPN event 760442, FT). Later 2026-06-19 matches (Morocco-Scotland, Haiti-Brazil, Paraguay-Turkiye) were not completed at sync time.
+
+Sources checked: ESPN public FIFA World Cup scoreboard and event summary APIs:
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260619
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760442
+
+Source-backed scoring: USA credited with a Cameron Burgess own goal at 11' and an Alex Freeman goal at 43'. ESPN team stats show USA clean sheet (2-0), but the lineup showed Matt Freese started in goal and selected Fantasy Five keeper Matt Turner stayed an unused substitute.
+
+Fantasy Five selected-player normalization from production listEntries/listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current USA exposure to Turner (official:united-states:defenderKeeper:turner), Christian Pulisic (pulisic), and Adams (official:united-states:playmaker:adams). Pulisic was not in the ESPN lineup/events, Adams started but had no source-backed goal or assist, and Turner did not play, so no clean sheet was written. Alex Freeman and Matt Freese were not selected Fantasy Five players.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

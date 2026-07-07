@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-24T06:10Z
+
+Current time check: Tue Jun 23 23:09:54 PDT 2026 / 2026-06-24 06:09 UTC.
+
+Completed/recent match window since prior sync note: Colombia 1-0 DR Congo completed after the 2026-06-24T02:09Z sync note, which had skipped it while in progress. Earlier June 23 matches (Portugal 5-0 Uzbekistan, England 0-0 Ghana, Panama 0-1 Croatia) were already evaluated by prior sync notes.
+
+Sources checked: ESPN public FIFA World Cup match/scoreboard result for event 760459 and public web reports. ESPN/search result showed Colombia 1-0 Congo DR. Public match reports credited Daniel Munoz with the 76th-minute winner; ESPN/reddit match-feed snippet credited the assist to Juan Fernando Quintero. Source URLs: https://www.espn.com/soccer/match/_/gameId/760459 and https://www.espn.com/soccer/player-stats/_/gameId/760459. Cross-check: Guardian live/report result Colombia 1-0 DR Congo, Daniel Munoz goal.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected Colombia exposure is Linda Caicedo. No selected Colombia scorer/assist player was found for Daniel Munoz or Juan Fernando Quintero. No selected Colombia defender/keeper clean-sheet beneficiary was found; Linda Caicedo is not a defender/keeper clean-sheet scoring entry. No selected DR Congo player had a source-backed scoring stat in the 1-0 loss.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

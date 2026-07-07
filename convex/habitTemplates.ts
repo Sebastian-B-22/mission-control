@@ -77,6 +77,61 @@ export const getDailyHabits = query({
   },
 });
 
+export const getHabitAccountability = query({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+    days: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const dayCount = args.days ?? 7;
+    const end = new Date(`${args.date}T00:00:00`);
+    const start = new Date(end);
+    start.setDate(start.getDate() - dayCount + 1);
+    const startKey = start.toISOString().slice(0, 10);
+
+    const habits = await ctx.db
+      .query("dailyHabits")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    const templates = await ctx.db
+      .query("habitTemplates")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    const templateById = new Map(templates.map((template) => [template._id, template]));
+
+    const windowHabits = habits.filter((habit) => habit.date >= startKey && habit.date <= args.date);
+    const todayHabits = windowHabits.filter((habit) => habit.date === args.date);
+    const completedToday = todayHabits.filter((habit) => habit.completed).length;
+
+    const byTemplate = new Map<string, { name: string; completed: number; total: number }>();
+    for (const habit of windowHabits) {
+      const template = templateById.get(habit.habitTemplateId);
+      if (!template) continue;
+      const key = String(habit.habitTemplateId);
+      const current = byTemplate.get(key) || { name: template.name, completed: 0, total: 0 };
+      current.total += 1;
+      if (habit.completed) current.completed += 1;
+      byTemplate.set(key, current);
+    }
+
+    const weakSpots = Array.from(byTemplate.values())
+      .filter((item) => item.total > 0 && item.completed < item.total)
+      .sort((a, b) => (a.completed / a.total) - (b.completed / b.total))
+      .slice(0, 3);
+
+    return {
+      dayCount,
+      today: {
+        completed: completedToday,
+        total: todayHabits.length,
+      },
+      weakSpots,
+    };
+  },
+});
+
 export const toggleDailyHabit = mutation({
   args: {
     id: v.id("dailyHabits"),
@@ -86,6 +141,22 @@ export const toggleDailyHabit = mutation({
     await ctx.db.patch(args.id, {
       completed: args.completed,
       completedAt: args.completed ? Date.now() : undefined,
+    });
+  },
+});
+
+export const setDailyHabitWorkoutTypes = mutation({
+  args: {
+    id: v.id("dailyHabits"),
+    workoutTypes: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const completed = args.workoutTypes.length > 0;
+
+    await ctx.db.patch(args.id, {
+      workoutTypes: args.workoutTypes,
+      completed,
+      completedAt: completed ? Date.now() : undefined,
     });
   },
 });
@@ -133,14 +204,17 @@ export const initializeDefaultHabitTemplates = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const defaultHabits = [
-      { name: "Morning light", icon: "☀️", order: 0 },
-      { name: "Redlight/meditation", icon: "🧘", order: 1 },
-      { name: "Workout before 8am", icon: "💪", order: 2 },
-      { name: "Take all supplements", icon: "💊", order: 3 },
-      { name: "Ice bath", icon: "🧊", order: 4 },
-      { name: "Sauna", icon: "🔥", order: 5 },
-      { name: "Screens off by 9:30 pm", icon: "📱", order: 6 },
-      { name: "Sleep 7.5 hours", icon: "😴", order: 7 },
+      { name: "Sleep 7.5 hours", icon: "😴", order: 0 },
+      { name: "Morning light", icon: "☀️", order: 1 },
+      { name: "Redlight/meditation", icon: "🧘", order: 2 },
+      { name: "Rebounder and vibration plate", icon: "🦶", order: 3 },
+      { name: "Breath work", icon: "🌬️", order: 4 },
+      { name: "Ice bath", icon: "🧊", order: 5 },
+      { name: "Workout", icon: "💪", order: 6 },
+      { name: "Take all supplements", icon: "💊", order: 7 },
+      { name: "Eat a salad", icon: "🥗", order: 8 },
+      { name: "Sauna", icon: "🔥", order: 9 },
+      { name: "Screens off by 9:30 pm", icon: "📱", order: 10 },
     ];
 
     for (const habit of defaultHabits) {

@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-03T21:07Z
+
+Current time checked first: Fri Jul 3 14:07:16 PDT 2026 / 2026-07-03T21:07Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260703T1738Z.txt: Egypt-Australia, ESPN event 760499, completed at Final Score - After Penalties. ESPN public scoreboard for 2026-07-03 showed Australia 1, Egypt 1, Egypt advanced on penalties; Cape Verde-Argentina at 22:00Z and Ghana-Colombia at 2026-07-04T01:30Z were still scheduled at this sync time.
+
+Supported source-backed scoring from ESPN summary/event commentary: Emam Ashour goal for Egypt at 13', assisted by Karim Hafez; Mohamed Hany own goal for Australia at 55'. No clean sheet. Penalty shootout goals are not counted in the supported Fantasy Five stat fields.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Egypt or Australia Fantasy Five player. Mohamed Salah is present in public/worldcup/index.html as salah and Egypt roster data is present in public/worldcup/fantasy-rosters.js, but no Egypt/Australia selected player appeared in current production Fantasy Five summaries. No selected player had a source-backed supported stat update.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update.
+
+Sources checked: ESPN public scoreboard API for 2026-07-03 saved at tmp/espn-scoreboard-20260703-cron-2107Z.json, ESPN summary API for event 760499 saved at tmp/espn-760499-20260703T2107Z.json, production Fantasy Five leaderboard saved at tmp/worldcup-leaderboard-cron-20260703T2107Z.json, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T18:37Z
+
+Cron window checked at Thu Jun 18 11:37 PDT / 2026-06-18 18:37 UTC.
+
+Completed/recent window since prior 2026-06-18T16:07Z sync note: Czechia 1-1 South Africa (ESPN event 760438, FT). Source-backed scoring found: Michal Sadilek 6' for Czechia; Teboho Mokoena 83' penalty for South Africa. ESPN credited one Czechia team assist but no selected Fantasy Five player was involved; Al Jazeera attributed the setup to Aleksandr Sojka after a Vladimir Coufal long throw. No clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard and public/worldcup/index.html found no currently selected Czechia or South Africa Fantasy Five players. Petr Cech is in the local catalog but is not currently selected on the production Fantasy Five leaderboard.
+
+Convex production: .env.production CONVEX values were checked before database work. No stat writes were needed because no currently selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed match.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned production leaderboard rows including Fantasy Five entries.
+
+Sources checked:
+https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260618
+https://www.fifa.com/en/match-centre/match/17/285023/289273/400021440
+https://www.aljazeera.com/sports/liveblog/2026/6/18/czechia-vs-south-africa-live-world-cup-2026
+https://www.foxsports.com/soccer/fifa-world-cup-men-czechia-vs-south-africa-jun-18-2026-game-boxscore-647640

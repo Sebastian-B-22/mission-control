@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-26T23:14Z
+
+Current time checked first: Fri Jun 26 16:12:23 PDT 2026 / 2026-06-26T23:12Z. Prior local sync note was tmp/worldcup-fantasy-stat-sync-note-20260626T1713Z.txt.
+
+Completed/recent match window since prior local sync note: Norway 1-4 France, ESPN event 760475, FT; Senegal 5-0 Iraq, ESPN event 760474, FT. Later June 26 matches were still upcoming at check time.
+
+Source-backed stats: ESPN public summary/commentary for Norway-France listed France goals as Ousmane Dembele 7' assisted by Kylian Mbappe, Ousmane Dembele 20' assisted by Kylian Mbappe, Ousmane Dembele 32' assisted by Aurelien Tchouameni, and Desire Doue 90'+4 assisted by Bradley Barcola. Field Level and Guardian public reports cross-checked Dembele's hat trick and Mbappe's two assists. Norway scored, so no France clean sheet.
+
+Senegal-Iraq ESPN public commentary listed Senegal goals by Habib Diarra, Ismaila Sarr, Pape Gueye x2, and Iliman Ndiaye, with a Senegal clean sheet. Current production Fantasy Five entries did not have selected Senegal players requiring stat writes.
+
+Fantasy Five selected-player normalization from production listEntries/listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found Kylian Mbappe selected with stable catalog id mbappe. Ousmane Dembele is selected only as a custom wildcard with id custom:wildcard, which is shared by unrelated custom wildcard picks such as Nico O'Reilly; Dembele's three goals were therefore skipped to avoid overcrediting unrelated entries.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for mbappe / Kylian Mbappe / France / goals=4 / assists=2 / cleanSheets=0. Returned id j97gnxj9jajpeavcde87z4q4b188s0vr. Total goals retain prior source-backed France-Senegal and France-Iraq goals; assists add the two Norway-France assists.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows. Public https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

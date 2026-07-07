@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-01T18:24Z
+
+Current time checked first: Wed Jul 1 11:24:45 PDT 2026 / 2026-07-01T18:24Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260701T1037Z.txt.
+
+Completed/recent match window since prior sync: ESPN public scoreboard API for 2026-07-01 showed England 2-1 Congo DR, event 760495, STATUS_FULL_TIME. Belgium-Senegal and United States-Bosnia-Herzegovina were still scheduled/not completed at sync time.
+
+Source-backed scoring: ESPN public summary/keyEvents for event 760495 credited Congo DR's goal to Brian Cipenga at 7' assisted by Chancel Mbemba, and England's goals to Harry Kane at 75' and 86', both assisted by Anthony Gordon. England did not keep a clean sheet. Public reports/live pages from Al Jazeera and The Guardian were checked as result/scorer cross-checks.
+
+Fantasy Five selected-player normalization from production worldCup:listEntries/listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure in this completed window for Harry Kane / England and Nico O'Reilly / England. Kane was already at 3 goals from the 2026-06-27 sync and was updated to 5 total goals. Nico O'Reilly was not credited because England conceded. Anthony Gordon and Chancel Mbemba were not currently selected Fantasy Five players.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production upsert completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for kane / Harry Kane / England / goals=5 / assists=0 / cleanSheets=0. Returned id j97rgmrfz0h4ey70vgmjgfpnhs88tbyf.
+
+Sources checked: ESPN public scoreboard API for 2026-07-01, ESPN summary API for event 760495, Al Jazeera live/report, The Guardian live page, production Fantasy Five leaderboard/listEntries from worldCup:listLeaderboard and worldCup:listEntries, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five rows; Rinky-dink Shinx loaded at rank 1 with total 180. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

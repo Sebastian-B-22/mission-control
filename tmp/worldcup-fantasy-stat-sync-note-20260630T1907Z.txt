@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-30T19:07Z
+
+Current time checked first: Tue Jun 30 12:07:52 PDT 2026 / 2026-06-30T19:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260628T2207Z.txt.
+
+Completed/recent match window since prior sync: June 29 Round of 32 matches from ESPN public scoreboard API for 2026-06-29: Brazil 2-1 Japan (event 760487), Germany 1-1 Paraguay after penalties (event 760489), Netherlands 1-1 Morocco after penalties (event 760488). June 30 Ivory Coast vs Norway had kicked off but was not complete at cron time, so it was not processed.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found relevant selected exposure in this completed window for Virgil van Dijk / Netherlands only. ESPN event 760488 credited Netherlands' goal to Cody Gakpo assisted by Crysencio Summerville and Morocco's equalizer to Issa Diop assisted by Chemsdine Talbi. Netherlands did not keep a clean sheet, so Virgil van Dijk had no source-backed supported stat update. No currently selected Fantasy Five player from Brazil, Japan, Germany, Paraguay, or Morocco had a source-backed goals/assists/cleanSheets update in this window.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update.
+
+Sources checked: ESPN public scoreboard API for 2026-06-29, ESPN summary APIs for events 760487/760489/760488, production Fantasy Five leaderboard from worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.

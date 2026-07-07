@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-16T16:38Z
+
+Checked current time (Tue Jun 16 09:38 PDT / 2026-06-16 16:38 UTC) and production Convex env (.env.production = harmless-salamander-44).
+
+No completed/recent match window since the prior 2026-06-16T15:38Z sync. Latest local sync notes show the next World Cup matches are still scheduled for later today: France-Senegal 19:00Z, Iraq-Norway 22:00Z, Argentina-Algeria 2026-06-17T01:00Z.
+
+No Convex stat writes were needed. Leaderboard verification via https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 with 39 rows and 5 Fantasy Five rows.

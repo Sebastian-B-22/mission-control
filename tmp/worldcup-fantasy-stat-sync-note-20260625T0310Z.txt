@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T03:10Z
+
+Checked current time first: Wed Jun 24 20:10:03 PDT 2026 / 2026-06-25T03:10Z. Prior local sync note was 2026-06-25T00:10Z.
+
+Completed/recent match window since prior sync: Czechia 0-3 Mexico and South Africa 1-0 South Korea reached full time after the prior note. Earlier 2026-06-24 full-time matches had already been handled in the 2026-06-25T00:10Z note.
+
+Sources used: ESPN public scoreboard API for 2026-06-24 confirmed FT statuses and scores. ESPN public summary/commentary APIs confirmed source-backed scoring events:
+- Czechia 0-3 Mexico (event 760467): Mateo Chavez 25' assisted by Luis Romo; Julian Quinones 43' assisted by Jorge Sanchez; Alvaro Fidalgo 54' assisted by Roberto Alvarado. Mexico clean sheet source-backed by final score.
+- South Africa 1-0 South Korea (event 760466): Thapelo Maseko 53' assisted by Tshepang Moremi. South Africa clean sheet source-backed by final score.
+
+Fantasy Five selected-player normalization from production worldCup:listEntries plus public/worldcup/index.html/public/worldcup/fantasy-rosters.js found no selected Fantasy Five players from Mexico, Czechia, South Africa, or South Korea. No selected Mexico or South Africa defender/keeper clean-sheet beneficiary was present.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no selected Fantasy Five player had a source-backed goals, assists, or cleanSheets stat in the completed/recent window.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows.

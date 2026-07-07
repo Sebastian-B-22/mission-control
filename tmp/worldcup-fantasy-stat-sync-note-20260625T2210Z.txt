@@ -1,0 +1,16 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T22:10Z
+
+Current time check: Thu Jun 25 15:10:29 PDT 2026. Last local stat-sync note found: tmp/worldcup-fantasy-stat-sync-note-20260625T1610Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public World Cup scoreboard for 2026-06-25 showed two newly completed 20:00Z matches: Curacao 0-2 Ivory Coast (event 760473) and Ecuador 2-1 Germany (event 760468). Later June 25 matches were still scheduled at check time.
+
+Source-backed stats checked:
+- ESPN public scoreboard API: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260625
+- ESPN public summary API for Ecuador-Germany event 760468: https://site.web.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760468
+- Ecuador-Germany goals from ESPN commentary/key events: Leroy Sane goal assisted by Florian Wirtz; Nilson Angulo goal assisted by Pedro Vite; Gonzalo Plata goal assisted by Kevin Rodriguez. Enner Valencia started and was substituted at 64', with no source-backed goal or assist.
+
+Fantasy Five selected-player normalization from production listLeaderboard found current selected players: Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Enner Valencia, Lamine Yamal, Linda Caicedo.
+
+No current selected Fantasy Five player had source-backed goals, assists, or defender/keeper clean sheets in the newly completed window. Enner Valencia's Ecuador match had no selected scoring stat. Ivory Coast/Curacao had no current selected Fantasy Five player. No Convex stat writes were made.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

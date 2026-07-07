@@ -1,0 +1,7 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-06T20:38Z
+
+Current time checked first: Mon Jul 6 13:37:31 PDT 2026 / 2026-07-06T20:37Z. Prior completed-match stat sync note found at tmp/worldcup-fantasy-stat-sync-note-20260706T1607Z.txt.
+
+Completed/recent match window: no completed World Cup match since the prior sync. ESPN public scoreboard for 2026-07-06 showed Portugal vs Spain in progress at 75' (0-0) and Belgium vs United States scheduled for 2026-07-07T00:00Z. No source-backed final goals, assists, or clean sheets were available to sync.
+
+Production Convex values were checked with grep CONVEX .env.production before any possible database work. No production Convex writes were needed, so worldCup:upsertFantasyPlayerStats was not run.

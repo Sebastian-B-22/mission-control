@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-19T03:07Z
+
+Completed/recent window since prior sync: ESPN public scoreboard for 2026-06-18 showed Qatar 0-6 Canada (event 760440, FT at 22:00Z start) and South Korea 0-1 Mexico (event 760441, FT at 2026-06-19T01:00Z start) completed after the 2026-06-18T21:37Z cron note. Earlier Czechia-South Africa and Switzerland-Bosnia-Herzegovina matches were already reviewed.
+
+Sources checked: ESPN public scoreboard/summary API for 2026-06-18 and events 760440/760441. Source-backed scoring: Canada goals by Cyle Larin 16', Jonathan David 29', Jonathan David 45'+3, Nathan Saliba 64', Mohamed Manai own goal 75', Jonathan David 90'+2; Mexico goal by Luis Romo 50'. Canada and Mexico clean sheets were source-backed by FT scores. ESPN did not expose source-backed assists in the available scoring details for these matches during this run.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html found no currently selected Canada, Qatar, Mexico, or South Korea Fantasy Five players. No selected defender/keeper clean-sheet beneficiaries from Canada or Mexico were present in the current Fantasy Five rows.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No stat writes were needed because no currently selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed/recent matches.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' returned production leaderboard rows including Fantasy Five entries.

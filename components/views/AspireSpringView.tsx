@@ -8,6 +8,8 @@ import { ProjectTaskList } from "@/components/ProjectTaskList";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { RosterAssignmentQueue } from "@/components/RosterAssignmentQueue";
+import { WorkSurfaceEmptyState, WorkSurfacePageHeader, WorkSurfaceStatCard } from "@/components/work-surface";
 import {
   AlertTriangle,
   ArrowRight,
@@ -349,11 +351,11 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Spring League Ops</h1>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      <WorkSurfacePageHeader
+        title="Spring League Ops"
+        description="Roster pressure, cleanup queues, and region-level follow-up for Agoura and Pali."
+        action={(
+          <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => onNavigate("aspire-families")}>
             <Users className="h-4 w-4 mr-2" />
             Family CRM
@@ -362,32 +364,45 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
             <ShieldCheck className="h-4 w-4 mr-2" />
             Coach Hub
           </Button>
-        </div>
-      </div>
+          </div>
+        )}
+      />
 
       <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(245,158,11,0.04)]">
-        <CardContent className="p-4 md:p-5">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-2xl border border-rose-400/35 bg-gradient-to-br from-rose-500/28 via-red-500/12 to-slate-950 p-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-rose-100/90">Agoura spring</div>
-              <div className="text-3xl font-semibold mt-2 text-white">{agouraSpringCount}</div>
-              <div className="mt-1 text-sm text-zinc-300">{agouraSpringCountIsStale ? "Live CRM count" : "Registrations tracked"}</div>
-            </div>
-            <div className="rounded-2xl border border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950 p-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/90">Pali spring</div>
-              <div className="text-3xl font-semibold mt-2 text-white">{paliSpringCount}</div>
-              <div className="mt-1 text-sm text-zinc-300">{paliSpringCountIsStale ? "Live CRM count" : "Registrations tracked"}</div>
-            </div>
-            <div className="rounded-2xl border border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-slate-950 p-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-100/90">Players mapped</div>
-              <div className="text-3xl font-semibold mt-2 text-white">{springSummary?.totalPlayers ?? "-"}</div>
-              <div className="mt-1 text-sm text-zinc-300">{springSummary?.totalFamilies ?? 0} families</div>
-            </div>
-            <div className="rounded-2xl border border-cyan-400/35 bg-gradient-to-br from-cyan-500/26 via-sky-500/12 to-slate-950 p-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/90">Needs cleanup</div>
-              <div className="text-3xl font-semibold mt-2 text-white">{cleanupCount}</div>
-              <div className="mt-1 text-sm text-zinc-300">{openTaskCount} open ops tasks</div>
-            </div>
+        <CardContent className="p-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <WorkSurfaceStatCard
+              label="Agoura spring"
+              value={agouraSpringCount}
+              description={agouraSpringCountIsStale ? "Live CRM count" : "Registrations tracked"}
+              tone="danger"
+              size="compact"
+              className="border-rose-400/35 bg-gradient-to-br from-rose-500/28 via-red-500/12 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Pali spring"
+              value={paliSpringCount}
+              description={paliSpringCountIsStale ? "Live CRM count" : "Registrations tracked"}
+              tone="warning"
+              size="compact"
+              className="border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Players mapped"
+              value={springSummary?.totalPlayers ?? "-"}
+              description={`${springSummary?.totalFamilies ?? 0} families`}
+              tone="success"
+              size="compact"
+              className="border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Needs cleanup"
+              value={cleanupCount}
+              description={`${openTaskCount} open ops tasks`}
+              tone="info"
+              size="compact"
+              className="border-cyan-400/35 bg-gradient-to-br from-cyan-500/26 via-sky-500/12 to-slate-950"
+            />
           </div>
         </CardContent>
       </Card>
@@ -409,6 +424,13 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
           </CardHeader>
         </Card>
       )}
+
+      <RosterAssignmentQueue
+        program="spring_league"
+        eyebrow="Spring roster operations"
+        title="Spring League assignment queue"
+        description="Paid Spring League players land here before Coach Hub groups are finalized."
+      />
 
       <div className="grid gap-4 xl:grid-cols-2">
         <RegionOpsCard
@@ -443,9 +465,11 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
             {!springSummary ? (
               <p className="text-sm text-muted-foreground">Loading Agoura roster groups...</p>
             ) : agouraRosterGroups.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-                No Agoura roster groups yet.
-              </div>
+              <WorkSurfaceEmptyState
+                icon={<Users className="h-5 w-5" />}
+                title="No Agoura roster groups yet"
+                description="Roster slices will appear here once paid players are normalized into practice-day groups."
+              />
             ) : (
               <div className="space-y-3">
                 {Object.entries(agouraGroupsByDay)
@@ -475,9 +499,11 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
             {!springSummary ? (
               <p className="text-sm text-muted-foreground">Loading Pali roster groups...</p>
             ) : paliRosterGroups.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-                No Pali roster groups yet.
-              </div>
+              <WorkSurfaceEmptyState
+                icon={<Users className="h-5 w-5" />}
+                title="No Pali roster groups yet"
+                description="Roster slices will appear here once paid players are normalized into practice-day groups."
+              />
             ) : (
               <div className="space-y-3">
                 {Object.entries(paliGroupsByDay)
@@ -509,9 +535,11 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
             {!springSummary ? (
               <p className="text-sm text-muted-foreground">Loading spring roster summary...</p>
             ) : springSummary.missingAssignments.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-                Nice, there are no obvious missing region, division, or practice day assignments right now.
-              </div>
+              <WorkSurfaceEmptyState
+                icon={<ShieldCheck className="h-5 w-5" />}
+                title="No obvious roster cleanup right now"
+                description="Region, division, and practice day assignments look complete from the current summary."
+              />
             ) : (
               <div className="space-y-3">
                 {springSummary.missingAssignments.map((item: any) => (
@@ -542,7 +570,11 @@ export function AspireSpringView({ userId, onNavigate }: AspireSpringViewProps) 
           </CardHeader>
           <CardContent>
             {priorityTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No open Spring League tasks right now.</p>
+              <WorkSurfaceEmptyState
+                icon={<ShieldCheck className="h-5 w-5" />}
+                title="No open Spring League tasks"
+                description="New follow-ups will appear here when the Agoura or Pali backlog has active items."
+              />
             ) : (
               <div className="space-y-3">
                 {priorityTasks.map((task: any) => (

@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync note - 2026-06-25T06:10Z
+
+Current date/time checked first: Wed Jun 24 23:10:04 PDT 2026 / 2026-06-25T06:10Z.
+
+Recent completed window since the prior 2026-06-25T04:10Z cron note was checked against ESPN public World Cup results/schedule. Public results at this run showed June 24 completed matches including Switzerland 2-1 Canada, Bosnia and Herzegovina 3-1 Qatar, Brazil 3-0 Scotland, Morocco 4-2 Haiti, Czechia 0-3 Mexico, and South Africa 1-0 South Korea. ESPN also listed Jordan vs Argentina as a future Group J match on Friday, June 26 / Saturday, June 27, so no new Argentina/Messi stat was eligible at this run time.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html found the current selected Fantasy Five players are Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Enner Valencia, Lamine Yamal, and Linda Caicedo. The relevant catalog players for the completed June 24 match window were not selected in current production Fantasy Five entries, or had no source-backed scoring/clean-sheet stat to write: Vinicius Junior/Brazil was not selected, Alphonso Davies/Canada was not selected, Akram Afif/Qatar was not selected, Achraf Hakimi/Morocco was not selected, Guillermo Ochoa/Mexico was not selected, Petr Cech/Czechia was not selected, and Son Heung-min/South Korea was not selected.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed goals, assists, or cleanSheets update in the completed/recent match window.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

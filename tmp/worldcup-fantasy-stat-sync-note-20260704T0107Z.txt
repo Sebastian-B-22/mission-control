@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-04T01:07Z
+
+Current time check: Fri Jul 3 18:07:16 PDT 2026 / 2026-07-04T01:07Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260703T2337Z.txt: ESPN public FIFA World Cup scoreboard for 2026-07-03 showed Argentina 3-2 Cabo Verde, Final Score - After Extra Time, event 760500. Ghana vs Colombia was still scheduled/pre-match at the sync time.
+
+Sources checked: ESPN public scoreboard API for 2026-07-03, ESPN public summary/keyEvents API for event 760500, production Fantasy Five leaderboard from worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed event details: ESPN credited Argentina goals to Lionel Messi at 29' assisted by Lisandro Martinez, Lisandro Martinez at 92' assisted by Alexis Mac Allister in header details, and a Diney Borges own goal at 111'. Cabo Verde goals were Deroy Duarte at 59' assisted by Ryan Mendes and Sidny Lopes Cabral at 103' assisted by Yannick Semedo. No clean sheet was available because both teams conceded.
+
+Fantasy Five selected-player normalization found Lionel Messi selected from the local catalog with playerId messi. Prior source-backed cumulative Messi stat was goals=6, assists=0, cleanSheets=0 from tmp/worldcup-fantasy-stat-sync-note-20260628T0512Z.txt. Production Convex update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats: messi / Lionel Messi / Argentina / goals=7 / assists=0 / cleanSheets=0. Returned id j97gcm8mz5dv7f5z2mezn6eq0s89tqat.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and showed Messi-captain Fantasy Five rows updated/ranked. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

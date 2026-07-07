@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-01T23:07Z
+
+Current time checked first: Wed Jul 1 16:07:21 PDT 2026 / 2026-07-01T23:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260701T1037Z.txt.
+
+Completed/recent match window since prior local sync note: ESPN public scoreboard for 2026-07-01 shows Congo DR 1-2 England, event 760495, full time at 2026-07-01T16:00Z, and Senegal 2-3 Belgium after extra time, event 760493, full time after the 2026-07-01T20:00Z kickoff. Bosnia-Herzegovina vs United States is scheduled for 2026-07-02T00:00Z and was not eligible.
+
+Sources checked: ESPN public scoreboard API for 2026-07-01; ESPN public summary API for events 760495 and 760493; production Fantasy Five leaderboard and entries from worldCup:listLeaderboard/worldCup:listEntries; public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed scoring: ESPN event 760495 credited England goals to Harry Kane at 75' and 86'. ESPN event 760493 credited Belgium goals to Romelu Lukaku, Youri Tielemans, and Youri Tielemans; Senegal goals to Habib Diarra and Ismaila Sarr. No clean sheets in either completed match.
+
+Fantasy Five selected-player normalization found current selected exposure in this completed window for Harry Kane/England only. Kane was already at 3 total goals from prior local sync notes and was updated to 5 total goals after event 760495 credited him with two more goals. Selected England custom player Nico O'Reilly had no source-backed supported stat. No currently selected Belgium/Senegal scorer/assistant or clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Production writes:
+- kane / Harry Kane / England / goals=5 / assists=0 / cleanSheets=0 / returned id j97rgmrfz0h4ey70vgmjgfpnhs88tbyf
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded after the write. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

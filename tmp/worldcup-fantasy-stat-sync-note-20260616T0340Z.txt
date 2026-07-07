@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-16T03:40Z
+
+Checked current time (Mon Jun 15 20:38 PDT) and production Convex env (.env.production = harmless-salamander-44).
+Completed/recent window since prior sync: Iran 2-2 New Zealand (ESPN event 760427, FT; completed after the 2026-06-16T00:42Z sync note).
+
+Fantasy Five selected-player normalization found no current selected players from Iran or New Zealand across production fantasy-five entries, so no Convex stat writes were needed.
+
+Source-backed scoring checked:
+- ESPN summary API event 760427: Elijah Just goals 7 and 54, both assisted by Chris Wood; Ramin Rezaeian goal 32; Mohammad Mohebbi goal 64 assisted by Ramin Rezaeian.
+- Guardian live/report: Iran 2-2 New Zealand; Elijah Just double, Chris Wood assists noted; Ramin Rezaeian and Mohammad Mohebbi Iran goals. Guardian text conflicts with ESPN on the Mohebbi assist by naming Saman Ghoddos, so no assist overwrite would be safe without official clarification.
+
+Leaderboard verification via Convex production listLeaderboard succeeded: 39 rows, 5 fantasy-five rows.
+Sources checked: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760427 and https://www.theguardian.com/football/live/2026/jun/16/fifa-world-cup-2026-live-iran-v-new-zealand-updates-irn-vs-nzl-group-f-match-score-latest

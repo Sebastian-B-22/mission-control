@@ -1,0 +1,24 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-04T15:07Z
+
+Current time checked first: Sat Jul 4 08:07:17 PDT 2026 / 2026-07-04T15:07Z.
+
+Completed/recent match window since prior local sync notes:
+- Ghana 0-1 Colombia, ESPN event 760501, FT. ESPN scoreboard/details credited Jhon Arias with Colombia's goal; ESPN team stats showed one Colombia assist but event details did not expose the assister, while LA Times recap credited Luis Suarez's cross. No currently selected Fantasy Five player had a supported stat update: Linda Caicedo is selected but was not source-backed for a goal/assist, and no selected Colombia defender/keeper clean-sheet beneficiary was found.
+- Saturday July 4 Round of 16 matches had not kicked off at sync time: Canada-Morocco 10:00 PDT / 13:00 EDT and Paraguay-France 14:00 PDT / 17:00 EDT.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Source-backed correction applied:
+- Earlier local note tmp/worldcup-fantasy-stat-sync-note-20260704T0107Z.txt correctly updated Lionel Messi to 7 cumulative goals after ESPN event 760500 credited Messi's 29' goal in Argentina 3-2 Cape Verde.
+- Later local note tmp/worldcup-fantasy-stat-sync-note-20260704T0137Z.txt appears to have overwritten Messi-related rows back to goals=6. This run corrected the source-backed cumulative total to 7 for messi, official:argentina:star:messi, and official:argentina:goalGetter:messi.
+
+Production Convex updates completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- messi / Lionel Messi / Argentina / goals=7 / assists=0 / cleanSheets=0 / returned id j97gcm8mz5dv7f5z2mezn6eq0s89tqat.
+- official:argentina:star:messi / MESSI / Argentina / goals=7 / assists=0 / cleanSheets=0 / returned id j97s7rq3f47rg8rs583nfjgv8h89t8sx.
+- official:argentina:goalGetter:messi / MESSI / Argentina / goals=7 / assists=0 / cleanSheets=0 / returned id j97kj3k5z1dt8ba7yh2j0rqf8589vm3x.
+
+Note: the exact no---prod Convex command form from the cron payload was attempted first and failed to resolve deployed worldCup functions, matching prior local notes. Retried with --prod against the same production Convex deployment and succeeded.
+
+Verification:
+- CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and returned Fantasy Five rows.
+- https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

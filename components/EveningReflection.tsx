@@ -50,7 +50,7 @@ export function EveningReflection({ userId, date }: EveningReflectionProps) {
           <span className="text-2xl">🌙</span>
           <CardTitle>Evening Reflection</CardTitle>
         </div>
-        <CardDescription>Close your day with gratitude</CardDescription>
+        <CardDescription>A quick closeout for today.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

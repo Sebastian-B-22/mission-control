@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-02T21:07Z
+
+Current time checked first: Thu Jul 2 14:07:50 PDT 2026 / 2026-07-02T21:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260702T0907Z.txt.
+
+Completed/recent match window since prior sync: Spain 3-0 Austria, ESPN public summary API event 760497, full time. Portugal-Croatia and Switzerland-Algeria were still future/not completed at this run time.
+
+Sources checked: ESPN public summary API for event 760497; ESPN/search snippets for match status; production Fantasy Five leaderboard from worldCup:listLeaderboard; public/worldcup/index.html and public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed scoring from ESPN event 760497: Mikel Oyarzabal 36' assisted by Marc Cucurella, Pedro Porro 66' assisted by Alex Baena, Mikel Oyarzabal 89' assisted by Marc Cucurella. Spain clean sheet confirmed by 3-0 full-time score.
+
+Fantasy Five selected-player normalization found current selected exposure to Lamine Yamal/Spain and David Alaba/Austria in this completed window. Yamal had no source-backed goal or assist in ESPN event 760497. Alaba's Austria conceded, so no clean-sheet stat. No currently selected Spain defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were needed.

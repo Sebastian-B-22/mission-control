@@ -1,0 +1,12 @@
+HTA World Cup Fantasy Five stat sync note
+Timestamp: 2026-06-19T01:38Z / 2026-06-18 18:38 America/Los_Angeles
+
+Completed/recent match window since prior sync: Canada 6-0 Qatar (ESPN event 760440, full time). Mexico vs South Korea was still in progress at cron time, so it was not finalized for stat updates.
+
+Source-backed Canada/Qatar stats: ESPN public summary API showed Canada 6, Qatar 0, STATUS_FULL_TIME. Commentary identified Canada scorers as Cyle Larin, Jonathan David, Jonathan David, Nathan Saliba, Qatar own goal by Mohammad Al Manai, plus the final 6-0 score. Public search result from The Guardian match report also described Canada 6-0 Qatar, Jonathan David hat-trick, Cyle Larin, Nathan Saliba, and a Qatar own goal; this was used only as a cross-check because the ESPN API output was automatable.
+
+Fantasy Five selected-player normalization: production worldCup:listLeaderboard Fantasy Five rows currently include Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Lamine Yamal, Cristiano Ronaldo, Adams, Enner Valencia, and Linda Caicedo. public/worldcup/index.html includes Alphonso Davies and Akram Afif, but neither appeared in the current production Fantasy Five selections. Canada scorers Cyle Larin, Jonathan David, Nathan Saliba and the Qatar own goal are not selected Fantasy Five players. No selected Fantasy Five player had a source-backed Canada/Qatar goal, assist, or clean-sheet stat.
+
+Convex production check: grep CONVEX .env.production completed before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

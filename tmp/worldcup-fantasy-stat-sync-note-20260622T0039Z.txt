@@ -1,0 +1,14 @@
+HTA World Cup Fantasy Five stat sync cron note
+Run time: 2026-06-22T00:39Z / 2026-06-21 17:39 America/Los_Angeles.
+
+Production Convex was checked before database work with grep CONVEX .env.production.
+
+Recent completed match window checked after prior 2026-06-21T21:08Z update:
+- Spain 4-0 Saudi Arabia, 2026-06-21. Public sources report Lamine Yamal scored Spain's opener, but yamal was already synced in the 2026-06-21T21:08Z cron note with goals=1. No additional source-backed selected-player write was found.
+- Belgium 0-0 IR Iran, 2026-06-21. Selected Fantasy Five player Kevin De Bruyne had no source-backed goal or assist. No clean-sheet scoring applies because he is not a defenderKeeper role. Sources: ESPN final score https://www.espn.com/soccer/match/_/gameId/760451/iran-belgium and FOX boxscore https://www.foxsports.com/soccer/fifa-world-cup-men-belgium-vs-iran-jun-21-2026-game-boxscore-647653.
+- Ecuador 0-0 Curacao, 2026-06-21. Selected Fantasy Five player Enner Valencia had no source-backed goal or assist. No clean-sheet scoring applies because he is not a defenderKeeper role. Sources: FIFA match centre https://www.fifa.com/en/match-centre/match/17/285023/289273/400021465 and FOX boxscore https://www.foxsports.com/soccer/fifa-world-cup-men-ecuador-vs-curacao-jun-20-2026-game-boxscore-647650.
+- Netherlands 5-1 Sweden and Japan 4-0 Tunisia were checked from public reports. Selected Van Dijk/Isak outcomes did not require source-backed stat writes; no selected Mitoma entry appeared in the current production Fantasy Five leaderboard output. Sources: Guardian/SBNation public reports surfaced in web search.
+
+No Convex fantasy stat writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. Public leaderboard https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

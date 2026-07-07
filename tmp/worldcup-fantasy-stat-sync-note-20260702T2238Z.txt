@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-02T22:38Z
+
+Current time checked first: Thu Jul 2 15:37:49 PDT 2026.
+
+Completed/recent match window since prior sync note: Spain 3-0 Austria, FIFA World Cup Round of 32, ESPN event 760497, completed at 2026-07-02T20:56:07Z. Portugal-Croatia and Switzerland-Algeria were still scheduled/pre-match at this run.
+
+Sources checked: ESPN public scoreboard API for 2026-07-02, ESPN public summary/play-by-play API for event 760497, production Fantasy Five leaderboard from worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.
+
+Source-backed Spain-Austria scoring: ESPN credited Spain goals to Mikel Oyarzabal 36', Pedro Porro 66', and Mikel Oyarzabal 89'; the 89' goal was assisted by Marc Cucurella in play-by-play. Spain kept a 3-0 clean sheet. Lamine Yamal appeared in Spain play-by-play but had no source-backed goal or assist and is not a defenderKeeper Fantasy Five role.
+
+Fantasy Five selected-player normalization found current selected exposure in this completed window for Lamine Yamal/Spain only. David Alaba/Austria is present in the local catalog but was not selected in the current production Fantasy Five leaderboard rows. No currently selected Fantasy Five player had a supported source-backed goals, assists, or cleanSheets update from Spain-Austria.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

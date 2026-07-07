@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-17T20:08Z
+
+Current time check: Wed Jun 17 13:08:16 PDT 2026 / 2026-06-17T20:08Z. Last local stat-sync note was 2026-06-17T13:38Z.
+
+Completed/recent window since prior sync: Portugal 1-1 DR Congo completed after the prior sync. England vs Croatia had just kicked off or was still in progress at this run time, and Ghana vs Panama / Uzbekistan vs Colombia were later June 17 fixtures.
+
+Sources checked: FIFA schedule/search results; ESPN report/match page https://www.espn.com/football/report/_/gameId/760435 and https://www.espn.com/soccer/match/_/gameId/760435 ; Guardian report https://www.theguardian.com/football/2026/jun/17/portugal-dr-congo-world-cup-2026-group-k-match-report ; Global Sports Archive match timeline https://globalsportsarchive.com/en/soccer/match/2026-06-17/portugal-vs-dr-congo/3592445 .
+
+Source-backed scoring found: João Neves goal for Portugal assisted by Pedro Neto; Yoane Wissa goal for DR Congo assisted by Arthur Masuaku. No clean sheet.
+
+Fantasy Five selected-player normalization: public/worldcup/index.html fantasyPlayers includes Cristiano Ronaldo and Bruno Fernandes for Portugal and Chancel Mbemba for DR Congo; none had source-backed goals or assists, and neither side kept a clean sheet. Pedro Neto, João Neves, Yoane Wissa, and Arthur Masuaku were not current selected Fantasy Five leaderboard players.
+
+Convex production: .env.production CONVEX values were checked before database work. No stat writes were needed because no selected Fantasy Five player had source-backed goals, assists, or clean sheets from the completed match.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

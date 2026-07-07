@@ -1,0 +1,102 @@
+[
+  {
+    "playerId": "official:australia:goalGetter:irankunda",
+    "playerName": "IRANKUNDA",
+    "country": "Australia",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "AUS 2-0 TUR 2026-06-14. Guardian/FOX: Nestory Irankunda scored 27; Guardian credits Paul Okon-Engstler assist. Sources: theguardian.com/football/2026/jun/14/australia-socceroos-turkey-world-cup-2026-group-d-match-report; foxsports.com/...647620. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:star:metcalfe",
+    "playerName": "METCALFE",
+    "country": "Australia",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "AUS 2-0 TUR 2026-06-14. Guardian/FOX/VAVEL: Connor Metcalfe scored Australia's second at 75; no assist source-backed. Sources: theguardian.com/football/2026/jun/14/australia-socceroos-turkey-world-cup-2026-group-d-match-report; vavel.com/...1263370. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:playmaker:metcalfe",
+    "playerName": "METCALFE",
+    "country": "Australia",
+    "goals": 1,
+    "assists": 0,
+    "cleanSheets": 0,
+    "notes": "AUS 2-0 TUR 2026-06-14. Guardian/FOX/VAVEL: Connor Metcalfe scored Australia's second at 75; no assist source-backed. Sources: theguardian.com/football/2026/jun/14/australia-socceroos-turkey-world-cup-2026-group-d-match-report; vavel.com/...1263370. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:playmaker:okon-engstler",
+    "playerName": "OKON-ENGSTLER",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 1,
+    "cleanSheets": 0,
+    "notes": "AUS 2-0 TUR 2026-06-14. Guardian match report: Irankunda 27 after assist by Paul Okon-Engstler. Source: theguardian.com/football/2026/jun/14/australia-socceroos-turkey-world-cup-2026-group-d-match-report. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:defenderKeeper:circati",
+    "playerName": "CIRCATI",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "AUS 2-0 TUR 2026-06-14 clean sheet. FotMob/Ahram lineups list Circati starting; FOX final confirms 2-0. Sources: fotmob.com/matches/turkiye-vs-australia/1gr3uk; english.ahram.org.eg/NewsContentP/66/570706. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:wildcard:circati",
+    "playerName": "CIRCATI",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "AUS 2-0 TUR 2026-06-14 clean sheet. FotMob/Ahram lineups list Circati starting; FOX final confirms 2-0. Sources: fotmob.com/matches/turkiye-vs-australia/1gr3uk; english.ahram.org.eg/NewsContentP/66/570706. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:defenderKeeper:italiano",
+    "playerName": "ITALIANO",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "AUS 2-0 TUR 2026-06-14 clean sheet. FotMob/Ahram lineups list Jacob Italiano starting; FOX final confirms 2-0. Sources: fotmob.com/matches/turkiye-vs-australia/1gr3uk; english.ahram.org.eg/NewsContentP/66/570706. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:wildcard:italiano",
+    "playerName": "ITALIANO",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "AUS 2-0 TUR 2026-06-14 clean sheet. FotMob/Ahram lineups list Jacob Italiano starting; FOX final confirms 2-0. Sources: fotmob.com/matches/turkiye-vs-australia/1gr3uk; english.ahram.org.eg/NewsContentP/66/570706. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:defenderKeeper:bos",
+    "playerName": "BOS",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "AUS 2-0 TUR 2026-06-14 clean sheet. FotMob/Ahram lineups list Jordan Bos starting; FOX final confirms 2-0. Sources: fotmob.com/matches/turkiye-vs-australia/1gr3uk; english.ahram.org.eg/NewsContentP/66/570706. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  },
+  {
+    "playerId": "official:australia:wildcard:bos",
+    "playerName": "BOS",
+    "country": "Australia",
+    "goals": 0,
+    "assists": 0,
+    "cleanSheets": 1,
+    "notes": "AUS 2-0 TUR 2026-06-14 clean sheet. FotMob/Ahram lineups list Jordan Bos starting; FOX final confirms 2-0. Sources: fotmob.com/matches/turkiye-vs-australia/1gr3uk; english.ahram.org.eg/NewsContentP/66/570706. Synced 2026-06-14T08:41:40Z",
+    "updatedAt": 1781426500802
+  }
+]

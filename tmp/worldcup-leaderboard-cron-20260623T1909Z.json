@@ -1,0 +1,262 @@
+{
+  "group": null,
+  "rows": [
+    {
+      "champion": "Kylian Mbappe",
+      "createdAt": 1781229564566,
+      "displayName": "Rinky-dink Shinx",
+      "familyName": "Rinky-dink Shinx",
+      "fantasySummary": {
+        "captain": "Kylian Mbappe",
+        "players": [
+          "Virgil Van Dijk",
+          "Harry Kane",
+          "Bruno Fernandes",
+          "Kylian Mbappe",
+          "Ousmane DembéLé"
+        ]
+      },
+      "id": "hd7qv7ynm2wfh2rwtnxe66nzh588gbhf",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 1,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 89,
+        "semifinalistBonus": 0,
+        "total": 89,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Lionel Messi",
+      "createdAt": 1780962344683,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "fantasySummary": {
+        "captain": "Lionel Messi",
+        "players": [
+          "Turner",
+          "Erling Haaland",
+          "Christian Pulisic",
+          "Lionel Messi",
+          "O'Reilly"
+        ]
+      },
+      "id": "hd7v6ewvb79m44j891kce70kpd888nk8",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 2,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 88,
+        "semifinalistBonus": 0,
+        "total": 88,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "Lionel Messi",
+      "createdAt": 1780962617781,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "fantasySummary": {
+        "captain": "Lionel Messi",
+        "players": [
+          "Turner",
+          "Cristiano Ronaldo",
+          "Adams",
+          "Lionel Messi",
+          "O'Reilly"
+        ]
+      },
+      "id": "hd7hdxt5c0taf4zww2v4h9r3an8899yq",
+      "mode": "fantasy-five",
+      "participantDisplayName": "Expired Milk",
+      "participantName": "Anthony",
+      "rank": 3,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 83,
+        "semifinalistBonus": 0,
+        "total": 83,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Bruno Fernandes",
+      "createdAt": 1781144070161,
+      "displayName": "Thou art crusty",
+      "familyName": "Thou art crusty",
+      "fantasySummary": {
+        "captain": "Bruno Fernandes",
+        "players": [
+          "Virgil Van Dijk",
+          "Erling Haaland",
+          "Bruno Fernandes",
+          "Lamine Yamal",
+          "Nico O’Reilly"
+        ]
+      },
+      "id": "hd7gnkmk41eqb1x59s2010hdes88fwfa",
+      "mode": "fantasy-five",
+      "participantDisplayName": "angwns",
+      "participantName": "Angie Winslow",
+      "rank": 4,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 73,
+        "semifinalistBonus": 0,
+        "total": 73,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781063405518,
+      "displayName": "Lambros",
+      "familyName": "Lambros",
+      "id": "hd7x5nrv02vd1dyp3t05ww1j3188cfb6",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 5,
+      "score": {
+        "advancingPoints": 25,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 14,
+        "groupWinnerPoints": 30,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 69,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "13+",
+      "champion": "France",
+      "createdAt": 1781235977336,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7qr8gda4y77kbpy2dq34se9588h9kw",
+      "mode": "full-family",
+      "participantName": "Jack",
+      "rank": 6,
+      "score": {
+        "advancingPoints": 25,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 12,
+        "groupWinnerPoints": 30,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 67,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Brazil",
+      "createdAt": 1781303822814,
+      "displayName": "Soccer Squirrels",
+      "familyName": "Soccer Squirrels",
+      "id": "hd7p4zjhcx7atyd6rpfdb9r9z188gh66",
+      "mode": "full-family",
+      "participantDisplayName": "MamaLlama",
+      "participantName": "Allison",
+      "rank": 7,
+      "score": {
+        "advancingPoints": 25,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 12,
+        "groupWinnerPoints": 30,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 67,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "France",
+      "createdAt": 1781234734707,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7qrtpyr38ffraq1xpysx1dpx88gxen",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 8,
+      "score": {
+        "advancingPoints": 24,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 12,
+        "groupWinnerPoints": 30,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 66,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "France",
+      "createdAt": 1781235186000,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "id": "hd7m6thhpzbstv4p1ayzgrevch88g755",
+      "mode": "full-family",
+      "participantDisplayName": "JamesAintFrench",
+      "participantName": "James 2",
+      "rank": 9,
+      "score": {
+        "advancingPoints": 24,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 12,
+        "groupWinnerPoints": 30,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 66,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Argentina",
+      "createdAt": 1781238176937,
+      "displayName": "Gluckman Guys",
+      "familyName": "Gluckman Guys",
+      "id": "hd7q87pbkn9ykb2j52j8a6jy7h88httb",
+      "mode": "full-family",
+      "participantName": "Family Bracket",
+      "rank": 10,
+      "score": {
+        "advancingPoints": 26,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 10,
+        "groupWinnerPoints": 30,
+        "knockoutPoints": 0,
+        "semifinalistBonus": 0,
+        "total": 66,
+        "underdogPoints": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,1778 @@
+[
+  {
+    "_creationTime": 1780943406720.2864,
+    "_id": "n176zphrps3gqvm1z8pvbq5gqh889sjh",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2017-10-20",
+        "firstName": "Alexander",
+        "gender": "boy",
+        "lastName": "Thomsen",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      },
+      {
+        "allergies": "",
+        "birthDate": "2019-08-25",
+        "firstName": "Oscar",
+        "gender": "boy",
+        "lastName": "Thomsen",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780943406720,
+    "emergencyContact": {
+      "name": "Joachim Hjelm",
+      "phone": "8053684063"
+    },
+    "paidAt": 1780943681531,
+    "parent": {
+      "email": "joachim.hjelm@gmail.com",
+      "firstName": "Joachim",
+      "lastName": "Hjelm",
+      "phone": "8053684063"
+    },
+    "pricing": {
+      "accountCreditApplied": 0,
+      "discount": 0,
+      "subtotal": 650,
+      "total": 650
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3Tg7w2GOalwnslJx03zGwwTb",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780935125940.9092,
+    "_id": "n173jc9nwyggt7sggnvq6wfqy588859j",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2018-02-11",
+        "firstName": "Joshua",
+        "gender": "boy",
+        "lastName": "Gluckman",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-20",
+              "2026-07-21",
+              "2026-07-22",
+              "2026-07-23",
+              "2026-07-24"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780935125940,
+    "emergencyContact": {
+      "name": "Amy Gluckman",
+      "phone": "9178284096"
+    },
+    "paidAt": 1780935206616,
+    "parent": {
+      "email": "acgluckman@gmail.com",
+      "firstName": "Amy",
+      "lastName": "Gluckman",
+      "phone": "9178284096"
+    },
+    "pricing": {
+      "accountCreditApplied": 0,
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3Tg5mTGOalwnslJx0SBCsIgX",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780881513122.7307,
+    "_id": "n176fxvhz2ypsyg0pbkez4brmn889t9d",
+    "children": [
+      {
+        "allergies": "Lactose intolerant to liquid form of milk. He can consume any dairy product except milk from the carton.",
+        "birthDate": "2021-05-15",
+        "firstName": "Antonio",
+        "gender": "boy",
+        "lastName": "Umali",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [
+              "2026-07-06",
+              "2026-07-07",
+              "2026-07-08",
+              "2026-07-09"
+            ],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780881513122,
+    "emergencyContact": {
+      "name": "Paola Umali",
+      "phone": "9739861574"
+    },
+    "paidAt": 1780881681409,
+    "parent": {
+      "email": "pggrande7@icloud.com",
+      "firstName": "Paola",
+      "lastName": "Umali",
+      "phone": "9739861574"
+    },
+    "pricing": {
+      "accountCreditApplied": 0,
+      "discount": 0,
+      "subtotal": 585,
+      "total": 585
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TfrpkGOalwnslJx0NZ3tFeu",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780690969194.8047,
+    "_id": "n17fh559g6axhxj2s673hb70y1882bbe",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2017-08-24",
+        "firstName": "Conway",
+        "gender": "boy",
+        "lastName": "Kleinschmidt",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      },
+      {
+        "allergies": "",
+        "birthDate": "2019-04-13",
+        "firstName": "Wylder",
+        "gender": "boy",
+        "lastName": "Kleinschmidt",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780690969194,
+    "emergencyContact": {
+      "name": "Rhett Kleinschmidt",
+      "phone": "8122196026"
+    },
+    "paidAt": 1780690993625,
+    "parent": {
+      "email": "rkleinschmidt@gmail.com",
+      "firstName": "Rhett",
+      "lastName": "Kleinschmidt",
+      "phone": "18122196026"
+    },
+    "pricing": {
+      "accountCreditApplied": 0,
+      "discount": 0,
+      "subtotal": 390,
+      "total": 390
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3Tf4GTGOalwnslJx0eCn2LMS",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780589864405.9717,
+    "_id": "n17azyj6e6kswat1y8rr3a6r91880gt7",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2017-06-04",
+        "firstName": "Grayson",
+        "gender": "boy",
+        "lastName": "Levy",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-23",
+              "2026-06-25"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [
+              "2026-07-07",
+              "2026-07-09"
+            ],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-21",
+              "2026-07-23"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [
+              "2026-07-28",
+              "2026-07-30"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780589864406,
+    "emergencyContact": {
+      "name": "Sara Levy",
+      "phone": "8186011778"
+    },
+    "paidAt": 1780589914584,
+    "parent": {
+      "email": "jblevy10@gmail.com",
+      "firstName": "Josh",
+      "lastName": "Levy",
+      "phone": "8182598699"
+    },
+    "pricing": {
+      "accountCreditApplied": 0,
+      "discount": 0,
+      "subtotal": 520,
+      "total": 520
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TedxkGOalwnslJx17lnqO3q",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780374961871.185,
+    "_id": "n1765zea1h7nzn1x4py7fp1aqx87xm90",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2019-07-15",
+        "firstName": "Rafael",
+        "gender": "boy",
+        "lastName": "Witman",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780374961871,
+    "emergencyContact": {
+      "name": "Andrew Witman",
+      "phone": "9142752401"
+    },
+    "paidAt": 1780375023974,
+    "parent": {
+      "email": "maestramumm@gmail.com",
+      "firstName": "Catalina",
+      "lastName": "Mumm",
+      "phone": "8187033412"
+    },
+    "pricing": {
+      "accountCreditApplied": 0,
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3Tdk3ZGOalwnslJx0e8rr9xg",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780295043239.6152,
+    "_id": "n17cpxnk086750a29m4gzsy85d87tecg",
+    "children": [
+      {
+        "allergies": "none",
+        "birthDate": "2016-04-10",
+        "firstName": "Kasra",
+        "gender": "boy",
+        "lastName": "Yermian",
+        "sessions": {
+          "week6": {
+            "selectedDays": [
+              "2026-08-03",
+              "2026-08-05",
+              "2026-08-07"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780295043239,
+    "emergencyContact": {
+      "name": "Shadi Golshani",
+      "phone": "8586880618"
+    },
+    "paidAt": 1780295043273,
+    "parent": {
+      "email": "shadigolshani@yahoo.com",
+      "firstName": "Shadi",
+      "lastName": "Golshani",
+      "phone": "18586880618"
+    },
+    "pricing": {
+      "accountCreditApplied": 225,
+      "discount": 0,
+      "subtotal": 225,
+      "total": 0
+    },
+    "season": "pali-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "credit_1780295043238",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780262401529.1753,
+    "_id": "n17aydswssnyestmrj9n2x2pbn87s3na",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2016-06-10",
+        "firstName": "Alec",
+        "gender": "boy",
+        "lastName": "Sun",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-24"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780262401529,
+    "emergencyContact": {
+      "name": "Yuhan Sun",
+      "phone": "6174297452"
+    },
+    "paidAt": 1780262482345,
+    "parent": {
+      "email": "chenlu.lc@gmail.com",
+      "firstName": "chen",
+      "lastName": "lu",
+      "phone": "6177561083"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 130,
+      "total": 130
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TdGm5GOalwnslJx1RPNPLzx",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780115759902.721,
+    "_id": "n17dqe9r88kvjspzcdq6e2as9587qnwm",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2020-08-08",
+        "firstName": "Leon",
+        "gender": "boy",
+        "lastName": "Miller",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780115759902,
+    "emergencyContact": {
+      "name": "Shanying Cui",
+      "phone": "858-822-8440"
+    },
+    "paidAt": 1780115772830,
+    "parent": {
+      "email": "michaelrmmiller@gmail.com",
+      "firstName": "Michael",
+      "lastName": "Miller",
+      "phone": "617-852-9030"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TcectGOalwnslJx0v8fiu35",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1780029905966.6106,
+    "_id": "n173yy8b2d10sejfrs199ttv0n87nn6z",
+    "children": [
+      {
+        "allergies": "none",
+        "birthDate": "2021-02-14",
+        "firstName": "Luca",
+        "gender": "boy",
+        "lastName": "Cohen",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1780029905966,
+    "emergencyContact": {
+      "name": "avshalom cohen",
+      "phone": "18183880652"
+    },
+    "paidAt": 1780029918876,
+    "parent": {
+      "email": "limi32@gmail.com",
+      "firstName": "Lemor",
+      "lastName": "Cohen",
+      "phone": "18183896234"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TcII9GOalwnslJx0iREcX50",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779941191185.5173,
+    "_id": "n17a6yr2pvnyccmrt3njecctpx87k531",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2019-04-15",
+        "firstName": "Ezekiel",
+        "gender": "boy",
+        "lastName": "Clites",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779941191185,
+    "emergencyContact": {
+      "name": "Angie Meik",
+      "phone": "5592397227"
+    },
+    "paidAt": 1779941215059,
+    "parent": {
+      "email": "kendallclites@gmail.com",
+      "firstName": "Kendall",
+      "lastName": "Clites",
+      "phone": "15125388297"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TbvDHGOalwnslJx0ANR0JrX",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779849940247.6523,
+    "_id": "n171canxe8ywqnzb74qfge5adx87h9sh",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2016-10-08",
+        "firstName": "Alexandra",
+        "gender": "girl",
+        "lastName": "Cordoves",
+        "sessions": {
+          "week5": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week7": {
+            "selectedDays": [
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14"
+            ],
+            "type": "days"
+          }
+        }
+      },
+      {
+        "allergies": "",
+        "birthDate": "2018-12-28",
+        "firstName": "Josephine",
+        "gender": "girl",
+        "lastName": "Cordoves",
+        "sessions": {
+          "week5": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week7": {
+            "selectedDays": [
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779849940247,
+    "emergencyContact": {
+      "name": "Lindsay Cordoves",
+      "phone": "9492805556"
+    },
+    "paidAt": 1779849973117,
+    "parent": {
+      "email": "nino.cordoves@gmail.com",
+      "firstName": "Nino",
+      "lastName": "Cordoves",
+      "phone": "9495106466"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 750,
+      "total": 750
+    },
+    "season": "pali-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TbXTUGOalwnslJx0ExX1Ee9",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779728557158.8372,
+    "_id": "n17236ptbay8xdetx516yxzqy187cz7x",
+    "children": [
+      {
+        "allergies": "No allergies, no medial problems",
+        "birthDate": "2020-07-13",
+        "firstName": "Mia",
+        "gender": "girl",
+        "lastName": "Hovanesian",
+        "sessions": {
+          "week6": {
+            "selectedDays": [
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779728557158,
+    "emergencyContact": {
+      "name": "Paul Hovanesian",
+      "phone": "3104296787"
+    },
+    "paidAt": 1779728574354,
+    "parent": {
+      "email": "jessa.m.baker@gmail.com",
+      "firstName": "Jessa",
+      "lastName": "Baker",
+      "phone": "808-294-4145"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 375,
+      "total": 375
+    },
+    "season": "pali-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3Tb1thGOalwnslJx09fPXykq",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779654785282.6362,
+    "_id": "n175hkw6kzvh55fjnrsvdq9vax87b794",
+    "children": [
+      {
+        "allergies": "Yes, Kaden has Type 1 Diabetes managed with Dexcom CGM, omnipod pump. May need to sit out due to low blood sugar. He will need access to his phone to check blood sugar levels at all times.",
+        "birthDate": "2015-05-29",
+        "firstName": "Kaden",
+        "gender": "boy",
+        "lastName": "Jones",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-23",
+              "2026-06-25"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-21",
+              "2026-07-23"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [
+              "2026-07-29"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779654785282,
+    "emergencyContact": {
+      "name": "Aaron Jones",
+      "phone": "8012288094"
+    },
+    "paidAt": 1779654990103,
+    "parent": {
+      "email": "meganjones87@gmail.com",
+      "firstName": "Megan",
+      "lastName": "Jones",
+      "phone": "8015892674"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TaihpGOalwnslJx1fDjUSsf",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779500212753.3716,
+    "_id": "n17dvp5r315fpg9s1fnyzm6hf5879zdw",
+    "children": [
+      {
+        "allergies": "Sometimes seasonal allergy -no afternoon medication",
+        "birthDate": "2017-11-17",
+        "firstName": "Arsenii",
+        "gender": "boy",
+        "lastName": "Perekrestov",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779500212753,
+    "emergencyContact": {
+      "name": "Stanislav",
+      "phone": "8056618285"
+    },
+    "paidAt": 1779500931393,
+    "parent": {
+      "email": "ruchka.oksana@gmail.com",
+      "firstName": "Oksana",
+      "lastName": "Ruchka",
+      "phone": "8056618287"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3Ta4UiGOalwnslJx1KV7MjNr",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779405827088.937,
+    "_id": "n17dn6d1rknwvktaw4sbmcdezx87432r",
+    "children": [
+      {
+        "allergies": "Tree Nut Allergy",
+        "birthDate": "2017-06-28",
+        "firstName": "Ranger",
+        "gender": "boy",
+        "lastName": "Jouan",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779405827089,
+    "emergencyContact": {
+      "name": "Darcy Jouan",
+      "phone": "(818) 642-3948"
+    },
+    "paidAt": 1779405885339,
+    "parent": {
+      "email": "cddramagirl@me.com",
+      "firstName": "Christina",
+      "lastName": "Davis",
+      "phone": "(310) 991-9581"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TZfwMGOalwnslJx0h5hRpuO",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779309837755.8054,
+    "_id": "n178scwh01cc4zbwwbgcs8z57d873ttt",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2016-01-17",
+        "firstName": "Mason",
+        "gender": "boy",
+        "lastName": "Megorden",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779309837755,
+    "emergencyContact": {
+      "name": "Lauren",
+      "phone": "8054054092"
+    },
+    "paidAt": 1779309874671,
+    "parent": {
+      "email": "williamslmw@gmail.com",
+      "firstName": "Lauren",
+      "lastName": "Megorden",
+      "phone": "8054054092"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 130,
+      "total": 130
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TZGy9GOalwnslJx1398rqNR",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779140680959.7576,
+    "_id": "n17359wfzxradj0r0dz3470nkd86z49c",
+    "appliedPromoCode": "VENMO_MANUAL",
+    "children": [
+      {
+        "allergies": "Not provided - manual Venmo registration; confirm medical notes with parent",
+        "birthDate": "2021-08-23",
+        "firstName": "Dominic",
+        "gender": "boy",
+        "lastName": "Gamboa",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779140680959,
+    "emergencyContact": {
+      "name": "Olya Bradley",
+      "phone": "9086271462"
+    },
+    "paidAt": 1779140696328,
+    "parent": {
+      "email": "olyabradley88@gmail.com",
+      "firstName": "Olya",
+      "lastName": "Bradley",
+      "phone": "9086271462"
+    },
+    "paymentMethod": "free_promo",
+    "pricing": {
+      "discount": 0,
+      "subtotal": 65,
+      "total": 65
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "manual_venmo_test_1779140680747",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1779128006434.6394,
+    "_id": "n1722pv2jqeazg44g8tgkedae186z2n6",
+    "children": [
+      {
+        "allergies": "none",
+        "birthDate": "2019-12-11",
+        "firstName": "Jeremy",
+        "gender": "boy",
+        "lastName": "Gamboa",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-25",
+              "2026-06-24"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [
+              "2026-07-27",
+              "2026-07-29"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1779128006434,
+    "emergencyContact": {
+      "name": "Olya Bradley",
+      "phone": "9086271462"
+    },
+    "paidAt": 1779128063867,
+    "parent": {
+      "email": "olyabradley88@gmail.com",
+      "firstName": "Olya",
+      "lastName": "Bradley",
+      "phone": "9086271462"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TYVfOGOalwnslJx0fT5RUI7",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1778449002891.4568,
+    "_id": "n175rsyd435syqt566znxsd6k986fqqm",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2018-12-30",
+        "firstName": "Lisa",
+        "gender": "girl",
+        "lastName": "Azzam",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-20",
+              "2026-07-21",
+              "2026-07-22",
+              "2026-07-23",
+              "2026-07-24"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1778449002891,
+    "emergencyContact": {
+      "name": "Ramzi Azzam",
+      "phone": "8184397324"
+    },
+    "paidAt": 1778605894413,
+    "parent": {
+      "email": "luzmfelix@hotmail.com",
+      "firstName": "Luz",
+      "lastName": "Felix",
+      "phone": "3104137324"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TVf1iGOalwnslJx0aC9jjUi",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1778376676561.542,
+    "_id": "n178sw6m4x0b5sjz8agshwy5kn86earj",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2020-10-10",
+        "firstName": "Violet",
+        "gender": "girl",
+        "lastName": "Howe",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-20",
+              "2026-07-21",
+              "2026-07-22",
+              "2026-07-23",
+              "2026-07-24"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1778376676561,
+    "emergencyContact": {
+      "name": "Holly Knipe",
+      "phone": "8184060871"
+    },
+    "paidAt": 1778605896632,
+    "parent": {
+      "email": "trevelyan.howe@gmail.com",
+      "firstName": "Trevelyan",
+      "lastName": "Howe",
+      "phone": "3103438523"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TVMDAGOalwnslJx1b5LewMy",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1778176252227.3347,
+    "_id": "n172x970j2y2rffy95ht8mht3586815m",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2015-07-07",
+        "firstName": "Ethan",
+        "gender": "boy",
+        "lastName": "Weber",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-22",
+              "2026-07-20",
+              "2026-07-21",
+              "2026-07-23"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1778176252227,
+    "emergencyContact": {
+      "name": "Chad weber",
+      "phone": "3105289643"
+    },
+    "paidAt": 1778605898666,
+    "parent": {
+      "email": "robynweber1114@gmail.com",
+      "firstName": "Robyn",
+      "lastName": "Weber",
+      "phone": "3104037626"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 520,
+      "total": 520
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TUW4WGOalwnslJx1v1PaQWc",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1778076944991.3887,
+    "_id": "n17apvwejh6txsdhpq9k40f71586688g",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2014-06-03",
+        "firstName": "Isabel",
+        "gender": "girl",
+        "lastName": "Furre",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [
+              "2026-07-06",
+              "2026-07-08",
+              "2026-07-10"
+            ],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1778076944991,
+    "emergencyContact": {
+      "name": "Anne Furre",
+      "phone": "3607469136"
+    },
+    "paidAt": 1778605900500,
+    "parent": {
+      "email": "ifurre@gmail.com",
+      "firstName": "Ivan",
+      "lastName": "Furre",
+      "phone": "3603898957"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 390,
+      "total": 390
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TU6EmGOalwnslJx0GMjLRAP",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1778076246586.0918,
+    "_id": "n171gyptk2kjgghsy7xkh46g6d867bpa",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2017-06-14",
+        "firstName": "James",
+        "gender": "boy",
+        "lastName": "Furre",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [
+              "2026-07-06",
+              "2026-07-08",
+              "2026-07-10"
+            ],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1778076246586,
+    "emergencyContact": {
+      "name": "Anne Furre",
+      "phone": "3607469136"
+    },
+    "paidAt": 1778605902832,
+    "parent": {
+      "email": "ifurre@gmail.com",
+      "firstName": "Ivan",
+      "lastName": "Furre",
+      "phone": "3603898957"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 390,
+      "total": 390
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TU63WGOalwnslJx17oDTUU7",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1778009150023.2822,
+    "_id": "n177q6g8846tya712sz24rv49n8655b1",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2015-01-29",
+        "firstName": "Sawyer",
+        "gender": "boy",
+        "lastName": "Zeevigold",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [
+              "2026-07-06",
+              "2026-07-08",
+              "2026-07-10"
+            ],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1778009150023,
+    "emergencyContact": {
+      "name": "Jason Gold",
+      "phone": "18185239877"
+    },
+    "paidAt": 1778605904238,
+    "parent": {
+      "email": "ncparentcoach@gmail.com",
+      "firstName": "Naama",
+      "lastName": "Zeevigold",
+      "phone": "18186182381"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 195,
+      "total": 195
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TTobJGOalwnslJx1eEe3Fr2",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1776985112662.431,
+    "_id": "n175d64wg624c4bw1ga5gbb03985c79m",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2014-12-30",
+        "firstName": "Roma",
+        "gender": "girl",
+        "lastName": "Test",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [
+              "2026-07-22",
+              "2026-07-23"
+            ],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1776985112662,
+    "emergencyContact": {
+      "name": "Test 2",
+      "phone": "3104240395"
+    },
+    "paidAt": 1776985112692,
+    "parent": {
+      "email": "corinnebriers@gmail.com",
+      "firstName": "Kim",
+      "lastName": "Test",
+      "phone": "3104240395"
+    },
+    "pricing": {
+      "discount": 130,
+      "subtotal": 130,
+      "total": 0
+    },
+    "promoCode": "TEST100",
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "free_1776985112660",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1776916553040.061,
+    "_id": "n1762yfe3sgzbwnte1tbcrryh185c9x5",
+    "children": [
+      {
+        "allergies": "",
+        "birthDate": "2014-12-30",
+        "firstName": "Roma",
+        "gender": "girl",
+        "lastName": "Test",
+        "sessions": {
+          "week1": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [
+              "2026-07-27"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1776916553040,
+    "emergencyContact": {
+      "name": "Test 2",
+      "phone": "3104240395"
+    },
+    "paidAt": 1776916553078,
+    "parent": {
+      "email": "corinnebriers@gmail.com",
+      "firstName": "Kim",
+      "lastName": "Test",
+      "phone": "3104240395"
+    },
+    "pricing": {
+      "discount": 65,
+      "subtotal": 65,
+      "total": 0
+    },
+    "promoCode": "TEST100",
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "free_1776916553037",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1776725786959.9727,
+    "_id": "n179ezj2aas3ea3tkxpsq91hfh857h8s",
+    "children": [
+      {
+        "age": 8,
+        "allergies": "SMOKE TEST ONLY",
+        "birthDate": "2017-09-01",
+        "firstName": "SmokeTwo",
+        "gender": "boys",
+        "lastName": "Test",
+        "sessions": {
+          "week4": {
+            "selectedDays": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday"
+            ],
+            "type": "full"
+          }
+        }
+      }
+    ],
+    "createdAt": 1776725786960,
+    "emergencyContact": {
+      "name": "Joey SmokeTest",
+      "phone": "8185550112"
+    },
+    "paidAt": 1776725786999,
+    "parent": {
+      "email": "corinne+camp-smoke-20260420-b@aspiresoccercoaching.com",
+      "firstName": "Corinne",
+      "lastName": "SmokeTest",
+      "phone": "8185550111"
+    },
+    "pricing": {
+      "discount": 299,
+      "subtotal": 299,
+      "total": 0
+    },
+    "promoCode": "TEST100",
+    "season": "summer-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "free_1776725786956",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1776559128614.7385,
+    "_id": "n17ae8812t020a69wzeymdzgnn8552gn",
+    "children": [
+      {
+        "allergies": "None",
+        "birthDate": "2017-08-18",
+        "firstName": "Rishit",
+        "gender": "boy",
+        "lastName": "Ghosh Roy",
+        "sessions": {
+          "week1": {
+            "selectedDays": [
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26"
+            ],
+            "type": "days"
+          },
+          "week2": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week3": {
+            "selectedDays": [],
+            "type": "days"
+          },
+          "week4": {
+            "selectedDays": [],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1776559128614,
+    "emergencyContact": {
+      "name": "Saurabh Ghosh Roy",
+      "phone": "19513688255"
+    },
+    "paidAt": 1778605905907,
+    "parent": {
+      "email": "saurabhghoshroy@gmail.com",
+      "firstName": "Saurabh",
+      "lastName": "Ghosh Roy",
+      "phone": "19513688255"
+    },
+    "pricing": {
+      "discount": 0,
+      "subtotal": 325,
+      "total": 325
+    },
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TNjNsGOalwnslJx1oBXIE0W",
+    "waiverAccepted": true
+  },
+  {
+    "_creationTime": 1775341996422.9502,
+    "_id": "n173kh293pf70q5pxv3q9pwykd846je3",
+    "children": [
+      {
+        "birthDate": "2018-05-15",
+        "firstName": "TestKid",
+        "gender": "boy",
+        "lastName": "Parent",
+        "sessions": {
+          "week3": {
+            "selectedDays": [
+              "monday",
+              "tuesday"
+            ],
+            "type": "days"
+          }
+        }
+      }
+    ],
+    "createdAt": 1775341996423,
+    "emergencyContact": {
+      "name": "Emergency Person",
+      "phone": "8185559999"
+    },
+    "paidAt": 1775342022487,
+    "parent": {
+      "email": "corinne@aspiresoccercoaching.com",
+      "firstName": "Test",
+      "lastName": "Parent",
+      "phone": "8185551234"
+    },
+    "pricing": {
+      "discount": 65,
+      "subtotal": 130,
+      "total": 65
+    },
+    "promoCode": "TEST50",
+    "season": "summer-camps-2026",
+    "status": "paid",
+    "stripePaymentIntentId": "pi_3TIckiGOalwnslJx09WjanER",
+    "waiverAccepted": true
+  }
+]

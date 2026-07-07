@@ -1,0 +1,18 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-27T23:12Z
+
+Current time checked first: Sat Jun 27 16:12:44 PDT 2026 / 2026-06-27T23:12Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260627T2242Z.txt.
+
+Completed/recent match window since prior local sync note: Croatia 2-1 Ghana (ESPN event 760480, FT) and Panama 0-2 England (ESPN event 760485, FT). Later 2026-06-27 matches were still scheduled at sync time.
+
+Public sources checked: ESPN public FIFA World Cup scoreboard for 2026-06-27 and ESPN public match summary/keyEvents JSON for events 760480 and 760485. Local snapshots saved as tmp/espn-scoreboard-20260627-cron-2312Z.json, tmp/espn-summary-760480-20260627T2312Z.json, and tmp/espn-summary-760485-20260627T2312Z.json.
+
+Source-backed scoring: Croatia goals by Petar Sucic and Nikola Vlasic, assists by Mateo Kovacic and Luka Modric; Ghana goal by Derrick Luckassen, assist by Ernest Nuamah. England goals by Jude Bellingham and Harry Kane, assists by Bukayo Saka and Jude Bellingham. England kept a clean sheet.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure in this completed window for Harry Kane/England only. Kane was already at 2 goals from England-Croatia and was updated to 3 total goals after ESPN event 760485 credited Kane with England's 67' goal. Jude Bellingham, Bukayo Saka, Luka Modric, Mateo Kovacic, Nikola Vlasic, and England defender/keeper clean-sheet beneficiaries were not currently selected on the production Fantasy Five leaderboard, so no stat write was made for them.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Writes made:
+- kane / Harry Kane / England / goals=3 / assists=0 / cleanSheets=0 / returned id j97rgmrfz0h4ey70vgmjgfpnhs88tbyf
+- official:england:goalGetter:kane / KANE / England / goals=3 / assists=0 / cleanSheets=0 / returned id j97q7nhpc6jdxgvf7wxmdmdpw588wyym
+- official:england:star:kane / KANE / England / goals=3 / assists=0 / cleanSheets=0 / returned id j97sxqj6hs2c2rkq8hzskpb0c588xrsa
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded after the write; the Kane entry Rinky-dink Shinx loaded with total 145. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

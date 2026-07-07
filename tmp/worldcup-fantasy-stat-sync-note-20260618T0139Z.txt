@@ -1,0 +1,19 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-18T01:39Z
+
+Cron window checked at Wed Jun 17 18:38 PDT / 2026-06-18 01:38 UTC.
+
+Completed/recent matches since the prior 2026-06-17T06:38Z no-op note included Portugal 1-1 DR Congo, England 4-2 Croatia, and Ghana 1-0 Panama. ESPN schedule/scoreboard backed all three as FT; Sky/Fox/Guardian-style public match reports were used for scorer cross-checks where available.
+
+Selected/player normalization from public/worldcup/index.html and production leaderboard found current Fantasy Five exposure to Harry Kane, Bruno Fernandes, and Cristiano Ronaldo. Cristiano Ronaldo and Bruno Fernandes had no source-backed scoring stat changes in Portugal 1-1 DR Congo. Ghana clean sheet and Caleb Yirenkyi/Brandon Thomas-Asante scoring involvement did not affect currently selected Fantasy Five players. No selected defender/keeper clean-sheet updates were source-backed from these matches.
+
+Convex production update written with --prod after the exact non---prod command failed to resolve the function on the production function list:
+playerId=kane, playerName=Harry Kane, country=England, goals=2, assists=0, cleanSheets=0.
+
+Sources:
+https://www.espn.com/soccer/schedule/_/league/fifa.world
+https://www.skysports.com/football/news/32461/13552729/world-cup-2026-england-4-2-croatia-harry-kane-jude-bellingham-and-marcus-rashford-on-target-as-three-lions-make-winning-start
+https://www.foxsports.com/stories/soccer/england-croatia-world-cup-kane-brace-4-takeaways
+https://www.espn.com/soccer/match/_/gameId/760435/congo-dr-portugal
+https://www.foxsports.com/soccer/fifa-world-cup-men-ghana-vs-panama-jun-17-2026-game-boxscore-647638
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' returned Fantasy Five leaderboard rows successfully; public https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 JSON.

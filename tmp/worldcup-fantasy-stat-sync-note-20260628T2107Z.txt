@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-28T21:07Z
+
+Current time checked first: Sun Jun 28 14:07:16 PDT 2026 / 2026-06-28T21:07Z.
+
+Completed/recent match window: South Africa 0-1 Canada, ESPN event 760486, FT.
+
+Public sources checked: ESPN public FIFA World Cup scoreboard/search result and ESPN public match summary/keyEvents JSON for event 760486. Local snapshots saved as tmp/espn-summary-760486-20260628T2107Z.json and tmp/worldcup-leaderboard-20260628T2107Z.json.
+
+Source-backed scoring: Stephen Eustaquio scored for Canada at 90+2. ESPN did not list an assist. Canada kept a clean sheet.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no selected Canada or South Africa player exposure affected by the completed match. No stat write was made.
+
+Production Convex was checked with grep CONVEX .env.production before database work. The first non-prod function call failed because the local deployment lacked worldCup functions; the production call succeeded with --prod.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

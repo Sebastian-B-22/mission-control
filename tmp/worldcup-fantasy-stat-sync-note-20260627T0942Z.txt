@@ -1,0 +1,20 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-27T09:42Z
+
+Current time checked: Sat Jun 27 02:42:31 PDT 2026.
+
+Completed/recent match window since prior note (2026-06-26T05:43Z) found ESPN public scoreboard matches:
+- France 4-1 Norway, event 760475
+- Senegal 5-0 Iraq, event 760474
+- Cape Verde 0-0 Saudi Arabia, event 760478
+- Spain 1-0 Uruguay, event 760479
+- Egypt 1-1 Iran, event 760476
+- Belgium 5-1 New Zealand, event 760477
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Source-backed stat applied:
+- debruyne / Kevin De Bruyne / Belgium: goals=1, assists=0, cleanSheets=0. ESPN event 760477 lists Kevin De Bruyne goal at 66'. Assists were not source-backed in available public data, so assists stayed 0.
+
+Skipped/conflict note:
+- Ousmane Dembele scored 3 goals for France in ESPN event 760475, but the active Fantasy Five entry stores him as playerId custom:wildcard. That id is also used by other custom wildcard picks in active/historical entries (for example Nico O'Reilly), so writing stats to custom:wildcard would mis-award unrelated players. Skipped until custom player IDs are made unique or the entry is corrected.
+- Kylian Mbappe, Erling Haaland, Lamine Yamal, Mohamed Salah, Salem Al-Dawsari, Bebe, and selected defender/keeper picks in these countries had no source-backed scoring-field update from the completed/recent matches.

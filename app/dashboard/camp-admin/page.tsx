@@ -41,8 +41,9 @@ export default function CampAdminPage() {
       "week2": "A2 (Jul 6-10)",
       "week3": "A3 (Jul 20-24)",
       "week4": "A4 (Jul 27-31)",
-      "week5": "P1 (TBD)",
-      "week6": "P2 (TBD)",
+      "week5": "P1 (Jul 27-31)",
+      "week6": "P2 (Aug 3-7)",
+      "week7": "P3 (Aug 10-14)",
     };
     
     for (const [wk, sess] of Object.entries(sessions || {})) {

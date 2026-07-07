@@ -8,6 +8,7 @@ export function WorkSurfaceStatCard({
   description,
   icon,
   tone = "default",
+  size = "default",
   className,
 }: {
   label: string;
@@ -15,6 +16,7 @@ export function WorkSurfaceStatCard({
   description?: string;
   icon?: ReactNode;
   tone?: "default" | "brand" | "success" | "warning" | "danger" | "info" | "accent";
+  size?: "default" | "compact";
   className?: string;
 }) {
   const toneClasses = {
@@ -29,11 +31,25 @@ export function WorkSurfaceStatCard({
 
   return (
     <Card className={cn("shadow-none", toneClasses[tone], className)}>
-      <CardContent className="flex items-center justify-between gap-4 p-4">
+      <CardContent className={cn(
+        "flex items-center justify-between gap-4",
+        size === "compact" ? "p-3" : "p-4"
+      )}>
         <div className="min-w-0">
-          <div className="text-xs font-medium uppercase tracking-wide text-ink-faint">{label}</div>
-          <div className="mt-2 text-3xl font-semibold tabular-nums text-ink">{value}</div>
-          {description ? <div className="mt-1 text-sm text-ink-soft">{description}</div> : null}
+          <div className={cn(
+            "font-medium uppercase text-ink-faint",
+            size === "compact" ? "text-[11px] tracking-[0.16em]" : "text-xs tracking-wide"
+          )}>{label}</div>
+          <div className={cn(
+            "font-semibold tabular-nums text-ink",
+            size === "compact" ? "mt-1.5 text-2xl" : "mt-2 text-3xl"
+          )}>{value}</div>
+          {description ? (
+            <div className={cn(
+              "mt-1 text-ink-soft",
+              size === "compact" ? "text-xs" : "text-sm"
+            )}>{description}</div>
+          ) : null}
         </div>
         {icon ? <div className="shrink-0">{icon}</div> : null}
       </CardContent>

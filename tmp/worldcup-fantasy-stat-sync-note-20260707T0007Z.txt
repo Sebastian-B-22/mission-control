@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-07T00:07Z
+
+Current time checked first: Mon Jul 6 17:07:35 PDT 2026 / 2026-07-07T00:07Z.
+
+Completed/recent match window since prior local sync notes: ESPN public scoreboard for 2026-07-06 showed Spain 1-0 Portugal (event 760506) as Full Time. Belgium vs United States was still scheduled for 2026-07-07T00:00Z at the scoreboard snapshot time and was not synced.
+
+Source-backed supported stats: ESPN public summary event 760506 credited Spain's goal to Mikel Merino at 90'+1 with Ferran Torres as the second listed participant/assist, and the final score supports a Spain clean sheet. A public recap/search cross-check also reported Merino's winner assisted by Ferran Torres.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current Spain/Portugal exposure only for Lamine Yamal and Bruno Fernandes in active Fantasy Five rows. Mikel Merino and Ferran Torres are in the Spain catalog but were not currently selected; Spain defender/keeper clean-sheet catalog rows were not currently selected; Lamine Yamal is not a defenderKeeper role and had no source-backed goal/assist; Bruno Fernandes had no source-backed goal/assist and Portugal did not keep a clean sheet.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed goals, assists, or cleanSheets update in the completed/recent window.
+
+Verification/context saved: tmp/espn-scoreboard-20260706-cron-2307Z.json, tmp/espn-summary-760506-20260706T0007Z.json, tmp/worldcup-leaderboard-cron-20260707T0007Z.json.

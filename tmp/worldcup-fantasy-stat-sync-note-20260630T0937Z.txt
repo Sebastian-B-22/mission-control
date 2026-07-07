@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-30T09:37Z
+
+Current time checked first: Tue Jun 30 02:37:46 PDT 2026 / 2026-06-30T09:37Z. Prior local stat-sync note found: tmp/worldcup-fantasy-stat-sync-note-20260630T0807Z.txt.
+
+No completed/recent match window since the prior sync. ESPN public scoreboard for 2026-06-30 showed Norway-Ivory Coast (17:00Z), France-Sweden (21:00Z), and Mexico-Ecuador (2026-07-01T01:00Z) still scheduled/pre-match.
+
+Production Convex was checked with grep CONVEX .env.production before database reads. No worldCup:upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows.
+
+Sources: tmp/espn-scoreboard-20260630T0937Z.json.

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-16T22:40Z
+
+Checked current time (Tue Jun 16 15:38 PDT / 2026-06-16 22:38 UTC) and production Convex env (.env.production = harmless-salamander-44).
+
+Completed/recent window since prior 2026-06-16T20:08Z sync: France 3-1 Senegal (ESPN event 760432, FT). ESPN summary details list France goals: Kylian Mbappe 66' assisted by Michael Olise, Bradley Barcola 82' assisted by Adrien Rabiot, Kylian Mbappe 90'+6; Senegal goal: Ibrahim Mbaye 90'+5 assisted by Iliman Ndiaye. No clean sheet.
+
+Fantasy Five selected-player normalization found Kylian Mbappe selected from the local catalog (id mbappe). One selected custom France player, Ousmane Dembele, had no source-backed goal/assist/clean-sheet stat in this match.
+
+Convex production update completed with `npx convex run --prod worldCup:upsertFantasyPlayerStats`: mbappe / Kylian Mbappe / France / goals=2 / assists=0 / cleanSheets=0. The exact payload form using only CONVEX_URL failed because the deployed function list did not resolve worldCup functions without --prod; --prod succeeded and returned id j97gnxj9jajpeavcde87z4q4b188s0vr.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 with 39 rows and 5 Fantasy Five rows after the update.
+
+Sources checked: ESPN public scoreboard API dates=20260616; ESPN public match summary API event=760432; https://www.espn.com/soccer/match/_/gameId/760432; production leaderboard HTTP endpoint.

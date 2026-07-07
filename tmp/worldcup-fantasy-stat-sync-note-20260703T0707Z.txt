@@ -1,0 +1,25 @@
+HTA World Cup Fantasy Five stat sync, 2026-07-03T07:07Z.
+
+Current time checked: Fri Jul 3 00:07:55 PDT 2026. Recent completed World Cup window found on 2026-07-02: Spain 3-0 Austria, Portugal 2-1 Croatia, Switzerland 2-0 Algeria.
+
+Source-backed public stats reviewed:
+- FIFA schedule/result page showed Match 83 Portugal 2-1 Croatia and Match 84 Spain 3-0 Austria.
+- ESPN player stats for Portugal 2-1 Croatia (gameId 760496) credited Cristiano Ronaldo with a 68' penalty goal and Goncalo Ramos with the 90'+4 winner.
+- AP/CBS/WCAX recap for Spain 3-0 Austria said Mikel Oyarzabal scored twice, Cucurella assisted one, and Yamal did not score.
+- Guardian/FOX/ESPN snippets for Switzerland 2-0 Algeria credited Breel Embolo and Dan Ndoye goals, Johan Manzambi assist on Embolo, and Switzerland clean sheet.
+
+Fantasy Five exposure from production leaderboard and local roster normalization:
+- Portugal-Croatia and Spain-Austria were already handled by earlier 2026-07-03 sync notes; Ronaldo was already at cumulative 3 goals after the 68' penalty.
+- Newly completed/recent window for this run was Switzerland 2-0 Algeria. No selected Fantasy Five Switzerland defender/keeper exposure was found, so no clean-sheet write was needed.
+- Lamine Yamal had no source-backed goal/assist; Spain clean sheet does not apply to his non-defenderKeeper role.
+- Bruno Fernandes/Modric/Mahrez/Alaba had no source-backed supported update in the reviewed window.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Updates:
+- A duplicate-window Ronaldo write briefly set goals=1; it was immediately corrected back to the source-backed cumulative goals=3 from prior sync notes and ESPN 760496. Returned id j97w4njst9wnw7509sezz0ewc189t2za.
+- No new Fantasy Five scoring writes were required for the newly completed Switzerland-Algeria window.
+
+Verification:
+- CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":200,"publicOnly":false}' succeeded before write and returned Fantasy Five rows.
+- https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200 after write.

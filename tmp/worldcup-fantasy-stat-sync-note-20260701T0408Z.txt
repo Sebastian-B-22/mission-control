@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-01T04:08Z
+
+Run time checked: Tue Jun 30 21:07:15 PDT 2026 / 2026-07-01T04:07Z.
+
+Completed/recent match window since the prior 2026-06-30T23:07Z sync: Mexico 2-0 Ecuador completed after the prior sync window. ESPN public scoreboard/match pages and FOX public boxscore snippets showed Mexico goals by Julian Quinones (22') and Raul Jimenez (31'), Ecuador no goals, and a Mexico clean sheet.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html/public/worldcup/fantasy-rosters.js found Enner Valencia selected for Ecuador, but he had no source-backed goal or assist in Mexico 2-0 Ecuador. Guillermo Ochoa is in the static catalog as a Mexico defender/keeper, but is not selected on the current production Fantasy Five leaderboard. No currently selected Mexico player had a supported goals/assists/cleanSheets update.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

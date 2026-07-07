@@ -1,0 +1,12 @@
+[
+  {
+    "playerId": "isak",
+    "playerName": "Alexander Isak",
+    "country": "Sweden",
+    "goals": 1,
+    "assists": 2,
+    "cleanSheets": 0,
+    "notes": "SWE 5-1 TUN 2026-06-15 UTC. ESPN event 760424: Isak goal 30 assisted Gyokeres; assists Gyokeres 59 and Svanberg 84. Source: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760424 Synced 2026-06-15T09:07Z",
+    "updatedAt": 1781514711960
+  }
+]

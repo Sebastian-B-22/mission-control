@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-29T04:38Z
+
+Current time check: Sun Jun 28 21:37:21 PDT 2026 / 2026-06-29 04:37 UTC.
+
+Completed/recent match window: the Round of 32 opened with South Africa 0-1 Canada on 2026-06-28 at Los Angeles Stadium. Al Jazeera's match page showed full-time South Africa 0, Canada 1, with S. Eustaquio scoring at 92'. Al Jazeera's schedule page listed this as the only Sunday match. Public AP/ESPN/NDTV/FOX search snippets cross-checked the same result and Stephen Eustaquio winner.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected players: Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Lamine Yamal, Enner Valencia, and Linda Caicedo. Alphonso Davies is present in the static catalog for Canada but not selected on the current production Fantasy Five leaderboard. No current selected Fantasy Five player from Canada or South Africa had a source-backed goal, assist, or clean sheet in this completed match.
+
+No upsertFantasyPlayerStats writes were made.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

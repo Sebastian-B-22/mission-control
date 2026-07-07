@@ -1,0 +1,11 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-20T11:39Z
+
+Current time checked first: Sat Jun 20 04:38:00 PDT 2026 / 2026-06-20T11:38Z. Production Convex values checked with grep CONVEX .env.production before any database work.
+
+Completed/recent match window since the prior cron note (2026-06-20T01:07Z): Brazil 3-0 Haiti (ESPN event 760444, FT, kickoff 2026-06-20T00:30Z) and Türkiye 0-1 Paraguay (ESPN event 760443, FT, kickoff 2026-06-20T03:00Z). ESPN public scoreboard for 2026-06-20 shows Netherlands-Sweden, Germany-Ivory Coast, and Ecuador-Curaçao still scheduled, so no later completed matches.
+
+Source-backed scoring from ESPN public summary/keyEvents: Brazil-Haiti goals Matheus Cunha 23' (no assist stated), Matheus Cunha 36' assisted by Vinícius Júnior, Vinícius Júnior 45'+3 assisted by Lucas Paquetá; Brazil clean sheet. Türkiye-Paraguay goal Matías Galarza 2' assisted by Julio Enciso; Paraguay clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current selected Fantasy Five player from Brazil, Haiti, Türkiye, or Paraguay. Vinicius Junior exists in public/worldcup/index.html fantasyPlayers, but is not present in current production fantasy-five entries. No Convex upsertFantasyPlayerStats writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

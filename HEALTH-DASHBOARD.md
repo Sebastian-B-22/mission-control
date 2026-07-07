@@ -25,9 +25,9 @@ New "Health" view in sidebar with:
    - Checkmark for perfect days
    - Click any day to log steps
 2. **Three progress bars** with real-time scoring:
-   - Sleep: Goal 7h → 33 points
-   - Steps: Goal 3,500 → 33 points
-   - Active Calories: Goal 350 → 34 points
+   - Sleep: Goal 7h -> 50 points
+   - Steps: Goal 3,500 -> 50 points
+   - Active Calories: tracked for display, not included in the Don't Die score
 3. **Scoring formula:** 100 = Perfect Day
 4. **Stats cards:** Perfect days, streak, goal level, days remaining
 5. **Goal progression tracker:** 20 → 25 → 30 perfect days/month
@@ -82,12 +82,12 @@ Convex (Storage) ─────────────────────
 
 | Metric | Goal | Max Points |
 |--------|------|------------|
-| Sleep | ≥7 hours | 33 |
-| Steps | ≥3,500 | 33 |
-| Active Calories | ≥350 | 34 |
+| Sleep | >=7 hours | 50 |
+| Steps | >=3,500 | 50 |
+| Active Calories | tracked separately | 0 |
 | **Total** | | **100** |
 
-Partial scores: `floor((actual / goal) * max_points)`
+Partial scores: `round((actual / goal) * max_points)`, capped at max.
 
 ---
 

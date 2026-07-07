@@ -1,0 +1,17 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-24T08:39Z
+
+Checked current time: Wed Jun 24 01:39:58 PDT 2026. Prior sync note was 2026-06-23T05:39Z.
+
+Completed/recent match window since prior sync: Portugal 5-0 Uzbekistan, England 0-0 Ghana, Croatia 1-0 Panama, Colombia 1-0 Congo DR. Earlier Norway/Senegal and Jordan/Algeria were already covered by the prior note.
+
+Fantasy Five selected-player normalization from production listLeaderboard plus public/worldcup/index.html found Cristiano Ronaldo (id ronaldo) and Bruno Fernandes (id bruno) selected from Portugal. Other selected players in the recent match window either had no source-backed scoring stat, were not in a clean-sheet-eligible role, or were not selected.
+
+Sources used: FIFA Portugal-Uzbekistan match report/highlights (https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/portugal-uzbekistan-match-report-highlights) lists Portugal goals Ronaldo 6,39; Mendes 17; Nematov own goal 60; Leao 87. ESPN public summary API (https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760461) confirms FT, Ronaldo goals at 6 and 39, and Bruno Fernandes assist at 39. ESPN scoreboard for 2026-06-23 confirms England-Ghana 0-0, Croatia-Panama 1-0, and Colombia-Congo DR 1-0.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production updates completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- ronaldo / Cristiano Ronaldo / Portugal / goals=2 / assists=0 / cleanSheets=0. Returned id j97kkb7945q3he2j202rdn7zmn896xhx.
+- bruno / Bruno Fernandes / Portugal / goals=0 / assists=1 / cleanSheets=0. Returned id j97nqyth8wevy8vrg6cdzryx4x89620d.
+
+No Ronaldo assist was written because ESPN did not credit an assist on the Rafael Leao goal. No Portugal clean sheet was written because selected Portugal players are not defenderKeeper picks.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five rows.

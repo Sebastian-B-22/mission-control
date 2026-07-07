@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T00:10Z
+
+Checked current time first: Wed Jun 24 17:10:00 PDT 2026 / 2026-06-25T00:10Z. Prior local sync note was 2026-06-24T21:11Z.
+
+Completed/recent match window since prior sync: Morocco 4-2 Haiti and Scotland 0-3 Brazil are full time. Czechia-Mexico and South Africa-South Korea were still scheduled/not completed at check time.
+
+Sources used: ESPN public scoreboard API for 2026-06-24 confirmed FT statuses and scores. ESPN public summary APIs confirmed key events:
+- Morocco 4-2 Haiti (event 760464): Yassine Bounou own goal for Haiti; Achraf Hakimi 39; Wilson Isidor 43; Ismael Saibari 45+1; Soufiane Rahimi 78; Gessime Yassine 89. ESPN web scoreboard snippet briefly showed 3-2, but the public API and summary showed 4-2 with the 89' Gessime Yassine goal, so no Fantasy Five stat depended on the discrepancy.
+- Scotland 0-3 Brazil (event 760465): Vinicius Junior 7 and 45+3; Matheus Cunha 60. Brazil clean sheet source-backed by final score.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html/public/worldcup/fantasy-rosters.js found no selected Fantasy Five players from Morocco, Haiti, Scotland, or Brazil. Brazil champion picks in full-family entries are not Fantasy Five player selections. No selected Brazil defender/keeper clean-sheet beneficiary was present.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no selected Fantasy Five player had a source-backed goals, assists, or cleanSheets stat in the completed/recent window.
+
+Verification: https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200. CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five rows.

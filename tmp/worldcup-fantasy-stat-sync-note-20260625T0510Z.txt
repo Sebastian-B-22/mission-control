@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-25T05:10Z
+
+Current time check: Wed Jun 24 22:10:03 PDT 2026 / 2026-06-25T05:10Z.
+
+Completed/recent match window since the prior 2026-06-24T07:09Z sync note: ESPN public World Cup scoreboard for 2026-06-24 showed six completed matches: Bosnia-Herzegovina 3-1 Qatar, Switzerland 2-1 Canada, Morocco 4-2 Haiti, Brazil 3-0 Scotland, Mexico 3-0 Czechia, South Africa 1-0 South Korea.
+
+Sources checked: ESPN public scoreboard API https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260624 and linked public ESPN match/report URLs for events 760462, 760463, 760464, 760465, 760467, 760466. Official FIFA was preferred by rule but no selected Fantasy Five affected stat needed an official-source write; ESPN public data was sufficient to rule out selected-player updates.
+
+Source-backed scoring from ESPN: Kerim Alajbegovic, Mahmoud Abunada own goal, Hassan Al-Haydos, Ermin Mahmic; Ruben Vargas, Johan Manzambi, Promise David; Yassine Bounou own goal, Achraf Hakimi, Wilson Isidor, Ismael Saibari, Soufiane Rahimi, Gessime Yassine; Vinicius Junior twice and Matheus Cunha; Mateo Chavez, Julian Quinones, Alvaro Fidalgo; Thapelo Maseko. Clean sheets: Brazil, Mexico, South Africa.
+
+Fantasy Five selected-player normalization from production listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current production Fantasy Five selection from Bosnia-Herzegovina, Qatar, Switzerland, Canada, Morocco, Haiti, Brazil, Scotland, Mexico, Czechia, South Africa, or South Korea. Local public catalog contains Vinicius Junior, Alphonso Davies, Akram Afif, Achraf Hakimi, Yassine Bounou, Guillermo Ochoa, Petr Cech, and Son Heung-min, but none appeared in current production Fantasy Five rows. No selected defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were needed.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-27T22:42Z
+
+Current time checked first: Sat Jun 27 15:42:39 PDT 2026 / 2026-06-27T22:42Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260626T2045Z.txt.
+
+Completed/recent match window since prior local sync note: Cabo Verde 0-0 Saudi Arabia (ESPN event 760478, FT), Uruguay 0-1 Spain (760479, FT), Egypt 1-1 Iran (760476, FT), and New Zealand 1-5 Belgium (760477, FT). 2026-06-27 21:00Z matches Croatia-Ghana and Panama-England were still in second half at sync time; later matches were scheduled.
+
+Public sources checked: ESPN public FIFA World Cup scoreboard for 2026-06-26/2026-06-27 and ESPN public match summary/keyEvents JSON for events 760478, 760479, 760476, and 760477. Local snapshots saved as tmp/espn-scoreboard-20260626-cron-2242Z.json, tmp/espn-scoreboard-20260627-cron-2242Z.json, and tmp/espn-summary-76047*.json.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found relevant selected player exposure in this window only for Lamine Yamal/Spain. ESPN keyEvents credited Spain's goal to Alex Baena, assisted by Marcos Llorente; Lamine Yamal was substituted at 76' with no source-backed goal or assist. Spain kept a clean sheet, but Lamine Yamal is not a defenderKeeper role in the Fantasy Five catalog, so no clean-sheet stat applies. No selected Fantasy Five player from Saudi Arabia, Cabo Verde, Uruguay, Egypt, Iran, Belgium, or New Zealand had a source-backed goals/assists/cleanSheets update in this completed window.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed supported stat update.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

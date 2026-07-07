@@ -1,0 +1,19 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-30T06:37Z
+
+Current date/time checked: Mon Jun 29 23:37:43 PDT 2026 / 2026-06-30 06:37 UTC.
+
+Completed/recent match window since the prior visible sync note: ESPN public scoreboard for 2026-06-28 through 2026-06-30 showed Canada 1-0 South Africa (event 760486), Brazil 2-1 Japan (760487), Germany 1-1 Paraguay FT-Pens (760489), and Netherlands 1-1 Morocco FT-Pens (760488) as post-match. Norway-Ivory Coast, France-Sweden, and Mexico-Ecuador were still scheduled/pre-match.
+
+Sources checked: ESPN public scoreboard and ESPN summary details for events 760486, 760487, 760489, and 760488; production Fantasy Five leaderboard via worldCup:listLeaderboard; public/worldcup/index.html and public/worldcup/fantasy-rosters.js were available for roster normalization.
+
+Source-backed scoring details from ESPN details:
+- CAN 1-0 RSA: Stephen Eustaquio goal, no assist listed; Canada clean sheet.
+- BRA 2-1 JPN: Kaishu Sano goal; Casemiro goal assisted by Gabriel Magalhaes; Gabriel Martinelli goal assisted by Bruno Guimaraes.
+- GER 1-1 PAR: Julio Enciso goal assisted by Matias Galarza; Kai Havertz goal assisted by Florian Wirtz.
+- NED 1-1 MAR: Cody Gakpo goal assisted by Crysencio Summerville; Issa Diop goal assisted by Chemsdine Talbi.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard found current selected players: Turner, Erling Haaland, Christian Pulisic, Lionel Messi, O'Reilly/Nico O'Reilly, Cristiano Ronaldo, Adams, Virgil Van Dijk, Harry Kane, Bruno Fernandes, Kylian Mbappe, Ousmane Dembele, Lamine Yamal, Enner Valencia, and Linda Caicedo. Of the completed-window countries, Virgil Van Dijk was the only selected Fantasy Five player found, and the Netherlands did not keep a clean sheet; he was not credited with a goal or assist. No selected Canada, South Africa, Brazil, Japan, Germany, Paraguay, Morocco scorer/assist/clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No worldCup:upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync note - 2026-07-03T03:07Z
+
+Current time checked first: Thu Jul 2 20:07:53 PDT 2026 / 2026-07-03T03:07Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260701T2307Z.txt.
+
+Completed/recent match window since last sync: ESPN public scoreboard for 2026-07-02 showed Spain 3-0 Austria (event 760497) and Portugal 2-1 Croatia (event 760496) as Full Time. Switzerland-Algeria (event 760498) was in progress and was not synced.
+
+Source-backed supported stat updates from completed matches: ESPN public summary event 760497 credited Spain goals to Mikel Oyarzabal (36', 89') and Pedro Porro (66'), assists to Marc Cucurella (36', 89') and Alex Baena (66'), and Spain kept a clean sheet. ESPN public summary event 760496 credited Croatia's goal to Ivan Perisic (53'), Portugal goals to Cristiano Ronaldo (68' penalty) and Goncalo Ramos (90'+4'), and the Ramos assist to Rafael Leao. No clean sheet in Portugal-Croatia.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found relevant selected exposure in this completed window for Cristiano Ronaldo, Bruno Fernandes, and Lamine Yamal. Cristiano Ronaldo received one new source-backed goal. Bruno Fernandes had no source-backed goal or assist in Portugal-Croatia and Portugal did not keep a clean sheet. Lamine Yamal had no source-backed goal or assist in Spain-Austria and is not a defenderKeeper role, so Spain's clean sheet did not apply.
+
+Production Convex was checked with grep CONVEX .env.production before database work. Production update completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats for ronaldo / Cristiano Ronaldo / Portugal / goals=3 / assists=0 / cleanSheets=0. Returned id j97w4njst9wnw7509sezz0ewc189t2za. Total includes Ronaldo's two goals from Portugal-Uzbekistan event 760461 plus the Portugal-Croatia penalty in event 760496.
+
+Verification: production worldCup:listLeaderboard --prod with limit 10 returned rows and included Fantasy Five rows after the write.
+
+Sources checked: ESPN public scoreboard API for 2026-07-02, ESPN public summary APIs for events 760497/760496/760461, production Fantasy Five leaderboard from worldCup:listLeaderboard, and public/worldcup/index.html plus public/worldcup/fantasy-rosters.js for roster ID normalization.

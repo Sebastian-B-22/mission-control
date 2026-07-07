@@ -1,0 +1,14 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-05T10:08Z
+
+Current time checked: Sun Jul 5 03:07 PDT / 2026-07-05T10:07Z. Last local sync note found was 2026-06-30T23:07Z, and ESPN public scoreboard showed two completed 2026-07-04 Round of 16 matches: Morocco 3-0 Canada (event 760502) and France 1-0 Paraguay (event 760503).
+
+Production Convex was checked first with grep CONVEX .env.production.
+
+Sources checked: ESPN public scoreboard API for 2026-07-04 and ESPN event links for 760502/760503. ESPN credited Morocco goals to Azzedine Ounahi (50, 82) and Soufiane Rahimi (90+8), with a Morocco clean sheet; no current production Fantasy Five selection matched those supported scoring/clean-sheet beneficiaries. ESPN credited France's goal to Kylian Mbappe on a 70' penalty, with no assist. France kept a clean sheet, but no selected Fantasy Five France defender/keeper was found in production leaderboard summaries.
+
+Production updates completed:
+- mbappe / Kylian Mbappe / France / goals=7 / assists=2 / cleanSheets=0 / returned id j97kvmv17jj0t45m5t9jbz0w2x89t1be
+- official:france:star:mbappe / MBAPPE / France / goals=7 / assists=2 / cleanSheets=0 / returned id j97rw5bz6rwpqqxy1qg8vqpyys89v4xt
+- official:france:goalGetter:mbappe / MBAPPE / France / goals=7 / assists=2 / cleanSheets=0 / returned id j97m8n30bcagt4dzbvtsjk4de589tjfk
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":5,"publicOnly":false}' succeeded and showed the top Fantasy Five row increased to 218 total. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

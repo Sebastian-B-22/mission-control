@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T21:38Z
+
+Current local time checked with date: Sun Jun 21 14:38:14 PDT 2026.
+
+Completed/recent window since prior sync note 2026-06-21T21:08Z: Belgium 0-0 Iran (ESPN event 760451, FT at 90'+5'). ESPN public scoreboard for 2026-06-21 also still shows Japan 4-0 Tunisia and Spain 4-0 Saudi Arabia as FT, both already reviewed in earlier 2026-06-21 notes; Uruguay vs Cape Verde and New Zealand vs Egypt remained scheduled/pre-match.
+
+Source checked: ESPN public scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621 and ESPN event summary https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760451 checked 2026-06-21T21:38Z. The completed Belgium-Iran result was 0-0, so no goals or assists were available. Clean sheets were source-backed at team level for Belgium and Iran.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current Fantasy Five selected players from Belgium or Iran. Kevin De Bruyne is available in the static fantasyPlayers catalog, but is not present in the current production Fantasy Five rows. No selected Belgium or Iran defender/keeper clean-sheet beneficiary was found.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made because no currently selected Fantasy Five player had a source-backed goal, assist, or clean-sheet stat from the completed/recent match.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

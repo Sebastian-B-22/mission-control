@@ -1,0 +1,20 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T18:08Z
+
+Current time checked first: Sun Jun 21 11:08:12 PDT 2026 / 2026-06-21T18:08Z.
+
+Completed/recent window since prior 2026-06-21T16:08Z sync note: ESPN public FIFA World Cup scoreboard for 2026-06-21 showed Spain 4-0 Saudi Arabia (event 760453) as Full Time. Belgium vs Iran, Uruguay vs Cape Verde, and New Zealand vs Egypt were still scheduled. Japan 4-0 Tunisia was already handled by earlier notes.
+
+Source-backed scoring for Spain 4-0 Saudi Arabia from ESPN summary event 760453: Lamine Yamal 10' assisted by Mikel Oyarzabal; Mikel Oyarzabal 21' assisted by Aymeric Laporte; Mikel Oyarzabal 24' assisted by Dani Olmo; Hassan Al-Tambakti own goal 49'. Final score supports Spain clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found Lamine Yamal selected in active Fantasy Five entries. No active selected Spain defender/keeper clean-sheet beneficiary was found. Oyarzabal, Laporte, Olmo, and Al-Tambakti were not active selected Fantasy Five players.
+
+Production Convex was checked with grep CONVEX .env.production before database work.
+
+Write made:
+- CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats -- '{"playerId":"yamal","playerName":"Lamine Yamal","country":"Spain","goals":1,"assists":0,"cleanSheets":0,"notes":"Spain 4-0 Saudi Arabia, 2026-06-21 FT. ESPN scoreboard https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621 and summary event 760453 https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760453 checked 2026-06-21T18:08Z; Yamal goal 10\"."}'
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- ESPN public FIFA World Cup summary API for event 760453: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760453
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded after the write and returned 39 rows.

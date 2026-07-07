@@ -28,6 +28,7 @@ import type * as contentPipeline from "../contentPipeline.js";
 import type * as contentVerification from "../contentVerification.js";
 import type * as costTracker from "../costTracker.js";
 import type * as cronJobs from "../cronJobs.js";
+import type * as crons from "../crons.js";
 import type * as daily from "../daily.js";
 import type * as dailyRecap from "../dailyRecap.js";
 import type * as emailDrafts from "../emailDrafts.js";
@@ -35,6 +36,7 @@ import type * as engagementHabits from "../engagementHabits.js";
 import type * as families from "../families.js";
 import type * as familyMeeting from "../familyMeeting.js";
 import type * as fieldTrips from "../fieldTrips.js";
+import type * as finance from "../finance.js";
 import type * as fixUserResolutionAndDedupe from "../fixUserResolutionAndDedupe.js";
 import type * as games from "../games.js";
 import type * as habitTemplates from "../habitTemplates.js";
@@ -48,6 +50,7 @@ import type * as homeschoolAgentNotes from "../homeschoolAgentNotes.js";
 import type * as homeschoolProgress from "../homeschoolProgress.js";
 import type * as http from "../http.js";
 import type * as jotformSync from "../jotformSync.js";
+import type * as knowledgeFiles from "../knowledgeFiles.js";
 import type * as mavenFeedback from "../mavenFeedback.js";
 import type * as memorySnapshots from "../memorySnapshots.js";
 import type * as onboarding from "../onboarding.js";
@@ -65,12 +68,15 @@ import type * as sebastianTasks from "../sebastianTasks.js";
 import type * as seedSebastianTasks from "../seedSebastianTasks.js";
 import type * as teamMembers from "../teamMembers.js";
 import type * as telegramOutbox from "../telegramOutbox.js";
+import type * as tickets from "../tickets.js";
+import type * as timeBlocks from "../timeBlocks.js";
 import type * as typing from "../typing.js";
 import type * as updateRPMGoals from "../updateRPMGoals.js";
 import type * as users from "../users.js";
 import type * as weeklyGoals from "../weeklyGoals.js";
 import type * as weeklySchedule from "../weeklySchedule.js";
 import type * as workouts from "../workouts.js";
+import type * as worldCup from "../worldCup.js";
 
 import type {
   ApiFromModules,
@@ -99,6 +105,7 @@ declare const fullApi: ApiFromModules<{
   contentVerification: typeof contentVerification;
   costTracker: typeof costTracker;
   cronJobs: typeof cronJobs;
+  crons: typeof crons;
   daily: typeof daily;
   dailyRecap: typeof dailyRecap;
   emailDrafts: typeof emailDrafts;
@@ -106,6 +113,7 @@ declare const fullApi: ApiFromModules<{
   families: typeof families;
   familyMeeting: typeof familyMeeting;
   fieldTrips: typeof fieldTrips;
+  finance: typeof finance;
   fixUserResolutionAndDedupe: typeof fixUserResolutionAndDedupe;
   games: typeof games;
   habitTemplates: typeof habitTemplates;
@@ -119,6 +127,7 @@ declare const fullApi: ApiFromModules<{
   homeschoolProgress: typeof homeschoolProgress;
   http: typeof http;
   jotformSync: typeof jotformSync;
+  knowledgeFiles: typeof knowledgeFiles;
   mavenFeedback: typeof mavenFeedback;
   memorySnapshots: typeof memorySnapshots;
   onboarding: typeof onboarding;
@@ -136,12 +145,15 @@ declare const fullApi: ApiFromModules<{
   seedSebastianTasks: typeof seedSebastianTasks;
   teamMembers: typeof teamMembers;
   telegramOutbox: typeof telegramOutbox;
+  tickets: typeof tickets;
+  timeBlocks: typeof timeBlocks;
   typing: typeof typing;
   updateRPMGoals: typeof updateRPMGoals;
   users: typeof users;
   weeklyGoals: typeof weeklyGoals;
   weeklySchedule: typeof weeklySchedule;
   workouts: typeof workouts;
+  worldCup: typeof worldCup;
 }>;
 
 /**

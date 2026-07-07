@@ -1,0 +1,9 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-03T14:38Z
+
+Current time checked first: Fri Jul 3 07:38:00 PDT 2026 / 2026-07-03T14:38Z.
+
+Completed/recent match window since prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260703T1408Z.txt: none. ESPN public scoreboard for 2026-07-03 showed Egypt-Australia at 18:00Z, Cape Verde-Argentina at 22:00Z, and Ghana-Colombia at 2026-07-04T01:30Z, all still scheduled at this sync time.
+
+No production Convex writes were needed, so worldCup:upsertFantasyPlayerStats was not run.
+
+Sources checked: ESPN public scoreboard API for 2026-07-03 saved at tmp/espn-scoreboard-20260703-cron-1438Z.json and prior local sync note tmp/worldcup-fantasy-stat-sync-note-20260703T1408Z.txt.

@@ -1,0 +1,19 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T16:08Z
+
+Current time checked first: Sun Jun 21 09:08:10 PDT 2026 / 2026-06-21T16:08Z.
+
+Completed/recent window since prior 2026-06-21T04:38Z sync note: Japan 4-0 Tunisia (ESPN event 760449, FT) completed after the prior note. Spain vs Saudi Arabia was in progress at this sync; Belgium vs Iran, Uruguay vs Cape Verde, and New Zealand vs Egypt were still scheduled.
+
+Source-backed scoring for Japan 4-0 Tunisia: Daichi Kamada 4' assisted by Keito Nakamura; Ayase Ueda 31' assisted by Ko Itakura; Junya Ito 69' assisted by Ayase Ueda; Ayase Ueda 83' assisted by Kaishu Sano. ESPN team stats and final score support a Japan clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no currently selected Japan or Tunisia Fantasy Five players. No selected Japan defender/keeper clean-sheet beneficiary was found, so no Convex stat writes were needed.
+
+Sources checked:
+- ESPN public FIFA World Cup scoreboard API for 2026-06-21: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260621
+- ESPN public FIFA World Cup summary API for event 760449: https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=760449
+- FOX Sports Tunisia vs Japan highlights page: https://www.foxsports.com/watch/fmc-xv2gczqpr38ey1af
+- Reddit post-match thread with ESPN match events mirror: https://www.reddit.com/r/soccer/comments/1ubi62n/post_match_thread_tunisia_0_4_japan_fifa_world/
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

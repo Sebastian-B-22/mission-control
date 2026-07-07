@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-24T07:09Z
+
+Completed/recent window since prior sync notes: ESPN public scoreboard for 2026-06-23 showed Portugal 5-0 Uzbekistan, England 0-0 Ghana, Croatia 1-0 Panama, and Colombia 1-0 Congo DR as full time.
+
+Sources checked: ESPN public scoreboard/summary API. Portugal-Uzbekistan event 760461 source-backed Cristiano Ronaldo goals at 6' and 39', and Bruno Fernandes assist on Ronaldo's 39' goal. England-Ghana had no goals; Croatia goal by Ante Budimir assisted by Josip Stanisic; Colombia goal by Daniel Munoz assisted by Juan Fernando Quintero.
+
+Fantasy Five selected-player normalization from production listEntries/listLeaderboard plus public/worldcup/index.html found currently selected Cristiano Ronaldo (id ronaldo) and Bruno Fernandes (id bruno). No selected Portugal defender/keeper clean-sheet beneficiary was found. No selected Fantasy Five player with source-backed goals/assists/defenderKeeper clean-sheet stat was found for England-Ghana, Croatia-Panama, or Colombia-Congo DR.
+
+Production Convex was checked with grep CONVEX .env.production before database writes. Production upserts completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats:
+- ronaldo / Cristiano Ronaldo / Portugal / goals=2 / assists=0 / cleanSheets=0 / returned id j97kkb7945q3he2j202rdn7zmn896xhx
+- bruno / Bruno Fernandes / Portugal / goals=0 / assists=1 / cleanSheets=0 / returned id j97nqyth8wevy8vrg6cdzryx4x89620d
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":10,"publicOnly":false}' succeeded and returned Fantasy Five rows. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

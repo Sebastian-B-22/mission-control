@@ -1,0 +1,163 @@
+{
+  "group": null,
+  "rows": [
+    {
+      "champion": "Lamine Yamal",
+      "createdAt": 1781277667497,
+      "displayName": "The French Fries",
+      "familyName": "The French Fries",
+      "fantasySummary": {
+        "captain": "Lamine Yamal",
+        "players": [
+          "Virgil Van Dijk",
+          "Enner Valencia",
+          "Lamine Yamal",
+          "Lionel Messi",
+          "Linda Caicedo"
+        ]
+      },
+      "id": "hd7x0fgxqqbvfk6vm1d857t4xx88g78m",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 1,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 91,
+        "semifinalistBonus": 0,
+        "total": 91,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Lionel Messi",
+      "createdAt": 1780962344683,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "fantasySummary": {
+        "captain": "Lionel Messi",
+        "players": [
+          "Turner",
+          "Erling Haaland",
+          "Christian Pulisic",
+          "Lionel Messi",
+          "O'Reilly"
+        ]
+      },
+      "id": "hd7v6ewvb79m44j891kce70kpd888nk8",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 2,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 89,
+        "semifinalistBonus": 0,
+        "total": 89,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Kylian Mbappe",
+      "createdAt": 1781229564566,
+      "displayName": "Rinky-dink Shinx",
+      "familyName": "Rinky-dink Shinx",
+      "fantasySummary": {
+        "captain": "Kylian Mbappe",
+        "players": [
+          "Virgil Van Dijk",
+          "Harry Kane",
+          "Bruno Fernandes",
+          "Kylian Mbappe",
+          "Ousmane DembéLé"
+        ]
+      },
+      "id": "hd7qv7ynm2wfh2rwtnxe66nzh588gbhf",
+      "mode": "fantasy-five",
+      "participantName": "Family Bracket",
+      "rank": 3,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 87,
+        "semifinalistBonus": 0,
+        "total": 87,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "ageRange": "9-12",
+      "champion": "Lionel Messi",
+      "createdAt": 1780962617781,
+      "displayName": "Kickin It Crew",
+      "familyName": "Kickin’ It Crew",
+      "fantasySummary": {
+        "captain": "Lionel Messi",
+        "players": [
+          "Turner",
+          "Cristiano Ronaldo",
+          "Adams",
+          "Lionel Messi",
+          "O'Reilly"
+        ]
+      },
+      "id": "hd7hdxt5c0taf4zww2v4h9r3an8899yq",
+      "mode": "fantasy-five",
+      "participantDisplayName": "Expired Milk",
+      "participantName": "Anthony",
+      "rank": 4,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 84,
+        "semifinalistBonus": 0,
+        "total": 84,
+        "underdogPoints": 0
+      }
+    },
+    {
+      "champion": "Bruno Fernandes",
+      "createdAt": 1781144070161,
+      "displayName": "Thou art crusty",
+      "familyName": "Thou art crusty",
+      "fantasySummary": {
+        "captain": "Bruno Fernandes",
+        "players": [
+          "Virgil Van Dijk",
+          "Erling Haaland",
+          "Bruno Fernandes",
+          "Lamine Yamal",
+          "Nico O’Reilly"
+        ]
+      },
+      "id": "hd7gnkmk41eqb1x59s2010hdes88fwfa",
+      "mode": "fantasy-five",
+      "participantDisplayName": "angwns",
+      "participantName": "Angie Winslow",
+      "rank": 5,
+      "score": {
+        "advancingPoints": 0,
+        "championPoints": 0,
+        "finalistBonus": 0,
+        "groupRunnerUpPoints": 0,
+        "groupWinnerPoints": 0,
+        "knockoutPoints": 83,
+        "semifinalistBonus": 0,
+        "total": 83,
+        "underdogPoints": 0
+      }
+    }
+  ]
+}

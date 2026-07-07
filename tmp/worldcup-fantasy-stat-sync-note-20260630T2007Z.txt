@@ -1,0 +1,15 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-30T20:07Z
+
+Current time checked first: Tue Jun 30 13:08:04 PDT 2026 / 2026-06-30T20:08Z. Prior local stat-sync note was tmp/worldcup-fantasy-stat-sync-note-20260630T1907Z.txt.
+
+Completed/recent match window since prior sync: ESPN public scoreboard API for 2026-06-30 showed Ivory Coast 1-2 Norway, event 760490, STATUS_FULL_TIME. France-Sweden and Mexico-Ecuador were still scheduled/pre-match and were not processed.
+
+Source-backed scoring: ESPN summary/keyEvents for event 760490 credited Norway goals to Antonio Nusa at 39' assisted by Martin Odegaard and Erling Haaland at 86' assisted by Patrick Berg; Ivory Coast goal to Amad Diallo at 74' assisted by Nicolas Pepe. AP/Guardian public reports cross-checked Haaland as the winner. No clean sheet applied because both teams conceded.
+
+Fantasy Five selected-player normalization from production worldCup:listLeaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure to Erling Haaland / Norway. No currently selected Cote d'Ivoire player had a supported goals/assists/cleanSheets update.
+
+Production Convex was checked with grep CONVEX .env.production before database work. The exact no---prod command requested by the cron failed to resolve deployed worldCup functions, matching prior notes, so the production update was run with --prod and CONVEX_URL=https://harmless-salamander-44.convex.cloud.
+
+Production update completed for haaland / Erling Haaland / Norway / goals=5 / assists=0 / cleanSheets=0. Returned id j97m2518k45qp43v11r2t5r6bx88t1n7. Total includes the prior two Iraq-Norway goals, two Norway-Senegal goals, and the new Ivory Coast-Norway goal.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five rows; Kickin It Crew total is 157 and Thou art crusty total is 107. https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

@@ -1,0 +1,26 @@
+HTA World Cup Fantasy Five stat sync - 2026-07-04T23:37Z
+
+Current time checked: Sat Jul 4 16:37:18 PDT 2026.
+
+Completed/recent match window since prior sync notes:
+- Canada 0-3 Morocco, ESPN public scoreboard/summary event 760502, FT.
+- Paraguay 0-1 France, ESPN public scoreboard/summary event 760503, FT.
+
+Source-backed event details:
+- ESPN 760502 credited Morocco goals to Azzedine Ounahi at 50' and 82' and Soufiane Rahimi at 90'+8'; assists to Achraf Hakimi and Brahim Diaz twice. Morocco kept a clean sheet.
+- ESPN 760503 credited France's goal to Kylian Mbappe from a 70' penalty. France kept a clean sheet.
+
+Fantasy Five selected-player normalization:
+- Production worldCup:listEntries plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected exposure to Kylian Mbappe / France and Achraf Hakimi / Morocco.
+- Hakimi now appears in a production Fantasy Five row with stable catalog id hakimi. His cumulative supported line includes the prior ESPN-backed Morocco-Haiti goal from event 760464 plus the ESPN-backed Canada-Morocco assist and clean sheet from event 760502.
+- No selected Canada or Paraguay player had a supported source-backed goals/assists/cleanSheets update. France clean sheet was not applied to Mbappe because he is not a defenderKeeper role.
+
+Production Convex:
+- grep CONVEX .env.production was run before database work.
+- Upserts completed with CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:upsertFantasyPlayerStats.
+- Updated mbappe plus official:france:star:mbappe and official:france:goalGetter:mbappe to goals=7, assists=2, cleanSheets=0.
+- Updated hakimi plus official:morocco:defenderKeeper:hakimi and official:morocco:wildcard:hakimi to goals=1, assists=1, cleanSheets=1.
+
+Verification:
+- Production worldCup:listLeaderboard with limit 10 succeeded and saved tmp/worldcup-leaderboard-cron-20260704T2337Z-after.json.
+- https://harmless-salamander-44.convex.site/worldcup/leaderboard returned HTTP 200.

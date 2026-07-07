@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-20T12:07Z
+
+Current time checked first: Sat Jun 20 05:07:56 PDT 2026 / 2026-06-20T12:07Z. Prior stat-sync note was 2026-06-20T11:39Z.
+
+Completed/recent window since prior local sync note: no newly completed World Cup matches found after the 2026-06-20T11:39Z sync. The prior note already handled Brazil 3-0 Haiti and Türkiye 0-1 Paraguay.
+
+Production Convex values were checked with grep CONVEX .env.production before database work.
+
+Correction made: an accidental no-change probe briefly overwrote Christian Pulisic's Fantasy Five stat row with 0 assists. Restored Pulisic to goals 0, assists 1, cleanSheets 0 using source-backed tournament data: US Soccer recap for USA 4-1 Paraguay credits Pulisic with an assist on Balogun's goal; AP/NPR reports for USA 2-0 Australia confirm Pulisic missed the Australia match. Sources:
+https://ussoccer.com/stories/2026/06/usmnt/folarin-balogun-brace-match-recap-highlights-vs-paraguay
+https://apnews.com/article/be65bf85eac80da9fd999af080bb300c
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

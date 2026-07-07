@@ -1,0 +1,19 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-20T01:07Z
+
+Current time check: Fri Jun 19 18:07 PDT / 2026-06-20 01:07 UTC.
+
+Completed/recent window since prior local sync note: Scotland 0-1 Morocco (ESPN event 760445 / FOX public box score; FT). USA 2-0 Australia was already reviewed in the 2026-06-19T21:07Z sync note. Brazil-Haiti and Paraguay-Turkiye were not completed at sync time.
+
+Sources checked:
+https://www.fifa.com/en/match-centre/match/17/285023/289273/400021454
+https://www.foxsports.com/soccer/fifa-world-cup-men-scotland-vs-morocco-jun-19-2026-game-boxscore-647646
+https://www.thescore.com/worldcup/event/93067
+https://www.theguardian.com/football/live/2026/jun/19/scotland-v-morocco-world-cup-2026-live
+
+Source-backed scoring: Morocco 1-0 Scotland; Ismael Saibari scored in the 2nd minute/after 71 seconds. theScore credited Brahim Diaz with 1 assist. Morocco kept a clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found no current selected Fantasy Five player from Morocco or Scotland. Achraf Hakimi is available in fantasyPlayers, but is not present in current production fantasy-five entries. No Convex stat writes were needed.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.

@@ -1,0 +1,13 @@
+HTA World Cup Fantasy Five stat sync - 2026-06-21T01:38Z
+
+Current time checked: Sat Jun 20 18:38:01 PDT 2026.
+
+Completed/recent window since prior 2026-06-20T23:08Z sync note: ESPN public scoreboard for 2026-06-20 shows Netherlands 5-1 Sweden (event 760447, FT), Germany 2-1 Ivory Coast (event 760448, FT), and Ecuador 0-0 Curacao still in second half at 2026-06-21T01:38Z. Germany-Ivory Coast was covered in the prior note. Ecuador-Curacao was not complete, so it was skipped.
+
+Source-backed Netherlands-Sweden scoring from ESPN event summary/key events: Brian Brobbey 5' assisted by Cody Gakpo; Brian Brobbey 17' assisted by Denzel Dumfries; Cody Gakpo 47' assisted by Denzel Dumfries; Cody Gakpo 54' assisted by Crysencio Summerville; Anthony Elanga 59' assisted by Alexander Isak; Crysencio Summerville 89' assisted by Memphis Depay. No clean sheet.
+
+Fantasy Five selected-player normalization from production leaderboard plus public/worldcup/index.html and public/worldcup/fantasy-rosters.js found current selected players include Virgil Van Dijk from Netherlands, but no currently selected Alexander Isak from Sweden. Virgil Van Dijk had no source-backed goal/assist and Netherlands did not keep a clean sheet. Alexander Isak is in the local catalog but is not currently selected in production Fantasy Five entries.
+
+Production Convex was checked with grep CONVEX .env.production before database work. No upsertFantasyPlayerStats writes were made.
+
+Verification: CONVEX_URL=https://harmless-salamander-44.convex.cloud npx convex run --prod worldCup:listLeaderboard -- '{"limit":100,"publicOnly":false}' succeeded and returned Fantasy Five leaderboard rows.
