@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>World Cup Family Fill-In Pages | Home Team Academy</title>
+  <meta name="description" content="Printable two-page World Cup family fill-in sheet with Pacific Time kickoff slots, group-stage scores, tables, and knockout bracket." />
+  <style>
+    :root { --ink:#17324d; --muted:#5d7282; --green:#179b57; --blue:#2d668e; --yellow:#ffd84d; --line:#b8ccd8; --paper:#fffaf0; --cream:#fff3cc; --grass:#e6f7dc; --sky:#e4f6ff; --coral:#ffefe6; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#eef6f8; color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
+    .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+    .toolbar strong { font-size:16px; }
+    .toolbar span { color:var(--muted); font-size:13px; }
+    .toolbar-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .btn { min-height:38px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); padding:0 12px; font-weight:900; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+    .btn.primary { background:var(--green); color:#fff; border-color:var(--green); }
+    .sheet { position:relative; width:11in; min-height:8.5in; margin:18px auto; background:var(--paper); border:3px solid var(--ink); box-shadow:0 18px 50px rgba(23,50,77,.18); padding:.18in; page-break-after:always; overflow:hidden; }
+    .sheet:last-child { page-break-after:auto; }
+    .sheet::before { content:""; position:absolute; inset:.08in; border:1px dashed rgba(23,50,77,.24); pointer-events:none; }
+    .sheet::after { content:""; position:absolute; right:-.35in; bottom:-.45in; width:2.4in; height:2.4in; border:16px solid rgba(23,50,77,.06); border-radius:999px; pointer-events:none; }
+    .sheet-head { position:relative; z-index:1; display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px; border:3px solid var(--ink); border-radius:10px; background:linear-gradient(135deg,#ffffff 0%,var(--cream) 62%,#ffffff 100%); padding:8px 10px; margin-bottom:8px; }
+    h1, h2, h3, p { margin:0; }
+    h1 { font-size:27px; letter-spacing:0; text-transform:uppercase; }
+    h2 { font-size:17px; }
+    h3 { font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+    .sub { color:var(--muted); font-size:10px; line-height:1.3; max-width:5.6in; }
+    .brand { display:flex; align-items:center; justify-content:flex-end; gap:8px; text-align:right; color:var(--green); font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; }
+    .brand img { width:.72in; height:.72in; object-fit:contain; }
+    .group-grid { position:relative; z-index:1; display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
+    .group-card { border:2px solid var(--ink); border-radius:9px; background:#fff; padding:0; min-height:0; overflow:hidden; box-shadow:3px 3px 0 rgba(23,50,77,.12); }
+    .group-title { display:flex; align-items:center; justify-content:space-between; gap:6px; margin:0; padding:4px 6px; background:var(--ink); color:#fff; }
+    .group-title strong { font-size:13px; }
+    .group-title span { font-size:7px; color:#d9edf7; text-transform:uppercase; font-weight:900; }
+    .group-poster { display:grid; grid-template-columns:.82fr 1fr; gap:4px; padding:5px; background:linear-gradient(135deg,var(--grass),#fff 58%,var(--sky)); }
+    .team-list { display:flex; flex-direction:column; justify-content:space-between; gap:3px; }
+    .team-list span { position:relative; border:1px solid rgba(23,50,77,.28); border-radius:5px; background:#fff; padding:4px 4px 4px 13px; min-height:18px; font-size:7.5px; line-height:1.05; font-weight:900; }
+    .team-list span::before { content:""; position:absolute; left:4px; top:50%; width:5px; height:5px; border-radius:999px; background:var(--yellow); border:1px solid var(--ink); transform:translateY(-50%); }
+    .fixtures { display:grid; grid-template-columns:1fr 1fr; gap:3px; }
+    .fixture { border:1px solid rgba(23,50,77,.24); border-radius:6px; background:rgba(255,255,255,.92); padding:3px; min-height:29px; }
+    .fixture-time { display:block; color:var(--blue); font-size:5.7px; line-height:1; font-weight:900; text-transform:uppercase; }
+    .fixture-teams { display:grid; grid-template-columns:1fr .15in .15in; align-items:end; gap:2px; margin-top:2px; font-size:5.8px; line-height:1.02; font-weight:900; }
+    .score-box { height:10px; border:1px solid #8099a7; background:#fff; border-radius:2px; }
+    .table-grid { display:grid; grid-template-columns:1fr .16in .16in .16in .19in .21in; gap:1px; align-items:center; padding:3px 5px 5px; background:#fbfdff; font-size:5.4px; }
+    .table-grid span { border-bottom:1px solid #c7d8e1; min-height:7px; }
+    .table-grid .head { color:var(--muted); font-weight:900; text-transform:uppercase; border-bottom:1px solid var(--ink); }
+    .advance-strip { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px 5px 5px; background:#fff7d9; border-top:1px solid rgba(23,50,77,.18); font-size:6.1px; font-weight:900; text-transform:uppercase; color:var(--muted); }
+    .advance-strip span { display:block; border-bottom:1px solid #8da7b6; min-height:13px; color:var(--ink); text-transform:none; }
+    .ko-grid { position:relative; z-index:1; display:grid; grid-template-columns:1fr .82fr .7fr .62fr 1.1fr .62fr .7fr .82fr 1fr; gap:6px; align-items:stretch; min-height:5.98in; }
+    .bracket-lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:visible; }
+    .bracket-lines path { fill:none; stroke:var(--ink); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; opacity:.42; }
+    .round { position:relative; z-index:1; display:flex; flex-direction:column; justify-content:space-around; gap:3px; min-width:0; }
+    .round h3 { flex:0 0 auto; background:var(--ink); color:#fff; border-radius:5px; padding:4px 4px; text-align:center; font-size:7.6px; line-height:1; }
+    .ko-match { position:relative; border:1px solid var(--ink); border-radius:5px; background:#fff; padding:2px 3px; min-height:.25in; box-shadow:1.5px 1.5px 0 rgba(23,50,77,.08); }
+    .ko-match::after { content:""; position:absolute; top:50%; width:8px; border-top:2px solid rgba(23,50,77,.48); }
+    .left-side .ko-match::after { right:-9px; }
+    .right-side .ko-match::after { left:-9px; }
+    .ko-meta { display:flex; justify-content:space-between; gap:3px; color:var(--blue); font-size:5.2px; line-height:1; font-weight:900; margin-bottom:1px; }
+    .blank-line { height:8px; border-bottom:1px solid #8da7b6; margin-top:1px; }
+    .champion-panel { align-self:center; border:3px solid var(--green); border-radius:10px; background:linear-gradient(135deg,#f3fff7,#fff7cf); padding:8px; box-shadow:3px 3px 0 rgba(23,50,77,.14); }
+    .champion-panel h3 { background:transparent; color:var(--green); padding:0; font-size:13px; margin-bottom:6px; }
+    .final-card { border:2px solid var(--ink); border-radius:7px; background:#fff; padding:5px; margin-bottom:7px; }
+    .third-card { border:1px solid var(--line); border-radius:7px; background:#fff; padding:5px; }
+    .notes { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-top:7px; }
+    .note-box { border:1px solid var(--line); border-radius:7px; background:#fff; padding:6px; min-height:.65in; font-size:9px; }
+    .note-box strong { display:block; color:var(--green); margin-bottom:3px; }
+    @page { size:Letter landscape; margin:0; }
+    @media print {
+      body { background:#fff; }
+      .toolbar { display:none; }
+      .sheet { width:11in; height:8.5in; min-height:0; margin:0; box-shadow:none; padding:.12in; border-width:2px; overflow:hidden; }
+      .group-grid { grid-template-columns:repeat(4, 1fr); gap:5px; }
+      .ko-grid { gap:5px; min-height:5.9in; }
+      .ko-meta { font-size:5px; }
+    }
+    @media screen and (max-width:900px) {
+      .sheet { width:100%; min-height:auto; margin:0; border-left:0; border-right:0; }
+      .group-grid, .ko-grid, .notes { grid-template-columns:1fr; }
+      .ko-match::after, .bracket-lines { display:none; }
+      .toolbar { position:static; align-items:flex-start; flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div>
+      <strong>World Cup Family Fill-In Pages</strong>
+      <span>Two printable pages. Times show Pacific Time by default.</span>
+    </div>
+    <div class="toolbar-actions">
+      <a class="btn" href="/worldcup/">Back to Challenge</a>
+      <button class="btn primary" type="button" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <section class="sheet" aria-label="Group stage printable">
+    <div class="sheet-head">
+      <div>
+        <h1>World Cup 2026 Wallchart</h1>
+        <p class="sub">Group stage score tracker and table blanks. Kickoff slots are shown in Pacific Time (PT).</p>
+      </div>
+      <div class="brand"><span>Home Team Academy<br />Family Challenge</span><img src="/worldcup/hta-logo.svg" alt="HTA" /></div>
+    </div>
+    <div id="groupGrid" class="group-grid"></div>
+  </section>
+
+  <section class="sheet" aria-label="Knockout stage printable">
+    <div class="sheet-head">
+      <div>
+        <h1>World Cup 2026 Knockout Rounds</h1>
+        <p class="sub">Write in the teams as they qualify, fill scores, and follow the road from Round of 32 to the Final. Times are Pacific Time (PT).</p>
+      </div>
+      <div class="brand"><span>Bragging Rights Tracker<br />Who called it?</span><img src="/worldcup/hta-logo.svg" alt="HTA" /></div>
+    </div>
+    <div id="knockoutGrid" class="ko-grid"></div>
+    <div class="notes">
+      <div class="note-box"><strong>Family champion pick</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+      <div class="note-box"><strong>Biggest upset we called</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+      <div class="note-box"><strong>Bragging rights winner</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+    </div>
+  </section>
+
+  <script>
+    const groups = [
+      { id:"A", teams:["Mexico","South Africa","South Korea","Czechia"] },
+      { id:"B", teams:["Canada","Qatar","Switzerland","Bosnia & Herzegovina"] },
+      { id:"C", teams:["Brazil","Morocco","Haiti","Scotland"] },
+      { id:"D", teams:["United States","Paraguay","Australia","Turkiye"] },
+      { id:"E", teams:["Germany","Curacao","Ivory Coast","Ecuador"] },
+      { id:"F", teams:["Netherlands","Japan","Tunisia","Sweden"] },
+      { id:"G", teams:["Belgium","Egypt","Iran","New Zealand"] },
+      { id:"H", teams:["Spain","Cape Verde","Saudi Arabia","Uruguay"] },
+      { id:"I", teams:["France","Senegal","Norway","Iraq"] },
+      { id:"J", teams:["Argentina","Algeria","Austria","Jordan"] },
+      { id:"K", teams:["Portugal","Uzbekistan","Colombia","DR Congo"] },
+      { id:"L", teams:["England","Croatia","Ghana","Panama"] },
+    ];
+
+    const groupMatches = [
+      ["A","2026-06-11","15:00","Mexico","South Africa"],["A","2026-06-11","22:00","South Korea","Czechia"],["A","2026-06-18","12:00","South Africa","Czechia"],["A","2026-06-18","21:00","Mexico","South Korea"],["A","2026-06-24","21:00","Mexico","Czechia"],["A","2026-06-24","21:00","South Korea","South Africa"],
+      ["B","2026-06-12","15:00","Canada","Bosnia & Herzegovina"],["B","2026-06-13","15:00","Qatar","Switzerland"],["B","2026-06-18","15:00","Switzerland","Bosnia & Herzegovina"],["B","2026-06-18","18:00","Canada","Qatar"],["B","2026-06-24","15:00","Canada","Switzerland"],["B","2026-06-24","15:00","Qatar","Bosnia & Herzegovina"],
+      ["C","2026-06-13","18:00","Brazil","Morocco"],["C","2026-06-13","21:00","Haiti","Scotland"],["C","2026-06-19","15:00","Scotland","Morocco"],["C","2026-06-19","21:00","Brazil","Haiti"],["C","2026-06-24","18:00","Scotland","Brazil"],["C","2026-06-24","18:00","Morocco","Haiti"],
+      ["D","2026-06-12","21:00","United States","Paraguay"],["D","2026-06-13","00:00","Australia","Turkiye"],["D","2026-06-19","00:00","Paraguay","Turkiye"],["D","2026-06-19","15:00","United States","Australia"],["D","2026-06-25","22:00","United States","Turkiye"],["D","2026-06-25","22:00","Paraguay","Australia"],
+      ["E","2026-06-14","13:00","Germany","Curacao"],["E","2026-06-14","19:00","Ivory Coast","Ecuador"],["E","2026-06-20","16:00","Germany","Ivory Coast"],["E","2026-06-20","20:00","Ecuador","Curacao"],["E","2026-06-25","16:00","Ecuador","Germany"],["E","2026-06-25","16:00","Curacao","Ivory Coast"],
+      ["F","2026-06-14","16:00","Netherlands","Japan"],["F","2026-06-14","22:00","Tunisia","Sweden"],["F","2026-06-20","00:00","Tunisia","Japan"],["F","2026-06-20","13:00","Netherlands","Sweden"],["F","2026-06-25","19:00","Tunisia","Netherlands"],["F","2026-06-25","19:00","Japan","Sweden"],
+      ["G","2026-06-15","15:00","Belgium","Egypt"],["G","2026-06-15","21:00","Iran","New Zealand"],["G","2026-06-21","15:00","Belgium","Iran"],["G","2026-06-21","21:00","New Zealand","Egypt"],["G","2026-06-26","23:00","New Zealand","Belgium"],["G","2026-06-26","23:00","Egypt","Iran"],
+      ["H","2026-06-15","12:00","Spain","Cape Verde"],["H","2026-06-15","18:00","Saudi Arabia","Uruguay"],["H","2026-06-21","12:00","Spain","Saudi Arabia"],["H","2026-06-21","18:00","Uruguay","Cape Verde"],["H","2026-06-26","20:00","Uruguay","Spain"],["H","2026-06-26","20:00","Cape Verde","Saudi Arabia"],
+      ["I","2026-06-16","15:00","France","Senegal"],["I","2026-06-16","18:00","Norway","Iraq"],["I","2026-06-22","17:00","France","Iraq"],["I","2026-06-22","20:00","Norway","Senegal"],["I","2026-06-26","15:00","Norway","France"],["I","2026-06-26","15:00","Senegal","Iraq"],
+      ["J","2026-06-16","00:00","Austria","Jordan"],["J","2026-06-16","21:00","Argentina","Algeria"],["J","2026-06-22","13:00","Argentina","Austria"],["J","2026-06-22","23:00","Jordan","Algeria"],["J","2026-06-27","22:00","Jordan","Argentina"],["J","2026-06-27","22:00","Algeria","Austria"],
+      ["K","2026-06-17","13:00","Portugal","DR Congo"],["K","2026-06-17","22:00","Uzbekistan","Colombia"],["K","2026-06-23","13:00","Portugal","Uzbekistan"],["K","2026-06-23","22:00","Colombia","DR Congo"],["K","2026-06-27","19:30","Colombia","Portugal"],["K","2026-06-27","19:30","Uzbekistan","DR Congo"],
+      ["L","2026-06-17","16:00","England","Croatia"],["L","2026-06-17","19:00","Ghana","Panama"],["L","2026-06-23","16:00","England","Ghana"],["L","2026-06-23","19:00","Panama","Croatia"],["L","2026-06-27","17:00","Panama","England"],["L","2026-06-27","17:00","Croatia","Ghana"],
+    ];
+
+    const knockout = [
+      { title:"Round of 32", count:16, slots:["Jun 28 12p","Jun 29 10a","Jun 29 1:30p","Jun 29 6p","Jun 30 10a","Jun 30 2p","Jun 30 6p","Jul 1 9a","Jul 1 1p","Jul 1 5p","Jul 2 12p","Jul 2 4p","Jul 2 8p","Jul 3 11a","Jul 3 3p","Jul 3 6:30p"] },
+      { title:"Round of 16", count:8, slots:["Jul 4 10a","Jul 4 2p","Jul 5 1p","Jul 5 5p","Jul 6 12p","Jul 6 5p","Jul 7 9a","Jul 7 1p"] },
+      { title:"Quarterfinals", count:4, slots:["Jul 9 1p","Jul 10 12p","Jul 11 2p","Jul 11 6p"] },
+      { title:"Semifinals", count:2, slots:["Jul 14 12p","Jul 15 12p"] },
+      { title:"Finals", count:2, slots:["Jul 18 2p Third place","Jul 19 12p Final"] },
+    ];
+
+    function formatPT(date, etTime) {
+      const [hour, minute] = etTime.split(":").map(Number);
+      const [year, month, day] = date.split("-").map(Number);
+      const utc = new Date(Date.UTC(year, month - 1, day, hour + 5, minute, 0));
+      return utc.toLocaleString("en-US", { timeZone:"America/Los_Angeles", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }).replace(",","");
+    }
+
+    function renderGroups() {
+      const target = document.getElementById("groupGrid");
+      target.innerHTML = groups.map(group => {
+        const matches = groupMatches.filter(match => match[0] === group.id);
+        return `<article class="group-card">
+          <div class="group-title"><strong>Group ${group.id}</strong><span>${group.teams.length} teams</span></div>
+          <div class="group-poster">
+            <div class="team-list">${group.teams.map(team => `<span>${team}</span>`).join("")}</div>
+            <div class="fixtures">
+              ${matches.map(match => `<div class="fixture">
+                <span class="fixture-time">${formatPT(match[1], match[2])}</span>
+                <div class="fixture-teams"><span>${match[3]} v ${match[4]}</span><span class="score-box"></span><span class="score-box"></span></div>
+              </div>`).join("")}
+            </div>
+          </div>
+          <div class="advance-strip">1st to knockout <span></span> 2nd to knockout <span></span></div>
+          <div class="table-grid">
+            ${["Team","W","D","L","GD","Pts"].map(item => `<span class="head">${item}</span>`).join("")}
+            ${[1,2,3,4].map(rank => `<span>${rank}.</span><span></span><span></span><span></span><span></span><span></span>`).join("")}
+          </div>
+        </article>`;
+      }).join("");
+    }
+
+    function renderKnockout() {
+      const makeRound = (title, slots, side) => `<div class="round ${side}-side">
+        <h3>${title}</h3>
+        ${slots.map(slot => `<div class="ko-match">
+          <div class="ko-meta"><span>${slot}</span><span>Score</span></div>
+          <div class="blank-line"></div>
+          <div class="blank-line"></div>
+        </div>`).join("")}
+      </div>`;
+
+      const r32 = knockout[0].slots;
+      const r16 = knockout[1].slots;
+      const qf = knockout[2].slots;
+      const sf = knockout[3].slots;
+      const final = knockout[4].slots[1];
+      const third = knockout[4].slots[0];
+
+      document.getElementById("knockoutGrid").innerHTML = [`<svg class="bracket-lines" aria-hidden="true"></svg>`,
+        makeRound("Round of 32", r32.slice(0, 8), "left"),
+        makeRound("Round of 16", r16.slice(0, 4), "left"),
+        makeRound("Quarterfinals", qf.slice(0, 2), "left"),
+        makeRound("Semifinal", sf.slice(0, 1), "left"),
+        `<div class="round">
+          <div class="champion-panel">
+            <h3>Champion</h3>
+            <div class="final-card">
+              <div class="ko-meta"><span>${final}</span><span>Final score</span></div>
+              <div class="blank-line"></div>
+              <div class="blank-line"></div>
+              <div class="blank-line"></div>
+            </div>
+            <div class="third-card">
+              <div class="ko-meta"><span>${third}</span><span>Third place</span></div>
+              <div class="blank-line"></div>
+              <div class="blank-line"></div>
+            </div>
+          </div>
+        </div>`,
+        makeRound("Semifinal", sf.slice(1, 2), "right"),
+        makeRound("Quarterfinals", qf.slice(2, 4), "right"),
+        makeRound("Round of 16", r16.slice(4, 8), "right"),
+        makeRound("Round of 32", r32.slice(8, 16), "right"),
+      ].join("");
+      requestAnimationFrame(drawBracketLines);
+    }
+
+    function pointFor(match, grid, side) {
+      const box = match.getBoundingClientRect();
+      const parent = grid.getBoundingClientRect();
+      return {
+        x: side === "right" ? box.right - parent.left : box.left - parent.left,
+        y: box.top - parent.top + box.height / 2,
+      };
+    }
+
+    function addPath(svg, d) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    }
+
+    function drawConnector(svg, startA, startB, target, direction) {
+      const sign = direction === "right-to-left" ? -1 : 1;
+      const distance = Math.abs(target.x - startA.x);
+      const joinX = startA.x + sign * Math.max(8, Math.min(16, distance * 0.42));
+      const targetStubX = target.x - sign * 8;
+      const midY = (startA.y + startB.y) / 2;
+      addPath(svg, `M ${startA.x} ${startA.y} H ${joinX}`);
+      addPath(svg, `M ${startB.x} ${startB.y} H ${joinX}`);
+      addPath(svg, `M ${joinX} ${startA.y} V ${startB.y}`);
+      addPath(svg, `M ${joinX} ${midY} H ${targetStubX} V ${target.y} H ${target.x}`);
+    }
+
+    function drawDirect(svg, start, target, direction) {
+      const sign = direction === "right-to-left" ? -1 : 1;
+      const midX = start.x + sign * Math.max(10, Math.abs(target.x - start.x) * 0.48);
+      addPath(svg, `M ${start.x} ${start.y} H ${midX} V ${target.y} H ${target.x}`);
+    }
+
+    function drawSide(svg, grid, rounds, direction) {
+      for (let roundIndex = 0; roundIndex < rounds.length - 1; roundIndex += 1) {
+        const current = rounds[roundIndex];
+        const next = rounds[roundIndex + 1];
+        for (let i = 0; i < next.length; i += 1) {
+          const first = current[i * 2];
+          const second = current[i * 2 + 1];
+          const target = next[i];
+          if (!first || !second || !target) continue;
+          drawConnector(
+            svg,
+            pointFor(first, grid, direction === "left-to-right" ? "right" : "left"),
+            pointFor(second, grid, direction === "left-to-right" ? "right" : "left"),
+            pointFor(target, grid, direction === "left-to-right" ? "left" : "right"),
+            direction
+          );
+        }
+      }
+    }
+
+    function drawBracketLines() {
+      const grid = document.getElementById("knockoutGrid");
+      const svg = grid.querySelector(".bracket-lines");
+      if (!svg || window.matchMedia("(max-width: 900px)").matches) return;
+      svg.innerHTML = "";
+      const gridBox = grid.getBoundingClientRect();
+      svg.setAttribute("viewBox", `0 0 ${gridBox.width} ${gridBox.height}`);
+      svg.setAttribute("preserveAspectRatio", "none");
+
+      const rounds = Array.from(grid.querySelectorAll(".round"));
+      const leftRounds = rounds.slice(0, 4).map(round => Array.from(round.querySelectorAll(".ko-match")));
+      const finalCard = grid.querySelector(".final-card");
+      const rightRounds = rounds.slice(5, 9).map(round => Array.from(round.querySelectorAll(".ko-match"))).reverse();
+
+      drawSide(svg, grid, leftRounds, "left-to-right");
+      drawSide(svg, grid, rightRounds, "right-to-left");
+      if (finalCard) {
+        drawDirect(svg, pointFor(leftRounds[3][0], grid, "right"), pointFor(finalCard, grid, "left"), "left-to-right");
+        drawDirect(svg, pointFor(rightRounds[3][0], grid, "left"), pointFor(finalCard, grid, "right"), "right-to-left");
+      }
+    }
+
+    renderGroups();
+    renderKnockout();
+    window.addEventListener("resize", () => requestAnimationFrame(drawBracketLines));
+    window.addEventListener("beforeprint", drawBracketLines);
+  </script>
+</body>
+</html>
