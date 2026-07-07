@@ -20,6 +20,13 @@ interface ExerciseDraft {
   sets: Array<{ reps: string; weight: string }>;
 }
 
+type WorkoutExerciseTemplate = {
+  _id: Id<"workoutProgramExercises">;
+  name: string;
+  setCount?: number;
+  suggestedWeight?: string;
+};
+
 const DAY_TONES = [
   {
     active: "border-violet-500/70 bg-violet-500/12 ring-1 ring-violet-500/40",
@@ -65,6 +72,21 @@ function getDefaultWorkoutDate(startsOn?: string) {
   const today = getLocalDateString();
   if (startsOn && startsOn > today) return startsOn;
   return today;
+}
+
+function buildExerciseDrafts(exercises: WorkoutExerciseTemplate[]): ExerciseDraft[] {
+  return exercises.map((exercise) => ({
+    exerciseTemplateId: exercise._id,
+    exerciseName: exercise.name,
+    sets: Array.from({ length: exercise.setCount ?? 3 }, () => ({
+      reps: "",
+      weight: exercise.suggestedWeight ?? "",
+    })),
+  }));
+}
+
+function getWorkoutDraftKey(userId: Id<"users">, dayId: string, workoutDate: string) {
+  return `mission-control-workout-draft-${userId}-${dayId}-${workoutDate}`;
 }
 
 function formatDateLabel(dateString?: string) {
@@ -115,8 +137,12 @@ export function WorkoutTrackerTab({ userId }: WorkoutTrackerTabProps) {
       return String(dashboard.days[0]._id);
     }
 
-    const lastLoggedDayId = dashboard.recentLogs[0]?.programDayId
-      ? String(dashboard.recentLogs[0].programDayId)
+    const programCycleLogs = dashboard.program?.startsOn
+      ? dashboard.recentLogs.filter((log: any) => log.workoutDate >= dashboard.program.startsOn)
+      : dashboard.recentLogs;
+
+    const lastLoggedDayId = programCycleLogs[0]?.programDayId
+      ? String(programCycleLogs[0].programDayId)
       : null;
 
     const lastIndex = lastLoggedDayId
@@ -153,30 +179,41 @@ export function WorkoutTrackerTab({ userId }: WorkoutTrackerTabProps) {
   useEffect(() => {
     if (!selectedDay || !dashboard?.program) return;
     setWorkoutDate(getDefaultWorkoutDate(dashboard.program.startsOn));
-    setExerciseDrafts(
-      selectedDay.exercises.map((exercise: any) => ({
-        exerciseTemplateId: exercise._id,
-        exerciseName: exercise.name,
-        sets: Array.from({ length: exercise.setCount ?? 3 }, () => ({
-          reps: "",
-          weight: exercise.suggestedWeight ?? "",
-        })),
-      }))
-    );
   }, [dashboard?.program, selectedDay]);
+
+  useEffect(() => {
+    if (!selectedDay || !selectedDayId || !workoutDate) return;
+
+    const defaultDrafts = buildExerciseDrafts(selectedDay.exercises);
+    const draftKey = getWorkoutDraftKey(userId, selectedDayId, workoutDate);
+
+    try {
+      const savedDraft = window.localStorage.getItem(draftKey);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft) as ExerciseDraft[];
+        setExerciseDrafts(parsed);
+        return;
+      }
+    } catch {
+      // Ignore broken local drafts and fall back to the base plan.
+    }
+
+    setExerciseDrafts(defaultDrafts);
+  }, [selectedDay, selectedDayId, userId, workoutDate]);
+
+  useEffect(() => {
+    if (!selectedDayId || !workoutDate || exerciseDrafts.length === 0) return;
+
+    const draftKey = getWorkoutDraftKey(userId, selectedDayId, workoutDate);
+    window.localStorage.setItem(draftKey, JSON.stringify(exerciseDrafts));
+  }, [exerciseDrafts, selectedDayId, userId, workoutDate]);
 
   const handleResetWeights = () => {
     if (!selectedDay) return;
-    setExerciseDrafts(
-      selectedDay.exercises.map((exercise: any) => ({
-        exerciseTemplateId: exercise._id,
-        exerciseName: exercise.name,
-        sets: Array.from({ length: exercise.setCount ?? 3 }, () => ({
-          reps: "",
-          weight: exercise.suggestedWeight ?? "",
-        })),
-      }))
-    );
+    if (selectedDayId && workoutDate) {
+      window.localStorage.removeItem(getWorkoutDraftKey(userId, selectedDayId, workoutDate));
+    }
+    setExerciseDrafts(buildExerciseDrafts(selectedDay.exercises));
     if (dashboard?.program) {
       setWorkoutDate(getDefaultWorkoutDate(dashboard.program.startsOn));
     }
@@ -201,6 +238,9 @@ export function WorkoutTrackerTab({ userId }: WorkoutTrackerTabProps) {
           })),
         })),
       });
+      if (selectedDayId && workoutDate) {
+        window.localStorage.removeItem(getWorkoutDraftKey(userId, selectedDayId, workoutDate));
+      }
       setCelebrationTick((tick) => tick + 1);
       setShowCelebration(true);
     } finally {
@@ -338,6 +378,8 @@ export function WorkoutTrackerTab({ userId }: WorkoutTrackerTabProps) {
                         <Input
                           value={set.reps}
                           placeholder="Reps"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           className="bg-zinc-800 border-zinc-700 text-zinc-100"
                           onChange={(e) =>
                             setExerciseDrafts((prev) =>
@@ -358,7 +400,7 @@ export function WorkoutTrackerTab({ userId }: WorkoutTrackerTabProps) {
                         />
                         <Input
                           value={set.weight}
-                          placeholder="Weight"
+                          placeholder="Weight, BW, bar, +20"
                           className="bg-zinc-800 border-zinc-700 text-zinc-100"
                           onChange={(e) =>
                             setExerciseDrafts((prev) =>
