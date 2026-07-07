@@ -9,17 +9,46 @@ const CALORIES_GOAL = 350;
 
 function calculateSleepScore(hours: number | undefined): number {
   if (!hours) return 0;
-  return hours >= SLEEP_GOAL_HOURS ? 33 : Math.floor((hours / SLEEP_GOAL_HOURS) * 33);
+  return hours >= SLEEP_GOAL_HOURS ? 50 : Math.round((hours / SLEEP_GOAL_HOURS) * 50);
 }
 
 function calculateStepsScore(steps: number | undefined): number {
   if (!steps) return 0;
-  return steps >= STEPS_GOAL ? 33 : Math.floor((steps / STEPS_GOAL) * 33);
+  return steps >= STEPS_GOAL ? 50 : Math.round((steps / STEPS_GOAL) * 50);
 }
 
 function calculateCaloriesScore(calories: number | undefined): number {
   if (!calories) return 0;
   return calories >= CALORIES_GOAL ? 34 : Math.floor((calories / CALORIES_GOAL) * 34);
+}
+
+function bestMetricValue(incoming: number | undefined, existing: number | undefined): number | undefined {
+  if (typeof incoming !== "number" || !Number.isFinite(incoming)) return existing;
+  if (typeof existing !== "number" || !Number.isFinite(existing)) return incoming;
+  return Math.max(incoming, existing);
+}
+
+function calculateDontDieScore(values: {
+  sleepHours?: number;
+  steps?: number;
+  activeCalories?: number;
+}) {
+  const sleepScore = calculateSleepScore(values.sleepHours);
+  const stepsScore = calculateStepsScore(values.steps);
+  const caloriesScore = calculateCaloriesScore(values.activeCalories);
+  // Don't Die's daily score appears to be based on sleep + steps only.
+  // Example from Corinne's screenshot: 6h03m / 7h sleep + 12.9k / 3.5k steps = 93,
+  // even with 0 / 350 active calories. Active calories stay visible but do not
+  // reduce the daily score.
+  const healthScore = sleepScore + stepsScore;
+
+  return {
+    sleepScore,
+    stepsScore,
+    caloriesScore,
+    healthScore,
+    isPerfectDay: healthScore >= 100,
+  };
 }
 
 // ─── Queries ────────────────────────────────────────────────────────────────
@@ -122,7 +151,7 @@ export const getMonthStats = query({
 
     return {
       perfectDays,
-      perfectDaysGoal: 20, // Will come from healthGoals later
+      perfectDaysGoal: 15, // Starter goal - adjusted to make the habit achievable first
       streak,
       todayScore: todayHealth?.healthScore ?? 0,
       todaySleep: todayHealth?.sleepHours,
@@ -148,7 +177,7 @@ export const getHealthGoals = query({
         sleepGoalHours: SLEEP_GOAL_HOURS,
         stepsGoal: STEPS_GOAL,
         caloriesGoal: CALORIES_GOAL,
-        perfectDaysGoal: 20,
+        perfectDaysGoal: 15,
         currentLevel: 1,
       };
     }
@@ -206,10 +235,10 @@ export const recordDailyHealthRaw = mutation({
     const { userIdStr, date, sleepHours, steps } = args;
     const userId = userIdStr as any; // Cast to bypass validation
     
-    const sleepScore = calculateSleepScore(sleepHours);
-    const stepsScore = calculateStepsScore(steps);
-    const healthScore = sleepScore + stepsScore;
-    const isPerfectDay = healthScore >= 66; // 2/3 metrics
+    const { sleepScore, stepsScore, healthScore, isPerfectDay } = calculateDontDieScore({
+      sleepHours,
+      steps,
+    });
     
     const existing = await ctx.db
       .query("dailyHealth")
@@ -256,20 +285,26 @@ export const recordDailyHealth = mutation({
       .withIndex("by_user_and_date", (q) => q.eq("userId", userId).eq("date", date))
       .first();
 
-    const finalSleepHours = sleepHours ?? existing?.sleepHours;
-    const finalSteps = steps ?? existing?.steps;
-    const finalActiveCalories = activeCalories ?? existing?.activeCalories;
+    // Health Auto Export often sends partial/incremental payloads. Keep the best known
+    // value for each Don't Die metric so a later sparse export never makes the day look worse.
+    const finalSleepHours = bestMetricValue(sleepHours, existing?.sleepHours);
+    const finalSteps = bestMetricValue(steps, existing?.steps);
+    const finalActiveCalories = bestMetricValue(activeCalories, existing?.activeCalories);
     const finalWeight = weight ?? existing?.weight;
 
-    // Calculate scores from the final persisted values, not just this patch payload.
-    const sleepScore = calculateSleepScore(finalSleepHours);
-    const stepsScore = calculateStepsScore(finalSteps);
-    const caloriesScore = calculateCaloriesScore(finalActiveCalories);
-    const calculatedHealthScore = sleepScore + stepsScore + caloriesScore;
-    // Don't Die can provide a richer daily score than our simple goal formula.
-    // If a richer score is already stored, do not downgrade it on partial Apple/Whoop re-syncs.
-    const healthScore = Math.max(calculatedHealthScore, existing?.healthScore ?? 0);
-    const isPerfectDay = healthScore >= 100;
+    // Don't Die-style score: sleep 50 + steps 50. Active calories stay visible
+    // but do not reduce the daily score.
+    const calculated = calculateDontDieScore({
+      sleepHours: finalSleepHours,
+      steps: finalSteps,
+      activeCalories: finalActiveCalories,
+    });
+    const { sleepScore, stepsScore, caloriesScore } = calculated;
+    const calculatedHealthScore = calculated.healthScore;
+    const healthScore = existing?.manualEntry && existing.healthScore > calculatedHealthScore
+      ? existing.healthScore
+      : calculatedHealthScore;
+    const isPerfectDay = healthScore >= 98;
 
     if (existing) {
       // Update existing record
@@ -313,6 +348,99 @@ export const recordDailyHealth = mutation({
   },
 });
 
+// Update health goals manually.
+export const upsertHealthGoals = mutation({
+  args: {
+    userId: v.id("users"),
+    sleepGoalHours: v.optional(v.number()),
+    stepsGoal: v.optional(v.number()),
+    caloriesGoal: v.optional(v.number()),
+    perfectDaysGoal: v.optional(v.number()),
+    currentLevel: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("healthGoals")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .first();
+
+    const patch = {
+      sleepGoalHours: args.sleepGoalHours ?? existing?.sleepGoalHours ?? SLEEP_GOAL_HOURS,
+      stepsGoal: args.stepsGoal ?? existing?.stepsGoal ?? STEPS_GOAL,
+      caloriesGoal: args.caloriesGoal ?? existing?.caloriesGoal ?? CALORIES_GOAL,
+      perfectDaysGoal: args.perfectDaysGoal ?? existing?.perfectDaysGoal ?? 15,
+      currentLevel: args.currentLevel ?? existing?.currentLevel ?? 1,
+      updatedAt: now,
+    };
+
+    if (existing) {
+      await ctx.db.patch(existing._id, patch);
+      return existing._id;
+    }
+
+    return await ctx.db.insert("healthGoals", {
+      userId: args.userId,
+      ...patch,
+      createdAt: now,
+    });
+  },
+});
+
+// Manual Don't Die score override from screenshots/app data.
+// Used when Apple Health Auto Export is delayed but Corinne provides confirmed daily totals.
+export const upsertDontDieDailyScore = mutation({
+  args: {
+    userId: v.id("users"),
+    date: v.string(),
+    healthScore: v.number(),
+    sleepHours: v.optional(v.number()),
+    steps: v.optional(v.number()),
+    activeCalories: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("dailyHealth")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", args.userId).eq("date", args.date))
+      .first();
+
+    const sleepHours = args.sleepHours ?? existing?.sleepHours;
+    const steps = args.steps ?? existing?.steps;
+    const activeCalories = args.activeCalories ?? existing?.activeCalories;
+    const sleepScore = calculateSleepScore(sleepHours);
+    const stepsScore = calculateStepsScore(steps);
+    const caloriesScore = calculateCaloriesScore(activeCalories);
+
+    const patch = {
+      sleepHours,
+      sleepScore,
+      steps,
+      stepsScore,
+      activeCalories,
+      caloriesScore,
+      healthScore: args.healthScore,
+      isPerfectDay: args.healthScore >= 98,
+      manualEntry: true,
+      whoopSynced: existing?.whoopSynced ?? false,
+      whoopSyncedAt: existing?.whoopSyncedAt,
+      updatedAt: now,
+    };
+
+    if (existing) {
+      await ctx.db.patch(existing._id, patch);
+      return existing._id;
+    }
+
+    return await ctx.db.insert("dailyHealth", {
+      userId: args.userId,
+      date: args.date,
+      ...patch,
+      createdAt: now,
+    });
+  },
+});
+
 // Update steps manually (since Apple Health integration is later)
 
 // Update steps (accepts either userId or clerkId)
@@ -350,10 +478,10 @@ export const updateSteps = mutation({
       )
       .first();
 
-    const stepsScore = args.steps >= 3500 ? 33 : Math.round((args.steps / 3500) * 33);
+    const stepsScore = calculateStepsScore(args.steps);
     const sleepScore = existing?.sleepScore || 0;
     const caloriesScore = existing?.caloriesScore || 0;
-    const healthScore = sleepScore + stepsScore + caloriesScore;
+    const healthScore = sleepScore + stepsScore;
     const now = Date.now();
 
     if (existing) {
@@ -472,9 +600,7 @@ export const upsertDailyHealth = mutation({
     source: v.string(),
   },
   handler: async (ctx, args) => {
-    const { userId, date, steps, sleepHours, activeCalories, sleepScore, stepsScore, caloriesScore, healthScore } = args;
-    
-    const isPerfectDay = healthScore >= 100;
+    const { userId, date } = args;
     const now = Date.now();
     
     // Check if record exists
@@ -482,12 +608,27 @@ export const upsertDailyHealth = mutation({
       .query("dailyHealth")
       .withIndex("by_user_and_date", (q) => q.eq("userId", userId).eq("date", date))
       .first();
+
+    const finalSleepHours = bestMetricValue(args.sleepHours, existing?.sleepHours);
+    const finalSteps = bestMetricValue(args.steps, existing?.steps);
+    const finalActiveCalories = bestMetricValue(args.activeCalories, existing?.activeCalories);
+    const calculated = calculateDontDieScore({
+      sleepHours: finalSleepHours,
+      steps: finalSteps,
+      activeCalories: finalActiveCalories,
+    });
+    const { sleepScore, stepsScore, caloriesScore } = calculated;
+    const calculatedHealthScore = calculated.healthScore;
+    const healthScore = existing?.manualEntry && existing.healthScore > calculatedHealthScore
+      ? existing.healthScore
+      : calculatedHealthScore;
+    const isPerfectDay = healthScore >= 98;
     
     if (existing) {
       await ctx.db.patch(existing._id, {
-        steps,
-        sleepHours,
-        activeCalories,
+        steps: finalSteps,
+        sleepHours: finalSleepHours,
+        activeCalories: finalActiveCalories,
         sleepScore,
         stepsScore,
         caloriesScore,
@@ -502,9 +643,9 @@ export const upsertDailyHealth = mutation({
       return await ctx.db.insert("dailyHealth", {
         userId,
         date,
-        steps,
-        sleepHours,
-        activeCalories,
+        steps: finalSteps,
+        sleepHours: finalSleepHours,
+        activeCalories: finalActiveCalories,
         sleepScore,
         stepsScore,
         caloriesScore,
@@ -516,5 +657,37 @@ export const upsertDailyHealth = mutation({
         updatedAt: now,
       });
     }
+  },
+});
+
+// Recalculate existing rows after scoring-rule changes.
+export const recalculateDontDieScores = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query("dailyHealth")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    let updated = 0;
+    for (const row of rows) {
+      const calculated = calculateDontDieScore({
+        sleepHours: row.sleepHours,
+        steps: row.steps,
+        activeCalories: row.activeCalories,
+      });
+
+      await ctx.db.patch(row._id, {
+        sleepScore: calculated.sleepScore,
+        stepsScore: calculated.stepsScore,
+        caloriesScore: calculated.caloriesScore,
+        healthScore: calculated.healthScore,
+        isPerfectDay: calculated.isPerfectDay,
+        updatedAt: Date.now(),
+      });
+      updated++;
+    }
+
+    return { updated };
   },
 });

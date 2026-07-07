@@ -65,42 +65,196 @@ const CAMP_WEEK_BLUEPRINTS = [
   {
     weekId: "week5",
     weekLabel: "Pali Week 1",
-    label: "Dates TBD",
-    shortLabel: "P1 · TBD",
-    startDate: "",
-    endDate: "",
+    label: "July 27-31",
+    shortLabel: "P1 · Jul 27-31",
+    startDate: "2026-07-27",
+    endDate: "2026-07-31",
     regionKey: "pali",
     regionLabel: "Pali",
-    locationLabel: "Paul Revere",
+    locationLabel: "Palisades High School",
     sequence: 5,
-    configured: false,
+    configured: true,
     weeklySlots: 0,
-    dailySlots: 0,
+    dailySlots: 40,
   },
   {
     weekId: "week6",
     weekLabel: "Pali Week 2",
-    label: "Dates TBD",
-    shortLabel: "P2 · TBD",
-    startDate: "",
-    endDate: "",
+    label: "August 3-7",
+    shortLabel: "P2 · Aug 3-7",
+    startDate: "2026-08-03",
+    endDate: "2026-08-07",
     regionKey: "pali",
     regionLabel: "Pali",
-    locationLabel: "Paul Revere",
+    locationLabel: "Palisades High School",
     sequence: 6,
-    configured: false,
+    configured: true,
     weeklySlots: 0,
-    dailySlots: 0,
+    dailySlots: 40,
+  },
+  {
+    weekId: "week7",
+    weekLabel: "Pali Week 3",
+    label: "August 10-14",
+    shortLabel: "P3 · Aug 10-14",
+    startDate: "2026-08-10",
+    endDate: "2026-08-14",
+    regionKey: "pali",
+    regionLabel: "Pali",
+    locationLabel: "Palisades High School",
+    sequence: 7,
+    configured: true,
+    weeklySlots: 0,
+    dailySlots: 40,
   },
 ] as const;
 
 const MAY17_MINI_CAMP_PROGRAM_ID = "trial-day-2026";
 const MAY17_MINI_CAMP_EVENT_DATE = "2026-05-17";
-const MAY17_MINI_CAMP_SESSION_CAPACITY = 30;
+const MAY17_MINI_CAMP_SESSION_CAPACITY = 40;
 const MAY17_MINI_CAMP_SESSIONS = [
   "Morning Session (9:00 AM - 11:30 AM)",
   "Afternoon Session (12:00 PM - 2:30 PM)",
 ] as const;
+
+const SPRING_REGISTRATION_PROGRAMS: Record<string, { program: string; region: string }> = {
+  "spring-agoura-2026": { program: "spring_league", region: "agoura" },
+  "spring-pali-2026": { program: "spring_league", region: "pali" },
+  "spring-agoura-2027": { program: "spring_league", region: "agoura" },
+  "spring-pali-2027": { program: "spring_league", region: "pali" },
+};
+
+function getRegistrationProgramRouting(season: string) {
+  if (SPRING_REGISTRATION_PROGRAMS[season]) return SPRING_REGISTRATION_PROGRAMS[season];
+  if (season.includes("pdp")) return { program: "pdp", region: season.includes("pali") ? "pali" : "agoura" };
+  if (season.includes("camp") || season.includes("summer")) {
+    return { program: "camp", region: season.includes("pali") ? "pali" : "agoura" };
+  }
+  return null;
+}
+
+function isTestCampRegistration(registration: any) {
+  const email = registration.parent?.email?.trim().toLowerCase() || "";
+  const parentName = String((registration.parent?.firstName || "") + " " + (registration.parent?.lastName || "")).trim().toLowerCase();
+  return email.includes("corinne")
+    || email.includes("smoketest")
+    || parentName.includes("test");
+}
+
+async function syncPaidRegistrationToFamilyCrm(ctx: any, reg: any) {
+  if (reg.status !== "paid") return null;
+
+  const routing = getRegistrationProgramRouting(reg.season);
+  if (!routing) return null;
+
+  const email = reg.parent.email.toLowerCase().trim();
+  const now = Date.now();
+
+  let family = await ctx.db
+    .query("families")
+    .withIndex("by_email", (q: any) => q.eq("email", email))
+    .first();
+
+  if (family) {
+    await ctx.db.patch(family._id, {
+      parentFirstName: reg.parent.firstName,
+      parentLastName: reg.parent.lastName,
+      email,
+      phone: reg.parent.phone,
+      updatedAt: now,
+    });
+    family = await ctx.db.get(family._id);
+  } else {
+    const familyId = await ctx.db.insert("families", {
+      parentFirstName: reg.parent.firstName,
+      parentLastName: reg.parent.lastName,
+      email,
+      phone: reg.parent.phone,
+      createdAt: now,
+      updatedAt: now,
+    });
+    family = await ctx.db.get(familyId);
+  }
+
+  if (!family) return null;
+
+  let syncedChildren = 0;
+  for (const child of reg.children ?? []) {
+    if (!child.firstName || !child.lastName) continue;
+
+    const sessions = child.sessions as Record<string, { type?: string; selectedDays?: string[] }> | undefined;
+    const selectedWeekIds = Object.entries(sessions || {})
+      .filter(([, session]) => session?.type === "full" || (session?.selectedDays?.length ?? 0) > 0)
+      .map(([weekId]) => weekId);
+
+    if (routing.program === "camp" && selectedWeekIds.length === 0) continue;
+
+    const existingChild = await ctx.db
+      .query("children")
+      .withIndex("by_family", (q: any) => q.eq("familyId", family._id))
+      .filter((q: any) => q.and(
+        q.eq(q.field("firstName"), child.firstName),
+        q.eq(q.field("lastName"), child.lastName)
+      ))
+      .first();
+
+    let childId = existingChild?._id;
+    const birthYear = child.birthYear ? Number(child.birthYear) : (child.age ? new Date().getFullYear() - child.age : undefined);
+
+    if (existingChild) {
+      await ctx.db.patch(existingChild._id, {
+        dob: child.birthDate || existingChild.dob,
+        birthYear: birthYear || existingChild.birthYear,
+        gender: child.gender || existingChild.gender,
+      });
+    } else {
+      childId = await ctx.db.insert("children", {
+        familyId: family._id,
+        firstName: child.firstName,
+        lastName: child.lastName,
+        dob: child.birthDate,
+        birthYear,
+        gender: child.gender,
+        createdAt: now,
+      });
+    }
+
+    if (!childId) continue;
+
+    const existingEnrollment = await ctx.db
+      .query("enrollments")
+      .withIndex("by_child", (q: any) => q.eq("childId", childId))
+      .filter((q: any) => q.and(
+        q.eq(q.field("program"), routing.program),
+        q.eq(q.field("season"), reg.season)
+      ))
+      .first();
+
+    const enrollment = {
+      childId,
+      familyId: family._id,
+      program: routing.program,
+      region: routing.region,
+      season: reg.season,
+      division: child.division || child.ageGroup,
+      practiceDay: child.practiceDay,
+      status: "paid_unassigned",
+      notes: routing.program === "camp"
+        ? "Created from camp registration " + reg._id + "; weeks: " + selectedWeekIds.join(", ")
+        : "Created from unified registration",
+      updatedAt: now,
+    };
+
+    if (existingEnrollment) {
+      await ctx.db.patch(existingEnrollment._id, enrollment);
+    } else {
+      await ctx.db.insert("enrollments", { ...enrollment, createdAt: now });
+    }
+    syncedChildren += 1;
+  }
+
+  return { familyId: family._id, syncedChildren };
+}
 
 async function syncTrialRegistrationToFamilyCrm(ctx: any, registration: {
   childFirstName: string;
@@ -226,7 +380,7 @@ function getWeekBlueprint(weekId: string) {
 
 function normalizeWeekRecord(week: any) {
   const blueprint = getWeekBlueprint(week.weekId);
-  const configured = blueprint.configured !== false;
+  const configured = Boolean(blueprint.configured);
   const weeklySlots = Math.max(week.weeklySlots ?? 0, blueprint.weeklySlots ?? 0);
   const dailySlots = Math.max(week.dailySlots ?? 0, blueprint.dailySlots ?? 0);
   const totalRegistered = week.weeklyUsed + week.dailyUsed;
@@ -285,7 +439,7 @@ function buildPlaceholderWeek(weekId: string) {
 function buildRegionSummaries(weeks: any[]) {
   const regions = [
     { regionKey: "agoura", regionLabel: "Agoura", locationLabel: "Brookside" },
-    { regionKey: "pali", regionLabel: "Pali", locationLabel: "Paul Revere" },
+    { regionKey: "pali", regionLabel: "Pali", locationLabel: "Palisades High School" },
   ];
 
   return regions.map((region) => {
@@ -297,6 +451,36 @@ function buildRegionSummaries(weeks: any[]) {
       totalRegistered: regionWeeks.reduce((sum, week) => sum + week.totalRegistered, 0),
       totalDisplaySpots: regionWeeks.reduce((sum, week) => sum + week.displaySpots, 0),
       weeks: regionWeeks,
+    };
+  });
+}
+
+function addDayAvailabilityToWeeks(weeks: any[], registrations: any[]) {
+  const dayAvailabilityByWeek = buildDayAvailabilityByWeek(weeks, registrations);
+  const paidRegistrations = registrations.filter((registration) => registration.status === "paid");
+
+  return weeks.map((week) => {
+    const days = Object.values(dayAvailabilityByWeek[week.weekId] ?? {});
+    const lowestOpenDay = days.length > 0
+      ? Math.min(...days.map((day: any) => day.remaining))
+      : week.dailyRemaining;
+    const highestRegisteredDay = days.length > 0
+      ? Math.max(...days.map((day: any) => day.reserved))
+      : week.dailyUsed;
+    const totalRegistered = paidRegistrations.reduce((sum, registration) => {
+      const weekKids = (registration.children ?? []).filter((child: any) => {
+        const session = child.sessions?.[week.weekId];
+        return session?.type === "full" || (session?.selectedDays?.length ?? 0) > 0;
+      }).length;
+      return sum + weekKids;
+    }, 0);
+
+    return {
+      ...week,
+      totalRegistered,
+      dailyUsed: highestRegisteredDay,
+      displaySpots: lowestOpenDay,
+      dayAvailability: days,
     };
   });
 }
@@ -320,8 +504,62 @@ function buildDateRange(startDate: string, endDate: string) {
   return dates;
 }
 
+function getCamperGender(child: any) {
+  const gender = String(child.gender || "").trim();
+  if (!gender) return "Unknown";
+  const normalized = gender.toLowerCase();
+  if (["girl", "girls", "female"].includes(normalized)) return "Girl";
+  if (["boy", "boys", "male"].includes(normalized)) return "Boy";
+  return gender;
+}
+
+function getCamperAgeGroup(child: any) {
+  const ageGroup = String(child.division || child.ageGroup || "").trim();
+  if (ageGroup) return ageGroup;
+
+  const age = child.age ?? calculateChildAge(child.birthDate);
+  return age === undefined ? "Unknown" : `Age ${age}`;
+}
+
+function getDayGenderBreakdown(campers: Array<{ gender: string }>) {
+  const counts: Record<string, number> = {};
+  for (const camper of campers) {
+    counts[camper.gender] = (counts[camper.gender] || 0) + 1;
+  }
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([gender, count]) => ({ gender, count }));
+}
+
+function getDayAgeGroupBreakdown(campers: Array<{ ageGroup: string }>) {
+  const counts: Record<string, number> = {};
+  for (const camper of campers) {
+    counts[camper.ageGroup] = (counts[camper.ageGroup] || 0) + 1;
+  }
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+    .map(([ageGroup, count]) => ({ ageGroup, count }));
+}
+
 function buildDayAvailabilityByWeek(weeks: any[], registrations: any[]) {
-  const result: Record<string, Record<string, { date: string; reserved: number; remaining: number; capacity: number; isFull: boolean }>> = {};
+  const result: Record<string, Record<string, {
+    date: string;
+    reserved: number;
+    remaining: number;
+    capacity: number;
+    isFull: boolean;
+    campers: Array<{
+      childName: string;
+      parentName: string;
+      gender: string;
+      ageGroup: string;
+      age?: number;
+      email?: string;
+      phone?: string;
+    }>;
+    genderBreakdown: Array<{ gender: string; count: number }>;
+    ageGroupBreakdown: Array<{ ageGroup: string; count: number }>;
+  }>> = {};
 
   for (const week of weeks) {
     const dates = buildDateRange(week.startDate, week.endDate);
@@ -333,6 +571,9 @@ function buildDayAvailabilityByWeek(weeks: any[], registrations: any[]) {
         remaining: capacity,
         capacity,
         isFull: false,
+        campers: [],
+        genderBreakdown: [],
+        ageGroupBreakdown: [],
       }])
     );
   }
@@ -355,6 +596,15 @@ function buildDayAvailabilityByWeek(weeks: any[], registrations: any[]) {
           const day = dayMap[date];
           if (!day) continue;
           day.reserved += 1;
+          day.campers.push({
+            childName: `${child.firstName || ""} ${child.lastName || ""}`.trim(),
+            parentName: `${registration.parent?.firstName || ""} ${registration.parent?.lastName || ""}`.trim(),
+            gender: getCamperGender(child),
+            ageGroup: getCamperAgeGroup(child),
+            age: child.age ?? calculateChildAge(child.birthDate),
+            email: registration.parent?.email,
+            phone: registration.parent?.phone,
+          });
         }
       }
     }
@@ -364,6 +614,9 @@ function buildDayAvailabilityByWeek(weeks: any[], registrations: any[]) {
     for (const day of Object.values(dayMap)) {
       day.remaining = Math.max(day.capacity - day.reserved, 0);
       day.isFull = day.remaining === 0;
+      day.campers.sort((a, b) => a.childName.localeCompare(b.childName));
+      day.genderBreakdown = getDayGenderBreakdown(day.campers);
+      day.ageGroupBreakdown = getDayAgeGroupBreakdown(day.campers);
     }
   }
 
@@ -437,13 +690,10 @@ export const getAvailability = query({
   handler: async (ctx) => {
     const weeks = await getNormalizedCampWeeks(ctx);
     const registrations = await ctx.db.query("campRegistrations").collect();
-    const dayAvailabilityByWeek = buildDayAvailabilityByWeek(weeks, registrations);
+    const weeksWithAvailability = addDayAvailabilityToWeeks(weeks, registrations);
     const result: Record<string, unknown> = {};
-    for (const week of weeks) {
-      result[week.weekId] = {
-        ...week,
-        dayAvailability: dayAvailabilityByWeek[week.weekId] ?? {},
-      };
+    for (const week of weeksWithAvailability) {
+      result[week.weekId] = week;
     }
     return result;
   },
@@ -469,6 +719,88 @@ export const validatePromo = query({
       value: promo.value,
       description: promo.description,
     };
+  },
+});
+
+function normalizeCampIdentity(value: string | undefined) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function normalizeCampPhone(value: string | undefined) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (digits.length === 10) return `1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return digits;
+  return digits;
+}
+
+export const validateFriendPromoEligibility = query({
+  args: {
+    code: v.optional(v.string()),
+    parent: v.object({
+      email: v.string(),
+      phone: v.string(),
+    }),
+    children: v.array(v.object({
+      firstName: v.string(),
+      lastName: v.string(),
+      birthDate: v.optional(v.string()),
+      birthYear: v.optional(v.string()),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const promoCode = (args.code || "FRIEND").trim().toUpperCase();
+    const submittedChildren = args.children.map((child) => ({
+      name: `${child.firstName || ""} ${child.lastName || ""}`.trim(),
+      key: normalizeCampIdentity(`${child.firstName || ""}${child.lastName || ""}`),
+      birthDate: child.birthDate,
+      birthYear: child.birthYear,
+    })).filter((child) => child.key);
+
+    if (!submittedChildren.length) {
+      return { eligible: false, error: `${promoCode} requires a camper name.` };
+    }
+
+    const submittedEmail = args.parent.email.trim().toLowerCase();
+    const submittedPhone = normalizeCampPhone(args.parent.phone);
+    const registrations = await ctx.db.query("campRegistrations").collect();
+    const activeRegistrations = registrations.filter((registration) =>
+      ["paid", "reconciled"].includes(String(registration.status || "").toLowerCase())
+    );
+
+    const blockedChildren: string[] = [];
+    for (const submitted of submittedChildren) {
+      const alreadyCamped = activeRegistrations.some((registration) => {
+        const parentEmail = registration.parent.email.trim().toLowerCase();
+        const parentPhone = normalizeCampPhone(registration.parent.phone);
+        const sameFamily = Boolean(
+          (submittedEmail && parentEmail === submittedEmail) ||
+          (submittedPhone && parentPhone === submittedPhone)
+        );
+
+        return registration.children.some((existingChild) => {
+          const existingKey = normalizeCampIdentity(`${existingChild.firstName || ""}${existingChild.lastName || ""}`);
+          if (!existingKey || existingKey !== submitted.key) return false;
+
+          const existingBirthDate = existingChild.birthDate;
+          const existingBirthYear = existingChild.birthYear;
+          if (submitted.birthDate && existingBirthDate) return submitted.birthDate === existingBirthDate;
+          if (submitted.birthYear && existingBirthYear) return submitted.birthYear === existingBirthYear;
+          return sameFamily || !submitted.birthDate;
+        });
+      });
+
+      if (alreadyCamped) blockedChildren.push(submitted.name);
+    }
+
+    if (blockedChildren.length) {
+      return {
+        eligible: false,
+        error: `${promoCode} is only for campers new to Aspire camps. Already registered: ${blockedChildren.join(", ")}.`,
+        blockedChildren,
+      };
+    }
+
+    return { eligible: true };
   },
 });
 
@@ -767,14 +1099,23 @@ export const createRegistration = mutation({
       lastName: v.string(),
       age: v.optional(v.number()),
       birthDate: v.optional(v.string()),
+      birthYear: v.optional(v.string()),
+      division: v.optional(v.string()),
+      practiceDay: v.optional(v.string()),
+      ageGroup: v.optional(v.string()),
       gender: v.optional(v.string()),
       allergies: v.optional(v.string()),
-      sessions: v.any(),
+      sessions: v.optional(v.any()),
     })),
     emergencyContact: v.object({ name: v.string(), phone: v.string() }),
     waiverAccepted: v.boolean(),
     promoCode: v.optional(v.string()),
-    pricing: v.object({ subtotal: v.number(), discount: v.number(), total: v.number() }),
+    pricing: v.object({
+      subtotal: v.number(),
+      discount: v.number(),
+      accountCreditApplied: v.optional(v.number()),
+      total: v.number(),
+    }),
     stripePaymentIntentId: v.string(),
   },
   handler: async (ctx, args) => {
@@ -813,6 +1154,19 @@ export const markFreeRegistration = mutation({
   },
 });
 
+export const setPaymentIntentForRegistration = internalMutation({
+  args: {
+    registrationId: v.id("campRegistrations"),
+    stripePaymentIntentId: v.string(),
+  },
+  handler: async (ctx, { registrationId, stripePaymentIntentId }) => {
+    const reg = await ctx.db.get(registrationId);
+    if (!reg) return null;
+    await ctx.db.patch(registrationId, { stripePaymentIntentId });
+    return reg;
+  },
+});
+
 export const markPaid = internalMutation({
   args: { stripePaymentIntentId: v.string() },
   handler: async (ctx, { stripePaymentIntentId }) => {
@@ -821,6 +1175,7 @@ export const markPaid = internalMutation({
       .withIndex("by_stripe_pi", (q) => q.eq("stripePaymentIntentId", stripePaymentIntentId))
       .first();
     if (!reg) return null;
+    if (reg.status === "paid") return reg;
 
     await ctx.db.patch(reg._id, { status: "paid", paidAt: Date.now() });
 
@@ -845,6 +1200,28 @@ export const markPaid = internalMutation({
     }
 
     if (family) {
+      const accountCreditApplied = reg.pricing.accountCreditApplied ?? 0;
+      if (accountCreditApplied > 0) {
+        const creditCents = Math.round(accountCreditApplied * 100);
+        const currentBalance = family.creditBalance ?? 0;
+        const debitAmount = Math.min(creditCents, currentBalance);
+
+        if (debitAmount > 0) {
+          await ctx.db.patch(family._id, {
+            creditBalance: currentBalance - debitAmount,
+            updatedAt: now,
+          });
+          await ctx.db.insert("creditTransactions", {
+            familyEmail: email,
+            amount: -debitAmount,
+            type: "applied_to_purchase",
+            description: `Applied account credit to ${reg.season} registration`,
+            registrationId: String(reg._id),
+            createdAt: now,
+          });
+        }
+      }
+
       for (const child of reg.children) {
         if (!child.firstName || !child.lastName) continue;
 
@@ -859,16 +1236,56 @@ export const markPaid = internalMutation({
           )
           .first();
 
+        let childId = existingChild?._id;
+        const birthYear = child.birthYear ? Number(child.birthYear) : (child.age ? new Date().getFullYear() - child.age : undefined);
+
         if (!existingChild) {
-          const birthYear = child.age ? new Date().getFullYear() - child.age : undefined;
-          await ctx.db.insert("children", {
+          childId = await ctx.db.insert("children", {
             familyId: family._id,
             firstName: child.firstName,
             lastName: child.lastName,
+            dob: child.birthDate,
             birthYear,
             gender: child.gender,
             createdAt: now,
           });
+        } else if (child.birthDate || child.gender || birthYear) {
+          await ctx.db.patch(existingChild._id, {
+            dob: child.birthDate || existingChild.dob,
+            birthYear: birthYear || existingChild.birthYear,
+            gender: child.gender || existingChild.gender,
+          });
+        }
+
+        const routing = getRegistrationProgramRouting(reg.season);
+        if (routing && childId) {
+          const existingEnrollment = await ctx.db
+            .query("enrollments")
+            .withIndex("by_child", (q) => q.eq("childId", childId))
+            .filter((q) => q.and(
+              q.eq(q.field("program"), routing.program),
+              q.eq(q.field("season"), reg.season)
+            ))
+            .first();
+
+          const enrollment = {
+            childId,
+            familyId: family._id,
+            program: routing.program,
+            region: routing.region,
+            season: reg.season,
+            division: child.division || child.ageGroup,
+            practiceDay: child.practiceDay,
+            status: "paid_unassigned",
+            notes: "Created from unified registration",
+            updatedAt: now,
+          };
+
+          if (existingEnrollment) {
+            await ctx.db.patch(existingEnrollment._id, enrollment);
+          } else {
+            await ctx.db.insert("enrollments", { ...enrollment, createdAt: now });
+          }
         }
       }
     }
@@ -882,8 +1299,8 @@ export const markPaid = internalMutation({
     }
 
     for (const child of reg.children) {
-      const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }>;
-      for (const [weekId, session] of Object.entries(sessions)) {
+      const sessions = child.sessions as Record<string, { type: string; selectedDays?: string[] }> | undefined;
+      for (const [weekId, session] of Object.entries(sessions || {})) {
         const week = await ctx.db
           .query("campAvailability")
           .withIndex("by_week_id", (q) => q.eq("weekId", weekId))
@@ -917,7 +1334,7 @@ export const getRegistrations = query({
     if (week) {
       regs = regs.filter((r) =>
         r.children.some((c) => {
-          const s = (c.sessions as Record<string, { type: string; selectedDays?: string[] }>)[week];
+          const s = (c.sessions as Record<string, { type: string; selectedDays?: string[] }> | undefined)?.[week];
           return s && s.type !== "none" && (s.type === "full" || (s.selectedDays?.length ?? 0) > 0);
         })
       );
@@ -940,6 +1357,265 @@ export const getRegistrations = query({
   },
 });
 
+export const updateRegistrationWeekDays = mutation({
+  args: {
+    registrationId: v.id("campRegistrations"),
+    childIndex: v.number(),
+    weekId: v.string(),
+    selectedDays: v.array(v.string()),
+  },
+  handler: async (ctx, { registrationId, childIndex, weekId, selectedDays }) => {
+    const registration = await ctx.db.get(registrationId);
+    if (!registration) return { updated: false, reason: "not_found" };
+
+    const children = [...registration.children];
+    const child = children[childIndex];
+    if (!child) return { updated: false, reason: "child_not_found" };
+
+    const sessions = { ...(child.sessions ?? {}) };
+    sessions[weekId] = {
+      ...(sessions[weekId] ?? {}),
+      type: selectedDays.length > 0 ? "days" : "none",
+      selectedDays,
+    };
+
+    children[childIndex] = { ...child, sessions };
+    await ctx.db.patch(registrationId, { children });
+
+    return { updated: true, registrationId, child: `${child.firstName} ${child.lastName}`, weekId, selectedDays };
+  },
+});
+
+export const migratePaliCampWeekKeys20260609 = mutation({
+  args: { dryRun: v.optional(v.boolean()) },
+  handler: async (ctx, { dryRun }) => {
+    const registrations = await ctx.db
+      .query("campRegistrations")
+      .filter((q) => q.eq(q.field("season"), "pali-camps-2026"))
+      .collect();
+
+    let registrationsChanged = 0;
+    let childrenChanged = 0;
+    const changes: Array<{ id: string; status: string; parentEmail: string; child: string; from: string; to: string; days: string[] }> = [];
+
+    for (const registration of registrations) {
+      let changedRegistration = false;
+      const children = (registration.children ?? []).map((child: any) => {
+        const sessions = { ...(child.sessions ?? {}) };
+        const updatedSessions = { ...sessions };
+        let changedChild = false;
+
+        const oldWeek6 = sessions.week6;
+        const oldWeek6Dates = oldWeek6?.selectedDays ?? [];
+        const oldWeek6IsAug10 = oldWeek6?.type === "full" || oldWeek6Dates.some((day: string) => day.startsWith("2026-08-1"));
+        if ((oldWeek6Dates.length || oldWeek6?.type === "full") && oldWeek6IsAug10) {
+          updatedSessions.week7 = oldWeek6;
+          delete updatedSessions.week6;
+          changedChild = true;
+          changes.push({
+            id: registration._id,
+            status: registration.status,
+            parentEmail: registration.parent.email,
+            child: `${child.firstName} ${child.lastName}`.trim(),
+            from: "old Week 2 / Aug 10-14",
+            to: "new Week 3 / Aug 10-14",
+            days: oldWeek6.selectedDays ?? [],
+          });
+        }
+
+        const oldWeek5 = sessions.week5;
+        const oldWeek5Dates = oldWeek5?.selectedDays ?? [];
+        const oldWeek5IsAug3 = oldWeek5?.type === "full" || oldWeek5Dates.some((day: string) => day.startsWith("2026-08-0"));
+        if ((oldWeek5Dates.length || oldWeek5?.type === "full") && oldWeek5IsAug3) {
+          updatedSessions.week6 = oldWeek5;
+          delete updatedSessions.week5;
+          changedChild = true;
+          changes.push({
+            id: registration._id,
+            status: registration.status,
+            parentEmail: registration.parent.email,
+            child: `${child.firstName} ${child.lastName}`.trim(),
+            from: "old Week 1 / Aug 3-7",
+            to: "new Week 2 / Aug 3-7",
+            days: oldWeek5.selectedDays ?? [],
+          });
+        }
+
+        if (!changedChild) return child;
+        childrenChanged += 1;
+        changedRegistration = true;
+        return { ...child, sessions: updatedSessions };
+      });
+
+      if (changedRegistration) {
+        registrationsChanged += 1;
+        if (!dryRun) {
+          await ctx.db.patch(registration._id, { children });
+        }
+      }
+    }
+
+    return { dryRun: Boolean(dryRun), registrationsChanged, childrenChanged, changes };
+  },
+});
+
+export const deleteRegistration = mutation({
+  args: { registrationId: v.id("campRegistrations") },
+  handler: async (ctx, { registrationId }) => {
+    const registration = await ctx.db.get(registrationId);
+    if (!registration) return { deleted: false, reason: "not_found" };
+
+    await ctx.db.delete(registrationId);
+    return {
+      deleted: true,
+      email: registration.parent.email,
+      season: registration.season,
+      children: registration.children.length,
+    };
+  },
+});
+
+export const backfillPaidSummerCampFamilyCrm = mutation({
+  args: { includeTests: v.optional(v.boolean()) },
+  handler: async (ctx, { includeTests }) => {
+    const registrations = await ctx.db
+      .query("campRegistrations")
+      .filter((q) => q.eq(q.field("status"), "paid"))
+      .collect();
+
+    let considered = 0;
+    let skippedTests = 0;
+    let syncedFamilies = 0;
+    let syncedChildren = 0;
+
+    for (const registration of registrations) {
+      const routing = getRegistrationProgramRouting(registration.season);
+      if (routing?.program !== "camp") continue;
+      considered += 1;
+
+      if (!includeTests && isTestCampRegistration(registration)) {
+        skippedTests += 1;
+        continue;
+      }
+
+      const result = await syncPaidRegistrationToFamilyCrm(ctx, registration);
+      if (result) {
+        syncedFamilies += 1;
+        syncedChildren += result.syncedChildren;
+      }
+    }
+
+    return { considered, skippedTests, syncedFamilies, syncedChildren };
+  },
+});
+
+// ─── Registration Review / Roster Assignment Queue ──────────────────────
+
+export const getEnrollmentReviewQueue = query({
+  args: {
+    program: v.optional(v.string()),
+    region: v.optional(v.string()),
+    season: v.optional(v.string()),
+    division: v.optional(v.string()),
+    practiceDay: v.optional(v.string()),
+    status: v.optional(v.string()),
+    q: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let enrollments;
+    if (args.program && args.status) {
+      enrollments = await ctx.db
+        .query("enrollments")
+        .withIndex("by_program_status", (q) => q.eq("program", args.program!).eq("status", args.status!))
+        .collect();
+    } else if (args.status) {
+      enrollments = await ctx.db
+        .query("enrollments")
+        .withIndex("by_status", (q) => q.eq("status", args.status!))
+        .collect();
+    } else if (args.program) {
+      enrollments = await ctx.db
+        .query("enrollments")
+        .withIndex("by_program", (q) => q.eq("program", args.program!))
+        .collect();
+    } else {
+      enrollments = await ctx.db.query("enrollments").collect();
+    }
+
+    enrollments = enrollments.filter((enrollment) => {
+      if (args.region && enrollment.region !== args.region) return false;
+      if (args.season && enrollment.season !== args.season) return false;
+      if (args.division && enrollment.division !== args.division) return false;
+      if (args.practiceDay && enrollment.practiceDay !== args.practiceDay) return false;
+      return true;
+    });
+
+    const rows = [];
+    for (const enrollment of enrollments) {
+      const [family, child] = await Promise.all([
+        ctx.db.get(enrollment.familyId),
+        ctx.db.get(enrollment.childId),
+      ]);
+      if (!family || !child) continue;
+
+      rows.push({
+        ...enrollment,
+        parent: {
+          firstName: family.parentFirstName,
+          lastName: family.parentLastName,
+          email: family.email,
+          phone: family.phone,
+        },
+        child: {
+          firstName: child.firstName,
+          lastName: child.lastName,
+          dob: child.dob,
+          birthYear: child.birthYear,
+          gender: child.gender,
+        },
+        displayName: `${child.firstName} ${child.lastName}`.trim(),
+        familyName: `${family.parentFirstName} ${family.parentLastName}`.trim(),
+      });
+    }
+
+    if (args.q) {
+      const needle = args.q.trim().toLowerCase();
+      return rows.filter((row) =>
+        row.displayName.toLowerCase().includes(needle) ||
+        row.familyName.toLowerCase().includes(needle) ||
+        row.parent.email.toLowerCase().includes(needle) ||
+        row.parent.phone.replace(/\D/g, "").includes(needle.replace(/\D/g, ""))
+      );
+    }
+
+    return rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  },
+});
+
+export const updateEnrollmentRosterAssignment = mutation({
+  args: {
+    enrollmentId: v.id("enrollments"),
+    status: v.optional(v.string()),
+    assignedGroup: v.optional(v.string()),
+    rosterNotes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const patch: {
+      status?: string;
+      assignedGroup?: string;
+      rosterNotes?: string;
+      updatedAt: number;
+    } = { updatedAt: Date.now() };
+
+    if (args.status) patch.status = args.status;
+    if (args.assignedGroup !== undefined) patch.assignedGroup = args.assignedGroup;
+    if (args.rosterNotes !== undefined) patch.rosterNotes = args.rosterNotes;
+
+    await ctx.db.patch(args.enrollmentId, patch);
+    return { success: true };
+  },
+});
+
 export const getStats = query({
   args: {},
   handler: async (ctx) => {
@@ -948,7 +1624,8 @@ export const getStats = query({
     const pending = regs.filter((r) => r.status === "pending");
     const totalKids = paid.reduce((sum, reg) => sum + reg.children.length, 0);
     const totalRevenue = paid.reduce((sum, reg) => sum + reg.pricing.total, 0);
-    const weeks = await getNormalizedCampWeeks(ctx);
+    const normalizedWeeks = await getNormalizedCampWeeks(ctx);
+    const weeks = addDayAvailabilityToWeeks(normalizedWeeks, regs);
     const weekStats = Object.fromEntries(weeks.map((week) => [week.weekId, week]));
     const byRegion = buildRegionSummaries(weeks);
 
@@ -1132,7 +1809,10 @@ export const getCheckInRoster = query({
             const session = sessions?.[activeWeek.weekId];
             if (!session) return [];
 
-            const attendsThatDay = session.type === "full" || (session.selectedDays || []).map((day) => day.toLowerCase()).includes(weekdayKey);
+            const selectedDays = (session.selectedDays || []).map((day) => day.toLowerCase());
+            const attendsThatDay = session.type === "full"
+              || selectedDays.includes(date.toLowerCase())
+              || selectedDays.includes(weekdayKey);
             if (!attendsThatDay) return [];
 
             const key = `${date}:${reg._id}:${childIndex}`;

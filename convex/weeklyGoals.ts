@@ -13,6 +13,40 @@ export const listByWeek = query({
   },
 });
 
+function normalizeGoalText(text: string) {
+  return text.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+export const listCarryOverCandidates = query({
+  args: {
+    userId: v.id("users"),
+    fromWeekOf: v.string(),
+    toWeekOf: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const [previousGoals, currentGoals] = await Promise.all([
+      ctx.db
+        .query("weeklyGoals")
+        .withIndex("by_user_week", (q) =>
+          q.eq("userId", args.userId).eq("weekOf", args.fromWeekOf)
+        )
+        .collect(),
+      ctx.db
+        .query("weeklyGoals")
+        .withIndex("by_user_week", (q) =>
+          q.eq("userId", args.userId).eq("weekOf", args.toWeekOf)
+        )
+        .collect(),
+    ]);
+
+    const currentText = new Set(currentGoals.map((goal) => normalizeGoalText(goal.text)));
+
+    return previousGoals
+      .filter((goal) => !goal.done && !currentText.has(normalizeGoalText(goal.text)))
+      .sort((a, b) => a.order - b.order);
+  },
+});
+
 export const add = mutation({
   args: {
     userId: v.id("users"),
@@ -43,6 +77,65 @@ export const add = mutation({
       createdAt: now,
       updatedAt: now,
     });
+  },
+});
+
+export const carryOverUnchecked = mutation({
+  args: {
+    userId: v.id("users"),
+    fromWeekOf: v.string(),
+    toWeekOf: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.fromWeekOf === args.toWeekOf) {
+      return { copied: 0 };
+    }
+
+    const [previousGoals, currentGoals] = await Promise.all([
+      ctx.db
+        .query("weeklyGoals")
+        .withIndex("by_user_week", (q) =>
+          q.eq("userId", args.userId).eq("weekOf", args.fromWeekOf)
+        )
+        .collect(),
+      ctx.db
+        .query("weeklyGoals")
+        .withIndex("by_user_week", (q) =>
+          q.eq("userId", args.userId).eq("weekOf", args.toWeekOf)
+        )
+        .collect(),
+    ]);
+
+    const currentText = new Set(currentGoals.map((goal) => normalizeGoalText(goal.text)));
+    const candidates = previousGoals
+      .filter((goal) => !goal.done && !currentText.has(normalizeGoalText(goal.text)))
+      .sort((a, b) => a.order - b.order);
+
+    if (candidates.length === 0) {
+      return { copied: 0 };
+    }
+
+    const now = Date.now();
+    const maxOrder = currentGoals.reduce((m, goal) => Math.max(m, goal.order), -1);
+
+    await Promise.all(
+      candidates.map((goal, index) =>
+        ctx.db.insert("weeklyGoals", {
+          userId: args.userId,
+          weekOf: args.toWeekOf,
+          text: goal.text,
+          categoryId: goal.categoryId,
+          scheduledDay: goal.scheduledDay,
+          important: goal.important ?? false,
+          done: false,
+          order: maxOrder + index + 1,
+          createdAt: now,
+          updatedAt: now,
+        })
+      )
+    );
+
+    return { copied: candidates.length };
   },
 });
 

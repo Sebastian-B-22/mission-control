@@ -97,14 +97,17 @@ export const initializeUserData = internalMutation({
 
     // Initialize habit templates
     const defaultHabits = [
-      { name: "Morning light", icon: "☀️", order: 0 },
-      { name: "Redlight/meditation", icon: "🧘", order: 1 },
-      { name: "Workout before 8am", icon: "💪", order: 2 },
-      { name: "Take all supplements", icon: "💊", order: 3 },
-      { name: "Ice bath", icon: "🧊", order: 4 },
-      { name: "Sauna", icon: "🔥", order: 5 },
-      { name: "Screens off by 9:30 pm", icon: "📱", order: 6 },
-      { name: "Sleep 7.5 hours", icon: "😴", order: 7 },
+      { name: "Sleep 7.5 hours", icon: "😴", order: 0 },
+      { name: "Morning light", icon: "☀️", order: 1 },
+      { name: "Redlight/meditation", icon: "🧘", order: 2 },
+      { name: "Rebounder and vibration plate", icon: "🦶", order: 3 },
+      { name: "Breath work", icon: "🌬️", order: 4 },
+      { name: "Ice bath", icon: "🧊", order: 5 },
+      { name: "Workout", icon: "💪", order: 6 },
+      { name: "Take all supplements", icon: "💊", order: 7 },
+      { name: "Eat a salad", icon: "🥗", order: 8 },
+      { name: "Sauna", icon: "🔥", order: 9 },
+      { name: "Screens off by 9:30 pm", icon: "📱", order: 10 },
     ];
 
     for (const habit of defaultHabits) {

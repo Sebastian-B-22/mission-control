@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>World Cup Family Leaderboard | Home Team Academy</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/hta-favicon-32.png?v=202606071745" />
+  <link rel="shortcut icon" href="/hta-favicon-32.png?v=202606071745" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/hta-apple-icon.png?v=202606071745" />
+  <meta name="description" content="Follow the Home Team Academy World Cup Family Challenge leaderboard with safe family display names, bracket standings, Quick Pick entries, and Second Chance results." />
+  <style>
+    :root { --ink:#17324d; --muted:#5e7185; --line:#d7e6ef; --brand:#25b95f; --yellow:#ffdc4d; --bg:#f8fcff; --deep:#102c43; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      background:
+        repeating-linear-gradient(90deg, rgba(23,50,77,.035) 0 1px, transparent 1px 74px),
+        linear-gradient(180deg,#dff6ff 0%,#f8fff3 56%,#fff7df 100%);
+      font-family:"Avenir Next","Nunito Sans",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      letter-spacing:0;
+    }
+    .app { width:min(980px,100%); margin:0 auto; padding:18px; }
+    .shell { overflow:hidden; border:1px solid rgba(72,141,178,.22); border-radius:8px; background:rgba(255,255,255,.9); box-shadow:0 18px 42px rgba(45,102,142,.14); }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; border-bottom:1px solid var(--line); background:#fff; }
+    .header-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; align-items:center; }
+    .mark { display:flex; align-items:center; gap:10px; min-width:0; }
+    .mark a { display:block; flex:none; line-height:0; }
+    .mark img { width:64px; height:64px; object-fit:contain; }
+    .challenge-nav { display:grid; grid-template-columns:repeat(4,minmax(0,auto)); align-items:start; gap:6px; }
+    .challenge-nav a, .challenge-nav summary { min-height:34px; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); padding:0 9px; font-size:12px; font-weight:900; line-height:1.05; text-align:center; text-decoration:none; white-space:nowrap; cursor:pointer; }
+    .challenge-nav a:hover, .challenge-nav a:focus-visible, .challenge-nav summary:hover, .challenge-nav summary:focus-visible { background:#f3fbff; outline:none; }
+    .challenge-nav summary { list-style:none; }
+    .challenge-nav summary::-webkit-details-marker { display:none; }
+    .nav-menu { position:relative; }
+    .nav-menu-panel { position:absolute; top:calc(100% + 6px); right:0; z-index:50; display:grid; gap:6px; min-width:158px; border:1px solid var(--line); border-radius:8px; background:#fff; padding:8px; box-shadow:0 18px 42px rgba(16,44,67,.16); }
+    .challenge-nav .nav-menu-panel a { justify-content:flex-start; }
+    h1 { margin:0; font-size:clamp(24px,6vw,44px); line-height:1.02; text-wrap:balance; }
+    p { color:var(--muted); line-height:1.55; text-wrap:pretty; }
+    main { display:grid; gap:14px; padding:16px; }
+    .hero { display:grid; gap:14px; border:1px solid var(--line); border-radius:8px; background:linear-gradient(135deg,#ffffff 0%,#f3fbff 62%,#fff8dd 100%); padding:16px; }
+    .hero-grid { display:grid; gap:16px; align-items:end; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; }
+    .tabs button, .btn { display:inline-flex; align-items:center; justify-content:center; min-height:42px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); padding:0 14px; font-weight:850; line-height:1.1; text-align:center; text-decoration:none; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease; }
+    .tabs button:hover, .btn:hover { transform:translateY(-1px); box-shadow:0 10px 20px rgba(45,102,142,.12); }
+    .tabs button:active, .btn:active { transform:translateY(0); box-shadow:none; }
+    .tabs button:focus-visible, .btn:focus-visible { outline:3px solid rgba(255,220,77,.95); outline-offset:3px; }
+    .tabs button.active, .btn.primary { border-color:var(--brand); background:var(--brand); color:#fff; }
+    .panel, .hero, .row { animation:lb-rise .52s ease; transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease, background-color .22s ease; }
+    .panel:nth-child(2n), .row:nth-child(2n) { animation-delay:.07s; }
+    .panel:nth-child(3n), .row:nth-child(3n) { animation-delay:.13s; }
+    .panel { border:1px solid var(--line); border-radius:8px; background:#fff; padding:14px; }
+    .leaderboard { display:grid; gap:8px; }
+    .row { display:grid; grid-template-columns:44px 1fr auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:8px; background:var(--bg); padding:10px; }
+    .row:nth-child(1) { border-color:rgba(255,220,77,.7); background:#fff8dd; }
+    @media (hover:hover) {
+      .hero:hover, .panel:hover { transform:translateY(-2px); box-shadow:0 16px 32px rgba(45,102,142,.12); border-color:rgba(37,185,95,.34); }
+      .row:hover { transform:translateY(-3px); border-color:rgba(37,185,95,.42); box-shadow:0 14px 28px rgba(45,102,142,.12); }
+    }
+    .hero:active, .panel:active, .row:active { transform:scale(.99); }
+    .row strong { color:var(--ink); }
+    .row span { color:var(--muted); font-size:13px; }
+    .score { font-size:18px; font-weight:950; color:var(--brand); }
+    .note { border-left:4px solid var(--yellow); background:#fff8e5; }
+    .share-box { display:none; gap:8px; border:1px solid rgba(37,185,95,.28); border-radius:8px; background:#f2fff7; padding:12px; }
+    .share-box.active { display:grid; }
+    .share-box code { color:var(--brand); font-weight:950; }
+    .group-card-list { display:grid; gap:10px; }
+    .group-card { display:grid; gap:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); padding:12px; }
+    .group-card-action { border-color:rgba(255,159,28,.46); background:linear-gradient(135deg,#fff8df 0%,#fffdf5 100%); }
+    .group-card-action strong { color:#8a5200; }
+    .group-card-action .btn { border-color:var(--brand); background:var(--brand); color:#fff; }
+    .group-card-saved { border-color:rgba(72,141,178,.22); background:#fff; }
+    .group-card-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+    .group-card strong { color:var(--ink); }
+    .group-card code { color:var(--brand); font-weight:950; }
+    .group-card .btn { width:fit-content; }
+    .btn.prize { border-color:rgba(255,159,28,.5); background:#fff4df; color:#8a5200; }
+    .prize-modal-backdrop { position:fixed; inset:0; z-index:70; display:none; place-items:center; padding:18px; background:rgba(16,44,67,.58); }
+    .prize-modal-backdrop.active { display:grid; }
+    .prize-modal { width:min(560px,100%); max-height:min(760px,calc(100vh - 36px)); overflow:auto; border:1px solid rgba(255,220,77,.46); border-radius:8px; background:linear-gradient(135deg,rgba(255,220,77,.2),rgba(75,183,245,.12)),#fff; padding:18px; box-shadow:0 28px 70px rgba(16,44,67,.32); }
+    .prize-modal-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    .prize-modal h2 { margin:0; color:var(--deep); font-size:clamp(28px,7vw,42px); line-height:.98; }
+    .prize-modal p { margin:8px 0 0; color:var(--muted); line-height:1.5; }
+    .prize-total { display:inline-flex; width:fit-content; margin-top:12px; border:1px solid rgba(255,159,28,.34); border-radius:999px; background:#fff4df; color:#8a5200; padding:7px 11px; font-size:13px; font-weight:950; }
+    .prize-modal-list { display:grid; gap:9px; margin:16px 0 0; padding:0; list-style:none; }
+    .prize-modal-list li { display:grid; grid-template-columns:28px 1fr; gap:10px; align-items:start; border:1px solid rgba(23,50,77,.1); border-radius:8px; background:rgba(255,255,255,.86); padding:10px; color:var(--ink); font-size:14px; font-weight:800; line-height:1.35; }
+    .prize-modal-list li::before { content:"★"; display:inline-grid; place-items:center; width:28px; height:28px; border-radius:8px; background:var(--yellow); color:var(--deep); line-height:1; }
+    .prize-modal-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .modal-close { flex:none; display:inline-grid; place-items:center; width:36px; height:36px; border:1px solid rgba(23,50,77,.16); border-radius:999px; background:#fff; color:var(--deep); font-size:20px; font-weight:950; cursor:pointer; transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
+    .modal-close:hover, .modal-close:focus-visible { transform:translateY(-1px); border-color:rgba(37,185,95,.5); box-shadow:0 10px 22px rgba(16,44,67,.12); }
+    @media (max-width:640px) { .row{grid-template-columns:36px 1fr; transform:none!important}.score{grid-column:2}.hero-grid{grid-template-columns:1fr} header{align-items:flex-start; flex-direction:column}.header-actions,.challenge-nav{width:100%}.challenge-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.challenge-nav a,.challenge-nav summary{min-height:44px;font-size:11px;white-space:normal} }
+    @keyframes lb-rise { from{opacity:.78;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important} }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="shell">
+      <header>
+        <div class="mark">
+          <a href="/" aria-label="Home Team Academy home"><img src="/worldcup/hta-logo.svg" alt="Home Team Academy" /></a>
+          <div>
+            <h1 id="pageTitle">World Cup Family Leaderboard</h1>
+            <p id="pageSubtitle" style="margin:4px 0 0;">Family-safe display names only. Parent contact info stays private.</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <nav class="challenge-nav" aria-label="Challenge pages">
+            <a href="/worldcup/">Start here</a>
+            <a href="/worldcup/?resume=1">My picks</a>
+            <a href="/worldcup/leaderboard/">Leaderboard</a>
+            <details class="nav-menu">
+              <summary>Menu</summary>
+              <div class="nav-menu-panel">
+                <a href="/worldcup/?pickers=1">Choose picker</a>
+                <a href="/worldcup/?family=1">Family setup</a>
+                <a href="/worldcup/missions/">Missions</a>
+                <a href="/worldcup/rules/">Rules</a>
+              </div>
+            </details>
+          </nav>
+          <a id="mainLeaderboardLink" class="btn" href="/worldcup/leaderboard/" hidden>Main Leaderboard</a>
+          <button class="btn prize" type="button" data-prize-overview>Prizes</button>
+        </div>
+      </header>
+      <main>
+        <div class="hero">
+          <div class="hero-grid">
+            <div>
+              <h1>World Cup family standings.</h1>
+              <p style="margin:8px 0 0;">Full Bracket points build by round. Quick Pick, Second Chance, and Family Missions each have their own ways to win, so a busted bracket does not end the fun.</p>
+            </div>
+          </div>
+        </div>
+        <div id="groupShareBox" class="share-box panel">
+          <strong id="groupShareTitle">Group leaderboard</strong>
+          <span id="groupShareCopy">Share this invite link with families you want in the group.</span>
+          <code id="groupShareCode"></code>
+          <button id="copyGroupInvite" class="btn" type="button">Share Group Invite</button>
+        </div>
+        <div class="tabs" aria-label="Leaderboard tabs">
+          <button class="active" data-filter="all">Overall</button>
+          <button data-filter="quick-kids">Quick Pick</button>
+          <button data-filter="full-family">Full Bracket</button>
+          <button data-filter="fantasy-five">Fantasy 5</button>
+          <button data-filter="second-chance">Second Chance</button>
+          <button data-filter="groups">Groups</button>
+          <button data-filter="missions">Family Missions</button>
+        </div>
+        <div id="leaderboard" class="leaderboard panel">Loading leaderboard...</div>
+        <div id="missionPrizePanel" class="panel">
+          <strong>Family Missions prizes</strong>
+          <p>Creative winners are chosen from parent-uploaded submissions like drawings, chants, goal celebrations, country snacks, and backyard skill missions. Public reposting only happens with parent approval.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div id="prizeModalBackdrop" class="prize-modal-backdrop" role="presentation">
+    <section class="prize-modal" role="dialog" aria-modal="true" aria-labelledby="prizeModalTitle">
+      <div class="prize-modal-head">
+        <div>
+          <h2 id="prizeModalTitle">Prize Highlights</h2>
+          <p>Families can win through brackets, Fantasy 5, Quick Pick, missions, and participation. Completely free. Nothing to purchase.</p>
+          <span class="prize-total">Over $2,000 in family-friendly prizes</span>
+        </div>
+        <button class="modal-close" type="button" data-prize-close aria-label="Close prize overview">×</button>
+      </div>
+      <ul class="prize-modal-list">
+        <li>Every eligible family is entered into the participation raffle.</li>
+        <li>Earn bonus raffle entries through Fantasy 5, family missions, and private groups.</li>
+        <li>Grand prize: MLS or NWSL tickets near you.</li>
+        <li>Other prizes include Amazon, Target, and Dick's Sporting Goods gift cards, plus fun soccer-themed prizes.</li>
+      </ul>
+      <div class="prize-modal-actions">
+        <a class="btn" href="/worldcup/rules/#prizes">See details and official rules</a>
+        <button class="btn" type="button" data-prize-close>Close</button>
+      </div>
+    </section>
+  </div>
+  <script>
+    let rows = [];
+    let activeGroup = null;
+    let savedGroups = [];
+    let savedBundle = null;
+    const params = new URLSearchParams(window.location.search);
+    const groupCode = String(params.get("group") || "").replace(/[^a-z0-9]/gi, "").toUpperCase();
+    document.getElementById("mainLeaderboardLink").hidden = !groupCode;
+    function escapeHtml(value) {
+      return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+    function modeLabel(mode) {
+      if (mode === "quick-kids") return "Quick Pick";
+      if (mode === "fantasy-five") return "Fantasy 5";
+      if (mode === "second-chance") return "Second Chance";
+      return "Full Bracket";
+    }
+    function displayPlayerName(value) {
+      return String(value || "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b([a-z])/g, (match) => match.toUpperCase());
+    }
+    function normalizedLeaderboardKey(value) {
+      return String(value || "Family Team")
+        .toLowerCase()
+        .replace(/[’‘]/g, "'")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+    function collapseOverallRows(input) {
+      const latest = new Map();
+      input.forEach((row) => {
+        const key = groupCode
+          ? normalizedLeaderboardKey(row.displayName || `${row.participantName || ""} ${row.familyName || ""}`)
+          : normalizedLeaderboardKey(row.familyName || row.displayName);
+        const current = latest.get(key);
+        const currentScore = current?.score?.total || 0;
+        const rowScore = row?.score?.total || 0;
+        if (!current || rowScore > currentScore || (rowScore === currentScore && (row.createdAt || 0) > (current.createdAt || 0))) {
+          latest.set(key, row);
+        }
+      });
+      return Array.from(latest.values()).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0) || (b.createdAt || 0) - (a.createdAt || 0));
+    }
+    function isTestLeaderboardRow(row) {
+      const participant = normalizedLeaderboardKey(row.participantName || "");
+      const family = normalizedLeaderboardKey(row.familyName || row.displayName || "");
+      return participant === "test" || family === "qa release test";
+    }
+    function render(filter = "all") {
+      const target = document.getElementById("leaderboard");
+      const missionPrizePanel = document.getElementById("missionPrizePanel");
+      if (missionPrizePanel) missionPrizePanel.hidden = filter !== "missions";
+      if (filter === "missions") {
+        target.innerHTML = "Family mission winners will appear here once tournament missions begin.";
+        return;
+      }
+      if (filter === "groups") {
+        target.innerHTML = `
+          <div class="group-card-list">
+            <div class="group-card group-card-action">
+              <div class="group-card-head">
+                <strong>Create or join a group</strong>
+                <span>Private leaderboards for cousins, teams, classmates, or friends.</span>
+              </div>
+              <a class="btn" href="/worldcup/?groups=1">Create / Join Group</a>
+            </div>
+            ${savedGroups.length ? savedGroups.map(group => `
+              <div class="group-card group-card-saved">
+                <div class="group-card-head">
+                  <strong>${escapeHtml(group.name || "Private Group")}</strong>
+                  <code>${escapeHtml(group.joinCode || "")}</code>
+                </div>
+                <a class="btn" href="/worldcup/leaderboard?group=${encodeURIComponent(group.joinCode || "")}">View standings</a>
+              </div>
+            `).join("") : `<span class="small">Open your saved challenge page to see private groups connected to this family.</span>`}
+          </div>
+        `;
+        return;
+      }
+      const filtered = rows.filter(row => !isTestLeaderboardRow(row) && (filter === "all" || row.mode === filter));
+      const visible = filter === "all" ? collapseOverallRows(filtered) : filtered;
+      target.innerHTML = visible.length ? visible.map((row, index) => `
+        <div class="row">
+          <strong>#${index + 1}</strong>
+          <div><strong>${escapeHtml(row.displayName || "Family Team")}</strong><br><span>${entrySummary(row)}</span></div>
+          <div class="score">${row.score?.total || 0} pts</div>
+        </div>
+      `).join("") : "No public leaderboard entries yet.";
+    }
+    function entrySummary(row) {
+      if (row.mode === "fantasy-five") {
+        const players = Array.isArray(row.fantasySummary?.players) ? row.fantasySummary.players.filter(Boolean).map(displayPlayerName) : [];
+        const captain = displayPlayerName(row.fantasySummary?.captain);
+        return `Fantasy 5${captain ? ` • Captain: ${escapeHtml(captain)}` : ""}${players.length ? ` • ${players.map(escapeHtml).join(", ")}` : ""}`;
+      }
+      return `${modeLabel(row.mode)}${row.champion ? ` • Champion pick: ${escapeHtml(row.champion)}` : ""}`;
+    }
+    function loadSavedGroups() {
+      try {
+        const saved = localStorage.getItem("hta-worldcup-entry-v1") || localStorage.getItem("hta-worldcup-prototype");
+        savedBundle = saved ? JSON.parse(saved) : null;
+        savedGroups = Array.isArray(savedBundle?.family?.groups) ? savedBundle.family.groups.filter(group => group?.joinCode) : [];
+      } catch {
+        savedBundle = null;
+        savedGroups = [];
+      }
+    }
+    function savedGroupForCode(code) {
+      const normalized = String(code || "").toUpperCase();
+      return savedGroups.find(group => String(group.joinCode || "").toUpperCase() === normalized);
+    }
+    function localRowsForGroup(code) {
+      if (!savedGroupForCode(code) || !savedBundle?.entries) return [];
+      const familyName = savedBundle.family?.familyName || "Family Team";
+      return Object.values(savedBundle.entries).flatMap((entry, index) => {
+        const name = entry?.name || entry?.participantName || `Entry ${index + 1}`;
+        const displayName = groupCode ? `${name} - ${familyName}` : familyName;
+        const output = [];
+        if (entry?.simplePicks?.champion) {
+          output.push({ displayName, mode: "quick-kids", champion: entry.simplePicks.champion, score: { total: 0 }, createdAt: Date.now() + index });
+        }
+        if (entry?.winners?.final?.final_0) {
+          output.push({ displayName, mode: "full-family", champion: entry.winners.final.final_0, score: { total: 0 }, createdAt: Date.now() + index });
+        }
+        const picks = entry?.fantasyFive?.picks || {};
+        if (Object.values(picks).filter(Boolean).length >= 5 && entry?.fantasyFive?.captain) {
+          output.push({ displayName, mode: "fantasy-five", champion: "", score: { total: 0 }, fantasySummary: { captain: entry.fantasyFive.captain, players: [] }, createdAt: Date.now() + index });
+        }
+        return output.map(row => ({ ...row, participantName: name }));
+      });
+    }
+    function completedModes(entry) {
+      const modes = [];
+      if (entry?.simplePicks?.champion) modes.push("quick-kids");
+      if (entry?.winners?.final?.final_0) modes.push("full-family");
+      const fantasyPicks = entry?.fantasyFive?.picks || {};
+      if (Object.values(fantasyPicks).filter(Boolean).length >= 5 && entry?.fantasyFive?.captain) modes.push("fantasy-five");
+      return modes;
+    }
+    async function syncSavedEntriesToGroup(code) {
+      if (!savedGroupForCode(code) || !savedBundle?.family?.parentPhone || !savedBundle?.entries) return;
+      const family = {
+        parentName: savedBundle.family.parentName || "",
+        parentEmail: "",
+        parentPhone: savedBundle.family.parentPhone,
+        textOptIn: false,
+        htaLaunchOptIn: false,
+        familyName: savedBundle.family.familyName || "Family Team",
+        groupCodes: savedGroups.map(group => String(group.joinCode || "").toUpperCase()).filter(Boolean),
+      };
+      const jobs = Object.values(savedBundle.entries).flatMap((entry) => completedModes(entry).map((mode) => fetch("https://harmless-salamander-44.convex.site/worldcup/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "worldcup-leaderboard-local-sync",
+          mode,
+          sendConfirmationText: false,
+          family,
+          participantName: entry.name || "Family Bracket",
+          participantDisplayName: "",
+          participantType: "family",
+          ageRange: "",
+          entry: {
+            simplePicks: entry.simplePicks,
+            fantasyFive: entry.fantasyFive,
+            groupPicks: entry.groupPicks,
+            wildcards: entry.wildcards,
+            winners: entry.winners,
+          },
+        }),
+      }).catch(() => null)));
+      if (jobs.length) await Promise.allSettled(jobs);
+    }
+    async function load() {
+      try {
+        loadSavedGroups();
+        const endpoint = groupCode
+          ? `https://harmless-salamander-44.convex.site/worldcup/leaderboard?group=${encodeURIComponent(groupCode)}`
+          : "https://harmless-salamander-44.convex.site/worldcup/leaderboard";
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error("leaderboard unavailable");
+        const data = await res.json();
+        rows = data.rows || [];
+        activeGroup = data.group || null;
+        if (groupCode && !rows.length) {
+          const localRows = localRowsForGroup(groupCode);
+          if (localRows.length) {
+            rows = localRows;
+            syncSavedEntriesToGroup(groupCode);
+          }
+        }
+        if (activeGroup) {
+          document.getElementById("pageTitle").textContent = `${activeGroup.name} Leaderboard`;
+          document.getElementById("pageSubtitle").textContent = `Private group code ${activeGroup.joinCode}. Participant names are visible inside this invite-only group.`;
+          document.getElementById("groupShareBox").classList.add("active");
+          document.getElementById("groupShareTitle").textContent = `${activeGroup.name} invite`;
+          document.getElementById("groupShareCode").textContent = `https://www.hometeamacademy.com/worldcup?join=${activeGroup.joinCode}&groups=1#groups`;
+        } else if (groupCode) {
+          const savedGroup = savedGroupForCode(groupCode);
+          if (savedGroup) {
+            activeGroup = savedGroup;
+            document.getElementById("pageTitle").textContent = `${savedGroup.name || "Private Group"} Leaderboard`;
+            document.getElementById("pageSubtitle").textContent = `Private group code ${savedGroup.joinCode}. Your saved local picks are shown while the public standings catch up.`;
+            document.getElementById("groupShareBox").classList.add("active");
+            document.getElementById("groupShareTitle").textContent = `${savedGroup.name || "Private Group"} invite`;
+            document.getElementById("groupShareCode").textContent = `https://www.hometeamacademy.com/worldcup?join=${savedGroup.joinCode}&groups=1#groups`;
+          } else {
+            document.getElementById("pageSubtitle").textContent = "That group code was not found yet. Showing an empty group leaderboard.";
+          }
+        }
+        render();
+      } catch {
+        document.getElementById("leaderboard").textContent = "Leaderboard is not available yet. Check back after entries begin scoring.";
+      }
+    }
+    document.querySelectorAll("[data-filter]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-filter]").forEach(item => item.classList.toggle("active", item === button));
+        render(button.dataset.filter);
+      });
+    });
+    function openPrizeOverview() {
+      const backdrop = document.getElementById("prizeModalBackdrop");
+      if (!backdrop) return;
+      backdrop.classList.add("active");
+      document.body.style.overflow = "hidden";
+      backdrop.querySelector("[data-prize-close]")?.focus();
+    }
+    function closePrizeOverview() {
+      const backdrop = document.getElementById("prizeModalBackdrop");
+      if (!backdrop) return;
+      backdrop.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+    document.querySelectorAll("[data-prize-overview]").forEach(button => {
+      button.addEventListener("click", openPrizeOverview);
+    });
+    document.querySelectorAll("[data-prize-close]").forEach(button => {
+      button.addEventListener("click", closePrizeOverview);
+    });
+    document.getElementById("prizeModalBackdrop")?.addEventListener("click", (event) => {
+      if (event.target.id === "prizeModalBackdrop") closePrizeOverview();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closePrizeOverview();
+    });
+    document.getElementById("copyGroupInvite").addEventListener("click", async () => {
+      if (!activeGroup) return;
+      const invite = `https://www.hometeamacademy.com/worldcup?join=${activeGroup.joinCode}&groups=1#groups`;
+      const groupName = activeGroup.name || "our private group";
+      const text = `Join our group ${groupName} in the Home Team Academy World Cup Family Prediction Challenge. Can your family beat ours? ${invite}`;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: `${groupName} World Cup group`, text, url: invite });
+        } else {
+          await navigator.clipboard.writeText(text);
+        }
+        document.getElementById("copyGroupInvite").textContent = "Copied";
+        setTimeout(() => { document.getElementById("copyGroupInvite").textContent = "Share Group Invite"; }, 1600);
+      } catch {}
+    });
+    load();
+  </script>
+</body>
+</html>
