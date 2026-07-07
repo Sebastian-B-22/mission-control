@@ -52,7 +52,6 @@ import { Aspire7v7View } from "@/components/views/Aspire7v7View";
 import { HomeschoolOverview } from "@/components/views/HomeschoolOverview";
 import { PushNotificationBanner } from "@/components/PushNotificationBanner";
 import { HomeschoolDailyView } from "@/components/views/HomeschoolDailyView";
-import HomeschoolProgressView from "@/components/views/HomeschoolProgressView";
 import { HomeschoolProgressViewNew } from "@/components/views/HomeschoolProgressViewNew";
 import { HomeschoolResourcesView } from "@/components/views/HomeschoolResourcesView";
 import {
@@ -94,9 +93,6 @@ export default function DashboardPage() {
     user?.id ? { clerkId: user.id } : "skip"
   );
   
-  // Debug logging
-  console.log('[Dashboard] Clerk user.id:', user?.id);
-  console.log('[Dashboard] convexUser:', convexUser);
   const createUser = useMutation(api.users.createUser);
 
   // Check user setup
