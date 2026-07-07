@@ -53,6 +53,25 @@ export const getMonthlyFocus = query({
   },
 });
 
+// Get current month's focus for Learning Block suggestions
+export const getCurrentMonthFocus = query({
+  args: {},
+  handler: async (ctx) => {
+    const now = new Date();
+    const monthFormats = [
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`, // "2026-04"
+      now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), // "April 2026"
+    ];
+    
+    const allFocus = await ctx.db.query("hsMonthlyFocus").collect();
+    const current = allFocus.find(f => 
+      monthFormats.some(fmt => f.month.includes(fmt) || fmt.includes(f.month))
+    );
+    
+    return current || null;
+  },
+});
+
 export const createMonthlyFocus = mutation({
   args: {
     quarterId: v.id("hsQuarters"),
@@ -78,19 +97,25 @@ export const getResources = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("hsResources");
-
+    let results;
+    
     if (args.type) {
-      query = ctx.db
+      results = await ctx.db
         .query("hsResources")
-        .withIndex("by_type", (q) => q.eq("type", args.type!));
+        .withIndex("by_type", (q) => q.eq("type", args.type!))
+        .collect();
+    } else {
+      results = await ctx.db.query("hsResources").collect();
     }
 
-    const results = await query.collect();
-
     if (args.category) {
+      const cat = args.category.toLowerCase();
+      // Match category field OR any subject in subjects array
       return results
-        .filter((r) => r.category === args.category)
+        .filter((r) => 
+          r.category?.toLowerCase() === cat || 
+          r.subjects?.some((s) => s.toLowerCase() === cat || s.toLowerCase().includes(cat))
+        )
         .slice(0, args.limit || 100);
     }
 
@@ -183,10 +208,40 @@ export const markResourceUsed = mutation({
     const resource = await ctx.db.get(args.resourceId);
     if (resource) {
       await ctx.db.patch(args.resourceId, {
-        lastUsed: new Date().toISOString().split("T")[0],
+        lastUsed: Date.now(),
         timesUsed: (resource.timesUsed || 0) + 1,
       });
     }
+  },
+});
+
+export const updateResource = mutation({
+  args: {
+    resourceId: v.id("hsResources"),
+    updates: v.object({
+      name: v.optional(v.string()),
+      type: v.optional(v.string()),
+      category: v.optional(v.string()),
+      subjects: v.optional(v.array(v.string())),
+      notes: v.optional(v.string()),
+      location: v.optional(v.string()),
+      tags: v.optional(v.array(v.string())),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const resource = await ctx.db.get(args.resourceId);
+    if (resource) {
+      await ctx.db.patch(args.resourceId, args.updates);
+    }
+    return args.resourceId;
+  },
+});
+
+export const deleteResource = mutation({
+  args: { resourceId: v.id("hsResources") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.resourceId);
+    return args.resourceId;
   },
 });
 
@@ -336,12 +391,24 @@ export const createDailySchedule = mutation({
       .withIndex("by_date", (q) => q.eq("date", args.date))
       .first();
 
+    // Transform args to match schema types
+    const scheduleData = {
+      date: args.date,
+      dayOfWeek: args.dayOfWeek,
+      blocks: args.blocks.map((b) => ({
+        ...b,
+        resourceIds: b.resourceIds as any,
+        completedAt: b.completedAt ? parseInt(b.completedAt) : undefined,
+      })),
+      notes: args.overallNotes,
+    };
+
     if (existing) {
-      await ctx.db.patch(existing._id, args);
+      await ctx.db.patch(existing._id, scheduleData as any);
       return existing._id;
     }
 
-    return await ctx.db.insert("hsDailySchedule", args);
+    return await ctx.db.insert("hsDailySchedule", scheduleData as any);
   },
 });
 
@@ -406,14 +473,13 @@ export const markBlockComplete = mutation({
         return {
           ...block,
           completed: args.completed,
-          completedAt: args.completed ? new Date().toISOString() : undefined,
-          completionNotes: args.notes,
+          completedAt: args.completed ? Date.now() : undefined,
         };
       }
       return block;
     });
 
-    await ctx.db.patch(schedule._id, { blocks: updatedBlocks });
+    await ctx.db.patch(schedule._id, { blocks: updatedBlocks as any });
 
     // Also log to completions table
     const block = schedule.blocks.find((b) => b.id === args.blockId);
@@ -423,12 +489,8 @@ export const markBlockComplete = mutation({
         blockId: args.blockId,
         subject: block.subject,
         activity: block.activity,
-        resourcesUsed: block.resourceNames,
-        completed: true,
-        duration: args.duration,
-        notes: args.notes,
-        completedAt: new Date().toISOString(),
-      });
+        completedAt: Date.now(),
+      } as any);
     }
 
     return schedule._id;
@@ -511,11 +573,11 @@ export const getMorningBriefHomeschool = query({
       };
     }
 
-    if (schedule.isHoliday) {
+    if ((schedule as any).isHoliday) {
       return {
         hasSchedule: true,
         isHoliday: true,
-        message: `Holiday: ${schedule.holidayName || "Day off"}`,
+        message: `Holiday: ${(schedule as any).holidayName || "Day off"}`,
       };
     }
 
@@ -563,7 +625,7 @@ export const suggestResources = query({
     if (args.excludeRecentlyUsed) {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const cutoff = thirtyDaysAgo.toISOString().split("T")[0];
+      const cutoff = thirtyDaysAgo.getTime();
 
       filtered = filtered.filter((r) => !r.lastUsed || r.lastUsed < cutoff);
     }
@@ -572,7 +634,7 @@ export const suggestResources = query({
     filtered.sort((a, b) => {
       if (!a.lastUsed) return -1;
       if (!b.lastUsed) return 1;
-      return a.lastUsed.localeCompare(b.lastUsed);
+      return a.lastUsed - b.lastUsed;
     });
 
     return filtered.slice(0, 10);
@@ -585,7 +647,7 @@ export const getForgottenResources = query({
     const days = args.daysSinceUsed || 60;
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
-    const cutoff = cutoffDate.toISOString().split("T")[0];
+    const cutoff = cutoffDate.getTime();
 
     const all = await ctx.db.query("hsResources").collect();
 
@@ -593,9 +655,7 @@ export const getForgottenResources = query({
   },
 });
 
-// ==========================================
-// PLANNING BLOCKS
-// ==========================================
+// ─── Planning Blocks ──────────────────────────────────────────────
 
 export const getPlanningBlocks = query({
   args: {
@@ -603,26 +663,41 @@ export const getPlanningBlocks = query({
     kid: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const all = await ctx.db
-      .query("hsPlanningBlocks")
-      .withIndex("by_date", (q) => q.eq("date", args.date))
-      .collect();
-
-    if (args.kid && args.kid !== "Both") {
-      return all.filter((b) => !b.kid || b.kid === args.kid);
+    let blocks;
+    if (args.kid && args.kid !== "both") {
+      // Get blocks for specific kid OR "both"
+      const kidBlocks = await ctx.db
+        .query("hsPlanningBlocks")
+        .withIndex("by_date_kid", (q) => q.eq("date", args.date).eq("kid", args.kid!))
+        .collect();
+      const bothBlocks = await ctx.db
+        .query("hsPlanningBlocks")
+        .withIndex("by_date_kid", (q) => q.eq("date", args.date).eq("kid", "both"))
+        .collect();
+      blocks = [...kidBlocks, ...bothBlocks];
+    } else {
+      blocks = await ctx.db
+        .query("hsPlanningBlocks")
+        .withIndex("by_date", (q) => q.eq("date", args.date))
+        .collect();
     }
-
-    return all;
+    // Sort by start time
+    return blocks.sort((a, b) => {
+      if (!a.startTime) return 1;
+      if (!b.startTime) return -1;
+      return a.startTime.localeCompare(b.startTime);
+    });
   },
 });
 
 export const createPlanningBlock = mutation({
   args: {
     date: v.string(),
-    kid: v.optional(v.string()),
+    kid: v.string(),
     topic: v.string(),
     subject: v.string(),
     methods: v.array(v.string()),
+    startTime: v.optional(v.string()),
     duration: v.optional(v.number()),
     materials: v.optional(v.string()),
     notes: v.optional(v.string()),
@@ -630,7 +705,8 @@ export const createPlanningBlock = mutation({
   handler: async (ctx, args) => {
     return await ctx.db.insert("hsPlanningBlocks", {
       ...args,
-      createdAt: new Date().toISOString(),
+      completed: false,
+      createdAt: Date.now(),
     });
   },
 });
@@ -641,14 +717,18 @@ export const updatePlanningBlock = mutation({
     topic: v.optional(v.string()),
     subject: v.optional(v.string()),
     methods: v.optional(v.array(v.string())),
+    startTime: v.optional(v.string()),
     duration: v.optional(v.number()),
     materials: v.optional(v.string()),
     notes: v.optional(v.string()),
+    completed: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-    return id;
+    const filtered = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(id, filtered);
   },
 });
 
@@ -658,46 +738,3 @@ export const deletePlanningBlock = mutation({
     await ctx.db.delete(args.id);
   },
 });
-
-export const convertPlanningBlockToSchedule = mutation({
-  args: {
-    blockId: v.id("hsPlanningBlocks"),
-    startTime: v.string(),
-    endTime: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const block = await ctx.db.get(args.blockId);
-    if (!block) return null;
-
-    // Get or create daily schedule for this date
-    let schedule = await ctx.db
-      .query("hsDailySchedule")
-      .withIndex("by_date", (q) => q.eq("date", block.date))
-      .first();
-
-    const scheduleBlock = {
-      id: `block-${Date.now()}`,
-      startTime: args.startTime,
-      endTime: args.endTime,
-      subject: block.subject,
-      activity: block.topic,
-      notes: block.notes,
-      completed: false,
-    };
-
-    if (schedule) {
-      const updatedBlocks = [...schedule.blocks, scheduleBlock];
-      await ctx.db.patch(schedule._id, { blocks: updatedBlocks });
-      return schedule._id;
-    } else {
-      const dateObj = new Date(block.date);
-      const dayOfWeek = dateObj.getDay();
-
-      return await ctx.db.insert("hsDailySchedule", {
-        date: block.date,
-        dayOfWeek,
-        blocks: [scheduleBlock],
-      });
-    }
-  },
-});}
