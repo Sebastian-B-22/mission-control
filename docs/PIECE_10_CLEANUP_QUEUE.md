@@ -28,7 +28,9 @@ deploys and require the normal approval path.
    - Inventory Mission Control-related Vercel projects.
    - Confirm the canonical project is `mission-control`.
    - Confirm whether `mission-control-deploy` is obsolete.
-   - Retire/archive the duplicate only after explicit approval.
+   - GitHub integration retired after explicit approval on July 7.
+   - Remaining cleanup: decide whether to archive/delete the inert Vercel
+     project record. Do not delete without explicit approval.
 
 3. Canonical deploy path
    - Document GitHub repo, Vercel project, production branch, custom
