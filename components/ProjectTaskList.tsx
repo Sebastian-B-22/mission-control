@@ -22,7 +22,7 @@ interface ProjectTaskListProps {
   project: "hta" | "aspire" | "homeschool";
   subProject: string;
   title: string;
-  description: string;
+  description?: string;
   showAssignments?: boolean;
   headerExtra?: React.ReactNode;
 }

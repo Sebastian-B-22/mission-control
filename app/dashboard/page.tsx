@@ -40,6 +40,7 @@ import { PersonalOverview } from "@/components/views/PersonalOverview";
 import { ProfessionalOverview } from "@/components/views/ProfessionalOverview";
 import { HTAOverview } from "@/components/views/HTAOverview";
 import { HTASubView } from "@/components/views/HTASubView";
+import { HTAWorldCupView } from "@/components/views/HTAWorldCupView";
 import { AspireOverview } from "@/components/views/AspireOverview";
 import { CoachHubView } from "@/components/views/CoachHubView";
 import { FamilyCRM } from "@/components/FamilyCRM";
@@ -64,16 +65,23 @@ import {
   HomeschoolGamesView,
   HomeschoolFieldTripsView,
   HomeschoolTripsView,
+  HomeschoolSummerView,
+  HomeschoolHealthView,
 } from "@/components/views/HomeschoolSubViews";
 import { FinanceView } from "@/components/views/FinanceView";
+import { TimeDashboardView } from "@/components/views/TimeDashboardView";
+import { TicketsView } from "@/components/views/TicketsView";
 import { HomeRemodelView } from "@/components/views/HomeRemodelView";
 import { WeeklyView } from "@/components/WeeklyView";
+import { MonthlyRPMView } from "@/components/MonthlyRPMView";
+import { DailyCommandCenter } from "@/components/DailyCommandCenter";
 import { AgentSquad } from "@/components/AgentSquad";
 import { AgentHQ } from "@/components/AgentHQ";
+import { AgentProfileView } from "@/components/AgentProfileView";
 import { OnboardingWizardDialog } from "@/components/OnboardingWizardDialog";
-import { CostTrackerCard } from "@/components/CostTrackerCard";
 import { CostTrackerView } from "@/components/views/CostTrackerView";
 import { MemoryPanelView } from "@/components/views/MemoryPanelView";
+import { KnowledgeFilesView } from "@/components/views/KnowledgeFilesView";
 import { AgentWorkflowShell } from "@/components/AgentWorkflowShell";
 import { DailyHandwritingPad } from "@/components/DailyHandwritingPad";
 import { Brain, Lightbulb, Mail, PenSquare, TrendingUp } from "lucide-react";
@@ -158,6 +166,7 @@ export default function DashboardPage() {
     "email-drafts",
     "agent-learnings",
     "engagement-habits",
+    "knowledge-files",
   ]);
 
   // Update date at midnight PST
@@ -173,6 +182,13 @@ export default function DashboardPage() {
     const interval = setInterval(checkDate, 60000);
     return () => clearInterval(interval);
   }, [today]);
+
+  useEffect(() => {
+    const view = new URLSearchParams(window.location.search).get("view");
+    if (view) {
+      setCurrentView(view);
+    }
+  }, []);
 
   const personalCategories = categories?.filter((c: any) => c.type === "personal") || [];
   const professionalCategories = categories?.filter((c: any) => c.type === "professional") || [];
@@ -281,23 +297,41 @@ export default function DashboardPage() {
               </h2>
             </div>
             <AgentSquad />
-            <MorningMindset userId={convexUser._id} date={today} />
             {user?.id && <SurpriseCard clerkId={user.id} />}
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-2">
-              <HealthWidget userId={convexUser._id} />
-              <HabitTracker userId={convexUser._id} date={today} />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <MorningMindset userId={convexUser._id} date={today} />
+              <EveningReflection userId={convexUser._id} date={today} />
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <HabitTracker userId={convexUser._id} date={today} />
+              <HealthWidget userId={convexUser._id} />
+            </div>
+            <div className="grid gap-6 lg:grid-cols-2">
               <FiveToThrive userId={convexUser._id} date={today} />
               <QuickWinsCard userId={convexUser._id} date={today} />
             </div>
-            <EveningReflection userId={convexUser._id} date={today} />
+            <DailyCommandCenter userId={convexUser._id} date={today} />
             <DailyHandwritingPad key={today} userId={convexUser._id} date={today} />
           </div>
         );
 
       case "weekly":
         return <WeeklyView userId={convexUser._id} />;
+
+      case "monthly":
+        return (
+          <MonthlyRPMView
+            categories={categories || []}
+            onEditCategory={handleEditCategory}
+            onViewCategory={(id) => {
+              const category = categories?.find((cat: any) => cat._id === id);
+              setCurrentView(`${category?.type || "personal"}-category-${id}`);
+            }}
+          />
+        );
+
+      case "time":
+        return <TimeDashboardView userId={convexUser._id} />;
 
       case "personal-overview":
         return (
@@ -368,172 +402,19 @@ export default function DashboardPage() {
         );
       
       case "agent-scout":
-        return (
-          <div className="space-y-6 p-6">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🔍</span>
-              <div>
-                <h1 className="text-2xl font-bold">Scout</h1>
-                <p className="text-gray-500">Operations Agent</p>
-              </div>
-              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-lg font-semibold text-blue-400">Operations</p>
-                  <p className="text-xs text-gray-500 mt-1">Registrations, rosters, scheduling, compliance</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Schedule</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-sm">Heartbeat: 8am, 11am, 2pm, 5pm</p>
-                  <p className="text-xs text-gray-500 mt-1">Night Shift: 2 AM (growth tasks)</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Recent Work</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-sm">Spring League parent emails</p>
-                  <p className="text-xs text-gray-500 mt-1">Coach cert tracking</p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="h-[calc(100vh-380px)]">
-              <AgentHuddle initialChannel="aspire-ops" />
-            </div>
-          </div>
-        );
+        return <AgentProfileView agentId="scout" />;
       
       case "agent-maven":
-        return (
-          <div className="space-y-6 p-6">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">📣</span>
-              <div>
-                <h1 className="text-2xl font-bold">Maven</h1>
-                <p className="text-gray-500">Marketing Agent</p>
-              </div>
-              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-lg font-semibold text-purple-400">Marketing</p>
-                  <p className="text-xs text-gray-500 mt-1">Content creation, social media, research</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Schedule</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-sm">Daily: 7:30am content, 9am research</p>
-                  <p className="text-xs text-gray-500 mt-1">Night Shift: 2 AM (growth tasks)</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Output</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-sm">Content Pipeline drafts</p>
-                  <p className="text-xs text-gray-500 mt-1">Reddit/X engagement</p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="h-[calc(100vh-380px)]">
-              <AgentHuddle initialChannel="hta-launch" />
-            </div>
-          </div>
-        );
+        return <AgentProfileView agentId="maven" />;
+
+      case "agent-hermes":
+        return <AgentProfileView agentId="hermes" />;
       
       case "agent-compass":
-        return (
-          <div className="space-y-6 p-6">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🧭</span>
-              <div>
-                <h1 className="text-2xl font-bold">Compass</h1>
-                <p className="text-gray-500">Anthony&apos;s AI Companion</p>
-              </div>
-              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-lg font-semibold text-amber-400">Anthony&apos;s Companion</p>
-                  <p className="text-xs text-gray-500 mt-1">Helps with learning, projects, and daily habits</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Chat</CardTitle></CardHeader>
-                <CardContent>
-                  <a href="https://t.me/CompassAspireBot" target="_blank" rel="noopener noreferrer" 
-                     className="text-blue-400 hover:text-blue-300 flex items-center gap-2">
-                    <span>@CompassAspireBot</span>
-                    <span className="text-xs">↗</span>
-                  </a>
-                  <p className="text-xs text-gray-500 mt-1">Telegram (Anthony&apos;s account)</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Schedule</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-sm">6 PM Daily Habit Check-in</p>
-                  <p className="text-xs text-gray-500 mt-1">Heartbeat every 15 min</p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="h-[calc(100vh-380px)]">
-              <AgentHuddle initialChannel="family" />
-            </div>
-          </div>
-        );
+        return <AgentProfileView agentId="compass" />;
       
       case "agent-james":
-        return (
-          <div className="space-y-6 p-6">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🎮</span>
-              <div>
-                <h1 className="text-2xl font-bold">James</h1>
-                <p className="text-gray-500">Roma&apos;s AI Companion</p>
-              </div>
-              <span className="ml-auto px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">● Live</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Role</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-lg font-semibold text-pink-400">Roma&apos;s Companion</p>
-                  <p className="text-xs text-gray-500 mt-1">Helps with learning, creativity, and projects</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Chat</CardTitle></CardHeader>
-                <CardContent>
-                  <a href="https://t.me/JamesAspireBot" target="_blank" rel="noopener noreferrer" 
-                     className="text-blue-400 hover:text-blue-300 flex items-center gap-2">
-                    <span>@JamesAspireBot</span>
-                    <span className="text-xs">↗</span>
-                  </a>
-                  <p className="text-xs text-gray-500 mt-1">Telegram (Roma&apos;s account)</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Current Project</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-sm text-amber-400">🎯 Roma&apos;s Spelling App</p>
-                  <p className="text-xs text-gray-500 mt-1">Design phase - gathering Roma&apos;s preferences</p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="h-[calc(100vh-380px)]">
-              <AgentHuddle initialChannel="family" />
-            </div>
-          </div>
-        );
+        return <AgentProfileView agentId="james" />;
 
       // Legacy views
       case "agent-ideas":
@@ -602,6 +483,9 @@ export default function DashboardPage() {
       case "memory-panel":
         return <MemoryPanelView userId={convexUser._id} />;
 
+      case "knowledge-files":
+        return <KnowledgeFilesView userId={convexUser._id} />;
+
       case "engagement-habits":
         return (
           <AgentWorkflowShell
@@ -633,7 +517,10 @@ export default function DashboardPage() {
         return <FamilyMeetingDashboard userId={convexUser._id} section="games" />;
 
       case "finance":
-        return <FinanceView />;
+        return <FinanceView userId={convexUser._id} />;
+
+      case "tickets":
+        return <TicketsView />;
 
       case "home-remodel":
         return <HomeRemodelView userId={convexUser._id} />;
@@ -652,6 +539,8 @@ export default function DashboardPage() {
       // HTA views
       case "hta-overview":
         return <HTAOverview userId={convexUser._id} onNavigate={setCurrentView} />;
+      case "hta-worldcup":
+        return <HTAWorldCupView />;
       case "hta-gtm":
         return <HTASubView userId={convexUser._id} subProject="gtm" title="GTM Timeline" description="Launch milestones, key dates & GTM strategy" />;
       case "hta-product":
@@ -701,6 +590,10 @@ export default function DashboardPage() {
         return <HomeschoolDailyView userId={convexUser._id} />;
       case "homeschool-progress":
         return <HomeschoolProgressViewNew userId={convexUser._id} />;
+      case "homeschool-summer":
+        return <HomeschoolSummerView userId={convexUser._id} />;
+      case "homeschool-health":
+        return <HomeschoolHealthView userId={convexUser._id} />;
       case "homeschool-resources":
         return <HomeschoolResourcesView />;
       case "homeschool-schedule":
@@ -741,7 +634,7 @@ export default function DashboardPage() {
         onViewChange={setCurrentView} 
       />
 
-      <div className="lg:pl-64 min-h-screen bg-black">
+      <div className="lg:pl-64 min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           {!standaloneSurfaceViews.has(currentView) ? (
             <div className="mb-8">
