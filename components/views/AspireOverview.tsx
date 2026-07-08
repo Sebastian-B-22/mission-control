@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProjectTaskList } from "@/components/ProjectTaskList";
-import { ArrowRight, Calendar } from "lucide-react";
+import { WorkSurfaceEmptyState, WorkSurfacePageHeader, WorkSurfaceStatCard } from "@/components/work-surface";
+import { ArrowRight, Calendar, CheckCircle2 } from "lucide-react";
 
 interface AspireOverviewProps {
   userId: Id<"users">;
@@ -118,43 +119,37 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       label: "Families in CRM",
       value: familyStats?.totalFamilies ?? "-",
       sub: "Parent and player records",
-      tone: "border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/28 via-violet-500/12 to-slate-950",
-      labelTone: "text-fuchsia-100/90",
+      tone: "accent" as const,
     },
     {
       label: "Agoura Spring",
       value: agouraSpringCount,
       sub: agouraSpringCountIsStale ? "Live CRM count" : "Registrations tracked",
-      tone: "border-rose-400/35 bg-gradient-to-br from-rose-500/28 via-red-500/12 to-slate-950",
-      labelTone: "text-rose-100/90",
+      tone: "danger" as const,
     },
     {
       label: "Pali Spring",
       value: paliSpringCount,
       sub: paliSpringCountIsStale ? "Live CRM count" : "Registrations tracked",
-      tone: "border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950",
-      labelTone: "text-amber-100/90",
+      tone: "brand" as const,
     },
     {
       label: "Camp registrations",
       value: campRegistrationsTracked || countsMap.camps || 0,
       sub: campLaneStats.length ? "Across active camp lanes" : "Camp pipeline tracked",
-      tone: "border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-slate-950",
-      labelTone: "text-emerald-100/90",
+      tone: "success" as const,
     },
     {
       label: "Open tasks",
       value: openTasks.length,
       sub: "Across Aspire operations",
-      tone: "border-cyan-400/35 bg-gradient-to-br from-cyan-500/26 via-sky-500/12 to-slate-950",
-      labelTone: "text-cyan-100/90",
+      tone: "info" as const,
     },
     {
       label: "Needs attention",
       value: urgentTasks.length,
       sub: urgentTasks.length === 0 ? "No active fire right now" : `${springTaskCount} spring, ${campTaskCount} camp`,
-      tone: "border-violet-400/35 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-slate-950",
-      labelTone: "text-violet-100/90",
+      tone: urgentTasks.length === 0 ? "success" as const : "warning" as const,
     },
   ];
 
@@ -165,9 +160,9 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-families",
       buttonLabel: "Open Family CRM",
       eyebrow: "People system",
-      tone: "border-fuchsia-400/30 bg-gradient-to-br from-fuchsia-500/24 via-violet-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(217,70,239,0.08)]",
+      tone: "border-fuchsia-400/30 bg-gradient-to-br from-fuchsia-500/24 via-violet-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(217,70,239,0.08)]",
       badgeTone: "border-fuchsia-400/30 bg-fuchsia-500/18 text-fuchsia-100",
-      statTone: "border-fuchsia-400/20 bg-slate-950/40 text-fuchsia-50",
+      statTone: "border-fuchsia-400/20 bg-zinc-950/40 text-fuchsia-50",
       stats: familyStats
         ? [
             `${familyStats.totalFamilies} total families`,
@@ -183,9 +178,9 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-spring",
       buttonLabel: "Open Spring Ops",
       eyebrow: "Live roster pressure",
-      tone: "border-rose-400/30 bg-gradient-to-br from-rose-500/26 via-orange-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(251,113,133,0.08)]",
+      tone: "border-rose-400/30 bg-gradient-to-br from-rose-500/26 via-orange-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(251,113,133,0.08)]",
       badgeTone: "border-rose-400/30 bg-rose-500/18 text-rose-100",
-      statTone: "border-rose-400/20 bg-slate-950/40 text-rose-50",
+      statTone: "border-rose-400/20 bg-zinc-950/40 text-rose-50",
       stats: [
         `${agouraSpringCount} Agoura ${agouraSpringCountIsStale ? "live" : "registration"} count`,
         `${paliSpringCount} Pali ${paliSpringCountIsStale ? "live" : "registration"} count`,
@@ -197,9 +192,9 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-coach-hub",
       buttonLabel: "Open Coach Staffing",
       eyebrow: "Coverage + compliance",
-      tone: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
+      tone: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
       badgeTone: "border-cyan-400/30 bg-cyan-500/18 text-cyan-100",
-      statTone: "border-cyan-400/20 bg-slate-950/40 text-cyan-50",
+      statTone: "border-cyan-400/20 bg-zinc-950/40 text-cyan-50",
       stats: [
         `${springTaskCount} spring-linked tasks`,
         `${campTaskCount} camp-linked tasks`,
@@ -211,9 +206,9 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
       view: "aspire-camps",
       buttonLabel: "Open Camps + Mini Camp",
       eyebrow: "Week-by-week delivery",
-      tone: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/26 via-teal-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
+      tone: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/26 via-teal-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
       badgeTone: "border-emerald-400/30 bg-emerald-500/18 text-emerald-100",
-      statTone: "border-emerald-400/20 bg-slate-950/40 text-emerald-50",
+      statTone: "border-emerald-400/20 bg-zinc-950/40 text-emerald-50",
       stats: campLaneStats.length
         ? campLaneStats.map(
             (region) => `${region.regionLabel}: ${region.configuredWeekCount}/${region.weekCount} weeks, ${region.totalRegistered} registered`
@@ -224,27 +219,27 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Aspire Operations</h1>
-          <p className="text-muted-foreground mt-1 max-w-3xl">
-            This should work like an operating cockpit. CRM, registrations, rosters, staffing, and tasks each need their own lane.
-          </p>
-        </div>
-        <Badge variant="outline" className="w-fit text-sm px-3 py-1">
+      <WorkSurfacePageHeader
+        title="Aspire Operations"
+        description="CRM, registrations, rosters, staffing, and tasks each have their own lane."
+        action={(
+          <Badge variant="outline" className="w-fit px-3 py-1 text-sm">
           {openTasks.length} open Aspire task{openTasks.length === 1 ? "" : "s"}
-        </Badge>
-      </div>
+          </Badge>
+        )}
+      />
 
-      <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(245,158,11,0.04)]">
+      <Card className="border-line bg-surface-0 shadow-[0_0_40px_rgba(245,158,11,0.04)]">
         <CardContent className="p-4 md:p-5">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {metricCards.map((card) => (
-              <div key={card.label} className={`rounded-2xl border p-4 ${card.tone}`}>
-                <div className={`text-[11px] uppercase tracking-[0.18em] ${card.labelTone}`}>{card.label}</div>
-                <div className="mt-2 text-3xl font-semibold text-white">{card.value}</div>
-                <div className="mt-1 text-sm text-zinc-300">{card.sub}</div>
-              </div>
+              <WorkSurfaceStatCard
+                key={card.label}
+                label={card.label}
+                value={card.value}
+                description={card.sub}
+                tone={card.tone}
+              />
             ))}
           </div>
         </CardContent>
@@ -259,7 +254,12 @@ export function AspireOverview({ userId, onNavigate }: AspireOverviewProps) {
         </CardHeader>
         <CardContent>
           {urgentTasks.length === 0 ? (
-            <div className="rounded-xl border border-white/8 bg-black/25 p-4 text-sm text-zinc-200">No open Aspire tasks right now. Nice.</div>
+            <WorkSurfaceEmptyState
+              icon={<CheckCircle2 className="h-6 w-6" />}
+              title="No open Aspire tasks right now"
+              description="The next priorities will surface here when there is something active to sort."
+              className="min-h-[120px]"
+            />
           ) : (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {urgentTasks.map((task: any) => (

@@ -54,14 +54,14 @@ const ROOM_STATUS_BG: Record<string, string> = {
   "not-started": "bg-zinc-950 border-zinc-800 text-zinc-100",
   "planning": "bg-blue-950/50 border-blue-700/40 text-blue-100",
   "in-progress": "bg-amber-950/40 border-amber-700/40 text-amber-100",
-  "done": "bg-green-950/40 border-green-700/40 text-green-100",
+  "done": "bg-emerald-950/40 border-emerald-700/40 text-emerald-100",
 };
 
 const ROOM_STATUS_BADGE: Record<string, string> = {
   "not-started": "bg-zinc-600 text-white",
   "planning": "bg-blue-600 text-white",
   "in-progress": "bg-amber-500 text-white",
-  "done": "bg-green-600 text-white",
+  "done": "bg-emerald-600 text-white",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -77,7 +77,7 @@ const TASK_STATUS_COLORS: Record<string, string> = {
   "idea": "bg-purple-950/40 text-purple-100 border-purple-700/40",
   "planned": "bg-blue-950/40 text-blue-100 border-blue-700/40",
   "in-progress": "bg-amber-950/40 text-amber-100 border-amber-700/40",
-  "done": "bg-green-950/40 text-green-100 border-green-700/40",
+  "done": "bg-emerald-950/40 text-emerald-100 border-emerald-700/40",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -199,7 +199,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
     id: "declutter",
     title: "Declutter",
     description: "May-June: clear Roma’s room/closets, move dental cabinets, prep estate sale, and remove what does not sell.",
-    cardClass: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
+    cardClass: "border-cyan-400/30 bg-gradient-to-br from-cyan-500/24 via-sky-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]",
     titleClass: "text-cyan-100",
     textClass: "text-cyan-200/80",
     buttonClass: "border-cyan-400/15 hover:bg-cyan-500/10",
@@ -208,7 +208,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
     id: "decisions",
     title: "Lock the big decisions",
     description: "July: start kitchen cabinet work, decide counters, measure stained glass panels, and lock the next renovation sequence.",
-    cardClass: "border-amber-400/30 bg-gradient-to-br from-amber-500/24 via-orange-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(251,191,36,0.08)]",
+    cardClass: "border-amber-400/30 bg-gradient-to-br from-amber-500/24 via-orange-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(251,191,36,0.08)]",
     titleClass: "text-amber-100",
     textClass: "text-amber-200/80",
     buttonClass: "border-amber-400/15 hover:bg-amber-500/10",
@@ -217,7 +217,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
     id: "source",
     title: "Source, quote, fund",
     description: "August-October: master bath, front bath, window pricing, clear-glass panel replacement, and funding decisions.",
-    cardClass: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/24 via-teal-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
+    cardClass: "border-emerald-400/30 bg-gradient-to-br from-emerald-500/24 via-teal-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]",
     titleClass: "text-emerald-100",
     textClass: "text-emerald-200/80",
     buttonClass: "border-emerald-400/15 hover:bg-emerald-500/10",
@@ -226,7 +226,7 @@ const MOVE_IN_OBJECTIVE_BLUEPRINT = [
     id: "pack",
     title: "Pack + move",
     description: "November-January: clear shed and sunroom, slow transition, personal touches, and final artwork placement.",
-    cardClass: "border-violet-400/30 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-slate-950 shadow-[0_0_0_1px_rgba(167,139,250,0.08)]",
+    cardClass: "border-violet-400/30 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-zinc-950 shadow-[0_0_0_1px_rgba(167,139,250,0.08)]",
     titleClass: "text-violet-100",
     textClass: "text-violet-200/80",
     buttonClass: "border-violet-400/15 hover:bg-violet-500/10",
@@ -640,42 +640,42 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
       label: "Rooms",
       value: `${stats?.roomsComplete || 0}/${stats?.roomsTotal || 0}`,
       sub: "Rooms mapped for move-in",
-      tone: "border-cyan-400/35 bg-gradient-to-br from-cyan-500/28 via-sky-500/12 to-slate-950",
+      tone: "border-cyan-400/35 bg-gradient-to-br from-cyan-500/28 via-sky-500/12 to-zinc-950",
       labelTone: "text-cyan-100/90",
     },
     {
       label: "Tasks",
       value: `${stats?.tasksByStatus.done || 0}/${stats?.tasksTotal || 0}`,
       sub: "Completed vs total tasks",
-      tone: "border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-slate-950",
+      tone: "border-amber-400/35 bg-gradient-to-br from-amber-500/28 via-orange-500/12 to-zinc-950",
       labelTone: "text-amber-100/90",
     },
     {
       label: "Active",
       value: stats?.tasksByStatus.inProgress || 0,
       sub: "Currently in motion",
-      tone: "border-rose-400/35 bg-gradient-to-br from-rose-500/28 via-red-500/12 to-slate-950",
+      tone: "border-rose-400/35 bg-gradient-to-br from-rose-500/28 via-red-500/12 to-zinc-950",
       labelTone: "text-rose-100/90",
     },
     {
       label: "Ideas",
       value: stats?.ideasTotal || 0,
       sub: "Still sitting in the queue",
-      tone: "border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/24 via-violet-500/12 to-slate-950",
+      tone: "border-fuchsia-400/35 bg-gradient-to-br from-fuchsia-500/24 via-violet-500/12 to-zinc-950",
       labelTone: "text-fuchsia-100/90",
     },
     {
       label: "Budget",
       value: `$${totalEstimated.toLocaleString()}`,
       sub: "Estimated across rooms + tasks",
-      tone: "border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-slate-950",
+      tone: "border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/12 to-zinc-950",
       labelTone: "text-emerald-100/90",
     },
     {
       label: "Spent",
       value: `$${totalSpent.toLocaleString()}`,
       sub: `${daysUntilMove} days until move`,
-      tone: "border-violet-400/35 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-slate-950",
+      tone: "border-violet-400/35 bg-gradient-to-br from-violet-500/24 via-indigo-500/12 to-zinc-950",
       labelTone: "text-violet-100/90",
     },
   ];
@@ -837,7 +837,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                     </div>
                   ) : null}
                 </div>
-                <Badge className={objective.isComplete ? "bg-green-600 text-white" : "bg-black/30 text-zinc-100 border border-white/10"}>
+                <Badge className={objective.isComplete ? "bg-emerald-600 text-white" : "bg-black/30 text-zinc-100 border border-white/10"}>
                   {objective.completedCount}/{objective.totalCount}
                 </Badge>
               </div>
@@ -859,7 +859,7 @@ export function HomeRemodelView({ userId }: { userId: Id<"users"> }) {
                       key={milestone._id}
                       className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-sm transition-all ${
                         milestone.completed
-                          ? "border-green-700/40 bg-green-950/40 text-green-100"
+                          ? "border-emerald-700/40 bg-emerald-950/40 text-emerald-100"
                           : isPast
                           ? "border-red-700/40 bg-red-950/40 text-red-100"
                           : `bg-black/28 text-zinc-100 ${objective.buttonClass}`

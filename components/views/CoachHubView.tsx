@@ -25,6 +25,7 @@ import {
   Folder,
   File
 } from "lucide-react";
+import { WorkSurfacePageHeader, WorkSurfaceStatCard } from "@/components/work-surface";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -88,6 +89,23 @@ interface Resource {
   region?: string;
 }
 
+interface CoachHubEvent {
+  id: string;
+  title: string;
+  startTime: number;
+  endTime?: number;
+  location?: string;
+  tags: string[];
+  counts: {
+    going: number;
+    maybe: number;
+    notGoing: number;
+  };
+  going: string[];
+  maybe: string[];
+  notGoing: string[];
+}
+
 interface CoachHubData {
   coaches: Coach[];
   posts: Post[];
@@ -100,7 +118,7 @@ interface CoachHubData {
     byAgeGroup: Record<string, Record<string, Resource[]>>;
     other: Resource[];
   };
-  events: any[];
+  events: CoachHubEvent[];
   summary: {
     totalCoaches: number;
     certsExpired: number;
@@ -112,11 +130,64 @@ interface CoachHubData {
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
+type WeekendStaffingStatus = "confirmed" | "asked" | "unavailable" | "unknown";
+
+type SeasonalWeekendStaff = {
+  name: string;
+  shortName: string;
+  phone: string;
+  usualLocation: string;
+  status: WeekendStaffingStatus;
+  note: string;
+};
+
 const COACH_HUB_API = "https://ideal-hummingbird-117.convex.site";
 const COACH_HUB_URL = "https://coach-hub-three.vercel.app";
 const API_KEY = "sk-sebastian-coach-hub-2026";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+const PALI_REGULAR_STAFF = ["Pete", "Mphatso", "Louis", "Josh"];
+
+const WEEKEND_STAFFING_TARGETS = {
+  Pali: 4,
+  Agoura: 6,
+};
+
+const SEASONAL_WEEKEND_STAFF: SeasonalWeekendStaff[] = [
+  {
+    name: "Marco Martir",
+    shortName: "Marco",
+    phone: "+1 (818) 212-9896",
+    usualLocation: "Either / usually Agoura",
+    status: "asked" as const,
+    note: "Asked via Pali Quo line today",
+  },
+  {
+    name: "Reagan",
+    shortName: "Reagan",
+    phone: "+1 (805) 276-5425",
+    usualLocation: "Agoura",
+    status: "asked" as const,
+    note: "Asked via Pali Quo line today",
+  },
+  {
+    name: "Elijah",
+    shortName: "Elijah",
+    phone: "+1 (661) 447-0858",
+    usualLocation: "Agoura",
+    status: "asked" as const,
+    note: "Asked via Pali Quo line today",
+  },
+  {
+    name: "Ernesto",
+    shortName: "Ernesto",
+    phone: "+1 (213) 294-1567",
+    usualLocation: "Either / usually Agoura",
+    status: "unavailable" as const,
+    note: "Not available this Saturday or next",
+  },
+];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -156,6 +227,57 @@ function isCurrentWeek(timestamp: number): boolean {
   return timestamp === monday.getTime();
 }
 
+function nextSaturdayLabel(offsetWeeks = 0): string {
+  const now = new Date();
+  const saturday = new Date(now);
+  const daysUntilSaturday = (6 - now.getDay() + 7) % 7;
+  saturday.setDate(now.getDate() + daysUntilSaturday + offsetWeeks * 7);
+  return saturday.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+}
+
+function staffingStatusClass(status: WeekendStaffingStatus) {
+  if (status === "confirmed") return "border-green-500 text-green-400";
+  if (status === "asked") return "border-amber-500 text-amber-400";
+  if (status === "unavailable") return "border-red-500 text-red-400";
+  return "border-gray-500 text-gray-400";
+}
+
+function staffingStatusLabel(status: WeekendStaffingStatus) {
+  if (status === "confirmed") return "Confirmed";
+  if (status === "asked") return "Asked";
+  if (status === "unavailable") return "Unavailable";
+  return "Unknown";
+}
+
+function isWeekendEvent(event: CoachHubEvent) {
+  const day = new Date(event.startTime).getDay();
+  return day === 0 || day === 6;
+}
+
+function eventRegion(event: CoachHubEvent): "Pali" | "Agoura" | "General" {
+  const haystack = `${event.title} ${(event.tags || []).join(" ")} ${event.location || ""}`.toLowerCase();
+  if (haystack.includes("pali") || haystack.includes("palisades")) return "Pali";
+  if (haystack.includes("agoura") || haystack.includes("region 4") || haystack.includes("brookside")) return "Agoura";
+  return "General";
+}
+
+function eventTarget(event: CoachHubEvent) {
+  const region = eventRegion(event);
+  if (region === "Pali") return WEEKEND_STAFFING_TARGETS.Pali;
+  if (region === "Agoura") return WEEKEND_STAFFING_TARGETS.Agoura;
+  return 4;
+}
+
+function formatEventTime(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 const AGE_GROUP_ORDER = ["5U", "6U", "7U", "8U", "9U", "10U", "11U", "12U", "14U"];
 
 // ─── Post Detail Modal ────────────────────────────────────────────────────
@@ -191,7 +313,7 @@ function PostDetail({ post, onClose }: { post: Post; onClose: () => void }) {
 
           {post.nonViewers.length > 0 && (
             <div className="mb-4 p-3 bg-amber-950/30 rounded-lg">
-              <div className="text-sm font-medium text-amber-400 mb-1">Haven't viewed:</div>
+              <div className="text-sm font-medium text-amber-400 mb-1">Haven&apos;t viewed:</div>
               <div className="text-sm text-gray-300">{post.nonViewers.join(", ")}</div>
             </div>
           )}
@@ -278,17 +400,25 @@ export function CoachHubView() {
     );
   }
 
+  const coachNames = data.coaches.map((coach) => coach.name);
+  const regularPaliStaff = PALI_REGULAR_STAFF.map((name) => ({
+    name,
+    source: coachNames.some((coachName) => coachName.toLowerCase().includes(name.toLowerCase()))
+      ? "Coach Hub"
+      : "Usual Pali staff",
+  }));
+  const confirmedSeasonal = SEASONAL_WEEKEND_STAFF.filter((coach) => coach.status === "confirmed").length;
+  const askedSeasonal = SEASONAL_WEEKEND_STAFF.filter((coach) => coach.status === "asked").length;
+  const availablePaliRegulars = regularPaliStaff.length;
+  const weekendEvents = data.events.filter(isWeekendEvent).slice(0, 6);
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <span>⚽</span> Coach Hub
-          </h1>
-          <p className="text-muted-foreground mt-1">Staff management, schedule & curriculum</p>
-        </div>
-        <div className="flex gap-2">
+      <WorkSurfacePageHeader
+        title="Coach Hub"
+        description="Staff management, schedule coverage, certifications, and curriculum."
+        action={(
+          <div className="flex flex-wrap gap-2">
           <Button onClick={fetchData} variant="outline" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
@@ -299,75 +429,64 @@ export function CoachHubView() {
               Open App
             </a>
           </Button>
-        </div>
-      </div>
+          </div>
+        )}
+      />
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-blue-400" />
-              <div>
-                <p className="text-2xl font-bold">{data.summary.totalCoaches}</p>
-                <p className="text-xs text-gray-400">Coaches</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className={`border-gray-800 ${data.summary.certsExpired > 0 ? 'bg-red-950/30' : 'bg-gray-900'}`}>
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-400" />
-              <div>
-                <p className="text-2xl font-bold text-red-400">{data.summary.certsExpired}</p>
-                <p className="text-xs text-gray-400">Expired</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className={`border-gray-800 ${data.summary.certsExpiring > 0 ? 'bg-amber-950/30' : 'bg-gray-900'}`}>
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-amber-400" />
-              <div>
-                <p className="text-2xl font-bold text-amber-400">{data.summary.certsExpiring}</p>
-                <p className="text-xs text-gray-400">Expiring</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <MessageSquare className="h-5 w-5 text-green-400" />
-              <div>
-                <p className="text-2xl font-bold">{data.summary.recentComments}</p>
-                <p className="text-xs text-gray-400">Comments (24h)</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-purple-400" />
-              <div>
-                <p className="text-2xl font-bold">{data.summary.upcomingEvents}</p>
-                <p className="text-xs text-gray-400">Events</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="border-zinc-800 bg-gradient-to-br from-zinc-950 via-black to-zinc-950 shadow-[0_0_40px_rgba(99,102,241,0.05)]">
+        <CardContent className="p-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            <WorkSurfaceStatCard
+              label="Coaches"
+              value={data.summary.totalCoaches}
+              tone="info"
+              size="compact"
+              icon={<Users className="h-5 w-5 text-cyan-200" />}
+              className="border-cyan-400/35 bg-gradient-to-br from-cyan-500/28 via-sky-500/14 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Expired"
+              value={data.summary.certsExpired}
+              description="Certs"
+              tone="danger"
+              size="compact"
+              icon={<AlertTriangle className="h-5 w-5 text-rose-200" />}
+              className="border-rose-400/35 bg-gradient-to-br from-rose-500/30 via-red-500/14 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Expiring"
+              value={data.summary.certsExpiring}
+              description="Soon"
+              tone="warning"
+              size="compact"
+              icon={<Clock className="h-5 w-5 text-amber-200" />}
+              className="border-amber-400/35 bg-gradient-to-br from-amber-500/30 via-orange-500/14 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Comments"
+              value={data.summary.recentComments}
+              description="Last 24h"
+              tone="success"
+              size="compact"
+              icon={<MessageSquare className="h-5 w-5 text-emerald-200" />}
+              className="border-emerald-400/35 bg-gradient-to-br from-emerald-500/28 via-teal-500/14 to-slate-950"
+            />
+            <WorkSurfaceStatCard
+              label="Events"
+              value={data.summary.upcomingEvents}
+              description="Upcoming"
+              tone="accent"
+              size="compact"
+              icon={<Calendar className="h-5 w-5 text-violet-200" />}
+              className="border-violet-400/35 bg-gradient-to-br from-violet-500/28 via-fuchsia-500/12 to-slate-950"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="grid grid-cols-4 w-full max-w-xl">
+        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
           <TabsTrigger value="posts">
             <Bell className="h-4 w-4 mr-2" />
             Posts
@@ -375,6 +494,10 @@ export function CoachHubView() {
           <TabsTrigger value="staff">
             <Users className="h-4 w-4 mr-2" />
             Staff
+          </TabsTrigger>
+          <TabsTrigger value="weekend">
+            <Calendar className="h-4 w-4 mr-2" />
+            Weekend
           </TabsTrigger>
           <TabsTrigger value="schedule">
             <Calendar className="h-4 w-4 mr-2" />
@@ -486,6 +609,200 @@ export function CoachHubView() {
                           SS
                         </Badge>
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Weekend Staffing Tab */}
+        <TabsContent value="weekend" className="mt-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-gray-900 border-gray-800">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-green-400" />
+                  <div>
+                    <p className="text-2xl font-bold">{availablePaliRegulars}/{WEEKEND_STAFFING_TARGETS.Pali}</p>
+                    <p className="text-xs text-gray-400">Pali regular target</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-amber-400" />
+                  <div>
+                    <p className="text-2xl font-bold">{askedSeasonal}</p>
+                    <p className="text-xs text-gray-400">Seasonal replies pending</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-3">
+                  <Users className="h-5 w-5 text-blue-400" />
+                  <div>
+                    <p className="text-2xl font-bold">{confirmedSeasonal}</p>
+                    <p className="text-xs text-gray-400">Seasonal confirmed</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center justify-between">
+                <span>Upcoming Coach Hub weekend events</span>
+                <Badge variant="outline" className="border-blue-500 text-blue-400">
+                  Coach Hub source
+                </Badge>
+              </CardTitle>
+              <p className="text-sm text-gray-400">
+                This pulls upcoming Saturday/Sunday events from Coach Hub and flags staffing gaps against the weekend targets.
+              </p>
+            </CardHeader>
+            <CardContent>
+              {weekendEvents.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No upcoming weekend events are exposed by Coach Hub yet.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {weekendEvents.map((event) => {
+                    const target = eventTarget(event);
+                    const gap = Math.max(target - event.counts.going, 0);
+                    const region = eventRegion(event);
+                    return (
+                      <div key={event.id} className={`p-3 rounded-lg border ${gap > 0 ? "border-amber-900/70 bg-amber-950/15" : "border-green-900/70 bg-green-950/10"}`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="font-medium">{event.title}</div>
+                            <div className="text-xs text-gray-400">
+                              {formatEventTime(event.startTime)}{event.location ? ` · ${event.location}` : ""}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className={gap > 0 ? "border-amber-500 text-amber-400" : "border-green-500 text-green-400"}>
+                            {gap > 0 ? `${gap} gap` : "Covered"}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 mt-3 text-sm">
+                          <div className="rounded bg-gray-800/50 p-2">
+                            <div className="text-xs text-gray-400">Region / target</div>
+                            <div>{region} · {target}</div>
+                          </div>
+                          <div className="rounded bg-gray-800/50 p-2">
+                            <div className="text-xs text-gray-400">Going</div>
+                            <div>{event.counts.going}</div>
+                          </div>
+                          <div className="rounded bg-gray-800/50 p-2">
+                            <div className="text-xs text-gray-400">Maybe</div>
+                            <div>{event.counts.maybe}</div>
+                          </div>
+                        </div>
+                        {(event.going.length > 0 || event.maybe.length > 0) && (
+                          <div className="mt-3 text-xs text-gray-400 space-y-1">
+                            {event.going.length > 0 && <div>Going: {event.going.join(", ")}</div>}
+                            {event.maybe.length > 0 && <div>Maybe: {event.maybe.join(", ")}</div>}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center justify-between">
+                <span>Saturday staffing - {nextSaturdayLabel()}</span>
+                <Badge variant="outline" className="border-purple-500 text-purple-400">
+                  Weekend only
+                </Badge>
+              </CardTitle>
+              <p className="text-sm text-gray-400">
+                Weekday practices stay handled in Coach Hub. This is the extra coverage layer for Saturday events.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-medium text-sm text-gray-300">Regular Pali staff pulled from Coach Hub context</h3>
+                  <Badge variant="outline" className="border-green-500 text-green-400">
+                    Target {WEEKEND_STAFFING_TARGETS.Pali}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {regularPaliStaff.map((coach) => (
+                    <div key={coach.name} className="p-3 rounded-lg bg-gray-800/50 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{coach.name}</div>
+                        <div className="text-xs text-gray-400">{coach.source}</div>
+                      </div>
+                      <Badge variant="outline" className="border-gray-500 text-gray-300">Regular</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-medium text-sm text-gray-300">Seasonal / flex staff availability</h3>
+                  <Badge variant="outline" className="border-blue-500 text-blue-400">
+                    Agoura target {WEEKEND_STAFFING_TARGETS.Agoura}
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  {SEASONAL_WEEKEND_STAFF.map((coach) => (
+                    <div key={coach.name} className="p-3 rounded-lg bg-gray-800/50 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-medium">{coach.name}</div>
+                        <div className="text-xs text-gray-400">{coach.usualLocation} · {coach.phone}</div>
+                        <div className="text-xs text-gray-500 mt-1">{coach.note}</div>
+                      </div>
+                      <Badge variant="outline" className={staffingStatusClass(coach.status)}>
+                        {staffingStatusLabel(coach.status)}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-amber-900/60 bg-amber-950/20 p-3 text-sm text-amber-100">
+                <div className="font-medium mb-1">Next improvement</div>
+                <div className="text-amber-100/80">
+                  Add one-click “ask seasonal staff” and auto-update these statuses from Pali Quo replies, so this page becomes the Saturday staffing command center.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-lg">Next Saturday preview - {nextSaturdayLabel(1)}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {SEASONAL_WEEKEND_STAFF.map((coach) => {
+                  const status = coach.name === "Ernesto" ? "unavailable" : "unknown";
+                  return (
+                    <div key={`${coach.name}-next`} className="p-3 rounded-lg bg-gray-800/50 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{coach.name}</div>
+                        <div className="text-xs text-gray-400">{coach.name === "Ernesto" ? "Already said not available next Saturday" : "Needs follow-up if needed"}</div>
+                      </div>
+                      <Badge variant="outline" className={staffingStatusClass(status)}>
+                        {staffingStatusLabel(status)}
+                      </Badge>
                     </div>
                   );
                 })}
