@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   Calendar,
+  Clock3,
   Target,
   Home,
   Briefcase,
@@ -21,6 +22,7 @@ import {
   Users,
   DollarSign,
   Hammer,
+  Ticket,
 } from "lucide-react";
 import { SoccerBall } from "@/components/icons/SoccerBall";
 
@@ -125,6 +127,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
     "agent-huddle-ideas",
     "agent-huddle-overnight",
     "agent-huddle-joy-support",
+    "knowledge-files",
     "memory",
     "memory-panel",
   ]);
@@ -157,6 +160,16 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       view: "weekly",
     },
     {
+      name: "Monthly",
+      icon: Calendar,
+      view: "monthly",
+    },
+    {
+      name: "Time",
+      icon: Clock3,
+      view: "time",
+    },
+    {
       name: "Health",
       icon: Heart,
       view: "health",
@@ -175,12 +188,31 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       view: "homeschool-overview",
       expandable: true,
       section: "homeschool",
+      activeViews: [
+        "homeschool-overview",
+        "homeschool-progress",
+        "homeschool-daily",
+        "homeschool-schedule",
+        "homeschool-focus",
+        "homeschool-life-skills",
+        "homeschool-projects",
+        "homeschool-readaloud",
+        "homeschool-library",
+        "homeschool-games",
+        "homeschool-resources",
+        "homeschool-fieldtrips",
+        "homeschool-trips",
+        "homeschool-summer",
+        "homeschool-health",
+      ],
       children: [
         { name: "Progress", view: "homeschool-progress" },
         { name: "Daily", view: "homeschool-daily" },
         { name: "Weekly", view: "homeschool-schedule" },
         { name: "Monthly", view: "homeschool-focus" },
         { name: "Life Skills", view: "homeschool-life-skills" },
+        { name: "Summer Goals", view: "homeschool-summer" },
+        { name: "Health Habits", view: "homeschool-health" },
         { name: "Projects", view: "homeschool-projects" },
         { name: "Read Aloud List", view: "homeschool-readaloud" },
         { name: "Book Library", view: "homeschool-library" },
@@ -211,6 +243,11 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       name: "Finance",
       icon: DollarSign,
       view: "finance",
+    },
+    {
+      name: "Tickets",
+      icon: Ticket,
+      view: "tickets",
     },
     {
       name: "Home Remodel",
@@ -268,6 +305,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
       expandable: true,
       section: "hta",
       children: [
+        { name: "World Cup", view: "hta-worldcup" },
         { name: "GTM Timeline", view: "hta-gtm" },
         { name: "Product Dev", view: "hta-product" },
         { name: "Curriculum Dev", view: "hta-curriculum" },
@@ -292,6 +330,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { name: "Engagement", view: "engagement-habits" },
         { type: "label", name: "Admin" },
         { name: "Huddle", view: "agent-huddle-main", activeViews: ["agent-huddle-main", "agent-huddle-aspire-ops", "agent-huddle-hta-launch", "agent-huddle-family", "agent-huddle-ideas", "agent-huddle-overnight", "agent-huddle-joy-support"] },
+        { name: "Docs", view: "knowledge-files" },
         { name: "Telegram Bridge", view: "agent-hq" },
         { name: "AI Costs", view: "cost-tracker" },
         { name: "Memory Search", view: "memory" },
