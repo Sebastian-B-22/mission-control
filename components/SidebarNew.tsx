@@ -324,7 +324,7 @@ export function SidebarNew({ userId, currentView, onViewChange }: SidebarProps) 
         { type: "label", name: "Work" },
         { name: "Queue", view: "sebastian" },
         { name: "Ideas", view: "agent-ideas" },
-        { name: "Content", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
+        { name: "Content HQ", view: "content-pipeline", badge: reviewCount > 0 ? `${reviewCount} to review` : null },
         { name: "Emails & Texts", view: "email-drafts" },
         { name: "Training", view: "agent-learnings" },
         { name: "Engagement", view: "engagement-habits" },

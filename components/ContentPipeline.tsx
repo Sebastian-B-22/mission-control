@@ -20,6 +20,9 @@ import {
   X,
   ArrowRight,
   Layers3,
+  CalendarDays,
+  Library,
+  LayoutDashboard,
 } from "lucide-react";
 
 import {
@@ -69,7 +72,7 @@ function Linkify({ text }: { text: string }) {
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
-type ContentType = "x-post" | "email" | "blog" | "landing-page" | "other";
+type ContentType = "x-post" | "instagram-post" | "instagram-reel" | "youtube-video" | "youtube-short" | "email" | "blog" | "landing-page" | "other";
 type DisplayContentType = ContentType | "x-reply";
 type ContentStage = "idea" | "review" | "approved" | "published";
 type RejectReason = "too-salesy" | "off-brand" | "wrong-tone" | "factually-wrong" | "custom";
@@ -91,6 +94,9 @@ type ContentItem = {
   createdBy: string;
   assignedTo: string;
   notes?: string;
+  scheduledFor?: number;
+  contentPillar?: string;
+  campaign?: string;
   parentContentId?: Id<"contentPipeline">;
   rootContentId?: Id<"contentPipeline">;
   outputGroupId?: Id<"contentOutputGroups">;
@@ -114,6 +120,10 @@ const STAGES: { value: ContentStage; label: string; sublabel?: string; emoji: st
 const TYPE_CONFIG: Record<DisplayContentType, { label: string; emoji: string; badgeClass: string }> = {
   "x-post":       { label: "X Post",       emoji: "𝕏",  badgeClass: "border-sky-500/30 bg-sky-500/10 text-sky-300" },
   "x-reply":      { label: "X Reply",      emoji: "💬", badgeClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300" },
+  "instagram-post": { label: "Instagram", emoji: "◎", badgeClass: "border-pink-500/30 bg-pink-500/10 text-pink-300" },
+  "instagram-reel": { label: "IG Reel", emoji: "▶", badgeClass: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300" },
+  "youtube-video": { label: "YouTube", emoji: "▶", badgeClass: "border-red-500/30 bg-red-500/10 text-red-300" },
+  "youtube-short": { label: "YT Short", emoji: "▮", badgeClass: "border-red-500/30 bg-red-500/10 text-red-300" },
   "email":        { label: "Email",        emoji: "📧", badgeClass: "border-amber-500/30 bg-amber-500/10 text-amber-300" },
   "blog":         { label: "Blog",         emoji: "📝", badgeClass: "border-green-500/30 bg-green-500/10 text-green-300" },
   "landing-page": { label: "Landing Page", emoji: "🖥️", badgeClass: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
@@ -1149,6 +1159,9 @@ function AddContentDialog({
     stage: ContentStage;
     createdBy: string;
     notes?: string;
+    scheduledFor?: number;
+    contentPillar?: string;
+    campaign?: string;
   }) => void;
 }) {
   const [title, setTitle] = useState("");
@@ -1157,15 +1170,29 @@ function AddContentDialog({
   const [stage, setStage] = useState<ContentStage>("review");
   const [createdBy, setCreatedBy] = useState("sebastian");
   const [notes, setNotes] = useState("");
+  const [scheduledFor, setScheduledFor] = useState("");
+  const [contentPillar, setContentPillar] = useState("");
+  const [campaign, setCampaign] = useState("");
 
   const reset = () => {
     setTitle(""); setContent(""); setType("x-post");
     setStage("review"); setCreatedBy("sebastian"); setNotes("");
+    setScheduledFor(""); setContentPillar(""); setCampaign("");
   };
 
   const handleSave = () => {
     if (!title.trim() || !content.trim()) return;
-    onSave({ title: title.trim(), content: content.trim(), type, stage, createdBy, notes: notes.trim() || undefined });
+    onSave({
+      title: title.trim(),
+      content: content.trim(),
+      type,
+      stage,
+      createdBy,
+      notes: notes.trim() || undefined,
+      scheduledFor: scheduledFor ? new Date(`${scheduledFor}T09:00:00`).getTime() : undefined,
+      contentPillar: contentPillar.trim() || undefined,
+      campaign: campaign.trim() || undefined,
+    });
     reset();
     onClose();
   };
@@ -1206,6 +1233,10 @@ function AddContentDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="x-post">𝕏 X Post</SelectItem>
+                      <SelectItem value="instagram-post">◎ Instagram Post</SelectItem>
+                      <SelectItem value="instagram-reel">▶ Instagram Reel</SelectItem>
+                      <SelectItem value="youtube-video">▶ YouTube Video</SelectItem>
+                      <SelectItem value="youtube-short">▮ YouTube Short</SelectItem>
                       <SelectItem value="email">📧 Email</SelectItem>
                       <SelectItem value="blog">📝 Blog Post</SelectItem>
                       <SelectItem value="landing-page">🖥️ Landing Page</SelectItem>
@@ -1226,6 +1257,21 @@ function AddContentDialog({
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label className="text-zinc-300">Publish date</Label>
+                  <Input type="date" value={scheduledFor} onChange={(e) => setScheduledFor(e.target.value)} className={DIALOG_FIELD_CLASS} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-zinc-300">Content pillar</Label>
+                  <Input placeholder="Coach wisdom" value={contentPillar} onChange={(e) => setContentPillar(e.target.value)} className={DIALOG_FIELD_CLASS} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-zinc-300">Campaign</Label>
+                  <Input placeholder="Fall registration" value={campaign} onChange={(e) => setCampaign(e.target.value)} className={DIALOG_FIELD_CLASS} />
                 </div>
               </div>
 
@@ -1369,6 +1415,7 @@ function RequestChangesDialog({
 // ─── Main ContentPipeline Component ───────────────────────────────────────
 
 export function ContentPipeline() {
+  const [hqView, setHqView] = useState<"overview" | "calendar" | "pipeline" | "story-bank">("overview");
   const [typeFilter, setTypeFilter] = useState<ContentType | "all">("all");
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -1400,11 +1447,16 @@ export function ContentPipeline() {
   const approvedCount = byStage("approved").length;
   const publishedCount = byStage("published").length;
   const totalCount  = allItems.length;
+  const scheduledItems = allItems
+    .filter((item) => item.scheduledFor)
+    .sort((a, b) => (a.scheduledFor ?? 0) - (b.scheduledFor ?? 0));
+  const storyBankItems = allItems.filter((item) => item.stage === "idea");
 
   // Handlers
   const handleCreate = async (data: {
     title: string; content: string; type: ContentType;
     stage: ContentStage; createdBy: string; notes?: string;
+    scheduledFor?: number; contentPillar?: string; campaign?: string;
   }) => {
     await createContent({
       title: data.title,
@@ -1414,6 +1466,9 @@ export function ContentPipeline() {
       createdBy: data.createdBy,
       assignedTo: "corinne",
       notes: data.notes,
+      scheduledFor: data.scheduledFor,
+      contentPillar: data.contentPillar,
+      campaign: data.campaign,
     });
   };
 
@@ -1543,7 +1598,7 @@ export function ContentPipeline() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="max-w-3xl">
           <p className="text-sm text-muted-foreground">
-            Maven drops drafts here daily. <strong className="text-green-400">Approve</strong> auto-posts to @corinnebriers within 15 min. Reply targets still need manual posting, and failed posts stay visible until you handle them.
+            One home for Maven&apos;s ideas, stories, calendar, drafts, approvals, publishing, and results across X, Instagram, and YouTube.
           </p>
           <div className="mt-1 flex flex-wrap items-center gap-3">
             <span className="text-xs text-zinc-500">{totalCount} total</span>
@@ -1595,6 +1650,27 @@ export function ContentPipeline() {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-2">
+        {[
+          { value: "overview" as const, label: "Overview", icon: LayoutDashboard },
+          { value: "calendar" as const, label: "Calendar", icon: CalendarDays },
+          { value: "pipeline" as const, label: "Pipeline", icon: Layers3 },
+          { value: "story-bank" as const, label: "Story Bank", icon: Library },
+        ].map((view) => (
+          <button
+            key={view.value}
+            onClick={() => setHqView(view.value)}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
+              hqView === view.value ? "bg-amber-500 font-semibold text-black" : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+            )}
+          >
+            <view.icon className="h-4 w-4" />
+            {view.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-3">
         {[
           { label: "In review", value: reviewCount, icon: <Check className="h-3.5 w-3.5 text-amber-400" />, tone: "border-amber-500/20 bg-amber-500/5" },
@@ -1611,7 +1687,68 @@ export function ContentPipeline() {
         ))}
       </div>
 
-      <div className="space-y-4">
+      {hqView === "overview" && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="border-zinc-800 bg-zinc-950/80 lg:col-span-2">
+            <CardHeader><CardTitle className="text-base text-zinc-100">This week</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {scheduledItems.length === 0 ? (
+                <p className="text-sm text-zinc-500">No content scheduled yet. Add a publish date to start the calendar.</p>
+              ) : scheduledItems.slice(0, 7).map((item) => (
+                <button key={item._id} onClick={() => setSelectedItem(item)} className="flex w-full items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-black/20 px-3 py-3 text-left hover:border-zinc-700">
+                  <div>
+                    <div className="font-medium text-zinc-100">{item.title}</div>
+                    <div className="mt-1 text-xs text-zinc-500">{item.contentPillar || item.campaign || "Uncategorized"}</div>
+                  </div>
+                  <div className="text-right text-xs text-zinc-400">
+                    <div>{item.scheduledFor ? formatContentDate(item.scheduledFor) : ""}</div>
+                    <div className="mt-1">{TYPE_CONFIG[item.type]?.label}</div>
+                  </div>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+          <Card className="border-zinc-800 bg-zinc-950/80">
+            <CardHeader><CardTitle className="text-base text-zinc-100">Maven&apos;s focus</CardTitle></CardHeader>
+            <CardContent className="space-y-3 text-sm text-zinc-400">
+              <p>Turn one real Corinne story or voice note into a coordinated X, Instagram, and YouTube package.</p>
+              <p>Keep platform execution native - concise conversation on X, visual storytelling on Instagram, deeper teaching on YouTube.</p>
+              <p className="text-amber-300">{reviewCount} items need Corinne&apos;s review.</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {hqView === "calendar" && (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {scheduledItems.length === 0 ? (
+            <WorkSurfaceEmptyState icon={<CalendarDays className="h-5 w-5" />} title="No scheduled content" description="Add a publish date to a new content item and it will appear here." />
+          ) : scheduledItems.map((item) => (
+            <button key={item._id} onClick={() => setSelectedItem(item)} className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 text-left hover:border-zinc-700">
+              <div className="text-xs font-semibold uppercase tracking-wide text-amber-400">{item.scheduledFor ? formatContentDate(item.scheduledFor) : ""}</div>
+              <div className="mt-2 font-semibold text-zinc-100">{item.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Badge className={TYPE_CONFIG[item.type]?.badgeClass}>{TYPE_CONFIG[item.type]?.label}</Badge>
+                {item.campaign && <Badge variant="outline" className="border-zinc-700 text-zinc-400">{item.campaign}</Badge>}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {hqView === "story-bank" && (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {storyBankItems.map((item) => (
+            <button key={item._id} onClick={() => setSelectedItem(item)} className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 text-left hover:border-zinc-700">
+              <div className="text-xs uppercase tracking-wide text-zinc-500">{item.contentPillar || "Story / idea"}</div>
+              <div className="mt-2 font-semibold text-zinc-100">{item.title}</div>
+              <p className="mt-2 line-clamp-4 text-sm text-zinc-400">{item.content}</p>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {hqView === "pipeline" && <div className="space-y-4">
         <div className="space-y-4">
           {/* Type filter */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3">
@@ -1659,7 +1796,7 @@ export function ContentPipeline() {
             ))}
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Expanded content modal */}
       <ContentModal

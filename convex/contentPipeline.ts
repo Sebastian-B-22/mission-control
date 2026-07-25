@@ -4,7 +4,7 @@
  * Agents drop content drafts here. Corinne reviews and approves.
  *
  * Stages: idea → priority | later | needs-work → review → approved → published
- * Types:  x-post | x-reply | email | blog | landing-page | other
+ * Types: X, Instagram, YouTube, email, blog, landing page, or other
  */
 
 import { v } from "convex/values";
@@ -16,6 +16,10 @@ import { internal } from "./_generated/api";
 const CONTENT_TYPE = v.union(
   v.literal("x-post"),
   v.literal("x-reply"),
+  v.literal("instagram-post"),
+  v.literal("instagram-reel"),
+  v.literal("youtube-video"),
+  v.literal("youtube-short"),
   v.literal("email"),
   v.literal("blog"),
   v.literal("landing-page"),
@@ -99,6 +103,9 @@ export const createContent = mutation({
     createdBy: v.optional(v.string()),
     assignedTo: v.optional(v.string()),
     notes: v.optional(v.string()),
+    scheduledFor: v.optional(v.number()),
+    contentPillar: v.optional(v.string()),
+    campaign: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -111,6 +118,9 @@ export const createContent = mutation({
       createdBy: args.createdBy ?? "sebastian",
       assignedTo: args.assignedTo ?? "corinne",
       notes: args.notes,
+      scheduledFor: args.scheduledFor,
+      contentPillar: args.contentPillar,
+      campaign: args.campaign,
       createdAt: now,
       updatedAt: now,
       verificationStatus: initialStage === "review" ? "pending" : undefined,
@@ -162,6 +172,9 @@ export const updateContent = mutation({
     content: v.optional(v.string()),
     notes: v.optional(v.string()),
     type: v.optional(CONTENT_TYPE),
+    scheduledFor: v.optional(v.number()),
+    contentPillar: v.optional(v.string()),
+    campaign: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.id);
@@ -172,6 +185,9 @@ export const updateContent = mutation({
     if (args.content !== undefined) updates.content = args.content;
     if (args.notes !== undefined) updates.notes = args.notes;
     if (args.type !== undefined) updates.type = args.type;
+    if (args.scheduledFor !== undefined) updates.scheduledFor = args.scheduledFor;
+    if (args.contentPillar !== undefined) updates.contentPillar = args.contentPillar;
+    if (args.campaign !== undefined) updates.campaign = args.campaign;
 
     await ctx.db.patch(args.id, updates);
 
@@ -205,6 +221,9 @@ export const createContentInternal = internalMutation({
     createdBy: v.optional(v.string()),
     assignedTo: v.optional(v.string()),
     notes: v.optional(v.string()),
+    scheduledFor: v.optional(v.number()),
+    contentPillar: v.optional(v.string()),
+    campaign: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -217,6 +236,9 @@ export const createContentInternal = internalMutation({
       createdBy: args.createdBy ?? "sebastian",
       assignedTo: args.assignedTo ?? "corinne",
       notes: args.notes,
+      scheduledFor: args.scheduledFor,
+      contentPillar: args.contentPillar,
+      campaign: args.campaign,
       createdAt: now,
       updatedAt: now,
       verificationStatus: initialStage === "review" ? "pending" : undefined,

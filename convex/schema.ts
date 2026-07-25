@@ -326,6 +326,10 @@ export default defineSchema({
     type: v.union(
       v.literal("x-post"),
       v.literal("x-reply"),
+      v.literal("instagram-post"),
+      v.literal("instagram-reel"),
+      v.literal("youtube-video"),
+      v.literal("youtube-short"),
       v.literal("email"),
       v.literal("blog"),
       v.literal("landing-page"),
@@ -344,6 +348,9 @@ export default defineSchema({
     createdBy: v.string(),           // "sebastian" | "maven" | "scout"
     assignedTo: v.string(),          // "corinne" (who reviews)
     notes: v.optional(v.string()),   // Agent notes / Corinne feedback
+    scheduledFor: v.optional(v.number()),
+    contentPillar: v.optional(v.string()),
+    campaign: v.optional(v.string()),
     parentContentId: v.optional(v.id("contentPipeline")),
     rootContentId: v.optional(v.id("contentPipeline")),
     outputGroupId: v.optional(v.string()),
@@ -511,8 +518,14 @@ export default defineSchema({
     status: v.string(),
     createdAt: v.number(),
     paidAt: v.optional(v.number()),
+    refundedAt: v.optional(v.number()),
     paymentMethod: v.optional(v.string()),
     appliedPromoCode: v.optional(v.string()),
+    abandonedAt: v.optional(v.number()),
+    abandonmentReason: v.optional(v.string()),
+    recoveryStatus: v.optional(v.string()),
+    recoveryApprovalId: v.optional(v.id("approvalsQueue")),
+    recoveredAt: v.optional(v.number()),
   })
     .index("by_status", ["status"])
     .index("by_email", ["parent.email"])
@@ -651,6 +664,38 @@ export default defineSchema({
     notes: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_family", ["familyId"]),
+
+  familyMemoryItems: defineTable({
+    familyId: v.id("families"),
+    childId: v.optional(v.id("children")),
+    kind: v.union(
+      v.literal("context"),
+      v.literal("preference"),
+      v.literal("ops_note"),
+      v.literal("sensitive_issue"),
+      v.literal("credit_promise"),
+      v.literal("follow_up"),
+      v.literal("testimonial"),
+      v.literal("coach_note")
+    ),
+    visibility: v.union(v.literal("internal"), v.literal("outbound_safe")),
+    title: v.string(),
+    note: v.string(),
+    source: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    followUpNeeded: v.boolean(),
+    followUpStatus: v.optional(
+      v.union(v.literal("open"), v.literal("done"), v.literal("not_needed"))
+    ),
+    occurredAt: v.optional(v.number()),
+    createdBy: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_family", ["familyId"])
+    .index("by_child", ["childId"])
+    .index("by_family_visibility", ["familyId", "visibility"])
+    .index("by_follow_up", ["followUpNeeded", "followUpStatus"]),
 
   enrollments: defineTable({
     childId: v.id("children"),
@@ -1155,6 +1200,115 @@ export default defineSchema({
   })
     .index("by_date", ["date"])
     .index("by_date_kid", ["date", "kid"]),
+
+  // Personal learning map - Marble curriculum spine + family quests.
+  learningNodes: defineTable({
+    nodeId: v.string(),
+    source: v.union(v.literal("marble"), v.literal("family"), v.literal("aspire"), v.literal("custom")),
+    type: v.optional(v.string()),
+    subject: v.string(),
+    domain: v.string(),
+    name: v.string(),
+    description: v.string(),
+    ageRangeStart: v.number(),
+    ageRangeEnd: v.number(),
+    evidenceCriteria: v.array(v.string()),
+    assessmentPrompt: v.optional(v.string()),
+    standards: v.array(v.string()),
+    sourceUrl: v.string(),
+    licenseNotes: v.string(),
+    clusterSummary: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_node", ["nodeId"])
+    .index("by_source", ["source"])
+    .index("by_subject_domain", ["subject", "domain"])
+    .index("by_age_start", ["ageRangeStart"])
+    .searchIndex("search_learning_nodes", {
+      searchField: "name",
+      filterFields: ["source", "subject"],
+    }),
+
+  learningEdges: defineTable({
+    fromNodeId: v.string(),
+    toNodeId: v.string(),
+    relationship: v.union(v.literal("prerequisite"), v.literal("unlocks"), v.literal("related")),
+    strength: v.union(v.literal("hard"), v.literal("soft")),
+    reason: v.string(),
+    source: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_from", ["fromNodeId"])
+    .index("by_to", ["toNodeId"])
+    .index("by_source", ["source"])
+    .index("by_relationship", ["relationship"]),
+
+  quests: defineTable({
+    questId: v.string(),
+    learnerId: v.string(),
+    weekStart: v.string(),
+    theme: v.string(),
+    nodeIds: v.array(v.string()),
+    do: v.string(),
+    prove: v.string(),
+    reflect: v.string(),
+    status: v.union(v.literal("planned"), v.literal("active"), v.literal("done")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_quest", ["questId"])
+    .index("by_learner_week", ["learnerId", "weekStart"])
+    .index("by_status", ["status"]),
+
+  learnerNodeStatus: defineTable({
+    learnerId: v.string(),
+    nodeId: v.string(),
+    status: v.union(v.literal("future"), v.literal("needs_check"), v.literal("active"), v.literal("mastered"), v.literal("gap")),
+    confidence: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    lastReviewedAt: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    updatedAt: v.number(),
+  })
+    .index("by_learner_node", ["learnerId", "nodeId"])
+    .index("by_learner_status", ["learnerId", "status"])
+    .index("by_node", ["nodeId"]),
+
+  learningEvidence: defineTable({
+    evidenceId: v.string(),
+    learnerId: v.string(),
+    questId: v.string(),
+    nodeIds: v.array(v.string()),
+    date: v.string(),
+    evidenceType: v.union(
+      v.literal("photo"),
+      v.literal("video"),
+      v.literal("writing"),
+      v.literal("explanation"),
+      v.literal("project"),
+      v.literal("observation"),
+    ),
+    artifactUrl: v.optional(v.string()),
+    observer: v.string(),
+    summary: v.string(),
+    masterySignal: v.union(v.literal("gap"), v.literal("partial"), v.literal("strong")),
+    createdAt: v.number(),
+  })
+    .index("by_learner_date", ["learnerId", "date"])
+    .index("by_quest", ["questId"])
+    .index("by_learner_quest", ["learnerId", "questId"]),
+
+  weeklyLearningPlans: defineTable({
+    learnerId: v.string(),
+    weekStart: v.string(),
+    theme: v.string(),
+    questIds: v.array(v.string()),
+    reviewNotes: v.optional(v.string()),
+    nextThemeIdeas: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_learner_week", ["learnerId", "weekStart"]),
 
   // ─── Registration Counters ──────────────────────────────────────────────
   // Live registration counts updated by Scout's nightly Jotform sync

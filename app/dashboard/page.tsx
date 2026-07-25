@@ -440,8 +440,8 @@ export default function DashboardPage() {
       case "content-pipeline":
         return (
           <AgentWorkflowShell
-            title="Content"
-            description="Review agent-generated drafts, approve what is ready, and keep the pipeline moving toward publication."
+            title="Content HQ"
+            description="Plan, review, approve, and track Maven's content across X, Instagram, and YouTube."
             icon={<PenSquare className="h-5 w-5 text-amber-500" />}
             stageLabel="Review"
             activeStep="content"

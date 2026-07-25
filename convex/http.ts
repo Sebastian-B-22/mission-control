@@ -17,7 +17,7 @@ import { internal, api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
 // Re-export type so TypeScript can use it
-type ContentType = "x-post" | "x-reply" | "email" | "blog" | "landing-page" | "other";
+type ContentType = "x-post" | "x-reply" | "instagram-post" | "instagram-reel" | "youtube-video" | "youtube-short" | "email" | "blog" | "landing-page" | "other";
 type ContentStage = "idea" | "priority" | "later" | "needs-work" | "review" | "approved" | "published" | "dismissed";
 
 const http = httpRouter();
@@ -416,7 +416,7 @@ http.route({
     if (!content) return errorResponse("Missing required field: content");
 
     const type = body.type as string;
-    const validTypes: ContentType[] = ["x-post", "x-reply", "email", "blog", "landing-page", "other"];
+    const validTypes: ContentType[] = ["x-post", "x-reply", "instagram-post", "instagram-reel", "youtube-video", "youtube-short", "email", "blog", "landing-page", "other"];
     if (!type || !validTypes.includes(type as ContentType)) {
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
@@ -436,6 +436,9 @@ http.route({
         createdBy: (body.createdBy as string) ?? "sebastian",
         assignedTo: (body.assignedTo as string) ?? "corinne",
         notes: body.notes as string | undefined,
+        scheduledFor: typeof body.scheduledFor === "number" ? body.scheduledFor : undefined,
+        contentPillar: body.contentPillar as string | undefined,
+        campaign: body.campaign as string | undefined,
       });
 
       return jsonResponse({ success: true, contentId }, 201);
@@ -528,7 +531,7 @@ http.route({
       return errorResponse(`Invalid stage. Must be: ${validStages.join(" | ")}`);
     }
 
-    const validTypes: ContentType[] = ["x-post", "x-reply", "email", "blog", "landing-page", "other"];
+    const validTypes: ContentType[] = ["x-post", "x-reply", "instagram-post", "instagram-reel", "youtube-video", "youtube-short", "email", "blog", "landing-page", "other"];
     if (type && !validTypes.includes(type as ContentType)) {
       return errorResponse(`Invalid type. Must be: ${validTypes.join(" | ")}`);
     }
