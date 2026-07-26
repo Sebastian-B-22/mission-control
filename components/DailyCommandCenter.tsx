@@ -63,6 +63,8 @@ export function DailyCommandCenter({ userId, date }: { userId: Id<"users">; date
   const [addEventOpen, setAddEventOpen] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventTime, setEventTime] = useState("12:00");
+  const [eventEndTime, setEventEndTime] = useState("13:00");
+  const [eventArea, setEventArea] = useState("Work");
   const [eventLocation, setEventLocation] = useState("");
   const [savingEvent, setSavingEvent] = useState(false);
   const { startMs, endMs } = useMemo(() => dateBounds(date), [date]);
@@ -125,12 +127,15 @@ export function DailyCommandCenter({ userId, date }: { userId: Id<"users">; date
     setSavingEvent(true);
     try {
       const start = new Date(date + "T" + (eventTime || "12:00") + ":00");
-      const end = new Date(start);
-      end.setMinutes(end.getMinutes() + 60);
+      let end = new Date(date + "T" + (eventEndTime || "13:00") + ":00");
+      if (end <= start) {
+        end = new Date(start);
+        end.setMinutes(end.getMinutes() + 60);
+      }
       await createManualEvent({
         userId,
-        title,
-        location: eventLocation.trim() || undefined,
+        title: `${eventArea}: ${title}`,
+        location: eventLocation.trim() || `Time block · ${eventArea}`,
         startMs: start.getTime(),
         endMs: end.getTime(),
         allDay: false,
@@ -155,16 +160,16 @@ export function DailyCommandCenter({ userId, date }: { userId: Id<"users">; date
               </span>
               <Dialog open={addEventOpen} onOpenChange={setAddEventOpen}>
                 <DialogTrigger asChild>
-                  <Button type="button" variant="ghost" size="icon-xs" aria-label="Add daily calendar note">
+                  <Button type="button" variant="ghost" size="icon-xs" aria-label="Add day block">
                     <Plus className="h-3 w-3" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-sm">
                   <form onSubmit={handleAddEvent} className="space-y-4">
                     <DialogHeader>
-                      <DialogTitle>Add Daily Calendar Note</DialogTitle>
+                      <DialogTitle>Plan a Day Block</DialogTitle>
                       <DialogDescription>
-                        Add a plan or thing-that-happened to this day without touching Google Calendar.
+                        Compartmentalize the day into Homeschool, Household, Work, Body, or Family time.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-2">
@@ -173,19 +178,41 @@ export function DailyCommandCenter({ userId, date }: { userId: Id<"users">; date
                         id="daily-event-title"
                         value={eventTitle}
                         onChange={(event) => setEventTitle(event.target.value)}
-                        placeholder="Farm tour"
+                        placeholder="Deep work, lessons, workout..."
                         autoComplete="off"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <Label htmlFor="daily-event-time">Time</Label>
+                        <Label htmlFor="daily-event-time">Start</Label>
                         <Input
                           id="daily-event-time"
                           type="time"
                           value={eventTime}
                           onChange={(event) => setEventTime(event.target.value)}
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="daily-event-end-time">End</Label>
+                        <Input
+                          id="daily-event-end-time"
+                          type="time"
+                          value={eventEndTime}
+                          onChange={(event) => setEventEndTime(event.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="daily-event-area">Life area</Label>
+                        <select
+                          id="daily-event-area"
+                          value={eventArea}
+                          onChange={(event) => setEventArea(event.target.value)}
+                          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                        >
+                          {["Homeschool", "Household", "Work", "Body", "Family"].map((area) => (
+                            <option key={area} value={area}>{area}</option>
+                          ))}
+                        </select>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="daily-event-location">Location</Label>
@@ -200,14 +227,14 @@ export function DailyCommandCenter({ userId, date }: { userId: Id<"users">; date
                     </div>
                     <DialogFooter>
                       <Button type="submit" disabled={savingEvent || !eventTitle.trim()}>
-                        {savingEvent ? "Adding..." : "Add"}
+                        {savingEvent ? "Adding..." : "Add block"}
                       </Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>
             </CardTitle>
-            <CardDescription>What compresses the day.</CardDescription>
+            <CardDescription>Your appointments and compartmentalized day blocks.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 px-4">
             {pressureEvents.length > 0 ? pressureEvents.map((event: any) => {
