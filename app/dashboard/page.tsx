@@ -159,6 +159,16 @@ export default function DashboardPage() {
   };
 
   const [today, setToday] = useState(() => getPSTDate());
+  const [fiveToThriveDate, setFiveToThriveDate] = useState(() => getPSTDate());
+  const tomorrow = (() => {
+    const date = new Date(`${today}T12:00:00`);
+    date.setDate(date.getDate() + 1);
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
+  })();
   const standaloneSurfaceViews = new Set([
     "sebastian",
     "agent-ideas",
@@ -295,6 +305,20 @@ export default function DashboardPage() {
                   timeZone: 'America/Los_Angeles'
                 })}
               </h2>
+              <div className="flex gap-2">
+                <Button
+                  variant={fiveToThriveDate === today ? "default" : "outline"}
+                  onClick={() => setFiveToThriveDate(today)}
+                >
+                  Today&apos;s plan
+                </Button>
+                <Button
+                  variant={fiveToThriveDate === tomorrow ? "default" : "outline"}
+                  onClick={() => setFiveToThriveDate(tomorrow)}
+                >
+                  Plan tomorrow
+                </Button>
+              </div>
             </div>
             <AgentSquad />
             {user?.id && <SurpriseCard clerkId={user.id} />}
@@ -307,7 +331,7 @@ export default function DashboardPage() {
               <HealthWidget userId={convexUser._id} />
             </div>
             <div className="grid gap-6 lg:grid-cols-2">
-              <FiveToThrive userId={convexUser._id} date={today} />
+              <FiveToThrive userId={convexUser._id} date={fiveToThriveDate} />
               <QuickWinsCard userId={convexUser._id} date={today} />
             </div>
             <DailyCommandCenter userId={convexUser._id} date={today} />
