@@ -94,9 +94,9 @@ const summerCampExpenseRows: ProgramExpense[] = [
   { expenseKey: "summer-2026-corinne", label: "Corinne", category: "Owner labor", amount: 1750, notes: "5 days x $350" },
   { expenseKey: "summer-2026-noe", label: "Noe", category: "Coach payroll", amount: 500, notes: "4 days x $125" },
   { expenseKey: "summer-2026-field", label: "Field / facility", category: "Operations", amount: 0 },
-  { expenseKey: "summer-2026-equipment", label: "Activity supplies", category: "Operations", amount: 875, notes: "$125/week x 7 weeks for clay, rocket balloons, and miscellaneous supplies" },
-  { expenseKey: "summer-2026-popsicles", label: "Daily popsicles", category: "Food", amount: 437.5, notes: "$12.50/day midpoint x 35 camp days" },
-  { expenseKey: "summer-2026-food", label: "Weekly coach lunch", category: "Food", amount: 350, notes: "$50/week x 7 weeks" },
+  { expenseKey: "summer-2026-equipment", label: "Activity supplies", category: "Operations", amount: 500, notes: "$125/week x 4 Agoura weeks; no activity expense for the small Pali week" },
+  { expenseKey: "summer-2026-popsicles", label: "Daily popsicles", category: "Food", amount: 312.5, notes: "$12.50/day midpoint x 25 camp days" },
+  { expenseKey: "summer-2026-food", label: "Weekly coach lunch", category: "Food", amount: 250, notes: "$50/week x 5 total camp weeks" },
   { expenseKey: "summer-2026-insurance", label: "Insurance / permits", category: "Operations", amount: 0 },
   { expenseKey: "summer-2026-marketing", label: "Marketing", category: "Marketing", amount: 0 },
   { expenseKey: "summer-2026-processing", label: "Payment processing fees", category: "Fees", amount: 0 },
@@ -310,7 +310,7 @@ function CampProfitModel({ userId }: FinanceViewProps) {
         </div>
 
         <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-100">
-          Food and supply estimates cover all 7 camp weeks. Update any amount below as the actual receipts come in.
+          Food estimates cover 5 total camp weeks. Activity supplies cover the 4 Agoura weeks only, with no activity expense assigned to the small Pali week.
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-zinc-800">
