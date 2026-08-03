@@ -86,6 +86,23 @@ const springLeagueExpenseRows: ProgramExpense[] = [
   { expenseKey: "spring-2026-owner-time", label: "Corinne owner time", category: "True profit layer", amount: 0 },
 ];
 
+const summerCampExpenseRows: ProgramExpense[] = [
+  { expenseKey: "summer-2026-gio", label: "Gio", category: "Coach payroll", amount: 4250, notes: "Week 1: $1,250; Weeks 2-4: $1,000 each" },
+  { expenseKey: "summer-2026-pete", label: "Pete", category: "Coach payroll", amount: 1400, notes: "4 days x $350" },
+  { expenseKey: "summer-2026-willow", label: "Willow", category: "Coach payroll", amount: 1800, notes: "Weeks 2-4: $600 per week" },
+  { expenseKey: "summer-2026-joey", label: "Joey", category: "Coach payroll", amount: 450, notes: "1 day x $250 + $200 Pops Command stipend" },
+  { expenseKey: "summer-2026-corinne", label: "Corinne", category: "Owner labor", amount: 1750, notes: "5 days x $350" },
+  { expenseKey: "summer-2026-noe", label: "Noe", category: "Coach payroll", amount: 600, notes: "4 days x $150 - rate needs confirmation ($125 or $150)" },
+  { expenseKey: "summer-2026-field", label: "Field / facility", category: "Operations", amount: 0 },
+  { expenseKey: "summer-2026-equipment", label: "Equipment and supplies", category: "Operations", amount: 0 },
+  { expenseKey: "summer-2026-food", label: "Snacks, water, and staff food", category: "Operations", amount: 0 },
+  { expenseKey: "summer-2026-insurance", label: "Insurance / permits", category: "Operations", amount: 0 },
+  { expenseKey: "summer-2026-marketing", label: "Marketing", category: "Marketing", amount: 0 },
+  { expenseKey: "summer-2026-processing", label: "Payment processing fees", category: "Fees", amount: 0 },
+  { expenseKey: "summer-2026-refunds", label: "Refunds not reflected in revenue", category: "Adjustments", amount: 0 },
+  { expenseKey: "summer-2026-other", label: "Other camp expenses", category: "Other", amount: 0 },
+];
+
 const springLeaguePrice = 299;
 
 const staffHoursSheet = {
@@ -214,6 +231,127 @@ function PersonalTab() {
   );
 }
 
+function CampProfitModel({ userId }: FinanceViewProps) {
+  const campStats = useQuery(api.camp.getStats, {});
+  const storedExpenses = useQuery(api.finance.getProgramExpenses, {
+    userId,
+    program: "camps",
+    season: "summer-2026",
+  }) || [];
+  const setProgramExpense = useMutation(api.finance.setProgramExpense);
+
+  const expenseByKey = useMemo(
+    () => new Map(storedExpenses.map((expense: any) => [expense.expenseKey, expense])),
+    [storedExpenses]
+  );
+  const expenseRows = summerCampExpenseRows.map((row) => {
+    const stored = expenseByKey.get(row.expenseKey) as any;
+    return { ...row, amount: stored?.amount ?? row.amount, notes: stored?.notes ?? row.notes };
+  });
+  const payrollTotal = expenseRows
+    .filter((row) => row.category === "Coach payroll" || row.category === "Owner labor")
+    .reduce((sum, row) => sum + row.amount, 0);
+  const otherExpenseTotal = expenseRows
+    .filter((row) => row.category !== "Coach payroll" && row.category !== "Owner labor")
+    .reduce((sum, row) => sum + row.amount, 0);
+  const revenue = campStats?.totalRevenue ?? 0;
+  const profit = revenue - payrollTotal - otherExpenseTotal;
+  const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
+
+  function updateExpense(row: ProgramExpense, rawValue: string) {
+    const amount = Number(rawValue || 0);
+    void setProgramExpense({
+      userId,
+      entity: "aspire",
+      program: "camps",
+      season: "summer-2026",
+      expenseKey: row.expenseKey,
+      label: row.label,
+      category: row.category,
+      amount: Number.isFinite(amount) ? amount : 0,
+      notes: row.notes,
+    });
+  }
+
+  return (
+    <Card className="border-zinc-800 bg-zinc-950">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-cyan-300" />
+          Summer Camp Profit Tracker
+        </CardTitle>
+        <p className="mt-1 text-sm text-zinc-400">
+          Live paid registration revenue minus coach payroll and every other camp cost.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 p-3">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-emerald-100/80">Paid revenue</p>
+            <p className="mt-1.5 font-mono text-lg font-semibold text-white">{formatCurrency(revenue)}</p>
+            <p className="mt-1 text-xs text-zinc-400">{campStats?.totalKids ?? 0} campers · live from registrations</p>
+          </div>
+          <div className="rounded-lg border border-cyan-500/25 bg-cyan-500/10 p-3">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-cyan-100/80">Camp payroll</p>
+            <p className="mt-1.5 font-mono text-lg font-semibold text-white">{formatCurrency(payrollTotal)}</p>
+            <p className="mt-1 text-xs text-zinc-400">Includes Corinne and Joey so profit is honest.</p>
+          </div>
+          <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-amber-100/80">Other costs</p>
+            <p className="mt-1.5 font-mono text-lg font-semibold text-white">{formatCurrency(otherExpenseTotal)}</p>
+            <p className="mt-1 text-xs text-zinc-400">Add facility, supplies, fees, and other costs below.</p>
+          </div>
+          <div className={`rounded-lg border p-3 ${profit >= 0 ? "border-violet-500/25 bg-violet-500/10" : "border-rose-500/25 bg-rose-500/10"}`}>
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-violet-100/80">Actual profit</p>
+            <p className="mt-1.5 font-mono text-lg font-semibold text-white">{formatCurrency(profit)}</p>
+            <p className="mt-1 text-xs text-zinc-400">{margin.toFixed(1)}% margin with entered costs</p>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+          Noe is currently calculated at $150/day. Confirm whether his rate is $125 or $150 and edit his total below if needed.
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-zinc-800">
+          <table className="w-full min-w-[760px] text-left text-sm">
+            <thead className="border-b border-zinc-800 bg-zinc-950/80 text-xs uppercase text-zinc-500">
+              <tr>
+                <th className="px-3 py-2 font-medium">Expense</th>
+                <th className="px-3 py-2 font-medium">Bucket</th>
+                <th className="px-3 py-2 font-medium">Amount</th>
+                <th className="px-3 py-2 font-medium">Basis / note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenseRows.map((row) => (
+                <tr key={row.expenseKey} className="border-b border-zinc-900 last:border-0">
+                  <td className="px-3 py-3 font-medium text-white">{row.label}</td>
+                  <td className="px-3 py-3 text-zinc-300">{row.category}</td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-zinc-500">$</span>
+                      <Input
+                        key={`${row.expenseKey}-${row.amount}`}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        defaultValue={row.amount || ""}
+                        onBlur={(event) => updateExpense(row, event.target.value)}
+                        className="h-8 w-32 border-zinc-700 bg-zinc-950 font-mono text-zinc-100"
+                      />
+                    </div>
+                  </td>
+                  <td className="px-3 py-3 text-zinc-400">{row.notes || "Enter when known"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function BusinessTab({ userId }: FinanceViewProps) {
   const registrationCounts = useQuery(api.registrations.getAllCounts) || [];
   const storedExpenses = useQuery(api.finance.getProgramExpenses, {
@@ -259,6 +397,8 @@ function BusinessTab({ userId }: FinanceViewProps) {
 
   return (
     <div className="space-y-4">
+      <CampProfitModel userId={userId} />
+
       <Card className="border-zinc-800 bg-zinc-950">
         <CardHeader className="pb-3">
           <div>
