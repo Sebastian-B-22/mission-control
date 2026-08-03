@@ -98,7 +98,7 @@ const summerCampExpenseRows: ProgramExpense[] = [
   { expenseKey: "summer-2026-popsicles", label: "Daily popsicles", category: "Food", amount: 312.5, notes: "$12.50/day midpoint x 25 camp days" },
   { expenseKey: "summer-2026-food", label: "Weekly coach lunch", category: "Food", amount: 250, notes: "$50/week x 5 total camp weeks" },
   { expenseKey: "summer-2026-insurance", label: "Insurance / permits", category: "Operations", amount: 0 },
-  { expenseKey: "summer-2026-marketing", label: "Marketing", category: "Marketing", amount: 0 },
+  { expenseKey: "summer-2026-marketing", label: "Marketing / flyers", category: "Marketing", amount: 0, notes: "Track flyers and other camp promotion here for future camps" },
   { expenseKey: "summer-2026-processing", label: "Payment processing fees", category: "Fees", amount: 0 },
   { expenseKey: "summer-2026-refunds", label: "Refunds not reflected in revenue", category: "Adjustments", amount: 0 },
   { expenseKey: "summer-2026-other", label: "Other camp expenses", category: "Other", amount: 0 },
