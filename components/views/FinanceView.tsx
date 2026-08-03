@@ -232,7 +232,7 @@ function PersonalTab() {
   );
 }
 
-function CampProfitModel({ userId }: FinanceViewProps) {
+export function CampProfitModel({ userId }: FinanceViewProps) {
   const campStats = useQuery(api.camp.getStats, {});
   const storedExpenses = useQuery(api.finance.getProgramExpenses, {
     userId,

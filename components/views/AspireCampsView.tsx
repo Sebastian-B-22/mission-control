@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Id } from "@/convex/_generated/dataModel";
 import { WorkSurfacePageHeader, WorkSurfaceStatCard } from "@/components/work-surface";
+import { CampProfitModel } from "@/components/views/FinanceView";
 
 interface AspireCampsViewProps {
   userId: Id<"users">;
@@ -257,6 +258,7 @@ export function AspireCampsView({ userId }: AspireCampsViewProps) {
         </CardContent>
       </Card>
 
+      <CampProfitModel userId={userId} />
 
       <details className="group rounded-xl border border-orange-500/20 bg-orange-500/[0.04]">
         <summary className="list-none cursor-pointer p-6">
