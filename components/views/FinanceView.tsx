@@ -92,10 +92,11 @@ const summerCampExpenseRows: ProgramExpense[] = [
   { expenseKey: "summer-2026-willow", label: "Willow", category: "Coach payroll", amount: 1800, notes: "Weeks 2-4: $600 per week" },
   { expenseKey: "summer-2026-joey", label: "Joey", category: "Coach payroll", amount: 450, notes: "1 day x $250 + $200 Pops Command stipend" },
   { expenseKey: "summer-2026-corinne", label: "Corinne", category: "Owner labor", amount: 1750, notes: "5 days x $350" },
-  { expenseKey: "summer-2026-noe", label: "Noe", category: "Coach payroll", amount: 600, notes: "4 days x $150 - rate needs confirmation ($125 or $150)" },
+  { expenseKey: "summer-2026-noe", label: "Noe", category: "Coach payroll", amount: 500, notes: "4 days x $125" },
   { expenseKey: "summer-2026-field", label: "Field / facility", category: "Operations", amount: 0 },
-  { expenseKey: "summer-2026-equipment", label: "Equipment and supplies", category: "Operations", amount: 0 },
-  { expenseKey: "summer-2026-food", label: "Snacks, water, and staff food", category: "Operations", amount: 0 },
+  { expenseKey: "summer-2026-equipment", label: "Activity supplies", category: "Operations", amount: 875, notes: "$125/week x 7 weeks for clay, rocket balloons, and miscellaneous supplies" },
+  { expenseKey: "summer-2026-popsicles", label: "Daily popsicles", category: "Food", amount: 437.5, notes: "$12.50/day midpoint x 35 camp days" },
+  { expenseKey: "summer-2026-food", label: "Weekly coach lunch", category: "Food", amount: 350, notes: "$50/week x 7 weeks" },
   { expenseKey: "summer-2026-insurance", label: "Insurance / permits", category: "Operations", amount: 0 },
   { expenseKey: "summer-2026-marketing", label: "Marketing", category: "Marketing", amount: 0 },
   { expenseKey: "summer-2026-processing", label: "Payment processing fees", category: "Fees", amount: 0 },
@@ -308,8 +309,8 @@ function CampProfitModel({ userId }: FinanceViewProps) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
-          Noe is currently calculated at $150/day. Confirm whether his rate is $125 or $150 and edit his total below if needed.
+        <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-100">
+          Food and supply estimates cover all 7 camp weeks. Update any amount below as the actual receipts come in.
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-zinc-800">
