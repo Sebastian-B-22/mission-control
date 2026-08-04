@@ -233,6 +233,7 @@ function PersonalTab() {
 }
 
 export function CampProfitModel({ userId }: FinanceViewProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const campStats = useQuery(api.camp.getStats, {});
   const storedExpenses = useQuery(api.finance.getProgramExpenses, {
     userId,
@@ -276,16 +277,31 @@ export function CampProfitModel({ userId }: FinanceViewProps) {
 
   return (
     <Card className="border-zinc-800 bg-zinc-950">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-cyan-300" />
-          Summer Camp Profit Tracker
-        </CardTitle>
-        <p className="mt-1 text-sm text-zinc-400">
-          Live paid registration revenue minus coach payroll and every other camp cost.
-        </p>
+      <CardHeader className={isExpanded ? "pb-3" : "p-4"}>
+        <button
+          type="button"
+          onClick={() => setIsExpanded((expanded) => !expanded)}
+          aria-expanded={isExpanded}
+          aria-controls="summer-camp-profit-details"
+          className="flex w-full items-center justify-between gap-3 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+        >
+          <span>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-cyan-300" />
+              Summer Camp Profit Tracker
+            </CardTitle>
+            {isExpanded && (
+              <span className="mt-1 block text-sm font-normal text-zinc-400">
+                Live paid registration revenue minus coach payroll and every other camp cost.
+              </span>
+            )}
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-zinc-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+          />
+        </button>
       </CardHeader>
-      <CardContent className="space-y-4">
+      {isExpanded && <CardContent id="summer-camp-profit-details" className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 p-3">
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-emerald-100/80">Paid revenue</p>
@@ -348,7 +364,7 @@ export function CampProfitModel({ userId }: FinanceViewProps) {
             </tbody>
           </table>
         </div>
-      </CardContent>
+      </CardContent>}
     </Card>
   );
 }
